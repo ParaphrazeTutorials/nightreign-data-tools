@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Nightreign Effect Tool</title>
+
+    <!-- One-line: makes things look good -->
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="../styles/site.css">
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+
+  <body>
+<main class="app-shell app-grid">
+
+  <!-- HEADER -->
+  <header class="hero">
+  <h2>The Round Table Codex</h2>
+  <h1>Reliquary</h1>
+  <p>
+    A relic compatibility tool for Nightreign, built as part of the Round Table Codex.
+  </p>
+</header>
+
+<nav class="tool-nav">
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="./index.html" class="active">Reliquary</a></li>
+    <li><a href="#" aria-disabled="true">Menagerie</a></li>
+  </ul>
+</nav>
+
+
+
+<section class="instructions">
+  <details open>
+    <summary><strong>Instructions</strong></summary>
+    <p style="margin-top: 0.75rem;">
+      Select a relic in <strong>Effect A</strong>. The <strong>Effect B</strong> list will automatically exclude any relics
+      that share a Compatibility ID with your selection.
+    </p>
+    <ul>
+      <li><strong>Compatible</strong> = no shared Compatibility IDs</li>
+      <li><strong>Incompatible</strong> = at least one shared Compatibility ID</li>
+      <li>Use the Details panel to see which Compatibility IDs caused a conflict (later)</li>
+    </ul>
+  </details>
+</section>
+
+
+
+  <!-- MAIN CONTENT -->
+  <section class="main-grid">
+
+    <!-- LEFT COLUMN (3 rows) -->
+    <section class="left-column">
+
+    <article id="effect1-selection">
+        <h3>Effect 1</h3>
+        <label>
+        Choose an Effect
+        <select id="effect1">
+            <option value="">— Effect 1 —</option>
+            <option value="fire">Fire Relic</option>
+            <option value="frost">Frost Relic</option>
+            <option value="lightning">Lightning Relic</option>
+        </select>
+        </label>
+    </article>
+
+    <article id="effect2-selection">
+        <h3>Effect 2</h3>
+        <label>
+        Choose an Effect
+        <select id="effect2">
+            <option value="">— Effect 2 —</option>
+            <option value="fire">Fire Relic</option>
+            <option value="frost">Frost Relic</option>
+            <option value="lightning">Lightning Relic</option>
+        </select>
+        </label>
+    </article>
+
+    <article id="effect3-selection">
+        <h3>Effect 3</h3>
+        <label>
+        Choose an Effect
+        <select id="effect3">
+            <option value="">— Select a Relic —</option>
+            <option value="fire">Fire Relic</option>
+            <option value="frost">Frost Relic</option>
+            <option value="lightning">Lightning Relic</option>
+        </select>
+        </label>
+    </article>
+
+    </section>
+
+
+    <!-- RIGHT COLUMN (2 rows) -->
+    <section class="right-column">
+    <article id="results">
+        <h3>Results</h3>
+        <p id="statusText">Choose effects to see compatibility.</p>
+    </article>
+
+    <article id="details">
+        <h3>Details</h3>
+        <ul id="detailsList">
+        <li>Waiting for selections…</li>
+        </ul>
+    </article>
+    </section>
+
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <small>Built for the Nightreign community</small>
+  </footer>
+
+</main>
+
+    <script>
+    const selects = [
+        document.getElementById("effect1"),
+        document.getElementById("effect2"),
+        document.getElementById("effect3"),
+    ];
+
+    const statusText = document.getElementById("statusText");
+    const detailsList = document.getElementById("detailsList");
+
+    function refresh() {
+        const values = selects.map(s => s.value).filter(Boolean);
+
+        // Fake logic for now:
+        // If the same value is selected twice, call it "Incompatible"
+        const hasDuplicate = new Set(values).size !== values.length;
+
+        if (values.length < 2) {
+        statusText.textContent = "Choose at least two effects to check compatibility.";
+        } else if (hasDuplicate) {
+        statusText.textContent = "❌ Incompatible (placeholder rule: duplicates conflict)";
+        } else {
+        statusText.textContent = "✅ Compatible (placeholder rule)";
+        }
+
+        // Update details panel
+        detailsList.innerHTML = "";
+        if (values.length === 0) {
+        detailsList.innerHTML = "<li>Waiting for selections…</li>";
+        return;
+        }
+
+        values.forEach((v, i) => {
+        const li = document.createElement("li");
+        li.textContent = `Effect ${i + 1}: ${v}`;
+        detailsList.appendChild(li);
+        });
+
+        // Helpful during dev
+        console.log("Selected effects:", values);
+    }
+
+    selects.forEach(s => s.addEventListener("change", refresh));
+    refresh();
+    </script>
+
+  </body>
+</html>
