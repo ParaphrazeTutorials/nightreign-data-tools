@@ -136,11 +136,11 @@
 
 /* Specific tile art */
 .app-tile--reliquary {
-  background-image: url("../assets/home/reliquary.png");
+  background-image: url("../Assets/home/reliquary.png");
 }
 
 .app-tile--menagerie {
-  background-image: url("../assets/home/menagerie.png");
+  background-image: url("../Assets/home/menagerie.png");
 }
 
 /* Disabled styling */
