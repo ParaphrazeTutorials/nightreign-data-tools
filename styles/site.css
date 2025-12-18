@@ -17,10 +17,9 @@
   /* ------------------------------------------------------------
      Global Hero Art Controls (CANONICAL)
      ------------------------------------------------------------ */
-  --hero-art-zoom: .6;
-  --hero-art-x: 65%;
-  --hero-art-y: 100%;
-  --hero-image: url("../Assets/home/Home.png");
+  --hero-art-zoom: 0.4;
+  --hero-art-x: 75%;
+  --hero-art-y: 80%;
 }
 
 
@@ -70,7 +69,7 @@
 
 
 /* ------------------------------------------------------------
-   Hero Art
+   Hero Art (IMG-based, per-page src)
    ------------------------------------------------------------ */
 
 .hero-art {
@@ -85,17 +84,11 @@
   min-width: 100%;
   min-height: 100%;
 
-  background-image: var(--hero-image);
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-
   transform: translate(-50%, -50%) scale(var(--hero-art-zoom));
   transform-origin: center;
 
   pointer-events: none;
 }
-
 
 
 /* ------------------------------------------------------------
@@ -135,10 +128,7 @@
 
 .tool-nav {
   background-color: var(--color-accent-primary);
-
-  /* KEY CHANGE: much tighter vertical padding */
   padding: 0.2rem 1rem;
-
   border-radius: 0.45rem;
 }
 
@@ -150,7 +140,6 @@
   list-style: none;
   align-items: center;
 
-  /* Reduce vertical contribution */
   line-height: 1;
   min-height: unset;
 }
@@ -161,7 +150,6 @@
   font-weight: 600;
   font-size: 0.85rem;
 
-  /* Tight hitbox, still usable */
   padding: 0.15rem 0.4rem;
 
   border-radius: 0.35rem;
