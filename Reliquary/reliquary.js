@@ -5,7 +5,7 @@ const DATA_URL = new URL("../Data/reliquary.json", window.location.href).toStrin
 // assets/icons/reliquary/{StatusIconID}.png
 function iconPath(statusIconId) {
   if (!statusIconId) return "";
-  return new URL(`../assets/icons/reliquary/${statusIconId}.png`, window.location.href).toString();
+  return new URL(`../Assets/icons/reliquary/${statusIconId}.png`, window.location.href).toString();
 }
 
 // Default relic images (your confirmed path + filenames)
@@ -23,7 +23,7 @@ function relicPath(relicType, color, size) {
   const type = relicFolderForType(relicType);
   const c = String(color).toLowerCase();
   const s = String(size).toLowerCase();
-  return new URL(`../assets/relics/${type}/${s}/${c}.png`, window.location.href).toString();
+  return new URL(`../Assets/relics/${type}/${s}/${c}.png`, window.location.href).toString();
 }
 
 const selType = document.getElementById("relicType");
