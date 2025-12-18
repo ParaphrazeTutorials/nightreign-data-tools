@@ -1,174 +1,205 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Nightreign Effect Tool</title>
 
-    <!-- One-line: makes things look good -->
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="../styles/site.css">
+    <link rel="stylesheet" href="../styles/reliquary.css">
 
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
 
   <body>
-<main class="app-shell app-grid">
+    <main class="app-shell app-grid">
 
-  <!-- HEADER -->
-  <header class="hero">
-  <h2>The Round Table Codex</h2>
-  <h1>Reliquary</h1>
-  <p>
-    A relic compatibility tool for Nightreign, built as part of the Round Table Codex.
-  </p>
-</header>
+      <!-- HEADER -->
+      <header class="hero">
+        <img
+          class="hero-art"
+          src="../assets/home/Header.png"
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
+          onerror="this.remove()"
+        />
 
-<nav class="tool-nav">
-  <ul>
-    <li><a href="../index.html">Home</a></li>
-    <li><a href="./index.html" class="active">Reliquary</a></li>
-    <li><a href="#" aria-disabled="true">Menagerie</a></li>
-  </ul>
-</nav>
+        <div class="hero-content">
+          <h1>The Round Table Codex</h1>
+          <h2>Reliquary</h2>
+        </div>
+      </header>
 
-
-
-<section class="instructions">
-  <details open>
-    <summary><strong>Instructions</strong></summary>
-    <p style="margin-top: 0.75rem;">
-      Select a relic in <strong>Effect A</strong>. The <strong>Effect B</strong> list will automatically exclude any relics
-      that share a Compatibility ID with your selection.
-    </p>
-    <ul>
-      <li><strong>Compatible</strong> = no shared Compatibility IDs</li>
-      <li><strong>Incompatible</strong> = at least one shared Compatibility ID</li>
-      <li>Use the Details panel to see which Compatibility IDs caused a conflict (later)</li>
-    </ul>
-  </details>
-</section>
-
-
-
-  <!-- MAIN CONTENT -->
-  <section class="main-grid">
-
-    <!-- LEFT COLUMN (3 rows) -->
-    <section class="left-column">
-
-    <article id="effect1-selection">
-        <h3>Effect 1</h3>
-        <label>
-        Choose an Effect
-        <select id="effect1">
-            <option value="">— Effect 1 —</option>
-            <option value="fire">Fire Relic</option>
-            <option value="frost">Frost Relic</option>
-            <option value="lightning">Lightning Relic</option>
-        </select>
-        </label>
-    </article>
-
-    <article id="effect2-selection">
-        <h3>Effect 2</h3>
-        <label>
-        Choose an Effect
-        <select id="effect2">
-            <option value="">— Effect 2 —</option>
-            <option value="fire">Fire Relic</option>
-            <option value="frost">Frost Relic</option>
-            <option value="lightning">Lightning Relic</option>
-        </select>
-        </label>
-    </article>
-
-    <article id="effect3-selection">
-        <h3>Effect 3</h3>
-        <label>
-        Choose an Effect
-        <select id="effect3">
-            <option value="">— Select a Relic —</option>
-            <option value="fire">Fire Relic</option>
-            <option value="frost">Frost Relic</option>
-            <option value="lightning">Lightning Relic</option>
-        </select>
-        </label>
-    </article>
-
-    </section>
-
-
-    <!-- RIGHT COLUMN (2 rows) -->
-    <section class="right-column">
-    <article id="results">
-        <h3>Results</h3>
-        <p id="statusText">Choose effects to see compatibility.</p>
-    </article>
-
-    <article id="details">
-        <h3>Details</h3>
-        <ul id="detailsList">
-        <li>Waiting for selections…</li>
+      <nav class="tool-nav">
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="./index.html" class="active">Reliquary</a></li>
+          <li><a href="#" aria-disabled="true">Menagerie</a></li>
         </ul>
-    </article>
-    </section>
+      </nav>
 
+      <!-- Everything below the header goes in the wide tool shell -->
+      <section class="tool-shell">
 
-  </section>
+        <!-- INSTRUCTIONS -->
+        <section class="instructions">
+          <details open>
+            <summary><strong>Instructions</strong></summary>
+            <p style="margin-top: 0.75rem;">
+              Select effects in order. Effect 1 filters Effect 2, and both filter Effect 3.
+            </p>
+            <ul>
+              <li><strong>Compatible</strong> = no shared Compatibility IDs</li>
+              <li><strong>Incompatible</strong> = at least one shared Compatibility ID</li>
+              <li>“Show Illegal Combinations” bypasses compatibility rules (duplicates still blocked)</li>
+            </ul>
+          </details>
+        </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <small>Built for the Nightreign community</small>
-  </footer>
+        <!-- OPTIONS -->
+        <section class="options-panel">
+          <div class="options-row">
+            <label>
+              Relic Type
+              <select id="relicType">
+                <option value="Standard">Standard</option>
+                <option value="Both">Both</option>
+                <option value="Depth Of Night">Depth Of Night</option>
+              </select>
+            </label>
 
-</main>
+            <label>
+              Relic Color
+              <select id="relicColor">
+                <option value="Random" selected>Random</option>
+                <option value="Red">Red</option>
+                <option value="Blue">Blue</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Green">Green</option>
+              </select>
+            </label>
 
-    <script>
-    const selects = [
-        document.getElementById("effect1"),
-        document.getElementById("effect2"),
-        document.getElementById("effect3"),
-    ];
+            <label class="inline-check">
+              <input type="checkbox" id="showIllegal" />
+              Show Illegal Combinations
+            </label>
+          </div>
+        </section>
 
-    const statusText = document.getElementById("statusText");
-    const detailsList = document.getElementById("detailsList");
+        <!-- MAIN CONTENT -->
+        <section class="main-grid">
+          <!-- LEFT -->
+          <section class="left-column">
 
-    function refresh() {
-        const values = selects.map(s => s.value).filter(Boolean);
+            <article class="effect-card" id="effect1-card">
+              <h3>Effect 1</h3>
 
-        // Fake logic for now:
-        // If the same value is selected twice, call it "Incompatible"
-        const hasDuplicate = new Set(values).size !== values.length;
+              <label>
+                Effect Category
+                <select id="cat1" disabled>
+                  <option value="">— All Categories —</option>
+                </select>
+              </label>
 
-        if (values.length < 2) {
-        statusText.textContent = "Choose at least two effects to check compatibility.";
-        } else if (hasDuplicate) {
-        statusText.textContent = "❌ Incompatible (placeholder rule: duplicates conflict)";
-        } else {
-        statusText.textContent = "✅ Compatible (placeholder rule)";
-        }
+              <label>
+                Effect Description
+                <select id="effect1">
+                  <option value="">— Effect 1 —</option>
+                </select>
+              </label>
 
-        // Update details panel
-        detailsList.innerHTML = "";
-        if (values.length === 0) {
-        detailsList.innerHTML = "<li>Waiting for selections…</li>";
-        return;
-        }
+              <small class="subtext" id="count1"></small>
+            </article>
 
-        values.forEach((v, i) => {
-        const li = document.createElement("li");
-        li.textContent = `Effect ${i + 1}: ${v}`;
-        detailsList.appendChild(li);
-        });
+            <article class="effect-card" id="effect2-card">
+              <h3>Effect 2</h3>
 
-        // Helpful during dev
-        console.log("Selected effects:", values);
-    }
+              <label>
+                Effect Category
+                <select id="cat2" disabled>
+                  <option value="">— All Categories —</option>
+                </select>
+              </label>
 
-    selects.forEach(s => s.addEventListener("change", refresh));
-    refresh();
-    </script>
+              <label>
+                Effect Description
+                <select id="effect2" disabled>
+                  <option value="">— Effect 2 —</option>
+                </select>
+              </label>
 
+              <small class="subtext" id="count2"></small>
+            </article>
+
+            <article class="effect-card" id="effect3-card">
+              <h3>Effect 3</h3>
+
+              <label>
+                Effect Category
+                <select id="cat3" disabled>
+                  <option value="">— All Categories —</option>
+                </select>
+              </label>
+
+              <label>
+                Effect Description
+                <select id="effect3" disabled>
+                  <option value="">— Effect 3 —</option>
+                </select>
+              </label>
+
+              <small class="subtext" id="count3"></small>
+            </article>
+
+          </section>
+
+          <!-- RIGHT -->
+          <section class="right-column">
+
+            <article id="results">
+              <h3>Relic Preview</h3>
+
+              <div class="relic-preview">
+                <div class="relic-frame">
+                  <img id="relicImg" alt="Relic preview" />
+                </div>
+
+                <div>
+                  <p id="statusText" style="margin:0;">Loading…</p>
+
+                  <ul class="chosen-effects" id="chosenList">
+                    <li>
+                      <div class="effect-icon" aria-hidden="true"></div>
+                      <div class="effect-line">
+                        <div class="title">No effects selected</div>
+                        <div class="meta">Pick Effect 1 to begin.</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article id="details">
+              <h3>Details</h3>
+              <ul id="detailsList">
+                <li>Loading…</li>
+              </ul>
+            </article>
+
+          </section>
+        </section>
+
+        <footer>
+          <small>Built for the Nightreign community</small>
+        </footer>
+
+      </section> <!-- /tool-shell -->
+
+    </main>
+
+    <script type="module" src="./reliquary.js"></script>
   </body>
 </html>

@@ -1,13 +1,14 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>The Round Table Codex</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="./styles/site.css">
-
+    <link rel="stylesheet" href="./styles/home.css">
   </head>
 
   <body>
@@ -15,60 +16,79 @@
 
       <!-- HERO -->
       <header class="hero">
-        <h1>The Round Table Codex</h1>
-        <p>A growing suite of Nightreign (and eventually FromSoft) tools.</p>
+        <img
+          class="hero-art"
+          src="./Assets/Home/Header.png"
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
+          onerror="this.remove()"
+        />
+
+        <div class="hero-content">
+          <h1>The Round Table Codex</h1>
+          <h2>Home</h2>
+        </div>
       </header>
 
-      <!-- NAV (same as app pages) -->
-    <nav class="tool-nav">
-    <ul>
-        <li><a href="./index.html" class="active">Home</a></li>
-        <li><a href="./reliquary/index.html">Reliquary</a></li>
-        <li><a href="#" aria-disabled="true">Menagerie</a></li>
-    </ul>
-    </nav>
+      <nav class="tool-nav">
+        <ul>
+          <li><a href="./index.html" class="active">Home</a></li>
+          <li><a href="./Reliquary/index.html">Reliquary</a></li>
+          <li><a href="#" aria-disabled="true">Menagerie</a></li>
+        </ul>
+      </nav>
 
+      <!-- HOME CONTENT -->
+      <section class="home-shell">
 
+        <!-- Two-column: Instructions + App Tiles -->
+        <section class="home-intro-grid">
 
-      <!-- TILE LINKS -->
-      <section class="tile-grid">
+          <!-- LEFT: Welcome / Instructions -->
+          <article class="home-intro">
+            <h3>Welcome, Tarnished</h3>
+            <p>
+              This Codex is a growing set of tools and data for the Nightreign community.
+              Pick an app on the right to get started.
+            </p>
+            <ul>
+              <li><strong>Reliquary</strong> lets you build relics in real time and validate compatibility.</li>
+              <li><strong>Menagerie</strong> will collect enemy / boss references as we expand.</li>
+              <li>More tools will appear here as we ship them.</li>
+            </ul>
+          </article>
 
-        <a
-          class="tool-tile reliquary"
-          href="./reliquary/index.html"
-          aria-label="Open Reliquary"
-          style="
-            background-image: url('./Assets/Reliquary.png');
-            background-position: center 60%;
-          "
-        >
-          <div class="label">
-            <h3>Reliquary</h3>
-            <p>Relic Compatibility & Optimization</p>
-          </div>
-        </a>
+          <!-- RIGHT: Image tiles with text overlay -->
+          <section class="home-apps" aria-label="Apps">
 
-        <a
-          class="tool-tile menagerie disabled"
-          href="#"
-          aria-label="Menagerie coming soon"
-          style="
-            background-image: url('./Assets/Menagerie.png');
-            background-position: center 55%;
-          "
-        >
-          <div class="label">
-            <h3>Menagerie</h3>
-            <p>(Coming Soon)</p>
-          </div>
-        </a>
+            <a class="app-tile app-tile--reliquary" href="./Reliquary/index.html">
+              <div class="app-tile__text">
+                <div class="app-tile__title">Reliquary</div>
+                <div class="app-tile__meta">Relic builder</div>
+              </div>
+            </a>
+
+            <a class="app-tile app-tile--menagerie is-disabled" href="#" aria-disabled="true">
+              <div class="app-tile__text">
+                <div class="app-tile__title">Menagerie</div>
+                <div class="app-tile__meta">Coming soon</div>
+              </div>
+            </a>
+
+          </section>
+
+        </section>
+
+        <footer class="home-footer">
+          <small>Built for the Nightreign community</small>
+        </footer>
 
       </section>
 
-      <footer>
-        <small>Built for the Nightreign community</small>
-      </footer>
-
     </main>
+
+    <script type="module" src="./home.js"></script>
   </body>
 </html>

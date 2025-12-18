@@ -1,101 +1,179 @@
-/* ---------- Layout ---------- */
+:root {
+  /* ------------------------------------------------------------
+     Core palette
+     ------------------------------------------------------------ */
+  --color-bg-dark: #0f0f12;
+  --color-bg-panel: rgba(0,0,0,0.35);
+
+  --color-accent-primary: #4a0f14;
+  --color-accent-hover: rgba(255,255,255,0.14);
+
+  --color-text-main: #ffffff;
+  --color-text-muted: rgba(255,255,255,0.75);
+
+  --overlay-strong: rgba(0,0,0,0.30);
+  --overlay-light: rgba(0,0,0,0.18);
+
+  /* ------------------------------------------------------------
+     Global Hero Art Controls (CANONICAL)
+     ------------------------------------------------------------ */
+  --hero-art-zoom: .6;
+  --hero-art-x: 65%;
+  --hero-art-y: 100%;
+  --hero-image: url("../Assets/Home/Home.png");
+}
+
+
+/* ------------------------------------------------------------
+   Layout
+   ------------------------------------------------------------ */
 
 .app-grid {
   display: grid;
   grid-template-rows: auto auto auto;
-  gap: 1.5rem;
+  gap: 1.1rem;
 }
 
 .app-shell {
-  width: min(94vw, 1600px);
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-inline: clamp(0.75rem, 2.2vw, 2.75rem);
 }
 
-/* ---------- Hero ---------- */
+
+/* ------------------------------------------------------------
+   Hero
+   ------------------------------------------------------------ */
 
 .hero {
   position: relative;
-  padding: 3rem 1.5rem;
+  overflow: hidden;
+
+  min-height: 200px;
+  padding: 1.4rem 1.25rem;
+
   border-radius: 0.5rem;
   color: white;
 
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.70) 0%,
-      rgba(0, 0, 0, 0.40) 45%,
-      rgba(0, 0, 0, 0.10) 100%
-    ),
-    url("../Assets/Header.png");
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.70) 0%,
+    rgba(0, 0, 0, 0.40) 45%,
+    rgba(0, 0, 0, 0.10) 100%
+  );
 
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center 60%;
-
-  min-height: 260px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 
+/* ------------------------------------------------------------
+   Hero Art
+   ------------------------------------------------------------ */
+
+.hero-art {
+  position: absolute;
+  z-index: 0;
+
+  left: var(--hero-art-x);
+  top: var(--hero-art-y);
+
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  min-height: 100%;
+
+  background-image: var(--hero-image);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+
+  transform: translate(-50%, -50%) scale(var(--hero-art-zoom));
+  transform-origin: center;
+
+  pointer-events: none;
+}
+
+
+
+/* ------------------------------------------------------------
+   Hero Text
+   ------------------------------------------------------------ */
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.35rem;
+}
+
 .hero h1,
-.hero h2,
-.hero p {
+.hero h2 {
   margin: 0;
 }
 
-.hero h2 {
-  font-size: 1rem;
-  font-weight: 400;
-  opacity: 0.85;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .hero h1 {
-  font-size: 2.5rem;
-  margin-top: 0.25rem;
+  font-size: 1.85rem;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
 }
 
-.hero p {
-  margin-top: 0.75rem;
-  max-width: 700px;
+.hero h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
   opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-/* ---------- Navigation ---------- */
+
+/* ------------------------------------------------------------
+   Navigation (BACKGROUND BOX TIGHTENED)
+   ------------------------------------------------------------ */
 
 .tool-nav {
-  background-color: #4a0f14;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  background-color: var(--color-accent-primary);
+
+  /* KEY CHANGE: much tighter vertical padding */
+  padding: 0.2rem 1rem;
+
+  border-radius: 0.45rem;
 }
 
 .tool-nav ul {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   margin: 0;
   padding: 0;
   list-style: none;
   align-items: center;
-  min-height: 44px;
+
+  /* Reduce vertical contribution */
+  line-height: 1;
+  min-height: unset;
 }
 
 .tool-nav a {
   color: white;
   text-decoration: none;
   font-weight: 600;
+  font-size: 0.85rem;
+
+  /* Tight hitbox, still usable */
+  padding: 0.15rem 0.4rem;
+
+  border-radius: 0.35rem;
+  display: inline-block;
 }
 
-.tool-nav a:hover {
-  text-decoration: underline;
+.tool-nav a:not([aria-disabled="true"]):hover {
+  background: var(--color-accent-hover);
 }
 
 .tool-nav a.active {
-  text-decoration: underline;
+  background: rgba(255,255,255,0.14);
 }
 
 .tool-nav a[aria-disabled="true"] {
@@ -103,76 +181,10 @@
   pointer-events: none;
 }
 
-/* ---------- Tiles ---------- */
 
-.tile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.25rem;
-}
-
-.tool-tile {
-  display: block;
-  border-radius: 0.6rem;
-  overflow: hidden;
-  text-decoration: none;
-  color: white;
-  aspect-ratio: 4 / 2.5;
-  position: relative;
-
-  background-size: cover;
-  background-position: center;
-  transform: translateY(0);
-}
-
-.tool-tile::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.30));
-}
-
-.tool-tile.reliquary::before {
-  background: linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.30));
-}
-
-.tool-tile.menagerie::before {
-  background: linear-gradient(rgba(0,0,0,0.00), rgba(0,0,0,0.18));
-}
-
-.tool-tile:hover {
-  transform: translateY(-2px);
-}
-
-.tool-tile:focus {
-  outline: 2px solid rgba(255,255,255,0.6);
-  outline-offset: 2px;
-}
-
-.tool-tile .label {
-  position: absolute;
-  left: 1rem;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 2;
-}
-
-.tool-tile .label h3 {
-  margin: 0 0 0.25rem 0;
-}
-
-.tool-tile .label p {
-  margin: 0;
-  opacity: 0.9;
-}
-
-.tool-tile.disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* ---------- Footer ---------- */
+/* ------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------ */
 
 footer {
   text-align: center;

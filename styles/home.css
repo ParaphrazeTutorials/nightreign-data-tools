@@ -1,0 +1,160 @@
+/* ------------------------------------------------------------
+   HOME SHELL (HOME-ONLY)
+   ------------------------------------------------------------ */
+
+.home-shell {
+  width: 100%;
+  max-width: clamp(980px, 92vw, 2200px);
+  margin-inline: auto;
+}
+
+/* Typography density BELOW hero only */
+.home-shell,
+.home-shell :where(p, li, a, small, button, label) {
+  font-size: 0.94rem;
+}
+
+.home-shell :where(h3) {
+  font-size: 1.05rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Reduce vertical air under the hero */
+.home-shell section,
+.home-shell article {
+  margin-top: 0.9rem;
+}
+
+
+/* ------------------------------------------------------------
+   TWO-COLUMN INTRO + APPS
+   ------------------------------------------------------------ */
+
+.home-intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .home-intro-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Left panel */
+.home-intro {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.22);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.home-intro p {
+  opacity: 0.9;
+  margin-bottom: 0.75rem;
+}
+
+.home-intro ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.home-intro li {
+  margin: 0.35rem 0;
+  opacity: 0.9;
+}
+
+
+/* ------------------------------------------------------------
+   APP TILES (IMAGE + TEXT OVERLAY)
+   ------------------------------------------------------------ */
+
+.home-apps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+
+/* The tile is the link */
+.app-tile {
+  position: relative;
+  display: block;
+
+  border-radius: 0.9rem;
+  overflow: hidden;
+
+  min-height: 170px;
+  padding: 0.85rem 0.95rem;
+
+  color: white;
+  text-decoration: none;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  background-size: cover;
+  background-position: center;
+
+  transform: translateY(0);
+  transition: transform 120ms ease;
+}
+
+/* Dark overlay so text reads on top of the image */
+.app-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.70) 0%,
+    rgba(0,0,0,0.42) 55%,
+    rgba(0,0,0,0.18) 100%
+  );
+  z-index: 0;
+}
+
+.app-tile:hover {
+  transform: translateY(-2px);
+}
+
+.app-tile__text {
+  position: relative;
+  z-index: 1;
+}
+
+.app-tile__title {
+  font-weight: 800;
+  line-height: 1.1;
+  font-size: 1.05rem;
+}
+
+.app-tile__meta {
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* Specific tile art */
+.app-tile--reliquary {
+  background-image: url("../assets/home/reliquary.png");
+}
+
+.app-tile--menagerie {
+  background-image: url("../assets/home/menagerie.png");
+}
+
+/* Disabled styling */
+.app-tile.is-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+
+/* ------------------------------------------------------------
+   FOOTER
+   ------------------------------------------------------------ */
+
+.home-footer {
+  margin-top: 1rem;
+  opacity: 0.85;
+}
