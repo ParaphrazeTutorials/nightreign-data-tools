@@ -1,5 +1,5 @@
 // Data (relative to Reliquary/index.html)
-const DATA_URL = new URL("../data/reliquary.json", window.location.href).toString();
+const DATA_URL = new URL("../Data/reliquary.json", window.location.href).toString();
 
 // Icon folder:
 // assets/icons/reliquary/{StatusIconID}.png
