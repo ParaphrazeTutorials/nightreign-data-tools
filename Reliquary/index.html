@@ -40,12 +40,11 @@
         </ul>
       </nav>
 
-      <!-- Everything below the header goes in the wide tool shell -->
       <section class="tool-shell">
 
         <!-- INSTRUCTIONS -->
         <section class="instructions">
-          <details open>
+          <details>
             <summary><strong>Instructions</strong></summary>
             <p style="margin-top: 0.75rem;">
               Select effects in order. Effect 1 filters Effect 2, and both filter Effect 3.
@@ -64,6 +63,7 @@
             <label>
               Relic Type
               <select id="relicType">
+                <option value="All" selected>All</option>
                 <option value="Standard">Standard</option>
                 <option value="Both">Both</option>
                 <option value="Depth Of Night">Depth Of Night</option>
@@ -80,11 +80,28 @@
                 <option value="Green">Green</option>
               </select>
             </label>
+          </div>
 
-            <label class="inline-check">
-              <input type="checkbox" id="showIllegal" />
-              Show Illegal Combinations
-            </label>
+          <div class="options-divider" aria-hidden="true"></div>
+
+          <div class="options-row options-row--bottom">
+            <div class="options-checks">
+              <label class="inline-check">
+                <input type="checkbox" id="showIllegal" />
+                Show Illegal Combinations
+              </label>
+
+              <label class="inline-check">
+                <input type="checkbox" id="showRaw" />
+                Show Raw Data
+              </label>
+            </div>
+
+            <div class="options-actions">
+              <button type="button" class="start-over" id="startOver">
+                Start Over
+              </button>
+            </div>
           </div>
         </section>
 
@@ -96,19 +113,21 @@
             <article class="effect-card" id="effect1-card">
               <h3>Effect 1</h3>
 
-              <label>
-                Effect Category
-                <select id="cat1" disabled>
-                  <option value="">— All Categories —</option>
-                </select>
-              </label>
+              <div class="effect-grid">
+                <label class="effect-grid__cat">
+                  Category
+                  <select id="cat1" disabled>
+                    <option value="">— All —</option>
+                  </select>
+                </label>
 
-              <label>
-                Effect Description
-                <select id="effect1">
-                  <option value="">— Effect 1 —</option>
-                </select>
-              </label>
+                <label class="effect-grid__desc">
+                  Effect
+                  <select id="effect1">
+                    <option value="">— Effect 1 —</option>
+                  </select>
+                </label>
+              </div>
 
               <small class="subtext" id="count1"></small>
             </article>
@@ -116,19 +135,21 @@
             <article class="effect-card" id="effect2-card">
               <h3>Effect 2</h3>
 
-              <label>
-                Effect Category
-                <select id="cat2" disabled>
-                  <option value="">— All Categories —</option>
-                </select>
-              </label>
+              <div class="effect-grid">
+                <label class="effect-grid__cat">
+                  Category
+                  <select id="cat2" disabled>
+                    <option value="">— All —</option>
+                  </select>
+                </label>
 
-              <label>
-                Effect Description
-                <select id="effect2" disabled>
-                  <option value="">— Effect 2 —</option>
-                </select>
-              </label>
+                <label class="effect-grid__desc">
+                  Effect
+                  <select id="effect2" disabled>
+                    <option value="">— Effect 2 —</option>
+                  </select>
+                </label>
+              </div>
 
               <small class="subtext" id="count2"></small>
             </article>
@@ -136,19 +157,21 @@
             <article class="effect-card" id="effect3-card">
               <h3>Effect 3</h3>
 
-              <label>
-                Effect Category
-                <select id="cat3" disabled>
-                  <option value="">— All Categories —</option>
-                </select>
-              </label>
+              <div class="effect-grid">
+                <label class="effect-grid__cat">
+                  Category
+                  <select id="cat3" disabled>
+                    <option value="">— All —</option>
+                  </select>
+                </label>
 
-              <label>
-                Effect Description
-                <select id="effect3" disabled>
-                  <option value="">— Effect 3 —</option>
-                </select>
-              </label>
+                <label class="effect-grid__desc">
+                  Effect
+                  <select id="effect3" disabled>
+                    <option value="">— Effect 3 —</option>
+                  </select>
+                </label>
+              </div>
 
               <small class="subtext" id="count3"></small>
             </article>
@@ -196,7 +219,7 @@
           <small>Built for the Nightreign community</small>
         </footer>
 
-      </section> <!-- /tool-shell -->
+      </section>
 
     </main>
 

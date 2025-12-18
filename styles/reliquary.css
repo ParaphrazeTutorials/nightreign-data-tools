@@ -16,14 +16,78 @@
 }
 
 .tool-shell :where(h3) {
-  font-size: 1.05rem;
-  margin-bottom: 0.6rem;
+  font-size: 1.02rem;
+  margin-bottom: 0.45rem;
 }
 
 /* Reduce overall vertical “air” a bit */
 .tool-shell section,
 .tool-shell article {
+  margin-top: 0.75rem;
+}
+
+
+/* ------------------------------------------------------------
+   Instructions (themed, not Pico-blue)
+   ------------------------------------------------------------ */
+
+.instructions {
   margin-top: 0.9rem;
+}
+
+/* Style the <details> itself as a themed panel */
+.instructions details {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Summary row: make it look like a header bar */
+.instructions summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  user-select: none;
+}
+
+/* Hide default marker in some browsers */
+.instructions summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Custom chevron */
+.instructions summary::before {
+  content: "▸";
+  display: inline-block;
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+.instructions details[open] summary::before {
+  content: "▾";
+}
+
+.instructions summary strong {
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
+
+.instructions details :where(p, ul, li) {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.instructions details ul {
+  margin-top: 0.6rem;
+  margin-bottom: 0.1rem;
+  padding-left: 1.1rem;
+}
+
+.instructions details li + li {
+  margin-top: 0.35rem;
 }
 
 
@@ -35,13 +99,13 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.22);
   border-radius: 0.6rem;
-  padding: 0.85rem 1rem;
+  padding: 0.8rem 1rem;
 }
 
 .options-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.85rem;
+  gap: 0.75rem;
   align-items: end;
 }
 
@@ -67,18 +131,55 @@
 
 .left-column {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .right-column {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.75rem;
   align-content: start;
+}
+
+
+/* ------------------------------------------------------------
+   Effect Cards (more compact, still clean)
+   ------------------------------------------------------------ */
+
+.effect-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 0.6rem;
+  padding: 0.65rem 0.8rem;
+}
+
+/* Tighten header */
+.effect-card h3 {
+  margin: 0 0 0.45rem 0;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+}
+
+/* Labels + selects: tighter spacing */
+.effect-card label {
+  margin-bottom: 0.45rem;
+}
+
+/* Make selects feel more compact */
+.effect-card select {
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.55rem;
+  height: auto;
+  line-height: 1.15;
+}
+
+/* Keep placeholder text subtle */
+.effect-card select option[value=""] {
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .effect-card small.subtext {
   display: block;
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   opacity: 0.75;
 }
 
@@ -168,4 +269,88 @@
   margin-left: 0.35rem;
   font-size: 0.78rem;
   opacity: 0.9;
+}
+
+/* ------------------------------------------------------------
+   Options: divider + bottom row + Start Over button
+   ------------------------------------------------------------ */
+
+.options-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.10);
+  margin: 0.75rem 0;
+}
+
+.options-row--bottom {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.options-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.options-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.start-over {
+  padding: 0.45rem 0.8rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+}
+
+.start-over:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ------------------------------------------------------------
+   Effect cards: side-by-side compact layout
+   ------------------------------------------------------------ */
+
+.effect-card h3 {
+  margin-bottom: 0.45rem;
+}
+
+.effect-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.65rem;
+  align-items: end;
+}
+
+/* Make labels less tall */
+.effect-grid label {
+  margin: 0;
+}
+
+/* Tighten label text a bit */
+.effect-grid label > select {
+  margin-top: 0.35rem;
+}
+
+/* Small screens: stack */
+@media (max-width: 520px) {
+  .effect-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Even denser controls inside effect cards */
+.effect-card select {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.effect-card .subtext {
+  margin-top: 0.25rem;
 }
