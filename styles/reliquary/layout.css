@@ -1,4 +1,9 @@
 /* ------------------------------------------------------------
+   Reliquary — Layout
+   (Includes: slicer/top controls + main grid + effect picker layout)
+   ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
    REAL ESTATE (high-res / ultrawide friendly)
    ------------------------------------------------------------ */
 
@@ -24,52 +29,198 @@
 }
 
 /* ------------------------------------------------------------
-   Options + Grid Layout
+   Options panel (SLICER SECTION)
    ------------------------------------------------------------ */
 
 .options-panel {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.22);
   border-radius: 0.6rem;
-  padding: 0.85rem 1rem;
+  padding: 1.05rem 1.55rem;
+
+  /* allow equal-height pairing with Instructions */
+  display: flex;
+  flex-direction: column;
 }
 
+/* Dropdowns side-by-side on top, controls below */
 .options-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 0.85rem;
   align-items: end;
+
+  /* take remaining height so controls can sit naturally */
+  flex: 1 1 auto;
 }
 
+/* The first two <label> elements in .options-row are the dropdowns */
+.options-row > label:nth-of-type(1) { grid-column: 1; }
+.options-row > label:nth-of-type(2) { grid-column: 2; }
+
+/* Subtext under fields */
+.field-subtext{
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.15;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Controls span full width below both dropdowns */
 .options-controls {
   grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.85rem;
-  align-items: center;
 
+  /* ✅ full width column so checkboxes + Start Over span the panel */
+  display: grid;
+  grid-template-columns: 1fr;
+
+  gap: 0.65rem;
   padding-top: 0.65rem;
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
   border-top: 1px solid rgba(255, 255, 255, 0.10);
 }
 
+/* Checkboxes side-by-side, each taking half width */
 .options-controls__left {
-  display: flex;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
   align-items: center;
-  flex-wrap: wrap;
-}
-
-.options-controls__right {
-  display: flex;
-  justify-content: flex-end;
+  width: 100%;
 }
 
 .inline-check {
-  display: flex;
+  display: inline-flex;
   gap: 0.5rem;
   align-items: center;
   margin: 0;
+  width: 100%;
+}
+
+/* Pico checkbox inputs sometimes carry default margins */
+.inline-check input[type="checkbox"] {
+  margin: 0;
+}
+
+/* Start Over – full width of the panel */
+.options-controls__right {
+  width: 100%;
+}
+
+#startOver {
+  display: block;
+  width: 100%;
+  min-height: 34px;
+  padding: 0.35rem 1.1rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  border-radius: 0.65rem;
+
+  /* override pico "secondary" */
+  border: 1px solid rgba(205, 185, 255, 0.40) !important;
+  background:
+    radial-gradient(120% 140% at 10% 10%, rgba(140, 180, 255, 0.40), rgba(0,0,0,0) 62%),
+    linear-gradient(135deg,
+      rgba(85, 115, 215, 0.50),
+      rgba(155, 95, 210, 0.30),
+      rgba(0, 0, 0, 0.12)
+    ) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+}
+
+#startOver:hover {
+  border-color: rgba(205, 185, 255, 0.65) !important;
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+#startOver:active {
+  transform: translateY(0px);
+}
+
+#startOver:focus {
+  outline: none;
+}
+
+#startOver:focus-visible {
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.40),
+    0 0 0 3px rgba(120, 170, 255, 0.30),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+/* ------------------------------------------------------------
+   Top layout: Filters + Instructions (MATCHED HEIGHT)
+   ------------------------------------------------------------ */
+
+.top-grid{
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 1rem;
+  align-items: stretch;
+  margin-top: 0.9rem;
+}
+
+.top-grid__left,
+.top-grid__right{
+  min-width: 0;
+}
+
+.top-grid__left,
+.top-grid__right{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.top-grid__left > .options-panel,
+.top-grid__right > .instructions-panel{
+  flex: 1 1 auto;
+}
+
+/* Instructions panel */
+.instructions-panel{
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.6rem;
+  padding: 0.65rem 0.9rem;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.instructions-panel h3{
+  margin-bottom: 0.5rem;
+}
+
+.instructions-panel :where(p, ul){
+  margin-top: 0.5rem;
+}
+
+.instructions-panel ul{
+  padding-left: 1.15rem;
+}
+
+.instructions-panel > *:last-child{
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px){
+  .top-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .options-controls__left{
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
 }
 
 /* ------------------------------------------------------------
@@ -180,11 +331,4 @@
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  align-items: stretch;
-  justify-content: flex-start;
-}
-
-.right-column > article {
-  width: 100%;
-  align-self: stretch;
 }

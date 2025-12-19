@@ -47,62 +47,69 @@
 
       <section class="tool-shell">
 
-        <!-- INSTRUCTIONS -->
-        <section class="instructions">
-          <details>
-            <summary><strong>Instructions</strong></summary>
-            <p style="margin-top: 0.75rem;">
-              Select effects in order. Effect 1 filters Effect 2, and both filter Effect 3.
-            </p>
-            <ul>
-              <li><strong>Compatible</strong> = no shared Compatibility IDs</li>
-              <li><strong>Incompatible</strong> = at least one shared Compatibility ID</li>
-              <li>“Show Illegal Combinations” bypasses compatibility rules (duplicates still blocked)</li>
-            </ul>
-          </details>
-        </section>
+        <!-- TOP (Filters + Instructions) -->
+        <section class="top-grid">
+          <div class="top-grid__left">
+            <!-- OPTIONS -->
+            <section class="options-panel">
+                      <div class="options-row">
+                        <label>
+                          Relic Type
+                          <select id="relicType">
+                            <option value="All" selected>All</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Both">Both</option>
+                            <option value="Depth Of Night">Depth Of Night</option>
+                          </select>
+                          <small class="field-subtext">Filters effects below</small>
+                        </label>
 
-        <!-- OPTIONS -->
-        <section class="options-panel">
-          <div class="options-row">
-            <label>
-              Relic Type
-              <select id="relicType">
-                <option value="All" selected>All</option>
-                <option value="Standard">Standard</option>
-                <option value="Both">Both</option>
-                <option value="Depth Of Night">Depth Of Night</option>
-              </select>
-            </label>
+                        <label>
+                          Relic Color
+                          <select id="relicColor">
+                            <option value="Random" selected>Random</option>
+                            <option value="Red">Red</option>
+                            <option value="Blue">Blue</option>
+                            <option value="Yellow">Yellow</option>
+                            <option value="Green">Green</option>
+                          </select>
+                          <small class="field-subtext">Cosmetic change only</small>
+                        </label>
 
-            <label>
-              Relic Color
-              <select id="relicColor">
-                <option value="Random" selected>Random</option>
-                <option value="Red">Red</option>
-                <option value="Blue">Blue</option>
-                <option value="Yellow">Yellow</option>
-                <option value="Green">Green</option>
-              </select>
-            </label>
+                        <div class="options-controls">
+                          <div class="options-controls__left">
+                            <label class="inline-check">
+                              <input type="checkbox" id="showIllegal" />
+                              Show Illegal Combinations
+                            </label>
 
-            <div class="options-controls">
-              <div class="options-controls__left">
-                <label class="inline-check">
-                  <input type="checkbox" id="showIllegal" />
-                  Show Illegal Combinations
-                </label>
+                            <label class="inline-check">
+                              <input type="checkbox" id="showRaw" />
+                              Show Raw Data
+                            </label>
+                          </div>
 
-                <label class="inline-check">
-                  <input type="checkbox" id="showRaw" />
-                  Show Raw Data
-                </label>
-              </div>
+                          <div class="options-controls__right">
+                            <button id="startOver" class="secondary" type="button">Start Over</button>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+          </div>
 
-              <div class="options-controls__right">
-                <button id="startOver" class="secondary" type="button">Start Over</button>
-              </div>
-            </div>
+          <div class="top-grid__right">
+            <!-- INSTRUCTIONS -->
+            <section class="instructions-panel">
+              <h3>Instructions</h3>
+              <p>
+                            Select effects in order. Effect 1 filters Effect 2, and both filter Effect 3.
+                          </p>
+                          <ul>
+                            <li><strong>Compatible</strong> = no shared Compatibility IDs</li>
+                            <li><strong>Incompatible</strong> = at least one shared Compatibility ID</li>
+                            <li>“Show Illegal Combinations” bypasses compatibility rules (duplicates still blocked)</li>
+                          </ul>
+            </section>
           </div>
         </section>
 
