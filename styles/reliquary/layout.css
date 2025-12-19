@@ -78,7 +78,7 @@
 
 .main-grid {
   display: grid;
-  grid-template-columns: clamp(320px, 30vw, 480px) 1fr; /* slightly narrower left */
+  grid-template-columns: clamp(320px, 30vw, 480px) 1fr;
   gap: 1rem;
 }
 
@@ -101,14 +101,14 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.22);
   border-radius: 0.75rem;
-  padding: 0.75rem; /* tighter */
+  padding: 0.75rem;
   margin-top: 0;
 }
 
 /* Tighten each effect section */
 .sidebar-panel .effect-card {
   margin: 0;
-  padding: 0.5rem 0; /* tighter */
+  padding: 0.5rem 0;
   border-radius: 0;
   background: transparent;
   border: none;
@@ -119,8 +119,8 @@
 
 .sidebar-panel .effect-card + .effect-card {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin-top: 0.5rem;      /* tighter separation */
-  padding-top: 0.65rem;    /* tighter separation */
+  margin-top: 0.5rem;
+  padding-top: 0.65rem;
 }
 
 /* Headings: smaller + no extra margin */
@@ -138,39 +138,42 @@
   font-size: 0.86rem;
 }
 
-/* Category + Effect row: tighter gap */
-.effect-row {
-  display: grid;
-  grid-template-columns: 0.9fr 1.4fr; /* gives Effect more room */
-  gap: 0.6rem;                         /* tighter */
-  align-items: end;
+/* ------------------------------------------------------------
+   EFFECT PICKERS: SIDE-BY-SIDE (FORCED)
+   ------------------------------------------------------------ */
+
+/* Force Category + Effect to sit side-by-side in the left panel */
+.sidebar-panel .effect-row {
+  display: grid !important;
+  grid-template-columns: minmax(120px, 0.85fr) minmax(200px, 1.55fr) !important;
+  gap: 0.55rem !important;
+  align-items: end !important;
 }
 
-@media (max-width: 520px) {
-  .effect-row { grid-template-columns: 1fr; }
+/* If the viewport is extremely narrow, stack them */
+@media (max-width: 420px) {
+  .sidebar-panel .effect-row {
+    grid-template-columns: 1fr !important;
+  }
 }
 
-/* LABELS + CONTROLS: this is the big win for vertical compactness */
+/* Kill Pico spacing and keep labels compact */
 .sidebar-panel .effect-row label {
-  margin: 0 !important;               /* pico adds space; kill it */
+  margin: 0 !important;
   padding: 0 !important;
-}
-
-.sidebar-panel .effect-row label > :is(select, input) {
-  margin-top: 0.25rem !important;     /* reduce space between label text and control */
-}
-
-/* Make label text smaller */
-.sidebar-panel .effect-row label {
   font-size: 0.86rem;
   opacity: 0.92;
 }
 
-/* Reduce select height slightly (safe with Pico) */
+.sidebar-panel .effect-row label > :is(select, input) {
+  margin-top: 0.25rem !important;
+}
+
+/* Reduce select height slightly */
 .sidebar-panel select {
   padding-top: 0.45rem !important;
   padding-bottom: 0.45rem !important;
-  min-height: 2.35rem;                /* smaller than Pico default */
+  min-height: 2.35rem;
 }
 
 /* ------------------------------------------------------------
