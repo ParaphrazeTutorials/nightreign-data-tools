@@ -1,9 +1,9 @@
 /* ------------------------------------------------------------
-   Reliquary — Results (stable image: fixed width, height matches 3 rows)
+   Reliquary — Results (Relic Preview)
    ------------------------------------------------------------ */
 
 :root {
-  --results-img-col: 170px;   /* fixed width so it never balloons */
+  --results-img-col: 170px;
   --row-radius: 0.75rem;
   --row-pad-y: 0.7rem;
   --row-pad-x: 0.85rem;
@@ -11,18 +11,11 @@
   --icon-size: 38px;
 }
 
-/* ------------------------------------------------------------
-   Results shell
-   ------------------------------------------------------------ */
-
 #results {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.22);
   border-radius: 0.75rem;
   padding: 0.9rem !important;
-
-  height: auto;
-  min-height: 0;
 }
 
 #results,
@@ -30,18 +23,42 @@
   box-sizing: border-box;
 }
 
+/* ------------------------------------------------------------
+   Header (Valid/Invalid + gradient)
+   ------------------------------------------------------------ */
+
 #results .panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 0.55rem 0.7rem;
   border-radius: 0.65rem;
-
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.10);
-
   margin-bottom: 0.75rem;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+#results .panel-header.is-valid {
+  background: linear-gradient(
+    90deg,
+    rgba(18, 74, 44, 0.55) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  border-color: rgba(18, 74, 44, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(18, 74, 44, 0.18);
+}
+
+#results .panel-header.is-invalid {
+  background: linear-gradient(
+    90deg,
+    rgba(92, 22, 22, 0.58) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  border-color: rgba(92, 22, 22, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
 }
 
 #results .panel-header h3 { margin: 0; }
@@ -62,80 +79,84 @@
 
 /* ------------------------------------------------------------
    Preview layout
-   - Left column is FIXED WIDTH (prevents ballooning)
-   - Height is defined by the chosen-effects list (3 rows)
-   - Image frame stretches to match that height
    ------------------------------------------------------------ */
 
 .relic-preview {
   display: grid;
   grid-template-columns: var(--results-img-col) minmax(0, 1fr);
   gap: 1rem;
-
-  /* make both columns share the same row height */
   align-items: stretch;
 }
 
-/* Frame stretches to match the list height */
 .relic-frame {
   width: var(--results-img-col);
   height: 100%;
-
   border-radius: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.22);
-
   overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Image never distorts; it scales inside the frame */
 .relic-frame img {
   width: 100%;
   height: 100%;
   display: block;
-
-  object-fit: contain; /* <-- IMPORTANT: no distortion */
+  object-fit: contain;
 }
 
 /* ------------------------------------------------------------
    Effects list
    ------------------------------------------------------------ */
 
-.relic-effects {
-  min-height: 0;
-}
-
 .chosen-effects {
   list-style: none;
   padding: 0;
   margin: 0;
-
   display: grid;
   gap: var(--row-gap);
-  align-content: start;
 }
 
-/* Each effect row */
 .chosen-effects li {
   display: grid;
   grid-template-columns: var(--icon-size) minmax(0, 1fr);
   gap: 0.75rem;
-  align-items: start;
-
   padding: var(--row-pad-y) var(--row-pad-x);
   border-radius: var(--row-radius);
-
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.16),
-    rgba(0, 0, 0, 0.10)
-  );
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.10));
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
+  align-items: start;
+}
+
+/* ------------------------------------------------------------
+   Row gradients driven by indicators
+   ------------------------------------------------------------ */
+
+.chosen-effects li:has(.move-indicator.move-up),
+.chosen-effects li:has(.move-indicator.move-down) {
+  background: linear-gradient(
+    90deg,
+    rgba(92, 22, 22, 0.58) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  border-color: rgba(92, 22, 22, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
+}
+
+/* ✅ Correct selector (your previous one was malformed) */
+.chosen-effects li:has(.move-indicator.move-ok):not(:has(.move-indicator.move-up)):not(:has(.move-indicator.move-down)) {
+  background: linear-gradient(
+    90deg,
+    rgba(18, 74, 44, 0.50) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  border-color: rgba(18, 74, 44, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(18, 74, 44, 0.18);
 }
 
 .chosen-effects li .effect-icon {
@@ -147,6 +168,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
+  align-self: center;
 }
 
 .chosen-effects li .effect-icon img {
@@ -155,58 +177,110 @@
   object-fit: contain;
 }
 
-/* Title + meta stacked */
 .chosen-effects li .effect-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  min-width: 0;
+  align-items: start;
+}
+
+.chosen-effects li .effect-main {
   display: grid;
   grid-template-rows: auto auto;
   gap: 0.35rem;
   min-width: 0;
 }
 
-.chosen-effects li .effect-line .title {
+.chosen-effects li .effect-main .title {
   font-weight: 850;
   line-height: 1.15;
   margin: 0;
-
-  white-space: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: calc(1.15em * 2.2);
 }
 
-/* Meta only in raw mode */
-.chosen-effects li .effect-line .meta {
+.chosen-effects li .effect-main .meta {
   font-size: 0.88rem;
   line-height: 1.25;
   opacity: 0.78;
-
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem 0.55rem;
   align-items: center;
-
   margin: 0;
   min-width: 0;
 }
 
-.chosen-effects li .effect-line .meta code {
+.chosen-effects li .effect-main .meta code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.85em;
-
   padding: 0.18rem 0.42rem;
   border-radius: 0.45rem;
-
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-#results:not(.is-raw) .chosen-effects li .effect-line .meta {
-  display: none;
-}
+#results:not(.is-raw) .chosen-effects li .effect-main .meta { display: none; }
+#results:not(.is-raw) .chosen-effects li,
+#results:not(.is-raw) .chosen-effects li .effect-line { align-items: center; }
 
 /* ------------------------------------------------------------
-   Responsive
+   Indicators
    ------------------------------------------------------------ */
+
+.move-indicator {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  background: none;
+  border: none;
+  padding: 0;
+  align-self: center;
+  height: var(--icon-size);
+}
+
+.move-indicator .carrot {
+  width: 0.92rem;
+  height: 0.92rem;
+  border-right: 4px solid currentColor;
+  border-bottom: 4px solid currentColor;
+  display: inline-block;
+  opacity: 0.95;
+  transform-origin: 50% 50%;
+}
+
+/* Arrows are ALL red */
+.move-indicator.move-up,
+.move-indicator.move-down { color: rgba(235, 90, 90, 1); }
+
+.move-indicator.move-up .carrot { transform: translateY(1px) rotate(-135deg); }
+.move-indicator.move-down .carrot { transform: translateY(1px) rotate(45deg); }
+
+/* Green check */
+.move-indicator.move-ok { color: rgba(70, 210, 130, 1); }
+
+.move-indicator .check-box {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-block;
+  position: relative;
+  border: 0;
+  background: transparent;
+}
+
+.move-indicator .check-box::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-52%, -56%) rotate(45deg);
+  width: 0.55rem;
+  height: 1.05rem;
+  border-right: 5px solid currentColor;
+  border-bottom: 5px solid currentColor;
+  opacity: 0.95;
+}
 
 @media (max-width: 720px) {
   :root { --results-img-col: 150px; }
@@ -216,17 +290,5 @@
   .relic-preview {
     grid-template-columns: 1fr;
     align-items: start;
-  }
-
-.relic-frame{
-  width: var(--preview-size);   /* keep your existing width (or whatever it is now) */
-  aspect-ratio: 1 / 2;          /* <-- this is the key */
-  height: auto;                 /* let height be derived from width */
-}
-
-  .relic-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
 }

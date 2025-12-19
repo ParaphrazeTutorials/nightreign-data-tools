@@ -36,16 +36,102 @@ function getRow(effectId) {
   return byId.get(String(effectId)) ?? null;
 }
 
-function computeValidity(selectedRows) {
-  const seen = new Set();
+function getRollValue(row) {
+  const n = Number.parseInt(row?.RollOrder, 10);
+  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+}
+
+function computeCompatDupGroups(selectedRows) {
+  const byCompat = new Map();
+
   for (const r of selectedRows) {
     if (!r) continue;
-    const cid = compatId(r);
-    if (!cid) continue;
-    if (seen.has(cid)) return "Invalid";
-    seen.add(cid);
+    const id = compatId(r);
+    if (!id) continue;
+    if (!byCompat.has(id)) byCompat.set(id, []);
+    byCompat.get(id).push(r);
   }
-  return "Valid";
+
+  return [...byCompat.entries()]
+    .filter(([, list]) => list.length > 1)
+    .map(([cid, list], idx) => ({ cid, list, listId: `compatDupList_${idx}` }));
+}
+
+function computeRollOrderIssue(a, b, c) {
+  const original = [a, b, c];
+  const picked = original.filter(Boolean);
+
+  if (picked.length < 2) {
+    return {
+      hasIssue: false,
+      sorted: null,
+      movedSlots: [false, false, false],
+      moveDeltaBySlot: [0, 0, 0]
+    };
+  }
+
+  const sortedPicked = picked.slice().sort((x, y) => getRollValue(x) - getRollValue(y));
+
+  // Is the current selected-only ordering already correct?
+  let mismatch = false;
+  let j = 0;
+  for (let i = 0; i < original.length; i++) {
+    if (!original[i]) continue;
+    if (String(original[i].EffectID) !== String(sortedPicked[j].EffectID)) mismatch = true;
+    j++;
+  }
+
+  if (!mismatch) {
+    return {
+      hasIssue: false,
+      sorted: null,
+      movedSlots: [false, false, false],
+      moveDeltaBySlot: [0, 0, 0]
+    };
+  }
+
+  // Map slot -> packed index among selected items
+  const slotToPickedIndex = [-1, -1, -1];
+  let k = 0;
+  for (let i = 0; i < original.length; i++) {
+    if (!original[i]) continue;
+    slotToPickedIndex[i] = k;
+    k++;
+  }
+
+  const idToSortedIndex = new Map(sortedPicked.map((r, idx) => [String(r.EffectID), idx]));
+
+  const movedSlots = [false, false, false];
+  const moveDeltaBySlot = [0, 0, 0];
+
+  for (let i = 0; i < original.length; i++) {
+    const row = original[i];
+    if (!row) continue;
+
+    const cur = slotToPickedIndex[i];
+    const want = idToSortedIndex.get(String(row.EffectID));
+    if (want == null || cur == null || cur < 0) continue;
+
+    const delta = want - cur; // negative => move up; positive => move down
+    moveDeltaBySlot[i] = delta;
+    movedSlots[i] = delta !== 0;
+  }
+
+  // 3-slot sorted array for Details mini-preview (keeps empties in place)
+  const sortedSlots = original.slice();
+  j = 0;
+  for (let i = 0; i < sortedSlots.length; i++) {
+    if (!sortedSlots[i]) continue;
+    sortedSlots[i] = sortedPicked[j];
+    j++;
+  }
+
+  return {
+    hasIssue: true,
+    sorted: sortedSlots,
+    movedSlots,
+    moveDeltaBySlot
+  };
 }
 
 function applyHeaderValidityClasses(state, anySelected) {
@@ -58,18 +144,15 @@ function applyHeaderValidityClasses(state, anySelected) {
   if (state === "Invalid") resultsHeader.classList.add("is-invalid");
 }
 
-function updateValidityBadge(a, b, c) {
+function setValidityBadge(state, anySelected) {
   if (!validityBadge) return;
 
-  const anySelected = !!a || !!b || !!c;
   if (!anySelected) {
     validityBadge.hidden = true;
     validityBadge.classList.remove("is-valid", "is-invalid");
     applyHeaderValidityClasses(null, false);
     return;
   }
-
-  const state = computeValidity([a, b, c]);
 
   validityBadge.hidden = false;
   validityBadge.textContent = state;
@@ -103,45 +186,25 @@ function installDetailsToggles() {
 }
 
 function markLineReordered(html) {
-  // renderChosenLine starts with `<li>`; we just add a class.
   return html.replace("<li>", `<li class="reorder-changed">`);
 }
 
-function updateDetails(a, b, c, showRaw) {
+function updateDetails(a, b, c) {
   if (!dom.detailsBody) return;
 
   const selected = [a, b, c].filter(Boolean);
-  if (selected.length === 0) {
+  if (selected.length < 2) {
     dom.detailsBody.innerHTML = "";
     return;
   }
 
   const blocks = [];
 
-  // 1) Compatibility duplicates -> generic header + popover explains + list of offenders
-  const byCompat = new Map();
-  for (const r of selected) {
-    const id = compatId(r);
-    if (!id) continue;
-    if (!byCompat.has(id)) byCompat.set(id, []);
-    byCompat.get(id).push(r);
-  }
-
-  // All duplicated groups (each group shows its own list)
-  const dupGroups = [...byCompat.entries()].filter(([, list]) => list.length > 1);
+  const dupGroups = computeCompatDupGroups(selected);
   const hasDup = dupGroups.length > 0;
 
-  // We'll render these lists after innerHTML is set (like sorted preview)
-  const compatRender = hasDup
-    ? dupGroups.map(([cid, list], idx) => ({
-        cid,
-        list,
-        listId: `compatDupList_${idx}`
-      }))
-    : [];
-
   if (hasDup) {
-    const groupBlocks = compatRender
+    const groupBlocks = dupGroups
       .map(g => {
         return `
           <div class="compat-dup-group" data-compat="${String(g.cid).replace(/"/g, "&quot;")}">
@@ -175,104 +238,72 @@ function updateDetails(a, b, c, showRaw) {
     `);
   }
 
-  // 2) RollOrder not sorted -> expandable "in the correct order"
-  let needsSortedPreview = false;
-  let sorted = null;
-  let movedSlots = [false, false, false]; // which slots (1..3) changed after sorting
+  const roll = computeRollOrderIssue(a, b, c);
+  if (roll.hasIssue) {
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="rollorder">
+        <div class="info-line">
+          Your effects aren't in the correct 
+          <button type="button" class="term-link" data-popover-toggle="orderPopover">
+            roll order
+          </button>.
+        </div>
 
-  if (a && b && c) {
-    const oa = Number.parseInt(a.RollOrder, 10);
-    const ob = Number.parseInt(b.RollOrder, 10);
-    const oc = Number.parseInt(c.RollOrder, 10);
-
-    const okNums = Number.isFinite(oa) && Number.isFinite(ob) && Number.isFinite(oc);
-    const inOrder = okNums && (oa <= ob) && (ob <= oc);
-
-    if (!inOrder) {
-      needsSortedPreview = true;
-
-      const original = [a, b, c];
-      sorted = original.slice().sort((x, y) => {
-        const rx = Number.parseInt(x.RollOrder, 10);
-        const ry = Number.parseInt(y.RollOrder, 10);
-        const ax = Number.isFinite(rx) ? rx : Number.MAX_SAFE_INTEGER;
-        const ay = Number.isFinite(ry) ? ry : Number.MAX_SAFE_INTEGER;
-        return ax - ay;
-      });
-
-      movedSlots = original.map((row, idx) => {
-        return String(row.EffectID) !== String(sorted[idx].EffectID);
-      });
-
-      blocks.push(`
-        <div class="info-box is-alert" data-kind="rollorder">
-          <div class="info-line">
-            Your effects aren't in the correct 
-            <button type="button" class="term-link" data-popover-toggle="orderPopover">
-              roll order
-            </button>.
+        <div class="popover" id="orderPopover" hidden>
+          <div class="popover-title">Roll Order</div>
+          <div class="popover-body popover-body--spaced">
+            <p>Behind the scenes, there is a value attached to each effect called "Roll Order", which determines the correct order each effect must be placed on the relic.</p>
+            <p>If you put your effects in the order shown below, your relic will have a valid Roll Order.</p>
           </div>
 
-          <div class="popover" id="orderPopover" hidden>
-            <div class="popover-title">Roll Order</div>
-            <div class="popover-body popover-body--spaced">
-              <p>Behind the scenes, there is a value attached to each effect called "Roll Order", which determines the correct order each effect must be placed on the relic.</p>
-              
-              <p>If you put your effects in the order shown below, your relic will have a valid Roll Order.</p>
-            </div>
+          <div class="sorted-preview">
+            <div class="relic-preview relic-preview--mini">
+              <div class="relic-frame relic-frame--mini">
+                <img id="sortedRelicImg" alt="" />
+              </div>
 
-            <div class="sorted-preview">
-              <div class="relic-preview relic-preview--mini">
-                <div class="relic-frame relic-frame--mini">
-                  <img id="sortedRelicImg" alt="" />
-                </div>
-
-                <div class="relic-effects">
-                  <ul class="chosen-effects" id="sortedChosenList"></ul>
-                </div>
+              <div class="relic-effects">
+                <ul class="chosen-effects" id="sortedChosenList"></ul>
               </div>
             </div>
           </div>
         </div>
-      `);
-    }
+      </div>
+    `);
   }
 
   dom.detailsBody.innerHTML = blocks.join("");
-
   installDetailsToggles();
 
-  // Render Compatibility dup lists (mini-preview style)
-  if (hasDup && compatRender.length > 0) {
-    for (const g of compatRender) {
+  // Details: raw intentionally disabled
+  if (hasDup) {
+    for (const g of dupGroups) {
       const listEl = dom.detailsBody.querySelector(`#${CSS.escape(g.listId)}`);
       if (!listEl) continue;
 
-      // Build lines like mini-preview (Effect 1/2/3 style labels, but only for offenders)
       const lines = g.list
-        .slice(0, 3) // safety: should be 2-3, but don't blow up if weird
-        .map((row, idx) => renderChosenLine(`Effect ${idx + 1}`, row, showRaw))
+        .slice(0, 3)
+        .map(row => renderChosenLine("", row, false))
         .join("");
 
       listEl.innerHTML = lines;
     }
   }
 
-  // Render sorted preview if present
-  if (needsSortedPreview && sorted) {
+  if (roll.hasIssue && roll.sorted) {
     const img = dom.detailsBody.querySelector("#sortedRelicImg");
     const list = dom.detailsBody.querySelector("#sortedChosenList");
 
     if (img) img.src = dom.relicImg?.src || "";
 
     if (list) {
-      let line1 = renderChosenLine("Effect 1", sorted[0], showRaw);
-      let line2 = renderChosenLine("Effect 2", sorted[1], showRaw);
-      let line3 = renderChosenLine("Effect 3", sorted[2], showRaw);
+      let line1 = renderChosenLine("", roll.sorted[0], false);
+      let line2 = renderChosenLine("", roll.sorted[1], false);
+      let line3 = renderChosenLine("", roll.sorted[2], false);
 
-      if (movedSlots[0]) line1 = markLineReordered(line1);
-      if (movedSlots[1]) line2 = markLineReordered(line2);
-      if (movedSlots[2]) line3 = markLineReordered(line3);
+      if (roll.movedSlots[0]) line1 = markLineReordered(line1);
+      if (roll.movedSlots[1]) line2 = markLineReordered(line2);
+      if (roll.movedSlots[2]) line3 = markLineReordered(line3);
 
       list.innerHTML = line1 + line2 + line3;
     }
@@ -280,7 +311,6 @@ function updateDetails(a, b, c, showRaw) {
 }
 
 function updateUI(reason = "") {
-  // Random color reroll on meaningful changes
   if (dom.selColor.value === "Random") {
     const modifierReasons = new Set([
       "type-change",
@@ -303,7 +333,6 @@ function updateUI(reason = "") {
   const b = getRow(dom.sel2.value);
   const c = getRow(dom.sel3.value);
 
-  // Stage controls relic size
   const stage = c ? 3 : b ? 2 : a ? 1 : 0;
 
   setRelicImageForStage({
@@ -314,13 +343,9 @@ function updateUI(reason = "") {
     stage
   });
 
-  updateValidityBadge(a, b, c);
-
-  // Exclude duplicates by ID (but don't exclude the dropdown's own current selection)
   const takenFor2 = new Set([dom.sel1.value, dom.sel3.value].filter(Boolean).map(String));
   const takenFor3 = new Set([dom.sel1.value, dom.sel2.value].filter(Boolean).map(String));
 
-  // Build blocked compat sets
   const blockedFor2 = new Set();
   if (a) {
     const cidA = compatId(a);
@@ -337,7 +362,6 @@ function updateUI(reason = "") {
     if (cidB) blockedFor3.add(cidB);
   }
 
-  // Enable flow
   dom.sel1.disabled = false;
   dom.cat1.disabled = false;
 
@@ -347,7 +371,6 @@ function updateUI(reason = "") {
   dom.sel3.disabled = !a || !b;
   dom.cat3.disabled = !a || !b;
 
-  // Available lists
   const base1 = baseFilteredByRelicType(rows, dom.selType.value);
   const filtered1 = applyCategory(base1, dom.cat1.value);
 
@@ -357,12 +380,10 @@ function updateUI(reason = "") {
   const eligible3 = (a && b) ? eligibleList(rows, dom.selType.value, blockedFor3, takenFor3, showIllegal) : [];
   const filtered3 = applyCategory(eligible3, dom.cat3.value);
 
-  // Preserve selections
   const prev1 = dom.sel1.value;
   const prev2 = dom.sel2.value;
   const prev3 = dom.sel3.value;
 
-  // Fill Effect 1
   fillSelect(dom.sel1, filtered1, "— Effect 1 —");
   if (![...dom.sel1.options].some(o => o.value === prev1)) {
     dom.sel1.value = "";
@@ -374,7 +395,6 @@ function updateUI(reason = "") {
 
   const a2 = getRow(dom.sel1.value);
 
-  // Fill Effect 2
   if (a2) {
     fillSelect(dom.sel2, filtered2, "— Effect 2 —");
     dom.sel2.value = [...dom.sel2.options].some(o => o.value === prev2) ? prev2 : "";
@@ -385,7 +405,6 @@ function updateUI(reason = "") {
 
   const b2 = getRow(dom.sel2.value);
 
-  // Fill Effect 3
   if (a2 && b2) {
     fillSelect(dom.sel3, filtered3, "— Effect 3 —");
     dom.sel3.value = [...dom.sel3.options].some(o => o.value === prev3) ? prev3 : "";
@@ -396,50 +415,76 @@ function updateUI(reason = "") {
 
   const c2 = getRow(dom.sel3.value);
 
+  const anySelected = !!a2 || !!b2 || !!c2;
+  const dupGroups = computeCompatDupGroups([a2, b2, c2].filter(Boolean));
+  const hasCompatIssue = dupGroups.length > 0;
+
+  const roll = computeRollOrderIssue(a2, b2, c2);
+  const hasOrderIssue = roll.hasIssue;
+
+  const state = anySelected && (hasCompatIssue || hasOrderIssue) ? "Invalid" : "Valid";
+  setValidityBadge(state, anySelected);
+
+  // --- Special checkmark condition (exactly 3 effects selected) ---
+  // If roll order is invalid and exactly one slot is already in the correct position,
+  // show a green checkbox on that slot.
+  const allThreeSelected = !!a2 && !!b2 && !!c2;
+  let okSlotIndex = -1;
+
+  if (allThreeSelected && roll.hasIssue) {
+    const deltas = roll.moveDeltaBySlot.slice(0, 3);
+    const zeros = deltas
+      .map((d, idx) => ({ d, idx }))
+      .filter(x => x.d === 0);
+
+    // “only two need to move” => exactly one is correct
+    if (zeros.length === 1) okSlotIndex = zeros[0].idx;
+  }
+
   // Preview rendering
   if (!a2) {
     setDetailsEmpty();
 
     dom.chosenList.innerHTML =
-      renderChosenLine("Effect 1", null, showRaw) +
-      renderChosenLine("Effect 2", null, showRaw) +
-      renderChosenLine("Effect 3", null, showRaw);
+      renderChosenLine("", null, showRaw) +
+      renderChosenLine("", null, showRaw) +
+      renderChosenLine("", null, showRaw);
 
     updateCounts(dom, 1, filtered1.length);
-    updateValidityBadge(null, null, null);
+    setValidityBadge("Valid", false);
     return;
   }
 
   if (!b2) {
-    updateDetails(a2, null, null, showRaw);
+    setDetailsEmpty();
 
     dom.chosenList.innerHTML =
-      renderChosenLine("Effect 1", a2, showRaw) +
-      renderChosenLine("Effect 2", null, showRaw) +
-      renderChosenLine("Effect 3", null, showRaw);
+      renderChosenLine("", a2, showRaw) +
+      renderChosenLine("", null, showRaw) +
+      renderChosenLine("", null, showRaw);
 
     updateCounts(dom, 2, filtered2.length);
     return;
   }
 
   if (!c2) {
-    updateDetails(a2, b2, null, showRaw);
+    updateDetails(a2, b2, null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("Effect 1", a2, showRaw) +
-      renderChosenLine("Effect 2", b2, showRaw) +
-      renderChosenLine("Effect 3", null, showRaw);
+      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], false) +
+      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], false) +
+      renderChosenLine("", null, showRaw);
 
     updateCounts(dom, 3, filtered3.length);
     return;
   }
 
-  updateDetails(a2, b2, c2, showRaw);
+  updateDetails(a2, b2, c2);
 
   dom.chosenList.innerHTML =
-    renderChosenLine("Effect 1", a2, showRaw) +
-    renderChosenLine("Effect 2", b2, showRaw) +
-    renderChosenLine("Effect 3", c2, showRaw);
+    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okSlotIndex === 0) +
+    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okSlotIndex === 1) +
+    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okSlotIndex === 2);
 
   updateCounts(dom, 3, filtered3.length);
 }
@@ -472,23 +517,19 @@ async function load() {
 
   pickRandomColor();
 
-  // Categories
   const base = baseFilteredByRelicType(rows, dom.selType.value);
   const cats = categoriesFor(base);
   fillCategorySelect(dom.cat1, cats);
   fillCategorySelect(dom.cat2, cats);
   fillCategorySelect(dom.cat3, cats);
 
-  // Initial lists
   fillSelect(dom.sel1, base, "— Effect 1 —");
   fillSelect(dom.sel2, [], "— Effect 2 —");
   fillSelect(dom.sel3, [], "— Effect 3 —");
 
-  // Default relic
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
   installRelicImgFallback(dom.relicImg, () => dom.selType.value);
 
-  // Events
   dom.selType.addEventListener("change", () => updateUI("type-change"));
   dom.selColor.addEventListener("change", () => updateUI("color-change"));
   dom.showIllegalEl.addEventListener("change", () => updateUI("illegal-change"));

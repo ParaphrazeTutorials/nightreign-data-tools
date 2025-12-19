@@ -59,15 +59,53 @@ function iconPath(statusIconId) {
   return new URL(`../Assets/icons/reliquary/${statusIconId}.png`, window.location.href).toString();
 }
 
-export function renderChosenLine(slotLabel, row, showRaw) {
+function okIndicatorHtml() {
+  return `
+    <div class="move-indicator move-ok" aria-label="Correct position" title="Correct position">
+      <span class="check-box" aria-hidden="true"></span>
+    </div>
+  `;
+}
+
+function moveIndicatorHtml(moveDelta, showOk = false) {
+  const delta = Number(moveDelta || 0);
+
+  // Only show green check for the special 3-effect case (controlled by caller)
+  if (showOk) return okIndicatorHtml();
+
+  if (!Number.isFinite(delta) || delta === 0) return "";
+
+  const count = Math.min(3, Math.abs(delta));
+  const dirClass = delta < 0 ? "move-up" : "move-down";
+
+  const label = delta < 0
+    ? `Move up ${count} ${count === 1 ? "slot" : "slots"}`
+    : `Move down ${count} ${count === 1 ? "slot" : "slots"}`;
+
+  const carrots = Array.from({ length: count })
+    .map(() => `<span class="carrot" aria-hidden="true"></span>`)
+    .join("");
+
+  return `<div class="move-indicator ${dirClass}" aria-label="${label}" title="${label}">${carrots}</div>`;
+}
+
+export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk = false) {
+  const prefix = slotLabel ? `${slotLabel}: ` : "";
+
   // Empty slot
   if (!row) {
+    const title = slotLabel
+      ? `${prefix}<span class="pill">Empty</span>`
+      : `<span class="pill">Empty</span>`;
+
     if (!showRaw) {
       return `
         <li>
           <div class="effect-icon" aria-hidden="true"></div>
           <div class="effect-line">
-            <div class="title">${slotLabel}: <span class="pill">Empty</span></div>
+            <div class="effect-main">
+              <div class="title">${title}</div>
+            </div>
           </div>
         </li>
       `;
@@ -77,8 +115,10 @@ export function renderChosenLine(slotLabel, row, showRaw) {
       <li>
         <div class="effect-icon" aria-hidden="true"></div>
         <div class="effect-line">
-          <div class="title">${slotLabel}: <span class="pill">Empty</span></div>
-          <div class="meta"></div>
+          <div class="effect-main">
+            <div class="title">${title}</div>
+            <div class="meta"></div>
+          </div>
         </div>
       </li>
     `;
@@ -90,6 +130,7 @@ export function renderChosenLine(slotLabel, row, showRaw) {
   const roll = (row?.RollOrder == null || String(row.RollOrder).trim() === "") ? "∅" : String(row.RollOrder);
 
   const src = iconId ? iconPath(iconId) : "";
+  const mover = moveIndicatorHtml(moveDelta, showOk);
 
   // Compact
   if (!showRaw) {
@@ -99,7 +140,10 @@ export function renderChosenLine(slotLabel, row, showRaw) {
           ${src ? `<img src="${src}" alt="" onerror="this.remove()" />` : ""}
         </div>
         <div class="effect-line">
-          <div class="title">${slotLabel}: ${name}</div>
+          <div class="effect-main">
+            <div class="title">${prefix}${name}</div>
+          </div>
+          ${mover}
         </div>
       </li>
     `;
@@ -112,13 +156,16 @@ export function renderChosenLine(slotLabel, row, showRaw) {
         ${src ? `<img src="${src}" alt="" onerror="this.remove()" />` : ""}
       </div>
       <div class="effect-line">
-        <div class="title">${slotLabel}: ${name}</div>
-        <div class="meta">
-          RollOrder <code>${roll}</code>
-          • EffectID <code>${row.EffectID}</code>
-          • Compatibility <code>${cid}</code>
-          ${iconId ? `• Icon <code>${iconId}</code>` : ``}
+        <div class="effect-main">
+          <div class="title">${prefix}${name}</div>
+          <div class="meta">
+            RollOrder <code>${roll}</code>
+            • EffectID <code>${row.EffectID}</code>
+            • Compatibility <code>${cid}</code>
+            ${iconId ? `• Icon <code>${iconId}</code>` : ``}
+          </div>
         </div>
+        ${mover}
       </div>
     </li>
   `;
