@@ -1,0 +1,235 @@
+/* ------------------------------------------------------------
+   Mini preview relic scaling (legacy; overridden below by hiding frame)
+   ------------------------------------------------------------ */
+
+#details .sorted-preview .relic-frame {
+  width: var(--mini-preview-size);
+  height: var(--mini-preview-size);
+  aspect-ratio: 1 / 1;
+}
+
+#details .sorted-preview .relic-frame img {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  object-fit: cover !important;
+  transform: scale(var(--mini-art-zoom));
+  transform-origin: center;
+}
+
+/* ------------------------------------------------------------
+   DETAILS — alert + popovers (scoped, stable)
+   Keep RED as the error signal, mute everything else so it plays
+   nicely with gold highlights.
+   ------------------------------------------------------------ */
+
+#details .details-body{
+  display: grid;
+  gap: 0.75rem;
+}
+
+#details .info-box{
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.14);
+  border-radius: 0.85rem;
+  padding: 0.85rem 0.95rem;
+}
+
+/* red stays vibrant */
+#details .info-box.is-alert{
+  border-color: rgba(220, 70, 70, 0.85);
+  background: linear-gradient(
+    180deg,
+    rgba(170, 32, 44, 0.55),
+    rgba(95, 18, 26, 0.48)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 120, 120, 0.22),
+    inset 0 1px 0 rgba(255, 200, 200, 0.14),
+    0 0 22px rgba(160, 30, 40, 0.20);
+}
+
+#details .info-line{
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+/* inline clickable term (underline + caret, aligned) */
+#details .term-link{
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.22rem;
+
+  font: inherit;
+  font-weight: 850;
+  color: inherit;
+
+  line-height: 1.05;
+  vertical-align: baseline;
+
+  cursor: pointer;
+
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(255,255,255,0.45);
+}
+
+#details .term-link::after{
+  content: "▾";
+  display: inline-block;
+  font-weight: 700;
+  opacity: 0.75;
+  transform: translateY(-0.02em);
+}
+
+#details .term-link:hover{
+  text-decoration-color: rgba(232,194,0,0.95);
+  text-shadow: 0 0 6px rgba(232,194,0,0.18);
+}
+
+#details .term-link:focus-visible{
+  outline: 2px solid rgba(232,194,0,0.55);
+  outline-offset: 3px;
+  border-radius: 0.35rem;
+}
+
+/* expanded panel (neutral smoke — no purple/beige) */
+#details .popover{
+  margin-top: 0.65rem;
+  border-radius: 0.95rem;
+  padding: 0.95rem 1rem;
+
+  background: linear-gradient(
+    180deg,
+    rgba(32, 34, 40, 0.65),
+    rgba(18, 20, 26, 0.60)
+  );
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.30),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+
+  display: grid;
+  gap: 0.75rem;
+
+  overflow-x: hidden;
+}
+
+#details .popover-title{
+  font-weight: 900;
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+#details .popover-body p{
+  margin: 0;
+  opacity: 0.88;
+}
+
+/* mini preview (LIST ONLY — no relic image) */
+#details .sorted-preview{
+  margin-top: 0.25rem;
+  padding: 0.85rem;
+  border-radius: 0.95rem;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.05),
+    rgba(18,20,26,0.18)
+  );
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+#details .sorted-preview .relic-frame,
+#details .sorted-preview .relic-frame--mini{
+  display: none !important;
+}
+
+/* force one-column layout inside the Details mini preview */
+#details .sorted-preview .relic-preview--mini{
+  display: grid;
+  grid-template-columns: 1fr !important;
+  gap: 0.65rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+#details .sorted-preview .relic-effects{
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+#details .sorted-preview .chosen-effects{
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  display: grid;
+  gap: 0.6rem;
+  grid-template-rows: repeat(3, auto);
+
+  width: 100%;
+  max-width: 100%;
+  overflow: visible !important;
+}
+
+#details .sorted-preview .chosen-effects li{
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+
+  padding: 0.50rem 0.75rem;
+  border-radius: 0.75rem;
+
+  background: linear-gradient(
+    180deg,
+    rgba(40, 42, 48, 0.85),
+    rgba(28, 30, 36, 0.85)
+  );
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+
+  overflow: hidden;
+}
+
+#details .sorted-preview .effect-line{
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+#details .sorted-preview .effect-line .title{
+  font-weight: 850;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+/* reordered rows (gold stays) */
+#details .sorted-preview .chosen-effects li.reorder-changed{
+  background: linear-gradient(
+    180deg,
+    rgba(232,194,0,0.14),
+    rgba(232,194,0,0.08)
+  );
+  border-color: rgba(232,194,0,0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(232,194,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}

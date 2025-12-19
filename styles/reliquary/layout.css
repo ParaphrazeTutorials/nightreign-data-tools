@@ -1,0 +1,191 @@
+/* ------------------------------------------------------------
+   REAL ESTATE (high-res / ultrawide friendly)
+   ------------------------------------------------------------ */
+
+.tool-shell {
+  width: 100%;
+  max-width: clamp(980px, 92vw, 2200px);
+  margin-inline: auto;
+}
+
+.tool-shell,
+.tool-shell :where(p, li, label, select, input, small) {
+  font-size: 0.94rem;
+}
+
+.tool-shell :where(h3) {
+  font-size: 1.05rem;
+  margin-bottom: 0.6rem;
+}
+
+.tool-shell section,
+.tool-shell article {
+  margin-top: 0.9rem;
+}
+
+/* ------------------------------------------------------------
+   Options + Grid Layout
+   ------------------------------------------------------------ */
+
+.options-panel {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.6rem;
+  padding: 0.85rem 1rem;
+}
+
+.options-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  align-items: end;
+}
+
+.options-controls {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+
+  padding-top: 0.65rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.options-controls__left {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.options-controls__right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.inline-check {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------
+   Main layout: 1/3 left, 2/3 right
+   ------------------------------------------------------------ */
+
+.main-grid {
+  display: grid;
+  grid-template-columns: clamp(320px, 30vw, 480px) 1fr; /* slightly narrower left */
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   LEFT COLUMN (COMPACT MODE)
+   ------------------------------------------------------------ */
+
+.left-column {
+  display: grid;
+  gap: 0.85rem;
+  align-content: start;
+}
+
+/* One sidebar container for all effects */
+.sidebar-panel {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.75rem;
+  padding: 0.75rem; /* tighter */
+  margin-top: 0;
+}
+
+/* Tighten each effect section */
+.sidebar-panel .effect-card {
+  margin: 0;
+  padding: 0.5rem 0; /* tighter */
+  border-radius: 0;
+  background: transparent;
+  border: none;
+}
+
+.sidebar-panel .effect-card:first-child { padding-top: 0; }
+.sidebar-panel .effect-card:last-child { padding-bottom: 0; }
+
+.sidebar-panel .effect-card + .effect-card {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 0.5rem;      /* tighter separation */
+  padding-top: 0.65rem;    /* tighter separation */
+}
+
+/* Headings: smaller + no extra margin */
+.sidebar-panel .effect-card h3 {
+  margin: 0 0 0.45rem 0;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+}
+
+/* Subtext count: smaller + closer */
+.effect-card small.subtext {
+  display: block;
+  margin-top: 0.25rem;
+  opacity: 0.75;
+  font-size: 0.86rem;
+}
+
+/* Category + Effect row: tighter gap */
+.effect-row {
+  display: grid;
+  grid-template-columns: 0.9fr 1.4fr; /* gives Effect more room */
+  gap: 0.6rem;                         /* tighter */
+  align-items: end;
+}
+
+@media (max-width: 520px) {
+  .effect-row { grid-template-columns: 1fr; }
+}
+
+/* LABELS + CONTROLS: this is the big win for vertical compactness */
+.sidebar-panel .effect-row label {
+  margin: 0 !important;               /* pico adds space; kill it */
+  padding: 0 !important;
+}
+
+.sidebar-panel .effect-row label > :is(select, input) {
+  margin-top: 0.25rem !important;     /* reduce space between label text and control */
+}
+
+/* Make label text smaller */
+.sidebar-panel .effect-row label {
+  font-size: 0.86rem;
+  opacity: 0.92;
+}
+
+/* Reduce select height slightly (safe with Pico) */
+.sidebar-panel select {
+  padding-top: 0.45rem !important;
+  padding-bottom: 0.45rem !important;
+  min-height: 2.35rem;                /* smaller than Pico default */
+}
+
+/* ------------------------------------------------------------
+   RIGHT COLUMN
+   ------------------------------------------------------------ */
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.right-column > article {
+  width: 100%;
+  align-self: stretch;
+}

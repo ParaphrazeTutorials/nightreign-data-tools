@@ -19,8 +19,10 @@ import {
 import { getDom } from "./reliquary.dom.js";
 
 const dom = getDom();
+const resultsEl = document.getElementById("results");
+const resultsHeader = document.querySelector("#results .panel-header");
+const validityBadge = document.getElementById("relicValidity");
 
-// App state
 let rows = [];
 let byId = new Map();
 let currentRandomColor = "Red";
@@ -30,23 +32,234 @@ function pickRandomColor() {
 }
 
 function getRow(effectId) {
+  if (!effectId) return null;
   return byId.get(String(effectId)) ?? null;
 }
 
+function computeValidity(selectedRows) {
+  const seen = new Set();
+  for (const r of selectedRows) {
+    if (!r) continue;
+    const cid = compatId(r);
+    if (!cid) continue;
+    if (seen.has(cid)) return "Invalid";
+    seen.add(cid);
+  }
+  return "Valid";
+}
+
+function applyHeaderValidityClasses(state, anySelected) {
+  if (!resultsHeader) return;
+
+  resultsHeader.classList.remove("is-valid", "is-invalid");
+
+  if (!anySelected) return;
+  if (state === "Valid") resultsHeader.classList.add("is-valid");
+  if (state === "Invalid") resultsHeader.classList.add("is-invalid");
+}
+
+function updateValidityBadge(a, b, c) {
+  if (!validityBadge) return;
+
+  const anySelected = !!a || !!b || !!c;
+  if (!anySelected) {
+    validityBadge.hidden = true;
+    validityBadge.classList.remove("is-valid", "is-invalid");
+    applyHeaderValidityClasses(null, false);
+    return;
+  }
+
+  const state = computeValidity([a, b, c]);
+
+  validityBadge.hidden = false;
+  validityBadge.textContent = state;
+
+  validityBadge.classList.toggle("is-valid", state === "Valid");
+  validityBadge.classList.toggle("is-invalid", state === "Invalid");
+
+  applyHeaderValidityClasses(state, true);
+}
+
+function setDetailsEmpty() {
+  if (!dom.detailsBody) return;
+  dom.detailsBody.innerHTML = "";
+}
+
+function installDetailsToggles() {
+  if (!dom.detailsBody) return;
+
+  const buttons = dom.detailsBody.querySelectorAll("[data-popover-toggle]");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-popover-toggle");
+      if (!id) return;
+
+      const pop = dom.detailsBody.querySelector(`#${CSS.escape(id)}`);
+      if (!pop) return;
+
+      pop.hidden = !pop.hidden;
+    });
+  });
+}
+
+function markLineReordered(html) {
+  // renderChosenLine starts with `<li>`; we just add a class.
+  return html.replace("<li>", `<li class="reorder-changed">`);
+}
+
+function updateDetails(a, b, c, showRaw) {
+  if (!dom.detailsBody) return;
+
+  const selected = [a, b, c].filter(Boolean);
+  if (selected.length === 0) {
+    dom.detailsBody.innerHTML = "";
+    return;
+  }
+
+  const blocks = [];
+
+  // 1) Compatibility duplicates
+  const counts = new Map();
+  for (const r of selected) {
+    const id = compatId(r);
+    if (!id) continue;
+    counts.set(id, (counts.get(id) || 0) + 1);
+  }
+  const hasDup = [...counts.values()].some(v => v > 1);
+
+  if (hasDup) {
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="compat-dup">
+        <div class="info-line">
+          You have two effects that share a
+          <button type="button" class="term-link" data-popover-toggle="compatPopover">
+            Compatibility Group
+          </button>.
+        </div>
+
+        <div class="popover" id="compatPopover" hidden>
+          <div class="popover-title">Compatibility Group</div>
+          <div class="popover-body">
+            <p>TODO: Add your explanation text here.</p>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  // 2) RollOrder not sorted -> expandable "in the correct order"
+  let needsSortedPreview = false;
+  let sorted = null;
+  let movedSlots = [false, false, false]; // which slots (1..3) changed after sorting
+
+  if (a && b && c) {
+    const oa = Number.parseInt(a.RollOrder, 10);
+    const ob = Number.parseInt(b.RollOrder, 10);
+    const oc = Number.parseInt(c.RollOrder, 10);
+
+    const okNums = Number.isFinite(oa) && Number.isFinite(ob) && Number.isFinite(oc);
+    const inOrder = okNums && (oa <= ob) && (ob <= oc);
+
+    if (!inOrder) {
+      needsSortedPreview = true;
+
+      const original = [a, b, c];
+      sorted = original.slice().sort((x, y) => {
+        const rx = Number.parseInt(x.RollOrder, 10);
+        const ry = Number.parseInt(y.RollOrder, 10);
+        const ax = Number.isFinite(rx) ? rx : Number.MAX_SAFE_INTEGER;
+        const ay = Number.isFinite(ry) ? ry : Number.MAX_SAFE_INTEGER;
+        return ax - ay;
+      });
+
+      movedSlots = original.map((row, idx) => {
+        return String(row.EffectID) !== String(sorted[idx].EffectID);
+      });
+
+      blocks.push(`
+        <div class="info-box is-alert" data-kind="rollorder">
+          <div class="info-line">
+            Your effects aren't
+            <button type="button" class="term-link" data-popover-toggle="orderPopover">
+              in the correct order
+            </button>.
+          </div>
+
+          <div class="popover" id="orderPopover" hidden>
+            <div class="popover-title">Correct Order</div>
+            <div class="popover-body">
+              <p>TODO: Add your explanation text here.</p>
+            </div>
+
+            <div class="sorted-preview">
+              <div class="relic-preview relic-preview--mini">
+                <div class="relic-frame relic-frame--mini">
+                  <img id="sortedRelicImg" alt="" />
+                </div>
+
+                <div class="relic-effects">
+                  <ul class="chosen-effects" id="sortedChosenList"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+  }
+
+  dom.detailsBody.innerHTML = blocks.join("");
+
+  installDetailsToggles();
+
+  // Render sorted preview if present
+  if (needsSortedPreview && sorted) {
+    const img = dom.detailsBody.querySelector("#sortedRelicImg");
+    const list = dom.detailsBody.querySelector("#sortedChosenList");
+
+    if (img) img.src = dom.relicImg?.src || "";
+
+    if (list) {
+      let line1 = renderChosenLine("Effect 1", sorted[0], showRaw);
+      let line2 = renderChosenLine("Effect 2", sorted[1], showRaw);
+      let line3 = renderChosenLine("Effect 3", sorted[2], showRaw);
+
+      if (movedSlots[0]) line1 = markLineReordered(line1);
+      if (movedSlots[1]) line2 = markLineReordered(line2);
+      if (movedSlots[2]) line3 = markLineReordered(line3);
+
+      list.innerHTML = line1 + line2 + line3;
+    }
+  }
+}
+
 function updateUI(reason = "") {
-  // If color is Random and a modifier changes, reroll
+  // Random color reroll on meaningful changes
   if (dom.selColor.value === "Random") {
-    const modifierReasons = new Set(["type-change", "illegal-change", "cat-change", "effect-change", "reset", "init"]);
+    const modifierReasons = new Set([
+      "type-change",
+      "illegal-change",
+      "cat-change",
+      "effect-change",
+      "reset",
+      "init",
+      "raw-change"
+    ]);
     if (modifierReasons.has(reason)) pickRandomColor();
   }
 
   const showIllegal = !!dom.showIllegalEl.checked;
+  const showRaw = !!dom.showRawEl?.checked;
+
+  if (resultsEl) resultsEl.classList.toggle("is-raw", showRaw);
 
   const a = getRow(dom.sel1.value);
   const b = getRow(dom.sel2.value);
   const c = getRow(dom.sel3.value);
 
+  // Stage controls relic size
   const stage = c ? 3 : b ? 2 : a ? 1 : 0;
+
   setRelicImageForStage({
     relicImg: dom.relicImg,
     selectedType: dom.selType.value,
@@ -55,10 +268,13 @@ function updateUI(reason = "") {
     stage
   });
 
-  // do NOT exclude a dropdown's own current selection
+  updateValidityBadge(a, b, c);
+
+  // Exclude duplicates by ID (but don't exclude the dropdown's own current selection)
   const takenFor2 = new Set([dom.sel1.value, dom.sel3.value].filter(Boolean).map(String));
   const takenFor3 = new Set([dom.sel1.value, dom.sel2.value].filter(Boolean).map(String));
 
+  // Build blocked compat sets
   const blockedFor2 = new Set();
   if (a) {
     const cidA = compatId(a);
@@ -85,7 +301,7 @@ function updateUI(reason = "") {
   dom.sel3.disabled = !a || !b;
   dom.cat3.disabled = !a || !b;
 
-  // Lists
+  // Available lists
   const base1 = baseFilteredByRelicType(rows, dom.selType.value);
   const filtered1 = applyCategory(base1, dom.cat1.value);
 
@@ -95,13 +311,13 @@ function updateUI(reason = "") {
   const eligible3 = (a && b) ? eligibleList(rows, dom.selType.value, blockedFor3, takenFor3, showIllegal) : [];
   const filtered3 = applyCategory(eligible3, dom.cat3.value);
 
-  // Preserve selections when refilling
+  // Preserve selections
   const prev1 = dom.sel1.value;
   const prev2 = dom.sel2.value;
   const prev3 = dom.sel3.value;
 
+  // Fill Effect 1
   fillSelect(dom.sel1, filtered1, "— Effect 1 —");
-
   if (![...dom.sel1.options].some(o => o.value === prev1)) {
     dom.sel1.value = "";
     dom.sel2.value = "";
@@ -112,6 +328,7 @@ function updateUI(reason = "") {
 
   const a2 = getRow(dom.sel1.value);
 
+  // Fill Effect 2
   if (a2) {
     fillSelect(dom.sel2, filtered2, "— Effect 2 —");
     dom.sel2.value = [...dom.sel2.options].some(o => o.value === prev2) ? prev2 : "";
@@ -122,6 +339,7 @@ function updateUI(reason = "") {
 
   const b2 = getRow(dom.sel2.value);
 
+  // Fill Effect 3
   if (a2 && b2) {
     fillSelect(dom.sel3, filtered3, "— Effect 3 —");
     dom.sel3.value = [...dom.sel3.options].some(o => o.value === prev3) ? prev3 : "";
@@ -132,61 +350,50 @@ function updateUI(reason = "") {
 
   const c2 = getRow(dom.sel3.value);
 
-  // Right panel
+  // Preview rendering
   if (!a2) {
-    dom.statusText.textContent = `Loaded ${rows.length} effects. Pick Effect 1 to begin.`;
-    dom.detailsList.innerHTML = `<li>Waiting for Effect 1…</li>`;
-    dom.chosenList.innerHTML = `
-      <li>
-        <div class="effect-icon" aria-hidden="true"></div>
-        <div class="effect-line">
-          <div class="title">No effects selected</div>
-          <div class="meta">Pick Effect 1 to begin.</div>
-        </div>
-      </li>
-    `;
+    setDetailsEmpty();
+
+    dom.chosenList.innerHTML =
+      renderChosenLine("Effect 1", null, showRaw) +
+      renderChosenLine("Effect 2", null, showRaw) +
+      renderChosenLine("Effect 3", null, showRaw);
+
     updateCounts(dom, 1, filtered1.length);
+    updateValidityBadge(null, null, null);
     return;
   }
 
   if (!b2) {
-    dom.statusText.textContent = `Effect 1 selected. Choose Effect 2.`;
-    dom.detailsList.innerHTML = `
-      <li><strong>Effect 2 blocked CompatibilityIDs:</strong> <code>${[...blockedFor2].length ? [...blockedFor2].join(", ") : "None"}</code></li>
-    `;
+    updateDetails(a2, null, null, showRaw);
+
     dom.chosenList.innerHTML =
-      renderChosenLine("Effect 1", a2) +
-      renderChosenLine("Effect 2", null) +
-      renderChosenLine("Effect 3", null);
+      renderChosenLine("Effect 1", a2, showRaw) +
+      renderChosenLine("Effect 2", null, showRaw) +
+      renderChosenLine("Effect 3", null, showRaw);
 
     updateCounts(dom, 2, filtered2.length);
     return;
   }
 
   if (!c2) {
-    dom.statusText.textContent = `Effects 1 & 2 selected. Choose Effect 3.`;
-    dom.detailsList.innerHTML = `
-      <li><strong>Effect 2 blocked CompatibilityIDs:</strong> <code>${[...blockedFor2].length ? [...blockedFor2].join(", ") : "None"}</code></li>
-      <li><strong>Effect 3 blocked CompatibilityIDs:</strong> <code>${[...blockedFor3].length ? [...blockedFor3].join(", ") : "None"}</code></li>
-    `;
+    updateDetails(a2, b2, null, showRaw);
+
     dom.chosenList.innerHTML =
-      renderChosenLine("Effect 1", a2) +
-      renderChosenLine("Effect 2", b2) +
-      renderChosenLine("Effect 3", null);
+      renderChosenLine("Effect 1", a2, showRaw) +
+      renderChosenLine("Effect 2", b2, showRaw) +
+      renderChosenLine("Effect 3", null, showRaw);
 
     updateCounts(dom, 3, filtered3.length);
     return;
   }
 
-  dom.statusText.textContent = `All 3 effects selected.`;
-  dom.detailsList.innerHTML = `
-    <li><strong>Effect 2 blocked CompatibilityIDs:</strong> <code>${[...blockedFor2].length ? [...blockedFor2].join(", ") : "None"}</code></li>
-    <li><strong>Effect 3 blocked CompatibilityIDs:</strong> <code>${[...blockedFor3].length ? [...blockedFor3].join(", ") : "None"}</code></li>
-  `;
+  updateDetails(a2, b2, c2, showRaw);
+
   dom.chosenList.innerHTML =
-    renderChosenLine("Effect 1", a2) +
-    renderChosenLine("Effect 2", b2) +
-    renderChosenLine("Effect 3", c2);
+    renderChosenLine("Effect 1", a2, showRaw) +
+    renderChosenLine("Effect 2", b2, showRaw) +
+    renderChosenLine("Effect 3", c2, showRaw);
 
   updateCounts(dom, 3, filtered3.length);
 }
@@ -211,8 +418,6 @@ function resetAll() {
 }
 
 async function load() {
-  dom.statusText.textContent = "Loading data…";
-
   const res = await fetch(DATA_URL, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${DATA_URL} (${res.status})`);
 
@@ -221,19 +426,19 @@ async function load() {
 
   pickRandomColor();
 
-  // Categories based on relic-type filtered list
+  // Categories
   const base = baseFilteredByRelicType(rows, dom.selType.value);
   const cats = categoriesFor(base);
   fillCategorySelect(dom.cat1, cats);
   fillCategorySelect(dom.cat2, cats);
   fillCategorySelect(dom.cat3, cats);
 
-  // Fill Effect 1; 2/3 filled on update
+  // Initial lists
   fillSelect(dom.sel1, base, "— Effect 1 —");
   fillSelect(dom.sel2, [], "— Effect 2 —");
   fillSelect(dom.sel3, [], "— Effect 3 —");
 
-  // Default relic image
+  // Default relic
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
   installRelicImgFallback(dom.relicImg, () => dom.selType.value);
 
@@ -264,7 +469,18 @@ async function load() {
 
 load().catch(err => {
   console.error(err);
-  dom.statusText.textContent = "Failed to load reliquary data. Check console.";
-  dom.detailsList.innerHTML = `<li><code>${String(err.message || err)}</code></li>`;
+  if (dom.detailsBody) {
+    dom.detailsBody.innerHTML = `
+      <div class="info-box is-alert">
+        <div class="info-line">Error loading data.</div>
+        <div class="popover" style="display:block; margin-top:0.55rem;">
+          <div class="popover-title">Error</div>
+          <div class="popover-body">
+            <p><code>${String(err.message || err)}</code></p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
   dom.relicImg.src = "";
 });

@@ -6,7 +6,12 @@
 
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="../styles/site.css">
-    <link rel="stylesheet" href="../styles/reliquary.css">
+    <link rel="stylesheet" href="../styles/reliquary/layout.css">
+    <link rel="stylesheet" href="../styles/reliquary/results.css">
+    <link rel="stylesheet" href="../styles/reliquary/components.css">
+    <link rel="stylesheet" href="../styles/reliquary/details.css">
+    <!-- MUST be last -->
+    <link rel="stylesheet" href="../styles/reliquary/overrides.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
@@ -14,7 +19,7 @@
   <body>
     <main class="app-shell app-grid">
 
-      <!-- HEADER -->
+      <!-- HERO -->
       <header class="hero">
         <img
           class="hero-art"
@@ -80,48 +85,45 @@
                 <option value="Green">Green</option>
               </select>
             </label>
-          </div>
 
-          <div class="options-divider" aria-hidden="true"></div>
+            <div class="options-controls">
+              <div class="options-controls__left">
+                <label class="inline-check">
+                  <input type="checkbox" id="showIllegal" />
+                  Show Illegal Combinations
+                </label>
 
-          <div class="options-row options-row--bottom">
-            <div class="options-checks">
-              <label class="inline-check">
-                <input type="checkbox" id="showIllegal" />
-                Show Illegal Combinations
-              </label>
+                <label class="inline-check">
+                  <input type="checkbox" id="showRaw" />
+                  Show Raw Data
+                </label>
+              </div>
 
-              <label class="inline-check">
-                <input type="checkbox" id="showRaw" />
-                Show Raw Data
-              </label>
-            </div>
-
-            <div class="options-actions">
-              <button type="button" class="start-over" id="startOver">
-                Start Over
-              </button>
+              <div class="options-controls__right">
+                <button id="startOver" class="secondary" type="button">Start Over</button>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN GRID -->
         <section class="main-grid">
+
           <!-- LEFT -->
           <section class="left-column">
 
             <article class="effect-card" id="effect1-card">
               <h3>Effect 1</h3>
 
-              <div class="effect-grid">
-                <label class="effect-grid__cat">
+              <div class="effect-row">
+                <label>
                   Category
                   <select id="cat1" disabled>
                     <option value="">— All —</option>
                   </select>
                 </label>
 
-                <label class="effect-grid__desc">
+                <label>
                   Effect
                   <select id="effect1">
                     <option value="">— Effect 1 —</option>
@@ -135,15 +137,15 @@
             <article class="effect-card" id="effect2-card">
               <h3>Effect 2</h3>
 
-              <div class="effect-grid">
-                <label class="effect-grid__cat">
+              <div class="effect-row">
+                <label>
                   Category
                   <select id="cat2" disabled>
                     <option value="">— All —</option>
                   </select>
                 </label>
 
-                <label class="effect-grid__desc">
+                <label>
                   Effect
                   <select id="effect2" disabled>
                     <option value="">— Effect 2 —</option>
@@ -157,15 +159,15 @@
             <article class="effect-card" id="effect3-card">
               <h3>Effect 3</h3>
 
-              <div class="effect-grid">
-                <label class="effect-grid__cat">
+              <div class="effect-row">
+                <label>
                   Category
                   <select id="cat3" disabled>
                     <option value="">— All —</option>
                   </select>
                 </label>
 
-                <label class="effect-grid__desc">
+                <label>
                   Effect
                   <select id="effect3" disabled>
                     <option value="">— Effect 3 —</option>
@@ -182,34 +184,28 @@
           <section class="right-column">
 
             <article id="results">
-              <h3>Relic Preview</h3>
+              <div class="panel-header">
+                <h3>Relic Preview</h3>
+                <span id="relicValidity" class="validity-badge" hidden>Valid</span>
+              </div>
 
               <div class="relic-preview">
                 <div class="relic-frame">
                   <img id="relicImg" alt="Relic preview" />
                 </div>
 
-                <div>
-                  <p id="statusText" style="margin:0;">Loading…</p>
-
-                  <ul class="chosen-effects" id="chosenList">
-                    <li>
-                      <div class="effect-icon" aria-hidden="true"></div>
-                      <div class="effect-line">
-                        <div class="title">No effects selected</div>
-                        <div class="meta">Pick Effect 1 to begin.</div>
-                      </div>
-                    </li>
-                  </ul>
+                <div class="relic-effects">
+                  <ul class="chosen-effects" id="chosenList"></ul>
                 </div>
               </div>
             </article>
 
             <article id="details">
-              <h3>Details</h3>
-              <ul id="detailsList">
-                <li>Loading…</li>
-              </ul>
+              <div class="panel-header">
+                <h3>Details</h3>
+              </div>
+
+              <div id="detailsBody" class="details-body"></div>
             </article>
 
           </section>

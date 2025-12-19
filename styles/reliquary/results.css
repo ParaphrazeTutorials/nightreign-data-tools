@@ -1,0 +1,232 @@
+/* ------------------------------------------------------------
+   Reliquary — Results (stable image: fixed width, height matches 3 rows)
+   ------------------------------------------------------------ */
+
+:root {
+  --results-img-col: 170px;   /* fixed width so it never balloons */
+  --row-radius: 0.75rem;
+  --row-pad-y: 0.7rem;
+  --row-pad-x: 0.85rem;
+  --row-gap: 0.65rem;
+  --icon-size: 38px;
+}
+
+/* ------------------------------------------------------------
+   Results shell
+   ------------------------------------------------------------ */
+
+#results {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.75rem;
+  padding: 0.9rem !important;
+
+  height: auto;
+  min-height: 0;
+}
+
+#results,
+#results * {
+  box-sizing: border-box;
+}
+
+#results .panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.65rem;
+
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  margin-bottom: 0.75rem;
+}
+
+#results .panel-header h3 { margin: 0; }
+
+.validity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.validity-badge.is-valid { background: rgba(18, 74, 44, 0.90); }
+.validity-badge.is-invalid { background: rgba(92, 22, 22, 0.90); }
+
+/* ------------------------------------------------------------
+   Preview layout
+   - Left column is FIXED WIDTH (prevents ballooning)
+   - Height is defined by the chosen-effects list (3 rows)
+   - Image frame stretches to match that height
+   ------------------------------------------------------------ */
+
+.relic-preview {
+  display: grid;
+  grid-template-columns: var(--results-img-col) minmax(0, 1fr);
+  gap: 1rem;
+
+  /* make both columns share the same row height */
+  align-items: stretch;
+}
+
+/* Frame stretches to match the list height */
+.relic-frame {
+  width: var(--results-img-col);
+  height: 100%;
+
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image never distorts; it scales inside the frame */
+.relic-frame img {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  object-fit: contain; /* <-- IMPORTANT: no distortion */
+}
+
+/* ------------------------------------------------------------
+   Effects list
+   ------------------------------------------------------------ */
+
+.relic-effects {
+  min-height: 0;
+}
+
+.chosen-effects {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  display: grid;
+  gap: var(--row-gap);
+  align-content: start;
+}
+
+/* Each effect row */
+.chosen-effects li {
+  display: grid;
+  grid-template-columns: var(--icon-size) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+
+  padding: var(--row-pad-y) var(--row-pad-x);
+  border-radius: var(--row-radius);
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.16),
+    rgba(0, 0, 0, 0.10)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.chosen-effects li .effect-icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border-radius: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.22);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.chosen-effects li .effect-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Title + meta stacked */
+.chosen-effects li .effect-line {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.chosen-effects li .effect-line .title {
+  font-weight: 850;
+  line-height: 1.15;
+  margin: 0;
+
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: calc(1.15em * 2.2);
+}
+
+/* Meta only in raw mode */
+.chosen-effects li .effect-line .meta {
+  font-size: 0.88rem;
+  line-height: 1.25;
+  opacity: 0.78;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  align-items: center;
+
+  margin: 0;
+  min-width: 0;
+}
+
+.chosen-effects li .effect-line .meta code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.85em;
+
+  padding: 0.18rem 0.42rem;
+  border-radius: 0.45rem;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+#results:not(.is-raw) .chosen-effects li .effect-line .meta {
+  display: none;
+}
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+
+@media (max-width: 720px) {
+  :root { --results-img-col: 150px; }
+}
+
+@media (max-width: 520px) {
+  .relic-preview {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+.relic-frame{
+  width: var(--preview-size);   /* keep your existing width (or whatever it is now) */
+  aspect-ratio: 1 / 2;          /* <-- this is the key */
+  height: auto;                 /* let height be derived from width */
+}
+
+  .relic-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}

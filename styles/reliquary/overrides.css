@@ -1,0 +1,68 @@
+/* ------------------------------------------------------------
+   Reliquary overrides (loaded last)
+   Purpose: safety rails only.
+   ------------------------------------------------------------ */
+
+#results,
+#results.is-raw {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+/* ------------------------------------------------------------
+   Relic Preview: square frame that tracks effects height,
+   but is capped so it can’t get absurdly large.
+   ------------------------------------------------------------ */
+
+#results .relic-preview {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  grid-template-rows: repeat(3, auto) !important;
+  column-gap: 1rem !important;
+  row-gap: 0.5rem !important;
+  align-items: stretch !important;
+}
+
+/* Frame spans all 3 rows, stays square, but has a max size */
+#results .relic-frame {
+  grid-column: 1 !important;
+  grid-row: 1 / span 3 !important;
+
+  width: auto !important;
+  height: 100% !important;
+
+  aspect-ratio: 1 / 1 !important;
+
+  /* === THE FIX: stop it from getting huge === */
+  max-height: clamp(180px, 28vh, 320px) !important;
+  /* (optional) keeps it from getting too tiny */
+  min-height: 160px !important;
+
+  align-self: stretch !important;
+  justify-self: start !important;
+  overflow: hidden !important;
+}
+
+#results .relic-frame img {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+#results .relic-effects { display: contents !important; }
+#results .chosen-effects {
+  display: contents !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+#results .chosen-effects > li { grid-column: 2 !important; }
+#results .chosen-effects > li:nth-child(1) { grid-row: 1 !important; }
+#results .chosen-effects > li:nth-child(2) { grid-row: 2 !important; }
+#results .chosen-effects > li:nth-child(3) { grid-row: 3 !important; }
+
+#results .chosen-effects > li:only-child {
+  grid-row: 1 / span 3 !important;
+}
