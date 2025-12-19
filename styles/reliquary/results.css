@@ -254,8 +254,8 @@
 .move-indicator.move-up,
 .move-indicator.move-down { color: rgba(235, 90, 90, 1); }
 
-.move-indicator.move-up .carrot { transform: translateY(1px) rotate(-135deg); }
-.move-indicator.move-down .carrot { transform: translateY(1px) rotate(45deg); }
+.move-indicator.move-up .carrot { transform: rotate(-135deg); }
+.move-indicator.move-down .carrot { transform: rotate(45deg); }
 
 /* Green check */
 .move-indicator.move-ok { color: rgba(70, 210, 130, 1); }
@@ -274,7 +274,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-52%, -56%) rotate(45deg);
+  transform: translate(-50%, -50%) rotate(45deg);
   width: 0.55rem;
   height: 1.05rem;
   border-right: 5px solid currentColor;

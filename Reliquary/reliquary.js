@@ -255,18 +255,6 @@ function updateDetails(a, b, c) {
             <p>Behind the scenes, there is a value attached to each effect called "Roll Order", which determines the correct order each effect must be placed on the relic.</p>
             <p>If you put your effects in the order shown below, your relic will have a valid Roll Order.</p>
           </div>
-
-          <div class="sorted-preview">
-            <div class="relic-preview relic-preview--mini">
-              <div class="relic-frame relic-frame--mini">
-                <img id="sortedRelicImg" alt="" />
-              </div>
-
-              <div class="relic-effects">
-                <ul class="chosen-effects" id="sortedChosenList"></ul>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     `);
@@ -425,11 +413,32 @@ function updateUI(reason = "") {
   const state = anySelected && (hasCompatIssue || hasOrderIssue) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
-  // --- Special checkmark condition (exactly 3 effects selected) ---
+  // --- Validity + checkmark indicators ---
+  // When the relic is valid at 1 or 2 effects, show green check(s) and green row gradient.
+  const okBySlot = [false, false, false];
+
+  if (state === "Valid") {
+    // 1-effect relics should immediately show as valid
+    if (a2 && !b2 && !c2) okBySlot[0] = true;
+
+    // 2-effect relics: if there is no roll-order issue, both are correct
+    if (a2 && b2 && !c2 && !roll.hasIssue && !hasCompatIssue) {
+      okBySlot[0] = true;
+      okBySlot[1] = true;
+    }
+
+    // 3-effect relics: if fully valid, all three are correct
+    if (a2 && b2 && c2 && !roll.hasIssue && !hasCompatIssue) {
+      okBySlot[0] = true;
+      okBySlot[1] = true;
+      okBySlot[2] = true;
+    }
+  }
+
+  // Special checkmark condition (exactly 3 effects selected)
   // If roll order is invalid and exactly one slot is already in the correct position,
   // show a green checkbox on that slot.
   const allThreeSelected = !!a2 && !!b2 && !!c2;
-  let okSlotIndex = -1;
 
   if (allThreeSelected && roll.hasIssue) {
     const deltas = roll.moveDeltaBySlot.slice(0, 3);
@@ -438,7 +447,7 @@ function updateUI(reason = "") {
       .filter(x => x.d === 0);
 
     // “only two need to move” => exactly one is correct
-    if (zeros.length === 1) okSlotIndex = zeros[0].idx;
+    if (zeros.length === 1) okBySlot[zeros[0].idx] = true;
   }
 
   // Preview rendering
@@ -459,7 +468,7 @@ function updateUI(reason = "") {
     setDetailsEmpty();
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw) +
+      renderChosenLine("", a2, showRaw, 0, okBySlot[0]) +
       renderChosenLine("", null, showRaw) +
       renderChosenLine("", null, showRaw);
 
@@ -471,8 +480,8 @@ function updateUI(reason = "") {
     updateDetails(a2, b2, null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], false) +
-      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], false) +
+      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0]) +
+      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1]) +
       renderChosenLine("", null, showRaw);
 
     updateCounts(dom, 3, filtered3.length);
@@ -482,9 +491,9 @@ function updateUI(reason = "") {
   updateDetails(a2, b2, c2);
 
   dom.chosenList.innerHTML =
-    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okSlotIndex === 0) +
-    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okSlotIndex === 1) +
-    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okSlotIndex === 2);
+    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0]) +
+    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1]) +
+    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2]);
 
   updateCounts(dom, 3, filtered3.length);
 }
