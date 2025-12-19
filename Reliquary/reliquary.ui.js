@@ -67,6 +67,12 @@ function okIndicatorHtml() {
   `;
 }
 
+
+function rowBadgeHtml(text, kind = "invalid") {
+  const cls = kind === "valid" ? "is-valid" : "is-invalid";
+  return `<span class="validity-badge validity-badge--row ${cls}">${text}</span>`;
+}
+
 function moveIndicatorHtml(moveDelta, showOk = false) {
   const delta = Number(moveDelta || 0);
 
@@ -89,7 +95,7 @@ function moveIndicatorHtml(moveDelta, showOk = false) {
   return `<div class="move-indicator ${dirClass}" aria-label="${label}" title="${label}">${carrots}</div>`;
 }
 
-export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk = false) {
+export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk = false, rowBadge = null) {
   const prefix = slotLabel ? `${slotLabel}: ` : "";
 
   // Empty slot
@@ -131,6 +137,8 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
 
   const src = iconId ? iconPath(iconId) : "";
   const mover = moveIndicatorHtml(moveDelta, showOk);
+  const badge = rowBadge ? rowBadgeHtml(rowBadge, "invalid") : "";
+  const indicators = (badge || mover) ? `<div class="row-indicators">${badge}${mover}</div>` : "";
 
   // Compact
   if (!showRaw) {
@@ -143,7 +151,7 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
           <div class="effect-main">
             <div class="title">${prefix}${name}</div>
           </div>
-          ${mover}
+          ${indicators}
         </div>
       </li>
     `;
@@ -165,7 +173,7 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
             ${iconId ? `• Icon <code>${iconId}</code>` : ``}
           </div>
         </div>
-        ${mover}
+        ${indicators}
       </div>
     </li>
   `;

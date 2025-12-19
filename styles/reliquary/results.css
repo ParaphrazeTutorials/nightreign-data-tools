@@ -147,8 +147,20 @@
   box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
 }
 
+.chosen-effects li:has(.validity-badge--row.is-invalid) {
+  background: linear-gradient(
+    90deg,
+    rgba(92, 22, 22, 0.58) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  border-color: rgba(92, 22, 22, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
+}
+
+
 /* ✅ Correct selector (your previous one was malformed) */
-.chosen-effects li:has(.move-indicator.move-ok):not(:has(.move-indicator.move-up)):not(:has(.move-indicator.move-down)) {
+.chosen-effects li:has(.move-indicator.move-ok):not(:has(.move-indicator.move-up)):not(:has(.move-indicator.move-down)):not(:has(.validity-badge--row.is-invalid)) {
   background: linear-gradient(
     90deg,
     rgba(18, 74, 44, 0.50) 0%,
@@ -254,8 +266,8 @@
 .move-indicator.move-up,
 .move-indicator.move-down { color: rgba(235, 90, 90, 1); }
 
-.move-indicator.move-up .carrot { transform: rotate(-135deg); }
-.move-indicator.move-down .carrot { transform: rotate(45deg); }
+.move-indicator.move-up .carrot { transform: translateY(1px) rotate(-135deg); }
+.move-indicator.move-down .carrot { transform: translateY(1px) rotate(45deg); }
 
 /* Green check */
 .move-indicator.move-ok { color: rgba(70, 210, 130, 1); }
@@ -274,7 +286,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%) rotate(45deg);
+  transform: translate(-52%, -56%) rotate(45deg);
   width: 0.55rem;
   height: 1.05rem;
   border-right: 5px solid currentColor;
@@ -291,4 +303,23 @@
     grid-template-columns: 1fr;
     align-items: start;
   }
+}
+
+
+/* ------------------------------------------------------------
+   Row-level validity badge (used for per-row invalid markers)
+   ------------------------------------------------------------ */
+
+.validity-badge.validity-badge--row {
+  font-size: 0.72rem;
+  padding: 0.18rem 0.5rem;
+  opacity: 0.95;
+}
+
+/* Row indicators container (badge + arrows/check) */
+.row-indicators {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  align-self: center;
 }

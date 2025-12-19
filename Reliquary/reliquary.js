@@ -204,15 +204,6 @@ function updateDetails(a, b, c) {
   const hasDup = dupGroups.length > 0;
 
   if (hasDup) {
-    const groupBlocks = dupGroups
-      .map(g => {
-        return `
-          <div class="compat-dup-group" data-compat="${String(g.cid).replace(/"/g, "&quot;")}">
-            <ul class="chosen-effects" id="${g.listId}"></ul>
-          </div>
-        `;
-      })
-      .join("");
 
     blocks.push(`
       <div class="info-box is-alert" data-kind="compat-dup">
@@ -228,10 +219,6 @@ function updateDetails(a, b, c) {
           <div class="popover-body popover-body--spaced">
             <p>Behind the scenes, most effects share a Compatibility Group with one or more other effects. Relics cannot have more than one effect from any given Compatibility group.</p>
             <p>For example, Fire Attack Power Up and Holy Attack Power Up share a Compatibility Group, and cannot be on the same Relic.</p>
-          </div>
-
-          <div class="sorted-preview">
-            ${groupBlocks}
           </div>
         </div>
       </div>
@@ -407,6 +394,31 @@ function updateUI(reason = "") {
   const dupGroups = computeCompatDupGroups([a2, b2, c2].filter(Boolean));
   const hasCompatIssue = dupGroups.length > 0;
 
+  // Row-level Compatibility Group conflicts (used for per-row indicators)
+  const compatConflictIds = (() => {
+    const m = new Map();
+    for (const r of [a2, b2, c2].filter(Boolean)) {
+      const cid = compatId(r);
+      if (!cid) continue;
+      if (!m.has(cid)) m.set(cid, []);
+      m.get(cid).push(String(r.EffectID));
+    }
+    const out = new Set();
+    for (const [, ids] of m.entries()) {
+      if (ids.length > 1) ids.forEach(id => out.add(id));
+    }
+    return out;
+  })();
+
+  function badgeForRow(r) {
+    if (!r) return null;
+    return compatConflictIds.has(String(r.EffectID)) ? "Incompatible" : null;
+  }
+
+  function isIncompatRow(r) {
+    return !!(r && compatConflictIds.has(String(r.EffectID)));
+  }
+
   const roll = computeRollOrderIssue(a2, b2, c2);
   const hasOrderIssue = roll.hasIssue;
 
@@ -435,6 +447,20 @@ function updateUI(reason = "") {
     }
   }
 
+  // If the relic is invalid ONLY due to Compatibility conflicts (but roll order is correct),
+  // still show green checks on the non-incompatible row(s).
+  if (hasCompatIssue && !roll.hasIssue) {
+    if (a2 && b2 && !c2) {
+      okBySlot[0] = !isIncompatRow(a2);
+      okBySlot[1] = !isIncompatRow(b2);
+    }
+    if (a2 && b2 && c2) {
+      okBySlot[0] = !isIncompatRow(a2);
+      okBySlot[1] = !isIncompatRow(b2);
+      okBySlot[2] = !isIncompatRow(c2);
+    }
+  }
+
   // Special checkmark condition (exactly 3 effects selected)
   // If roll order is invalid and exactly one slot is already in the correct position,
   // show a green checkbox on that slot.
@@ -447,7 +473,11 @@ function updateUI(reason = "") {
       .filter(x => x.d === 0);
 
     // “only two need to move” => exactly one is correct
-    if (zeros.length === 1) okBySlot[zeros[0].idx] = true;
+    if (zeros.length === 1) {
+      const idx = zeros[0].idx;
+      const rowByIdx = idx === 0 ? a2 : idx === 1 ? b2 : c2;
+      if (!isIncompatRow(rowByIdx)) okBySlot[idx] = true;
+    }
   }
 
   // Preview rendering
@@ -468,7 +498,7 @@ function updateUI(reason = "") {
     setDetailsEmpty();
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, 0, okBySlot[0]) +
+      renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2)) +
       renderChosenLine("", null, showRaw) +
       renderChosenLine("", null, showRaw);
 
@@ -480,8 +510,8 @@ function updateUI(reason = "") {
     updateDetails(a2, b2, null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0]) +
-      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1]) +
+      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2)) +
+      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2)) +
       renderChosenLine("", null, showRaw);
 
     updateCounts(dom, 3, filtered3.length);
@@ -491,9 +521,9 @@ function updateUI(reason = "") {
   updateDetails(a2, b2, c2);
 
   dom.chosenList.innerHTML =
-    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0]) +
-    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1]) +
-    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2]);
+    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2)) +
+    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2)) +
+    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(c2));
 
   updateCounts(dom, 3, filtered3.length);
 }
