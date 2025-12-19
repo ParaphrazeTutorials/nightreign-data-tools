@@ -139,22 +139,18 @@
 }
 
 /* ------------------------------------------------------------
-   EFFECT PICKERS: SIDE-BY-SIDE (FORCED)
+   EFFECT PICKERS: SIDE-BY-SIDE (SAFE + COMPACT)
    ------------------------------------------------------------ */
 
-/* Force Category + Effect to sit side-by-side in the left panel */
 .sidebar-panel .effect-row {
-  display: grid !important;
-  grid-template-columns: minmax(120px, 0.85fr) minmax(200px, 1.55fr) !important;
-  gap: 0.55rem !important;
-  align-items: end !important;
+  display: grid;
+  grid-template-columns: minmax(120px, 0.85fr) minmax(200px, 1.55fr);
+  gap: 0.55rem;
+  align-items: end;
 }
 
-/* If the viewport is extremely narrow, stack them */
-@media (max-width: 420px) {
-  .sidebar-panel .effect-row {
-    grid-template-columns: 1fr !important;
-  }
+@media (max-width: 520px) {
+  .sidebar-panel .effect-row { grid-template-columns: 1fr; }
 }
 
 /* Kill Pico spacing and keep labels compact */
@@ -169,7 +165,7 @@
   margin-top: 0.25rem !important;
 }
 
-/* Reduce select height slightly */
+/* Slightly shorter selects */
 .sidebar-panel select {
   padding-top: 0.45rem !important;
   padding-bottom: 0.45rem !important;

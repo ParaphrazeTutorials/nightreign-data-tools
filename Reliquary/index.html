@@ -112,8 +112,8 @@
           <!-- LEFT -->
           <section class="left-column">
 
-            <!-- One container for all effect selectors (compact stacked panel) -->
-            <article class="sidebar-panel">
+            <!-- One compact container for all three effects -->
+            <div class="sidebar-panel">
 
               <article class="effect-card" id="effect1-card">
                 <h3>Effect 1</h3>
@@ -181,7 +181,7 @@
                 <small class="subtext" id="count3"></small>
               </article>
 
-            </article>
+            </div>
           </section>
 
           <!-- RIGHT -->
@@ -204,16 +204,25 @@
               </div>
             </article>
 
-            <article id="details" hidden>
-              <h3 style="margin: 0;">Details</h3>
-              <div id="detailsBody"></div>
+            <article id="details">
+              <div class="panel-header">
+                <h3>Details</h3>
+              </div>
+
+              <div id="detailsBody" class="details-body"></div>
             </article>
 
           </section>
         </section>
+
+        <footer>
+          <small>Built for the Nightreign community</small>
+        </footer>
+
       </section>
 
-      <script type="module" src="./reliquary.js"></script>
     </main>
+
+    <script type="module" src="./reliquary.js"></script>
   </body>
 </html>

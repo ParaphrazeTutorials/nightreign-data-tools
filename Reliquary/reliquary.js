@@ -118,29 +118,57 @@ function updateDetails(a, b, c, showRaw) {
 
   const blocks = [];
 
-  // 1) Compatibility duplicates
-  const counts = new Map();
+  // 1) Compatibility duplicates -> generic header + popover explains + list of offenders
+  const byCompat = new Map();
   for (const r of selected) {
     const id = compatId(r);
     if (!id) continue;
-    counts.set(id, (counts.get(id) || 0) + 1);
+    if (!byCompat.has(id)) byCompat.set(id, []);
+    byCompat.get(id).push(r);
   }
-  const hasDup = [...counts.values()].some(v => v > 1);
+
+  // All duplicated groups (each group shows its own list)
+  const dupGroups = [...byCompat.entries()].filter(([, list]) => list.length > 1);
+  const hasDup = dupGroups.length > 0;
+
+  // We'll render these lists after innerHTML is set (like sorted preview)
+  const compatRender = hasDup
+    ? dupGroups.map(([cid, list], idx) => ({
+        cid,
+        list,
+        listId: `compatDupList_${idx}`
+      }))
+    : [];
 
   if (hasDup) {
+    const groupBlocks = compatRender
+      .map(g => {
+        return `
+          <div class="compat-dup-group" data-compat="${String(g.cid).replace(/"/g, "&quot;")}">
+            <ul class="chosen-effects" id="${g.listId}"></ul>
+          </div>
+        `;
+      })
+      .join("");
+
     blocks.push(`
       <div class="info-box is-alert" data-kind="compat-dup">
         <div class="info-line">
-          You have two effects that share a
+          You have conflicting
           <button type="button" class="term-link" data-popover-toggle="compatPopover">
-            Compatibility Group
+            Compatibility Groups
           </button>.
         </div>
 
         <div class="popover" id="compatPopover" hidden>
           <div class="popover-title">Compatibility Group</div>
-          <div class="popover-body">
-            <p>TODO: Add your explanation text here.</p>
+          <div class="popover-body popover-body--spaced">
+            <p>Behind the scenes, most effects share a Compatibility Group with one or more other effects. Relics cannot have more than one effect from any given Compatibility group.</p>
+            <p>For example, Fire Attack Power Up and Holy Attack Power Up share a Compatibility Group, and cannot be on the same Relic.</p>
+          </div>
+
+          <div class="sorted-preview">
+            ${groupBlocks}
           </div>
         </div>
       </div>
@@ -179,16 +207,18 @@ function updateDetails(a, b, c, showRaw) {
       blocks.push(`
         <div class="info-box is-alert" data-kind="rollorder">
           <div class="info-line">
-            Your effects aren't
+            Your effects aren't in the correct 
             <button type="button" class="term-link" data-popover-toggle="orderPopover">
-              in the correct order
+              roll order
             </button>.
           </div>
 
           <div class="popover" id="orderPopover" hidden>
-            <div class="popover-title">Correct Order</div>
-            <div class="popover-body">
-              <p>TODO: Add your explanation text here.</p>
+            <div class="popover-title">Roll Order</div>
+            <div class="popover-body popover-body--spaced">
+              <p>Behind the scenes, there is a value attached to each effect called "Roll Order", which determines the correct order each effect must be placed on the relic.</p>
+              
+              <p>If you put your effects in the order shown below, your relic will have a valid Roll Order.</p>
             </div>
 
             <div class="sorted-preview">
@@ -211,6 +241,22 @@ function updateDetails(a, b, c, showRaw) {
   dom.detailsBody.innerHTML = blocks.join("");
 
   installDetailsToggles();
+
+  // Render Compatibility dup lists (mini-preview style)
+  if (hasDup && compatRender.length > 0) {
+    for (const g of compatRender) {
+      const listEl = dom.detailsBody.querySelector(`#${CSS.escape(g.listId)}`);
+      if (!listEl) continue;
+
+      // Build lines like mini-preview (Effect 1/2/3 style labels, but only for offenders)
+      const lines = g.list
+        .slice(0, 3) // safety: should be 2-3, but don't blow up if weird
+        .map((row, idx) => renderChosenLine(`Effect ${idx + 1}`, row, showRaw))
+        .join("");
+
+      listEl.innerHTML = lines;
+    }
+  }
 
   // Render sorted preview if present
   if (needsSortedPreview && sorted) {
