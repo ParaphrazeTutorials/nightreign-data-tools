@@ -1,31 +1,55 @@
 /* ------------------------------------------------------------
-   Icons + Pills
+   Reliquary — Components (Start Over button recolor)
+   Tan + Black parchment theme
    ------------------------------------------------------------ */
 
-.effect-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 0.45rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.25);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
+/* Target ONLY the Start Over / reset button */
+button.start-over,
+.btn-reset {
+  background: linear-gradient(
+    180deg,
+    #d6c29a 0%,
+    #b9a47a 55%,
+    #1a1a1a 100%
+  );
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
-.effect-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+/* Hover: slightly darker parchment, more contrast */
+button.start-over:hover,
+.btn-reset:hover {
+  background: linear-gradient(
+    180deg,
+    #cdb88f 0%,
+    #a79267 55%,
+    #111 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 8px 18px rgba(0, 0, 0, 0.55);
 }
 
-.pill {
-  display: inline-block;
-  padding: 0.12rem 0.45rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.18);
-  margin-left: 0.35rem;
-  font-size: 0.78rem;
-  opacity: 0.9;
+/* Active: pressed, ink-heavy */
+button.start-over:active,
+.btn-reset:active {
+  background: linear-gradient(
+    180deg,
+    #bca577 0%,
+    #8f7b55 60%,
+    #000 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  transform: translateY(1px);
+}
+
+/* Focus-visible for accessibility */
+button.start-over:focus-visible,
+.btn-reset:focus-visible {
+  outline: 2px solid rgba(214, 194, 154, 0.9);
+  outline-offset: 2px;
 }

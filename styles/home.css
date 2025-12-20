@@ -29,7 +29,6 @@
   margin-top: 0.9rem;
 }
 
-
 /* ------------------------------------------------------------
    TWO-COLUMN INTRO + APPS
    ------------------------------------------------------------ */
@@ -60,25 +59,19 @@
   margin-bottom: 0.75rem;
 }
 
-.home-intro ul {
-  margin: 0;
-  padding-left: 1.1rem;
-}
-
-.home-intro li {
-  margin: 0.35rem 0;
-  opacity: 0.9;
-}
-
-
 /* ------------------------------------------------------------
-   APP TILES (IMAGE + TEXT OVERLAY)
+   APP TILES (2x2 GRID)
    ------------------------------------------------------------ */
 
 .home-apps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
   gap: 0.85rem;
+  align-content: start;
+}
+
+@media (max-width: 720px) {
+  .home-apps { grid-template-columns: 1fr; }
 }
 
 /* The tile is the link */
@@ -138,27 +131,18 @@
   opacity: 0.85;
 }
 
-/* Specific tile art */
-.app-tile--reliquary {
-  background-image: url("../Assets/home/Reliquary.png");
-}
+/* ------------------------------------------------------------
+   Tile art (paths are case-sensitive on GitHub Pages)
+   home.css lives in /styles, so assets are ../Assets/...
+   ------------------------------------------------------------ */
 
-.app-tile--menagerie {
-  background-image: url("../Assets/home/Menagerie.png");
-}
+.app-tile--reliquary { background-image: url("../Assets/home/Reliquary.png"); }
+.app-tile--menagerie { background-image: url("../Assets/home/Menagerie.png"); }
+.app-tile--armory    { background-image: url("../Assets/home/Armory.png"); }
+.app-tile--grimoire  { background-image: url("../Assets/home/Grimoire.png"); }
 
 /* Disabled styling */
 .app-tile.is-disabled {
   opacity: 0.6;
   pointer-events: none;
-}
-
-
-/* ------------------------------------------------------------
-   FOOTER
-   ------------------------------------------------------------ */
-
-.home-footer {
-  margin-top: 1rem;
-  opacity: 0.85;
 }
