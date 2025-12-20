@@ -1,27 +1,31 @@
 /* ------------------------------------------------------------
-   HOME SHELL (HOME-ONLY)
+   HOME (scoped to Home content, but aligned with Reliquary shell)
    ------------------------------------------------------------ */
 
-.home-shell {
+/* ------------------------------------------------------------
+   REAL ESTATE + TYPOGRAPHY (match Reliquary's .tool-shell defaults)
+   ------------------------------------------------------------ */
+
+.tool-shell {
   width: 100%;
   max-width: clamp(980px, 92vw, 2200px);
   margin-inline: auto;
 }
 
 /* Typography density BELOW hero only */
-.home-shell,
-.home-shell :where(p, li, a, small, button, label) {
+.tool-shell,
+.tool-shell :where(p, li, a, small, button, label) {
   font-size: 0.94rem;
 }
 
-.home-shell :where(h3) {
+.tool-shell :where(h3) {
   font-size: 1.05rem;
   margin-bottom: 0.6rem;
 }
 
 /* Reduce vertical air under the hero */
-.home-shell section,
-.home-shell article {
+.tool-shell section,
+.tool-shell article {
   margin-top: 0.9rem;
 }
 

@@ -11,28 +11,32 @@
   </head>
 
   <body>
-    <main class="app-shell app-grid home-shell">
+    <main class="app-shell app-grid">
 
       <!-- HERO -->
       <header class="hero">
-        <h1>The Round Table Codex</h1>
-        <h2>HOME</h2>
+        <img
+          class="hero-art"
+          src="./Assets/home/Home.png"
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
+          onerror="this.remove()"
+        />
+
+        <div class="hero-content">
+          <h1>The Round Table Codex</h1>
+          <h2>Home</h2>
+        </div>
       </header>
 
-      <!-- NAV -->
-      <nav class="tool-nav">
-        <ul>
-          <li><a class="active" href="./index.html">Home</a></li>
-          <li><a href="./reliquary/index.html">Reliquary</a></li>
-          <li><a href="#" aria-disabled="true" tabindex="-1">Menagerie</a></li>
-          <li><a href="#" aria-disabled="true" tabindex="-1">Armory</a></li>
-          <li><a href="#" aria-disabled="true" tabindex="-1">Grimoire</a></li>
-        </ul>
-      </nav>
+      <!-- NAV (global) -->
+      <nav id="globalNav" class="tool-nav" aria-label="Primary navigation"></nav>
 
       <section class="tool-shell">
         <div class="home-intro-grid">
-                    <!-- LEFT: INTRO -->
+          <!-- LEFT: INTRO -->
           <section class="home-intro">
             <h3>Welcome, Tarnished</h3>
             <p>
@@ -93,20 +97,13 @@
 
         <p class="home-footer">Built for the Nightreign community</p>
       </section>
-      <footer class="site-footer">
-        <div class="footer-inner">
-          <p class="footer-disclaimer">
-            Unofficial community tools for Elden Ring: Nightreign. This project does not modify your game, connect to your account, or guarantee online safety. You are responsible for how you use the information provided.
-          </p>
-          <p class="footer-credits">
-            Created by <strong>Paraphraze</strong> — with assistance from <strong>gazer500</strong> and <strong>Acarii</strong>.
-          </p>
-        </div>
-      </footer>
 
+      <!-- FOOTER (global) -->
+      <footer id="globalFooter" class="site-footer"></footer>
 
     </main>
 
     <script type="module" src="./home.js"></script>
+    <script type="module" src="./scripts/chrome.js"></script>
   </body>
 </html>
