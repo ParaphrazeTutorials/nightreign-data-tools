@@ -72,7 +72,7 @@
 .options-controls {
   grid-column: 1 / -1;
 
-  /* ✅ full width column so checkboxes + Start Over span the panel */
+  /* full width so checkboxes + Start Over span the panel */
   display: grid;
   grid-template-columns: 1fr;
 
@@ -212,6 +212,20 @@
   margin-bottom: 0;
 }
 
+/* ------------------------------------------------------------
+   Instructions panel text compacting (TEXT ONLY)
+   ------------------------------------------------------------ */
+
+.instructions-panel p {
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.instructions-panel h4 {
+  margin-top: 0.6rem;
+  margin-bottom: 0.35rem;
+}
+
 @media (max-width: 900px){
   .top-grid{
     grid-template-columns: 1fr;
@@ -235,6 +249,17 @@
 
 @media (max-width: 900px) {
   .main-grid { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   Main grid alignment fix
+   Ensure left Effect Selection panel and right Relic Preview panel
+   start at the same vertical baseline.
+   ------------------------------------------------------------ */
+
+.main-grid .left-column > *:first-child,
+.main-grid .right-column > *:first-child {
+  margin-top: 0 !important;
 }
 
 /* ------------------------------------------------------------

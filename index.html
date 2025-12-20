@@ -1,10 +1,9 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <title>The Round Table Codex</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="./styles/site.css">
@@ -12,80 +11,99 @@
   </head>
 
   <body>
-    <main class="app-shell app-grid">
+    <main class="app-shell app-grid home-shell">
 
       <!-- HERO -->
       <header class="hero">
-        <img
-          class="hero-art"
-          src="./Assets/home/Home.png"
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          decoding="async"
-          onerror="this.remove()"
-        />
-
-        <div class="hero-content">
-          <h1>The Round Table Codex</h1>
-          <h2>Home</h2>
-        </div>
+        <h1>The Round Table Codex</h1>
+        <h2>HOME</h2>
       </header>
 
+      <!-- NAV -->
       <nav class="tool-nav">
         <ul>
-          <li><a href="./index.html" class="active">Home</a></li>
-          <li><a href="./Reliquary/index.html">Reliquary</a></li>
-          <li><a href="#" aria-disabled="true">Menagerie</a></li>
+          <li><a class="active" href="./index.html">Home</a></li>
+          <li><a href="./reliquary/index.html">Reliquary</a></li>
+          <li><a href="#" aria-disabled="true" tabindex="-1">Menagerie</a></li>
+          <li><a href="#" aria-disabled="true" tabindex="-1">Armory</a></li>
+          <li><a href="#" aria-disabled="true" tabindex="-1">Grimoire</a></li>
         </ul>
       </nav>
 
-      <!-- HOME CONTENT -->
-      <section class="home-shell">
-
-        <!-- Two-column: Instructions + App Tiles -->
-        <section class="home-intro-grid">
-
-          <!-- LEFT: Welcome / Instructions -->
-          <article class="home-intro">
+      <section class="tool-shell">
+        <div class="home-intro-grid">
+                    <!-- LEFT: INTRO -->
+          <section class="home-intro">
             <h3>Welcome, Tarnished</h3>
             <p>
-              This Codex is a growing set of tools and data for the Nightreign community.
-              Pick an app on the right to get started.
+              The Round Table Codex is a suite of tools built for the <strong>Elden Ring: Nightreign</strong> community.
+              We hope you find value in our tomes.
             </p>
-            <ul>
-              <li><strong>Reliquary</strong> lets you build relics in real time and validate compatibility.</li>
-              <li><strong>Menagerie</strong> will collect enemy / boss references as we expand.</li>
-              <li>More tools will appear here as we ship them.</li>
-            </ul>
-          </article>
 
-          <!-- RIGHT: Image tiles with text overlay -->
+            <h4>Updates</h4>
+            <p>
+              <strong>12.19.25 – Paraphraze</strong><br>
+              Welcome to the Beta launch of The Round Table Codex! We are starting with the <strong>Reliquary</strong>,
+              a tool for planning and validating your relics. The first version doesn't have a great way to provide feedback,
+              so please join the
+              <a href="https://discord.gg/xpxUvYPN" target="_blank" rel="noopener">Hexington Discord Server</a>,
+              and find our feedback thread in the <code>#support-nightreign</code> channel in the meantime.
+            </p>
+          </section>
+
+          <!-- RIGHT: APP TILES -->
           <section class="home-apps" aria-label="Apps">
-
             <a class="app-tile app-tile--reliquary" href="./Reliquary/index.html">
-              <div class="app-tile__text">
-                <div class="app-tile__title">Reliquary</div>
-                <div class="app-tile__meta">Relic builder</div>
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Reliquary</div>
+                  <div>Relic builder</div>
+                </div>
               </div>
             </a>
 
             <a class="app-tile app-tile--menagerie is-disabled" href="#" aria-disabled="true">
-              <div class="app-tile__text">
-                <div class="app-tile__title">Menagerie</div>
-                <div class="app-tile__meta">Coming soon</div>
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Menagerie</div>
+                  <div>Coming soon</div>
+                </div>
               </div>
             </a>
 
+            <a class="app-tile app-tile--armory is-disabled" href="#" aria-disabled="true">
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Armory</div>
+                  <div>Coming soon</div>
+                </div>
+              </div>
+            </a>
+
+            <a class="app-tile app-tile--grimoire is-disabled" href="#" aria-disabled="true">
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Grimoire</div>
+                  <div>Coming soon</div>
+                </div>
+              </div>
+            </a>
           </section>
+        </div>
 
-        </section>
-
-        <footer class="home-footer">
-          <small>Built for the Nightreign community</small>
-        </footer>
-
+        <p class="home-footer">Built for the Nightreign community</p>
       </section>
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <p class="footer-disclaimer">
+            Unofficial community tools for Elden Ring: Nightreign. This project does not modify your game, connect to your account, or guarantee online safety. You are responsible for how you use the information provided.
+          </p>
+          <p class="footer-credits">
+            Created by <strong>Paraphraze</strong> — with assistance from <strong>gazer500</strong> and <strong>Acarii</strong>.
+          </p>
+        </div>
+      </footer>
+
 
     </main>
 

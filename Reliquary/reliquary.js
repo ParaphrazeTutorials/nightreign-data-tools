@@ -1,4 +1,4 @@
-import { DATA_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
+import { DATA_URL, relicDefaultPath, visualRelicType, RELEASE_CHANNEL, GAME_VERSION } from "./reliquary.assets.js";
 import {
   COLORS,
   compatId,
@@ -19,9 +19,32 @@ import {
 import { getDom } from "./reliquary.dom.js";
 
 const dom = getDom();
+
+function initHeaderBuildTag() {
+  const el = document.getElementById("heroBuild");
+  if (!el) return;
+
+  const channel = String(RELEASE_CHANNEL || "").trim().toUpperCase();
+  const version = String(GAME_VERSION || "").trim();
+
+  el.classList.toggle("is-beta", channel === "BETA");
+  el.classList.toggle("is-live", channel === "LIVE");
+
+  const statusText = channel || "BETA";
+  const versionText = version ? `Game Version ${version}` : "Game Version";
+
+  el.innerHTML = `
+    <span class="hero-build__status">${statusText}</span>
+    <span class="hero-build__sep">|</span>
+    <span class="hero-build__version">${versionText}</span>
+  `;
+}
+
 const resultsEl = document.getElementById("results");
 const resultsHeader = document.querySelector("#results .panel-header");
 const validityBadge = document.getElementById("relicValidity");
+
+initHeaderBuildTag();
 
 let rows = [];
 let byId = new Map();
@@ -528,6 +551,28 @@ function updateUI(reason = "") {
   updateCounts(dom, 3, filtered3.length);
 }
 
+function resetAllPreserveIllegal(desiredIllegal) {
+  dom.selType.value = "All";
+  dom.selColor.value = "Random";
+
+  // Preserve Show Illegal Combinations state (the user just toggled it)
+  dom.showIllegalEl.checked = Boolean(desiredIllegal);
+
+  // Start Over behavior: Raw Data off, all selections cleared, default color repicked
+  if (dom.showRawEl) dom.showRawEl.checked = false;
+
+  dom.cat1.value = "";
+  dom.cat2.value = "";
+  dom.cat3.value = "";
+
+  dom.sel1.value = "";
+  dom.sel2.value = "";
+  dom.sel3.value = "";
+
+  pickRandomColor();
+  updateUI("illegal-change");
+}
+
 function resetAll() {
   dom.selType.value = "All";
   dom.selColor.value = "Random";
@@ -571,7 +616,7 @@ async function load() {
 
   dom.selType.addEventListener("change", () => updateUI("type-change"));
   dom.selColor.addEventListener("change", () => updateUI("color-change"));
-  dom.showIllegalEl.addEventListener("change", () => updateUI("illegal-change"));
+  dom.showIllegalEl.addEventListener("change", () => resetAllPreserveIllegal(dom.showIllegalEl.checked));
   if (dom.showRawEl) dom.showRawEl.addEventListener("change", () => updateUI("raw-change"));
 
   dom.cat1.addEventListener("change", () => updateUI("cat-change"));

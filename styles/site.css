@@ -17,9 +17,10 @@
   /* ------------------------------------------------------------
      Global Hero Art Controls (CANONICAL)
      ------------------------------------------------------------ */
-  --hero-art-zoom: 0.4;
-  --hero-art-x: 65%;
-  --hero-art-y: 80%;
+  /* Canonical global hero art controls */
+  --hero-art-zoom: 0.3;
+  --hero-art-x: 85%;
+  --hero-art-y: 100%;
 }
 
 
@@ -178,4 +179,106 @@ footer {
   text-align: center;
   opacity: 0.7;
   margin-bottom: 1rem;
+}
+
+/* ------------------------------------------------------------
+   Hero build tag (page status + DB/Game version)
+   ------------------------------------------------------------ */
+
+.hero-build{
+  position: absolute;
+  left: 1.05rem;
+  bottom: 0.9rem;
+  z-index: 2;
+
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+
+  text-shadow: 0 6px 18px rgba(0,0,0,0.55);
+}
+
+.hero-build__status{
+  text-transform: uppercase;
+}
+
+.hero-build__sep{
+  opacity: 0.55;
+  font-weight: 900;
+}
+
+.hero-build__version{
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  opacity: 0.88;
+}
+
+.hero-build.is-beta .hero-build__status{
+  color: rgba(214, 92, 92, 0.95); /* medium red */
+}
+
+.hero-build.is-live .hero-build__status{
+  color: rgba(255, 255, 255, 0.92); /* medium white */
+}
+
+/* ------------------------------------------------------------
+   Overrides / upgrades (app-wide)
+   ------------------------------------------------------------ */
+
+/* Stronger nav styling (Pico can make links blue). */
+.tool-nav ul li a,
+.tool-nav ul li a:visited {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+}
+
+.tool-nav ul li a[aria-disabled="true"],
+.tool-nav ul li a[aria-disabled="true"]:visited {
+  color: rgba(255, 255, 255, 0.42);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Beta/Live pill behind the hero build string */
+.hero-build {
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(180deg, rgba(120, 16, 24, 0.38), rgba(16, 8, 10, 0.55));
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+/* Make BETA pop while keeping the rest readable */
+.hero-build.is-beta .hero-build__status {
+  color: rgba(214, 92, 92, 0.95);
+}
+
+/* Compact global footer */
+.site-footer {
+  margin-top: 1.1rem;
+  padding: 0.55rem 0 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.site-footer .footer-inner {
+  max-width: var(--shell-max, 1600px);
+  margin: 0 auto;
+  padding: 0 var(--shell-pad, 18px);
+}
+
+.site-footer p {
+  margin: 0.15rem 0;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  opacity: 0.72;
+}
+
+.site-footer .footer-credits {
+  opacity: 0.78;
 }

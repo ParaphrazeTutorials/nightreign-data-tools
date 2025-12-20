@@ -167,10 +167,9 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
         <div class="effect-main">
           <div class="title">${prefix}${name}</div>
           <div class="meta">
-            RollOrder <code>${roll}</code>
-            • EffectID <code>${row.EffectID}</code>
-            • Compatibility <code>${cid}</code>
-            ${iconId ? `• Icon <code>${iconId}</code>` : ``}
+            EffectID <code>${row.EffectID}</code>
+            • CompatibilityID <code>${cid}</code>
+            • RollOrder <code>${roll}</code>
           </div>
         </div>
         ${indicators}

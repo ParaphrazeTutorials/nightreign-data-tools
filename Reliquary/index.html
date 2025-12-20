@@ -35,13 +35,16 @@
           <h1>The Round Table Codex</h1>
           <h2>Reliquary</h2>
         </div>
-      </header>
 
+        <div id="heroBuild" class="hero-build" aria-label="Release channel and game version"></div>
+      </header>
       <nav class="tool-nav">
         <ul>
           <li><a href="../index.html">Home</a></li>
-          <li><a href="./index.html" class="active">Reliquary</a></li>
-          <li><a href="#" aria-disabled="true">Menagerie</a></li>
+          <li><a class="active" href="./index.html">Reliquary</a></li>
+          <li><a href="#" aria-disabled="true" tabindex="-1">Menagerie</a></li>
+          <li><a href="#" aria-disabled="true" tabindex="-1">Armory</a></li>
+          <li><a href="#" aria-disabled="true" tabindex="-1">Grimoire</a></li>
         </ul>
       </nav>
 
@@ -100,16 +103,27 @@
           <div class="top-grid__right">
             <!-- INSTRUCTIONS -->
             <section class="instructions-panel">
-              <h3>Instructions</h3>
-              <p>
-                            Select effects in order. Effect 1 filters Effect 2, and both filter Effect 3.
-                          </p>
-                          <ul>
-                            <li><strong>Compatible</strong> = no shared Compatibility IDs</li>
-                            <li><strong>Incompatible</strong> = at least one shared Compatibility ID</li>
-                            <li>“Show Illegal Combinations” bypasses compatibility rules (duplicates still blocked)</li>
-                          </ul>
-            </section>
+
+        <h3>Instructions</h3>
+        <p>
+          Select the effects you want on your relic, and the reliquary will tell you how to make it a legal combination&mdash;if it's possible.
+        </p>
+
+        <h4>Disclaimer</h4>
+        <p>
+          This tool is an <strong>unofficial</strong> community helper for planning effect combinations. It does <strong>not</strong> modify your game, connect to your account,
+          or guarantee anything about online safety. You are responsible for how you use the information provided here and for any changes you make to your save/data.
+        </p>
+        <p>
+          Compatibility rules and outcomes can change with patches, anticheat updates, and server-side checks.
+          If you're not sure whether a change is safe, assume it isn't and keep your relics unedited for online play.
+        </p>
+        <p class="disclaimer-warning">
+          <span style="color: rgba(255, 115, 115, 0.95); font-weight: 800; text-decoration: underline;">
+            Please do not play online with illegal relics.
+          </span>
+        </p>
+      </section>
           </div>
         </section>
 
@@ -222,9 +236,16 @@
           </section>
         </section>
 
-        <footer>
-          <small>Built for the Nightreign community</small>
-        </footer>
+        <footer class="site-footer">
+        <div class="footer-inner">
+          <p class="footer-disclaimer">
+            Unofficial community tools for Elden Ring: Nightreign. This project does not modify your game, connect to your account, or guarantee online safety. You are responsible for how you use the information provided.
+          </p>
+          <p class="footer-credits">
+            Created by <strong>Paraphraze</strong> — with assistance from <strong>gazer500</strong> and <strong>Acarii</strong>.
+          </p>
+        </div>
+      </footer>
 
       </section>
 
