@@ -263,7 +263,6 @@ function updateDetails(a, b, c) {
           <div class="popover-title">Roll Order</div>
           <div class="popover-body popover-body--spaced">
             <p>Behind the scenes, there is a value attached to each effect called "Roll Order", which determines the correct order each effect must be placed on the relic.</p>
-            <p>If you put your effects in the order shown below, your relic will have a valid Roll Order.</p>
           </div>
         </div>
       </div>
