@@ -14,12 +14,13 @@ jobs:
       - name: Checkout dev branch
         uses: actions/checkout@v4
 
-      - name: Publish to dev Pages repo
+        - name: Publish to dev Pages repo
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          personal_token: ${{ secrets.DEV_PAGES_TOKEN }}
           external_repository: ParaphrazeTutorials/nightreign-data-tools-dev
           publish_branch: main
           publish_dir: .
           keep_files: false
           commit_message: "Deploy dev site from source repo @development"
+
