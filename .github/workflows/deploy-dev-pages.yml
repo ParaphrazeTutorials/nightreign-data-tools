@@ -2,7 +2,7 @@ name: Deploy DEV site to dev Pages repo
 
 on:
   push:
-    branches: [dev]
+    branches: [development]
 
 permissions:
   contents: read
