@@ -17,9 +17,9 @@ jobs:
       - name: Publish to dev Pages repo
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.DEV_PAGES_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           external_repository: ParaphrazeTutorials/nightreign-data-tools-dev
           publish_branch: main
           publish_dir: .
           keep_files: false
-          commit_message: "Deploy dev site from source repo @dev"
+          commit_message: "Deploy dev site from source repo @development"
