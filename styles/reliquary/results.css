@@ -197,7 +197,7 @@
   align-items: start;
 }
 
-.chosen-effects li .effect-main {
+.chosen-effects li .effect-main:not(.effect-main--row) {
   display: grid;
   grid-template-rows: auto auto;
   gap: 0.35rem;
@@ -344,4 +344,30 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+/* ------------------------------------------------------------
+   RAW DATA: lock Curse button to title row (override components.css)
+   ------------------------------------------------------------ */
+
+#results.is-raw .effect-main--row {
+  align-items: start;
+}
+
+#results.is-raw .effect-main--row .curse-btn {
+  align-self: start;
+}
+
+/* ------------------------------------------------------------
+   RAW DATA: align Curse button with the TITLE line
+   Override components.css which forces center alignment in raw mode.
+   ------------------------------------------------------------ */
+
+#results.is-raw .effect-main.effect-main--row {
+  align-items: baseline !important;
+}
+
+#results.is-raw .effect-main.effect-main--row .title,
+#results.is-raw .effect-main.effect-main--row .curse-btn {
+  align-self: baseline !important;
 }
