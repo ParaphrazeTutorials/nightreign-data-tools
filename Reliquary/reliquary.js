@@ -610,10 +610,12 @@ async function load() {
   const res = await fetch(DATA_URL, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${DATA_URL} (${res.status})`);
 
-  rows = await res.json();
+  const rowsAll = await res.json();
+  // Filter out cursed effects (Curse = 1) from dropdowns and categories.
+  // Data values are strings in JSON, so compare as strings.
+  rows = rowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
   byId = new Map(rows.map(r => [String(r.EffectID), r]));
-
-  pickRandomColor();
+pickRandomColor();
 
   const base = baseFilteredByRelicType(rows, dom.selType.value);
   const cats = categoriesFor(base);
