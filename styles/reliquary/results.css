@@ -356,9 +356,6 @@
 }
 
 
-#results.is-raw .effect-main--row:has(.meta--curse) .curse-btn {
-  align-self: flex-start !important;
-}
 
 /* ------------------------------------------------------------
    Raw Data — keep Curse button position stable when a curse is selected
@@ -374,4 +371,33 @@
 #results.is-raw .effect-main--row:has(.meta--curse) .curse-btn {
   align-self: center !important;
   justify-self: start !important;
+}
+
+
+
+/* ------------------------------------------------------------
+   Curse Button — Purple gradient when a curse is selected
+   Keep "Select a Curse" red; switch only after selection.
+   Uses the same left-to-right multi-stop gradient language as other states,
+   with a slightly darker purple.
+   ------------------------------------------------------------ */
+
+#results .effect-line:has(.curse-sub) .curse-btn {
+  background: linear-gradient(
+    90deg,
+    rgba(112, 70, 168, 0.92) 0%,
+    rgba(0, 0, 0, 0.18) 62%,
+    rgba(0, 0, 0, 0.45) 100%
+  ) !important;
+  border-color: rgba(140, 110, 210, 0.55) !important;
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.22) !important;
+}
+
+#results .effect-line:has(.curse-sub) .curse-btn:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(132, 86, 190, 0.95) 0%,
+    rgba(0, 0, 0, 0.16) 62%,
+    rgba(0, 0, 0, 0.42) 100%
+  ) !important;
 }
