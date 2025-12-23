@@ -24,7 +24,11 @@ function initHeaderBuildTag() {
   const el = document.getElementById("heroBuild");
   if (!el) return;
 
-  const channel = String(RELEASE_CHANNEL || "").trim().toUpperCase();
+  // Treat local dev (Live Server / localhost) as BETA regardless of configured channel.
+  const host = String(window.location.hostname || "").toLowerCase();
+  const isLocal = host === "localhost" || host === "127.0.0.1" || host === "::1";
+
+  const channel = (isLocal ? "BETA" : String(RELEASE_CHANNEL || "").trim().toUpperCase());
   const version = String(GAME_VERSION || "").trim();
 
   el.classList.toggle("is-beta", channel === "BETA");

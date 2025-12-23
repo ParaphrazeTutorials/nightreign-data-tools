@@ -13,23 +13,15 @@
   <body>
     <main class="app-shell app-grid">
 
-      <!-- HERO -->
-      <header class="hero">
-        <img
-          class="hero-art"
-          src="./Assets/home/Home.png"
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          decoding="async"
-          onerror="this.remove()"
-        />
-
-        <div class="hero-content">
-          <h1>The Round Table Codex</h1>
-          <h2>Home</h2>
-        </div>
-      </header>
+      <!-- HERO (global renderer) -->
+      <header
+        id="globalHero"
+        class="hero"
+        data-hero-image="./Assets/home/Home.png"
+        data-hero-h1="The Round Table Codex"
+        data-hero-h2="Home"
+        data-hero-build="false"
+      ></header>
 
       <!-- NAV (global) -->
       <nav id="globalNav" class="tool-nav" aria-label="Primary navigation"></nav>
@@ -102,6 +94,7 @@
     </main>
 
     <script type="module" src="./home.js"></script>
+    <script type="module" src="./scripts/hero.js"></script>
     <script type="module" src="./scripts/chrome.js"></script>
   </body>
 </html>
