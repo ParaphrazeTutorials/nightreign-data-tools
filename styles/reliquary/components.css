@@ -39,6 +39,15 @@
   display: inline-block;
 }
 
+
+
+/* Curse subtitle — tightened to sit directly under title */
+.curse-sub {
+  margin-top: -0.25rem; /* pull up under title */
+  line-height: 1.15;
+  opacity: 0.9;
+}
+
 /* Curse button */
 /* Curse button: hard reset margins so it can't drift relative to icon/text */
 /* Curse button: styled to match the "Invalid" validity pill */
