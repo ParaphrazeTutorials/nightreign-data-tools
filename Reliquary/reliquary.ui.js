@@ -156,16 +156,7 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
   const src = iconId ? iconPath(iconId) : "";
   const mover = moveIndicatorHtml(moveDelta, showOk);
   const badge = rowBadge ? rowBadgeHtml(rowBadge, "invalid") : "";
-
-  // Curse missing should show the SAME red gradient as other invalid states.
-  // We do this by adding a hidden per-row invalid badge that results.css already keys off of.
-  const curseMissingFlag = (curseRequired && !curseRow)
-    ? `<span class="validity-badge validity-badge--row is-invalid curse-missing-flag" style="display:none"></span>`
-    : "";
-
-  const indicators = (badge || mover || curseMissingFlag)
-    ? `<div class="row-indicators">${curseMissingFlag}${badge}${mover}</div>`
-    : "";
+  const indicators = (badge || mover) ? `<div class="row-indicators">${badge}${mover}</div>` : "";
 
   // Compact
   if (!showRaw) {
@@ -204,6 +195,13 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
             EffectID <code>${row.EffectID}</code>
             • CompatibilityID <code>${cid}</code>
             • RollOrder <code>${roll}</code>
+            ${(showRaw && curseRow)
+    ? `<div class="meta meta--curse">
+         <span class="curse-label">CurseID</span> <code>${curseRow.EffectID}</code>
+         • <span class="curse-label">CurseCompatibilityID</span> <code>${curseRow.CompatibilityID}</code>
+       </div>`
+    : ``}
+
           </div>
         </div>
         ${indicators}
@@ -211,28 +209,3 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
     </li>
   `;
 }
-
-/* CURSE REQUIRED DETAILS START */
-function renderCurseRequiredDetails() {
-  return `
-    <div class="info-box is-alert">
-      <div class="info-line">
-        <span>One or more of your effects requires a </span>
-        <button class="term-link" type="button" aria-expanded="false">
-          Curse
-        </button>
-      </div>
-      <div class="popover" hidden>
-        <h4 class="popover-title">Curse Required</h4>
-        <div class="popover-body">
-          <p>
-            One or more selected effects requires a Curse to be chosen before this relic can be finalized.
-            This Curse will negatively impact your character in exchange for the selected effect.
-          </p>
-          <p><em>(Placeholder) Future details about Curse selection will appear here.</em></p>
-        </div>
-      </div>
-    </div>
-  `;
-}
-/* CURSE REQUIRED DETAILS END */

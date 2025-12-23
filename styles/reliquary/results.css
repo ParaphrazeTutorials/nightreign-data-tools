@@ -197,7 +197,7 @@
   align-items: start;
 }
 
-.chosen-effects li .effect-main:not(.effect-main--row) {
+.chosen-effects li .effect-main {
   display: grid;
   grid-template-rows: auto auto;
   gap: 0.35rem;
@@ -347,27 +347,31 @@
 }
 
 /* ------------------------------------------------------------
-   RAW DATA: lock Curse button to title row (override components.css)
+   Raw Data — Curse meta labels (labels only; values unchanged)
    ------------------------------------------------------------ */
 
-#results.is-raw .effect-main--row {
-  align-items: start;
+#results.is-raw .meta.meta--curse .curse-label {
+  color: rgba(181, 140, 255, 1);
+  opacity: 1;
 }
 
-#results.is-raw .effect-main--row .curse-btn {
-  align-self: start;
+
+#results.is-raw .effect-main--row:has(.meta--curse) .curse-btn {
+  align-self: flex-start !important;
 }
 
 /* ------------------------------------------------------------
-   RAW DATA: align Curse button with the TITLE line
-   Override components.css which forces center alignment in raw mode.
+   Raw Data — keep Curse button position stable when a curse is selected
+   The raw layout uses a grid (components.css) with a 1fr first column which can
+   push the button as content grows (e.g., curse lines). When a curse meta row is
+   present, switch to auto/auto/1fr so the button stays adjacent to the title.
    ------------------------------------------------------------ */
 
-#results.is-raw .effect-main.effect-main--row {
-  align-items: baseline !important;
+#results.is-raw .effect-main--row:has(.meta--curse) {
+  grid-template-columns: auto auto 1fr !important;
 }
 
-#results.is-raw .effect-main.effect-main--row .title,
-#results.is-raw .effect-main.effect-main--row .curse-btn {
-  align-self: baseline !important;
+#results.is-raw .effect-main--row:has(.meta--curse) .curse-btn {
+  align-self: center !important;
+  justify-self: start !important;
 }
