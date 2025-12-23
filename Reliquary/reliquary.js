@@ -63,6 +63,10 @@ initHeaderBuildTag();
 
 let rows = [];
 let byId = new Map();
+let rowsAll = [];
+let byIdAll = new Map();
+let curses = [];
+const curseBySlot = [null, null, null];
 let currentRandomColor = "Red";
 
 function pickRandomColor() {
@@ -72,6 +76,11 @@ function pickRandomColor() {
 function getRow(effectId) {
   if (!effectId) return null;
   return byId.get(String(effectId)) ?? null;
+}
+
+function getAnyRow(effectId) {
+  if (!effectId) return null;
+  return byIdAll.get(String(effectId)) ?? null;
 }
 
 function getRollValue(row) {
@@ -227,6 +236,147 @@ function markLineReordered(html) {
   return html.replace("<li>", `<li class="reorder-changed">`);
 }
 
+
+function slotLabel(idx) {
+  return idx === 0 ? "Effect 1" : idx === 1 ? "Effect 2" : "Effect 3";
+}
+
+let curseDialog;
+let curseDialogList;
+let curseDialogTitle;
+
+function ensureCurseDialog() {
+  if (curseDialog) return;
+
+  const d = document.createElement("dialog");
+  d.className = "curse-dialog";
+  d.innerHTML = `
+    <form method="dialog" class="curse-dialog__form">
+      <header class="curse-dialog__header">
+        <h4 class="curse-dialog__title" id="curseDialogTitle">Select a Curse</h4>
+      </header>
+
+      <div class="curse-dialog__body">
+        <div class="curse-dialog__list" id="curseDialogList"></div>
+      </div>
+
+      <footer class="curse-dialog__footer">
+        <button value="cancel" class="secondary" type="submit">Cancel</button>
+      </footer>
+    </form>
+  `;
+  document.body.appendChild(d);
+
+  curseDialog = d;
+  curseDialogList = d.querySelector("#curseDialogList");
+  curseDialogTitle = d.querySelector("#curseDialogTitle");
+}
+
+function computeBlockedCompatForCurse(slotIdx) {
+  const blocked = new Set();
+
+  // Block compatibility groups already used by selected curses in OTHER slots.
+  for (let i = 0; i < curseBySlot.length; i++) {
+    if (i === slotIdx) continue;
+    const id = curseBySlot[i];
+    if (!id) continue;
+    const row = getAnyRow(id);
+    const cid = compatId(row);
+    if (cid) blocked.add(String(cid));
+  }
+
+  // Also block groups used by selected effects (keeps overall rules consistent).
+  const a = getRow(dom.sel1.value);
+  const b = getRow(dom.sel2.value);
+  const c = getRow(dom.sel3.value);
+
+  // Keep curse selections consistent with current effect picks.
+  const picked = [a, b, c];
+  for (let i = 0; i < picked.length; i++) {
+    const r = picked[i];
+    const req = r && String(r?.CurseRequired ?? "0") === "1";
+    if (!req) curseBySlot[i] = null;
+  }
+  for (const r of [a, b, c]) {
+    if (!r) continue;
+    const cid = compatId(r);
+    if (cid) blocked.add(String(cid));
+  }
+
+  // Allow this slot's current selection (so you can reopen and keep it).
+  const curId = curseBySlot[slotIdx];
+  if (curId) {
+    const curRow = getAnyRow(curId);
+    const cid = compatId(curRow);
+    if (cid) blocked.delete(String(cid));
+  }
+
+  return blocked;
+}
+
+function openCurseDialog(slotIdx) {
+  ensureCurseDialog();
+  if (!curseDialogList) return;
+
+  if (curseDialogTitle) curseDialogTitle.textContent = `Select a Curse for ${slotLabel(slotIdx)}`;
+
+  const blockedCompat = computeBlockedCompatForCurse(slotIdx);
+
+  // Curses should be Depth of Night; still respect the current relic-type filter.
+  const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
+    .filter(r => {
+      const cid = compatId(r);
+      if (!cid) return true;
+      return !blockedCompat.has(String(cid));
+    })
+    .sort((x, y) => getRollValue(x) - getRollValue(y));
+
+  const current = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
+
+  if (eligibleCurses.length === 0) {
+    curseDialogList.innerHTML = `
+      <div class="curse-dialog__empty">
+        No curses available based on current Compatibility selections.
+      </div>
+    `;
+  } else {
+    curseDialogList.innerHTML = eligibleCurses.map(r => {
+      const id = String(r.EffectID);
+      const name = r.EffectDescription ?? `(Effect ${id})`;
+      const checked = id === current ? "checked" : "";
+      return `
+        <label class="curse-pick">
+          <input type="radio" name="cursePick" value="${id}" ${checked} />
+          <span class="curse-pick__label">${name}</span>
+        </label>
+      `;
+    }).join("");
+  }
+
+  // Handle selection
+  const radios = curseDialogList.querySelectorAll('input[name="cursePick"]');
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      curseBySlot[slotIdx] = radio.value;
+      if (curseDialog && curseDialog.open) curseDialog.close();
+      updateUI("curse-change");
+    });
+  });
+
+  curseDialog.showModal();
+}
+
+function installCurseButtons() {
+  const btns = document.querySelectorAll("[data-curse-slot]");
+  btns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const slotIdx = Number.parseInt(btn.getAttribute("data-curse-slot") || "-1", 10);
+      if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
+      openCurseDialog(slotIdx);
+    });
+  });
+}
+
 function updateDetails(a, b, c) {
   if (!dom.detailsBody) return;
 
@@ -240,6 +390,26 @@ function updateDetails(a, b, c) {
 
   const dupGroups = computeCompatDupGroups(selected);
   const hasDup = dupGroups.length > 0;
+
+  const missingCurseSlots = [];
+  const orig = [a, b, c];
+  for (let i = 0; i < orig.length; i++) {
+    const r = orig[i];
+    if (!r) continue;
+    const req = String(r?.CurseRequired ?? "0") === "1";
+    if (req && !curseBySlot[i]) missingCurseSlots.push(i);
+  }
+
+  if (missingCurseSlots.length > 0) {
+    const labels = missingCurseSlots.map(i => slotLabel(i)).join(", ");
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="curse-required">
+        <div class="info-line">
+          Curse required: select a curse for <strong>${labels}</strong>.
+        </div>
+      </div>
+    `);
+  }
 
   if (hasDup) {
 
@@ -459,7 +629,18 @@ function updateUI(reason = "") {
   const roll = computeRollOrderIssue(a2, b2, c2);
   const hasOrderIssue = roll.hasIssue;
 
-  const state = anySelected && (hasCompatIssue || hasOrderIssue) ? "Invalid" : "Valid";
+  const hasCurseMissing = (() => {
+    const orig = [a2, b2, c2];
+    for (let i = 0; i < orig.length; i++) {
+      const r = orig[i];
+      if (!r) continue;
+      const req = String(r?.CurseRequired ?? "0") === "1";
+      if (req && !curseBySlot[i]) return true;
+    }
+    return false;
+  })();
+
+  const state = anySelected && (hasCompatIssue || hasOrderIssue || hasCurseMissing) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
   // --- Validity + checkmark indicators ---
@@ -526,6 +707,8 @@ function updateUI(reason = "") {
       renderChosenLine("", null, showRaw) +
       renderChosenLine("", null, showRaw);
 
+    installCurseButtons();
+
     updateCounts(dom, 1, filtered1.length);
     setValidityBadge("Valid", false);
     return;
@@ -535,9 +718,16 @@ function updateUI(reason = "") {
     setDetailsEmpty();
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2)) +
+      renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2), {
+      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[0]),
+      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
+      curseSlot: 0
+    }) +
       renderChosenLine("", null, showRaw) +
       renderChosenLine("", null, showRaw);
+
+    installCurseButtons();
 
     updateCounts(dom, 2, filtered2.length);
     return;
@@ -547,9 +737,21 @@ function updateUI(reason = "") {
     updateDetails(a2, b2, null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2)) +
-      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2)) +
+      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
+      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[0]),
+      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
+      curseSlot: 0
+    }) +
+      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
+      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[1]),
+      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
+      curseSlot: 1
+    }) +
       renderChosenLine("", null, showRaw);
+
+    installCurseButtons();
 
     updateCounts(dom, 3, filtered3.length);
     return;
@@ -558,9 +760,26 @@ function updateUI(reason = "") {
   updateDetails(a2, b2, c2);
 
   dom.chosenList.innerHTML =
-    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2)) +
-    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2)) +
-    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(c2));
+    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
+      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[0]),
+      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
+      curseSlot: 0
+    }) +
+    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
+      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[1]),
+      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
+      curseSlot: 1
+    }) +
+    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(c2), {
+      curseRequired: String(c2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[2]),
+      curseButtonLabel: curseBySlot[2] ? "Change Curse" : "Select a Curse",
+      curseSlot: 2
+    });
+
+    installCurseButtons();
 
   updateCounts(dom, 3, filtered3.length);
 }
@@ -610,8 +829,10 @@ async function load() {
   const res = await fetch(DATA_URL, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${DATA_URL} (${res.status})`);
 
-  const rowsAll = await res.json();
-  // Filter out cursed effects (Curse = 1) from dropdowns and categories.
+  rowsAll = await res.json();
+  byIdAll = new Map(rowsAll.map(r => [String(r.EffectID), r]));
+  curses = rowsAll.filter(r => String(r?.Curse ?? "0") === "1");
+  // Filter out cursed effects (Curse = 1) from main dropdowns and categories.
   // Data values are strings in JSON, so compare as strings.
   rows = rowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
   byId = new Map(rows.map(r => [String(r.EffectID), r]));
