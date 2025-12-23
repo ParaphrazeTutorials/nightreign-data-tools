@@ -24,12 +24,23 @@ function initHeaderBuildTag() {
   const el = document.getElementById("heroBuild");
   if (!el) return;
 
-  // Treat local dev (Live Server / localhost) as BETA regardless of configured channel.
+  // Environment detection (deployment-based):
+  // - Local dev (localhost / 127.0.0.1 / ::1) => BETA
+  // - Dev GitHub Pages repo (nightreign-data-tools-dev) => BETA
+  // - Prod GitHub Pages repo (nightreign-data-tools) => LIVE
+  // - Otherwise => fall back to configured RELEASE_CHANNEL
   const host = String(window.location.hostname || "").toLowerCase();
+  const path = String(window.location.pathname || "").toLowerCase();
   const isLocal = host === "localhost" || host === "127.0.0.1" || host === "::1";
+  const isDevDeploy = path.startsWith("/nightreign-data-tools-dev/");
+  const isProdDeploy = path.startsWith("/nightreign-data-tools/");
 
-  const channel = (isLocal ? "BETA" : String(RELEASE_CHANNEL || "").trim().toUpperCase());
-  const version = String(GAME_VERSION || "").trim();
+  const channel = (isLocal || isDevDeploy)
+    ? "BETA"
+    : (isProdDeploy
+        ? "LIVE"
+        : String(RELEASE_CHANNEL || "").trim().toUpperCase());
+const version = String(GAME_VERSION || "").trim();
 
   el.classList.toggle("is-beta", channel === "BETA");
   el.classList.toggle("is-live", channel === "LIVE");
