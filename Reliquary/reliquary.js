@@ -381,14 +381,14 @@ function updateDetails(a, b, c) {
   if (!dom.detailsBody) return;
 
   const selected = [a, b, c].filter(Boolean);
-  if (selected.length < 2) {
+  if (selected.length < 1) {
     dom.detailsBody.innerHTML = "";
     return;
   }
 
   const blocks = [];
 
-  const dupGroups = computeCompatDupGroups(selected);
+  const dupGroups = (selected.length >= 2) ? computeCompatDupGroups(selected) : [];
   const hasDup = dupGroups.length > 0;
 
   const missingCurseSlots = [];
@@ -400,18 +400,28 @@ function updateDetails(a, b, c) {
     if (req && !curseBySlot[i]) missingCurseSlots.push(i);
   }
 
-  if (missingCurseSlots.length > 0) {
+  if (missingCurseSlots.length > 0)
+  {
     const labels = missingCurseSlots.map(i => slotLabel(i)).join(", ");
     blocks.push(`
       <div class="info-box is-alert" data-kind="curse-required">
         <div class="info-line">
-          Curse required: select a curse for <strong>${labels}</strong>.
+          <span>One or more of your effects requires a </span>
+          <button type="button" class="term-link" data-popover-toggle="cursePopover">Curse</button><span>.</span>
+        </div>
+
+        <div id="cursePopover" class="popover" hidden>
+          <h4 class="popover-title">Curse Required</h4>
+          <div class="popover-body">
+            <p><em>On Depth of Night Relics only, there are certain effects that cannot be rolled without an accompanying Curse, which adds a detrimental effect to your roll.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
+            <p>Missing for: <strong>${labels}</strong>.</p>
+          </div>
         </div>
       </div>
     `);
   }
 
-  if (hasDup) {
+if (hasDup) {
 
     blocks.push(`
       <div class="info-box is-alert" data-kind="compat-dup">
@@ -433,7 +443,7 @@ function updateDetails(a, b, c) {
     `);
   }
 
-  const roll = computeRollOrderIssue(a, b, c);
+  const roll = (selected.length >= 2) ? computeRollOrderIssue(a, b, c) : { hasIssue: false };
   if (roll.hasIssue) {
     blocks.push(`
       <div class="info-box is-alert" data-kind="rollorder">
@@ -715,7 +725,8 @@ function updateUI(reason = "") {
   }
 
   if (!b2) {
-    setDetailsEmpty();
+    // With only Effect 1 selected, still show Details if a curse is required/missing.
+    updateDetails(a2, null, null);
 
     dom.chosenList.innerHTML =
       renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2), {
@@ -802,6 +813,9 @@ function resetAllPreserveIllegal(desiredIllegal) {
   dom.sel2.value = "";
   dom.sel3.value = "";
 
+  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
+
   pickRandomColor();
   updateUI("illegal-change");
 }
@@ -820,6 +834,9 @@ function resetAll() {
   dom.sel1.value = "";
   dom.sel2.value = "";
   dom.sel3.value = "";
+
+  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
 
   pickRandomColor();
   updateUI("reset");
@@ -861,14 +878,24 @@ pickRandomColor();
   dom.cat3.addEventListener("change", () => updateUI("cat-change"));
 
   dom.sel1.addEventListener("change", () => {
+    // Any effect change forces curse re-pick for that slot
+    curseBySlot[0] = null;
     const chosen = getRow(dom.sel1.value);
     const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
     if (nextType) dom.selType.value = nextType;
     updateUI("effect-change");
   });
 
-  dom.sel2.addEventListener("change", () => updateUI("effect-change"));
-  dom.sel3.addEventListener("change", () => updateUI("effect-change"));
+  dom.sel2.addEventListener("change", () => {
+    // Any effect change forces curse re-pick for that slot
+    curseBySlot[1] = null;
+    updateUI("effect-change");
+  });
+  dom.sel3.addEventListener("change", () => {
+    // Any effect change forces curse re-pick for that slot
+    curseBySlot[2] = null;
+    updateUI("effect-change");
+  });
 
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", resetAll);
 
