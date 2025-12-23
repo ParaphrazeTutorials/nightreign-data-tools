@@ -1,284 +1,173 @@
+/* ============================================================
+   Global Site Styles — The Round Table Codex
+   ============================================================ */
+
 :root {
-  /* ------------------------------------------------------------
-     Core palette
-     ------------------------------------------------------------ */
-  --color-bg-dark: #0f0f12;
-  --color-bg-panel: rgba(0,0,0,0.35);
+  --bg-main: radial-gradient(1200px 600px at 70% -20%, #1a1f2b 0%, #0b0e14 45%, #07090e 100%);
+  --panel-bg: rgba(16, 20, 30, 0.75);
+  --panel-border: rgba(255, 255, 255, 0.08);
 
-  --color-accent-primary: #4a0f14;
-  --color-accent-hover: rgba(255,255,255,0.14);
+  --text-main: #e8eaf0;
+  --text-muted: #b7bcc9;
 
-  --color-text-main: #ffffff;
-  --color-text-muted: rgba(255,255,255,0.75);
+  --accent-red-1: #6b1515;
+  --accent-red-2: #9e1e1e;
 
-  --overlay-strong: rgba(0,0,0,0.30);
-  --overlay-light: rgba(0,0,0,0.18);
+  --accent-green-1: #164f2b;
+  --accent-green-2: #1f7a3f;
 
-  /* ------------------------------------------------------------
-     Global Hero Art Controls (CANONICAL)
-     ------------------------------------------------------------ */
-  /* Canonical global hero art controls */
-  --hero-art-zoom: 0.5;
-  --hero-art-x: 65%;
-  --hero-art-y: 90%;
+  --radius-lg: 1rem;
+  --radius-md: 0.65rem;
 }
 
-
 /* ------------------------------------------------------------
-   Layout
+   Base layout
    ------------------------------------------------------------ */
 
-.app-grid {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  gap: 1.1rem;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-main);
+  color: var(--text-main);
 }
 
 .app-shell {
-  width: 100%;
-  max-width: none;
-  margin: 0 auto;
-  padding-inline: clamp(0.75rem, 2.2vw, 2.75rem);
+  min-height: 100vh;
 }
 
+.app-grid {
+  display: flex;
+  flex-direction: column;
+}
 
 /* ------------------------------------------------------------
-   Hero
+   HERO
    ------------------------------------------------------------ */
 
 .hero {
   position: relative;
+  padding: 2.5rem 3rem 2rem;
   overflow: hidden;
-
-  min-height: 200px;
-  padding: 1.4rem 1.25rem;
-
-  border-radius: 0.5rem;
-  color: white;
-
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.70) 0%,
-    rgba(0, 0, 0, 0.40) 45%,
-    rgba(0, 0, 0, 0.10) 100%
-  );
-
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
 }
-
-
-/* ------------------------------------------------------------
-   Hero Art (IMG-based, per-page src)
-   ------------------------------------------------------------ */
 
 .hero-art {
   position: absolute;
-  z-index: 0;
-
-  left: var(--hero-art-x);
-  top: var(--hero-art-y);
-
-  width: auto;
-  height: auto;
-  min-width: 100%;
-  min-height: 100%;
-
-  transform: translate(-50%, -50%) scale(var(--hero-art-zoom));
-  transform-origin: center;
-
+  inset: auto -10% -35% auto;
+  width: 55%;
+  max-width: 900px;
+  opacity: 0.85;
   pointer-events: none;
 }
-
-
-/* ------------------------------------------------------------
-   Hero Text
-   ------------------------------------------------------------ */
 
 .hero-content {
   position: relative;
   z-index: 1;
-  display: grid;
-  gap: 0.35rem;
 }
 
-.hero h1,
-.hero h2 {
+.hero-content h1 {
   margin: 0;
+  font-size: 2.2rem;
+  letter-spacing: 0.04em;
 }
 
-.hero h1 {
-  font-size: 1.85rem;
-  line-height: 1.1;
-  letter-spacing: 0.01em;
-}
-
-.hero h2 {
-  font-size: 1.05rem;
-  font-weight: 600;
-  opacity: 0.9;
+.hero-content h2 {
+  margin-top: 0.3rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--text-muted);
 }
-
 
 /* ------------------------------------------------------------
-   Navigation (BACKGROUND BOX TIGHTENED)
+   HERO BUILD PILL (BETA / LIVE)
+   ------------------------------------------------------------ */
+
+.hero-build {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* -------- BETA (red) -------- */
+
+.hero-build.is-beta {
+  background: linear-gradient(
+    135deg,
+    var(--accent-red-1),
+    var(--accent-red-2)
+  );
+  color: #fff;
+}
+
+/* -------- LIVE (green) -------- */
+
+.hero-build.is-live {
+  background: linear-gradient(
+    135deg,
+    var(--accent-green-1),
+    var(--accent-green-2)
+  );
+  color: #eafff1;
+}
+
+/* ------------------------------------------------------------
+   NAV BAR
    ------------------------------------------------------------ */
 
 .tool-nav {
-  background-color: var(--color-accent-primary);
-  padding: 0.2rem 1rem;
-  border-radius: 0.45rem;
-}
-
-.tool-nav ul {
-  display: flex;
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  align-items: center;
-
-  line-height: 1;
-  min-height: unset;
+  margin: 0 2rem 1.2rem;
+  padding: 0.7rem 1rem;
+  background: linear-gradient(
+    180deg,
+    rgba(95, 18, 18, 0.95),
+    rgba(65, 12, 12, 0.95)
+  );
+  border-radius: var(--radius-md);
 }
 
 .tool-nav a {
-  color: white;
-  text-decoration: none;
+  margin-right: 1.4rem;
   font-weight: 600;
-  font-size: 0.85rem;
-
-  padding: 0.15rem 0.4rem;
-
-  border-radius: 0.35rem;
-  display: inline-block;
-}
-
-.tool-nav a:not([aria-disabled="true"]):hover {
-  background: var(--color-accent-hover);
-}
-
-.tool-nav a.active {
-  background: rgba(255,255,255,0.14);
-}
-
-.tool-nav a[aria-disabled="true"] {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-
-/* ------------------------------------------------------------
-   Footer
-   ------------------------------------------------------------ */
-
-footer {
-  text-align: center;
-  opacity: 0.7;
-  margin-bottom: 1rem;
-}
-
-/* ------------------------------------------------------------
-   Hero build tag (page status + DB/Game version)
-   ------------------------------------------------------------ */
-
-.hero-build{
-  position: absolute;
-  left: 1.05rem;
-  bottom: 0.9rem;
-  z-index: 2;
-
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.55rem;
-
-  font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
-
-  text-shadow: 0 6px 18px rgba(0,0,0,0.55);
-}
-
-.hero-build__status{
-  text-transform: uppercase;
-}
-
-.hero-build__sep{
-  opacity: 0.55;
-  font-weight: 900;
-}
-
-.hero-build__version{
-  font-weight: 750;
-  letter-spacing: 0.02em;
-  opacity: 0.88;
-}
-
-.hero-build.is-beta .hero-build__status{
-  color: rgba(214, 92, 92, 0.95); /* medium red */
-}
-
-.hero-build.is-live .hero-build__status{
-  color: rgba(255, 255, 255, 0.92); /* medium white */
-}
-
-/* ------------------------------------------------------------
-   Overrides / upgrades (app-wide)
-   ------------------------------------------------------------ */
-
-/* Stronger nav styling (Pico can make links blue). */
-.tool-nav ul li a,
-.tool-nav ul li a:visited {
-  color: rgba(255, 255, 255, 0.92);
+  color: #f2f2f2;
   text-decoration: none;
 }
 
-.tool-nav ul li a[aria-disabled="true"],
-.tool-nav ul li a[aria-disabled="true"]:visited {
-  color: rgba(255, 255, 255, 0.42);
-  cursor: not-allowed;
+.tool-nav a.is-active {
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+.tool-nav a.is-disabled {
+  opacity: 0.45;
   pointer-events: none;
 }
 
-/* Beta/Live pill behind the hero build string */
-.hero-build {
-  padding: 0.55rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: linear-gradient(180deg, rgba(120, 16, 24, 0.38), rgba(16, 8, 10, 0.55));
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-}
+/* ------------------------------------------------------------
+   FOOTER
+   ------------------------------------------------------------ */
 
-/* Make BETA pop while keeping the rest readable */
-.hero-build.is-beta .hero-build__status {
-  color: rgba(214, 92, 92, 0.95);
-}
-
-/* Compact global footer */
 .site-footer {
-  margin-top: 1.1rem;
-  padding: 0.55rem 0 0.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: auto;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.75rem;
   text-align: center;
-}
-
-.site-footer .footer-inner {
-  max-width: var(--shell-max, 1600px);
-  margin: 0 auto;
-  padding: 0 var(--shell-pad, 18px);
-}
-
-.site-footer p {
-  margin: 0.15rem 0;
-  font-size: 0.82rem;
-  line-height: 1.25;
-  opacity: 0.72;
-}
-
-.site-footer .footer-credits {
-  opacity: 0.78;
+  color: var(--text-muted);
+  background: rgba(10, 12, 18, 0.85);
+  border-top: 1px solid var(--panel-border);
 }
