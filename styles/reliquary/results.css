@@ -323,3 +323,25 @@
   gap: 0.65rem;
   align-self: center;
 }
+
+/* ------------------------------------------------------------
+   RIGHT RAIL: Row indicators (badge/arrows/check) pinned to the far right
+   ------------------------------------------------------------ */
+#results .chosen-effects li {
+  position: relative;
+}
+
+#results .chosen-effects li .effect-line {
+  /* reserve space so text/buttons never collide with the right rail */
+  padding-right: 8.75rem;
+}
+
+#results .chosen-effects li .row-indicators {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
