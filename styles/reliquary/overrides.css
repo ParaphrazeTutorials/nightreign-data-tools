@@ -112,4 +112,48 @@ button#startOver:focus-visible {
   outline: 2px solid rgba(214, 194, 154, 0.9) !important;
   outline-offset: 2px;
 }
+/* ------------------------------------------------------------
+   Raw-mode Curse button placement
+   Keep the Curse button directly after the Effect title (like non-raw)
+   ------------------------------------------------------------ */
 
+/* Only affects the Results list when Raw Data is ON */
+#results.is-raw .effect-main--row {
+  display: grid;
+  grid-template-columns: max-content max-content 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "title btn ."
+    "curse curse ."
+    "meta meta meta";
+  column-gap: 0.75rem;
+  row-gap: 0.35rem;
+  align-items: start;
+}
+
+/* Let the inner wrapper contribute its children to the grid */
+#results.is-raw .effect-main--row .effect-text {
+  display: contents;
+}
+
+/* Place title + curse line */
+#results.is-raw .effect-main--row .effect-text .title {
+  grid-area: title;
+}
+
+#results.is-raw .effect-main--row .effect-text .curse-sub {
+  grid-area: curse;
+}
+
+/* Button sits immediately after title, not at far right */
+#results.is-raw .effect-main--row .curse-btn {
+  grid-area: btn;
+  justify-self: start;
+  align-self: start;
+  margin: 0;
+}
+
+/* Raw meta always starts on its own row */
+#results.is-raw .effect-main--row .meta {
+  grid-area: meta;
+}

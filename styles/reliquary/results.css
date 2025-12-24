@@ -158,6 +158,22 @@
   box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
 }
 
+/* ------------------------------------------------------------
+   Invalid — Curse Required but Missing (no curse selected yet)
+   Match standard Invalid gradient exactly
+   ------------------------------------------------------------ */
+
+.chosen-effects li:has(.curse-btn):not(:has(.curse-sub)) {
+  background: linear-gradient(
+    90deg,
+    rgba(92, 22, 22, 0.58) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  border-color: rgba(92, 22, 22, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
+}
+
 
 /* ✅ Correct selector (your previous one was malformed) */
 .chosen-effects li:has(.move-indicator.move-ok):not(:has(.move-indicator.move-up)):not(:has(.move-indicator.move-down)):not(:has(.validity-badge--row.is-invalid)) {
