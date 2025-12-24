@@ -3,7 +3,7 @@
 export const DATA_URL = new URL("../Data/reliquary.json", window.location.href).toString();
 
 // Page header build info (manually maintained)
-export const RELEASE_CHANNEL = "BETA"; // "BETA" | "LIVE"
+export const RELEASE_CHANNEL = "LIVE"; // "BETA" | "LIVE"
 export const GAME_VERSION = "1.03.1.0025";
 
 // Icon folder:

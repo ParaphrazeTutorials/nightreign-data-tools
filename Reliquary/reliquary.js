@@ -24,8 +24,23 @@ function initHeaderBuildTag() {
   const el = document.getElementById("heroBuild");
   if (!el) return;
 
-  const channel = String(RELEASE_CHANNEL || "").trim().toUpperCase();
-  const version = String(GAME_VERSION || "").trim();
+  // Environment detection (deployment-based):
+  // - Local dev (localhost / 127.0.0.1 / ::1) => BETA
+  // - Dev GitHub Pages repo (nightreign-data-tools-dev) => BETA
+  // - Prod GitHub Pages repo (nightreign-data-tools) => LIVE
+  // - Otherwise => fall back to configured RELEASE_CHANNEL
+  const host = String(window.location.hostname || "").toLowerCase();
+  const path = String(window.location.pathname || "").toLowerCase();
+  const isLocal = host === "localhost" || host === "127.0.0.1" || host === "::1";
+  const isDevDeploy = path.startsWith("/nightreign-data-tools-dev/");
+  const isProdDeploy = path.startsWith("/nightreign-data-tools/");
+
+  const channel = (isLocal || isDevDeploy)
+    ? "BETA"
+    : (isProdDeploy
+        ? "LIVE"
+        : String(RELEASE_CHANNEL || "").trim().toUpperCase());
+const version = String(GAME_VERSION || "").trim();
 
   el.classList.toggle("is-beta", channel === "BETA");
   el.classList.toggle("is-live", channel === "LIVE");
@@ -48,6 +63,12 @@ initHeaderBuildTag();
 
 let rows = [];
 let byId = new Map();
+let rowsAll = [];
+let byIdAll = new Map();
+let curses = [];
+const curseBySlot = [null, null, null];
+const curseCatBySlot = ["", "", ""]; // remembered per slot ("" = All)
+
 let currentRandomColor = "Red";
 
 function pickRandomColor() {
@@ -57,6 +78,11 @@ function pickRandomColor() {
 function getRow(effectId) {
   if (!effectId) return null;
   return byId.get(String(effectId)) ?? null;
+}
+
+function getAnyRow(effectId) {
+  if (!effectId) return null;
+  return byIdAll.get(String(effectId)) ?? null;
 }
 
 function getRollValue(row) {
@@ -212,21 +238,249 @@ function markLineReordered(html) {
   return html.replace("<li>", `<li class="reorder-changed">`);
 }
 
+
+function slotLabel(idx) {
+  return idx === 0 ? "Effect 1" : idx === 1 ? "Effect 2" : "Effect 3";
+}
+
+let curseDialog;
+let curseDialogList;
+let curseDialogTitle;
+
+function ensureCurseDialog() {
+  if (curseDialog) return;
+
+  const d = document.createElement("dialog");
+  d.className = "curse-dialog";
+  d.innerHTML = `
+    <form method="dialog" class="curse-dialog__form">
+      <header class="curse-dialog__header">
+        <h4 class="curse-dialog__title" id="curseDialogTitle">Select a Curse</h4>
+        <button type="button" class="curse-dialog__close" aria-label="Close">✕</button>
+      </header>
+
+      <div class="curse-dialog__body">
+        <div class="curse-dialog__controls">
+          <label class="curse-field">
+            <span class="curse-field__label">Curse Category</span>
+            <select id="curseCategorySelect">
+              <option value="">All</option>
+            </select>
+          </label>
+
+          <label class="curse-field">
+            <span class="curse-field__label">Curse Effect</span>
+            <select id="curseEffectSelect">
+              <option value="">Select a Curse…</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <footer class="curse-dialog__footer">
+        <button type="button" class="secondary" id="curseCancelBtn">Cancel</button>
+        <button type="submit" class="primary" id="curseSubmitBtn" disabled>Apply Curse</button>
+      </footer>
+    </form>
+  `;
+  document.body.appendChild(d);
+
+  curseDialog = d;
+  curseDialogTitle = d.querySelector("#curseDialogTitle");
+
+  d.querySelector(".curse-dialog__close").onclick =
+  d.querySelector("#curseCancelBtn").onclick = () => d.close("cancel");
+}
+
+
+function computeBlockedCompatForCurse(slotIdx) {
+  const blocked = new Set();
+
+  // Block compatibility groups already used by selected curses in OTHER slots.
+  for (let i = 0; i < curseBySlot.length; i++) {
+    if (i === slotIdx) continue;
+    const id = curseBySlot[i];
+    if (!id) continue;
+    const row = getAnyRow(id);
+    const cid = compatId(row);
+    if (cid) blocked.add(String(cid));
+  }
+
+  // Also block groups used by selected effects (keeps overall rules consistent).
+  const a = getRow(dom.sel1.value);
+  const b = getRow(dom.sel2.value);
+  const c = getRow(dom.sel3.value);
+
+  // Keep curse selections consistent with current effect picks.
+  const picked = [a, b, c];
+  for (let i = 0; i < picked.length; i++) {
+    const r = picked[i];
+    const req = r && String(r?.CurseRequired ?? "0") === "1";
+    if (!req) curseBySlot[i] = null;
+  }
+  for (const r of [a, b, c]) {
+    if (!r) continue;
+    const cid = compatId(r);
+    if (cid) blocked.add(String(cid));
+  }
+
+  // Allow this slot's current selection (so you can reopen and keep it).
+  const curId = curseBySlot[slotIdx];
+  if (curId) {
+    const curRow = getAnyRow(curId);
+    const cid = compatId(curRow);
+    if (cid) blocked.delete(String(cid));
+  }
+
+  return blocked;
+}
+
+function openCurseDialog(slotIdx) {
+  ensureCurseDialog();
+  if (!curseDialog) return;
+
+  const catSel = curseDialog.querySelector("#curseCategorySelect");
+  const effectSel = curseDialog.querySelector("#curseEffectSelect");
+  if (!catSel || !effectSel) return;
+
+  if (curseDialogTitle) curseDialogTitle.textContent = `Select a Curse for ${slotLabel(slotIdx)}`;
+
+  const blockedCompat = computeBlockedCompatForCurse(slotIdx);
+
+  // Respect current relic-type filter and compatibility rules.
+  const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
+    .filter(r => {
+      const cid = compatId(r);
+      if (!cid) return true;
+      return !blockedCompat.has(String(cid));
+    })
+    .sort((x, y) => getRollValue(x) - getRollValue(y));
+
+  const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
+
+  // If we already have a selected curse, default the category to that curse's category.
+  if (!curseCatBySlot[slotIdx] && currentId) {
+    const curRow = getAnyRow(currentId);
+    const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
+    curseCatBySlot[slotIdx] = curCat;
+  }
+
+  // Build category list from eligible curses
+  const cats = categoriesFor(eligibleCurses);
+
+  catSel.innerHTML = `<option value="">All</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join("");
+  catSel.value = curseCatBySlot[slotIdx] || "";
+
+  function renderEffectOptions() {
+    const catVal = catSel.value || "";
+    curseCatBySlot[slotIdx] = catVal;
+
+    const filtered = applyCategory(eligibleCurses, catVal);
+
+    if (filtered.length === 0) {
+      effectSel.innerHTML = `<option value="">No curses available</option>`;
+      effectSel.value = "";
+      effectSel.disabled = true;
+      return;
+    }
+
+    effectSel.disabled = false;
+    effectSel.innerHTML =
+      `<option value="">Select a Curse…</option>` +
+      filtered.map(r => {
+        const id = String(r.EffectID);
+        const name = r.EffectDescription ?? `(Effect ${id})`;
+        return `<option value="${id}">${name}</option>`;
+      }).join("");
+
+    // Keep current selection if it still exists under this filter
+    if (currentId && [...effectSel.options].some(o => o.value === currentId)) {
+      effectSel.value = currentId;
+    } else {
+      effectSel.value = "";
+    }
+  }
+
+  // initial render
+  renderEffectOptions();
+
+  // events
+  catSel.onchange = () => renderEffectOptions();
+
+  effectSel.onchange = () => {
+    const v = String(effectSel.value || "");
+    const submit = curseDialog.querySelector("#curseSubmitBtn");
+    submit.disabled = !v;
+  };
+
+  const submitBtn = curseDialog.querySelector("#curseSubmitBtn");
+  submitBtn.onclick = () => {
+    const v = String(effectSel.value || "");
+    if (!v) return;
+    curseBySlot[slotIdx] = v;
+    curseDialog.close("apply");
+    updateUI("curse-change");
+  };
+
+  curseDialog.showModal();
+}
+
+function installCurseButtons() {
+  const btns = document.querySelectorAll("[data-curse-slot]");
+  btns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const slotIdx = Number.parseInt(btn.getAttribute("data-curse-slot") || "-1", 10);
+      if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
+      openCurseDialog(slotIdx);
+    });
+  });
+}
+
 function updateDetails(a, b, c) {
   if (!dom.detailsBody) return;
 
   const selected = [a, b, c].filter(Boolean);
-  if (selected.length < 2) {
+  if (selected.length < 1) {
     dom.detailsBody.innerHTML = "";
     return;
   }
 
   const blocks = [];
 
-  const dupGroups = computeCompatDupGroups(selected);
+  const dupGroups = (selected.length >= 2) ? computeCompatDupGroups(selected) : [];
   const hasDup = dupGroups.length > 0;
 
-  if (hasDup) {
+  const missingCurseSlots = [];
+  const orig = [a, b, c];
+  for (let i = 0; i < orig.length; i++) {
+    const r = orig[i];
+    if (!r) continue;
+    const req = String(r?.CurseRequired ?? "0") === "1";
+    if (req && !curseBySlot[i]) missingCurseSlots.push(i);
+  }
+
+  if (missingCurseSlots.length > 0)
+  {
+    const labels = missingCurseSlots.map(i => slotLabel(i)).join(", ");
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="curse-required">
+        <div class="info-line">
+          <span>One or more of your effects requires a </span>
+          <button type="button" class="term-link" data-popover-toggle="cursePopover">Curse</button><span>.</span>
+        </div>
+
+        <div id="cursePopover" class="popover" hidden>
+          <h4 class="popover-title">Curse Required</h4>
+          <div class="popover-body">
+            <p><em>On Depth of Night Relics only, there are certain effects that cannot be rolled without an accompanying Curse, which adds a detrimental effect to your roll.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
+            <p>Missing for: <strong>${labels}</strong>.</p>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+if (hasDup) {
 
     blocks.push(`
       <div class="info-box is-alert" data-kind="compat-dup">
@@ -248,7 +502,7 @@ function updateDetails(a, b, c) {
     `);
   }
 
-  const roll = computeRollOrderIssue(a, b, c);
+  const roll = (selected.length >= 2) ? computeRollOrderIssue(a, b, c) : { hasIssue: false };
   if (roll.hasIssue) {
     blocks.push(`
       <div class="info-box is-alert" data-kind="rollorder">
@@ -444,7 +698,18 @@ function updateUI(reason = "") {
   const roll = computeRollOrderIssue(a2, b2, c2);
   const hasOrderIssue = roll.hasIssue;
 
-  const state = anySelected && (hasCompatIssue || hasOrderIssue) ? "Invalid" : "Valid";
+  const hasCurseMissing = (() => {
+    const orig = [a2, b2, c2];
+    for (let i = 0; i < orig.length; i++) {
+      const r = orig[i];
+      if (!r) continue;
+      const req = String(r?.CurseRequired ?? "0") === "1";
+      if (req && !curseBySlot[i]) return true;
+    }
+    return false;
+  })();
+
+  const state = anySelected && (hasCompatIssue || hasOrderIssue || hasCurseMissing) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
   // --- Validity + checkmark indicators ---
@@ -511,18 +776,28 @@ function updateUI(reason = "") {
       renderChosenLine("", null, showRaw) +
       renderChosenLine("", null, showRaw);
 
+    installCurseButtons();
+
     updateCounts(dom, 1, filtered1.length);
     setValidityBadge("Valid", false);
     return;
   }
 
   if (!b2) {
-    setDetailsEmpty();
+    // With only Effect 1 selected, still show Details if a curse is required/missing.
+    updateDetails(a2, null, null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2)) +
+      renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2), {
+      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[0]),
+      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
+      curseSlot: 0
+    }) +
       renderChosenLine("", null, showRaw) +
       renderChosenLine("", null, showRaw);
+
+    installCurseButtons();
 
     updateCounts(dom, 2, filtered2.length);
     return;
@@ -532,9 +807,21 @@ function updateUI(reason = "") {
     updateDetails(a2, b2, null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2)) +
-      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2)) +
+      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
+      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[0]),
+      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
+      curseSlot: 0
+    }) +
+      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
+      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[1]),
+      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
+      curseSlot: 1
+    }) +
       renderChosenLine("", null, showRaw);
+
+    installCurseButtons();
 
     updateCounts(dom, 3, filtered3.length);
     return;
@@ -543,9 +830,26 @@ function updateUI(reason = "") {
   updateDetails(a2, b2, c2);
 
   dom.chosenList.innerHTML =
-    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2)) +
-    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2)) +
-    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(c2));
+    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
+      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[0]),
+      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
+      curseSlot: 0
+    }) +
+    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
+      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[1]),
+      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
+      curseSlot: 1
+    }) +
+    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(c2), {
+      curseRequired: String(c2?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[2]),
+      curseButtonLabel: curseBySlot[2] ? "Change Curse" : "Select a Curse",
+      curseSlot: 2
+    });
+
+    installCurseButtons();
 
   updateCounts(dom, 3, filtered3.length);
 }
@@ -568,6 +872,9 @@ function resetAllPreserveIllegal(desiredIllegal) {
   dom.sel2.value = "";
   dom.sel3.value = "";
 
+  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
+
   pickRandomColor();
   updateUI("illegal-change");
 }
@@ -587,6 +894,9 @@ function resetAll() {
   dom.sel2.value = "";
   dom.sel3.value = "";
 
+  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
+
   pickRandomColor();
   updateUI("reset");
 }
@@ -595,10 +905,14 @@ async function load() {
   const res = await fetch(DATA_URL, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${DATA_URL} (${res.status})`);
 
-  rows = await res.json();
+  rowsAll = await res.json();
+  byIdAll = new Map(rowsAll.map(r => [String(r.EffectID), r]));
+  curses = rowsAll.filter(r => String(r?.Curse ?? "0") === "1");
+  // Filter out cursed effects (Curse = 1) from main dropdowns and categories.
+  // Data values are strings in JSON, so compare as strings.
+  rows = rowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
   byId = new Map(rows.map(r => [String(r.EffectID), r]));
-
-  pickRandomColor();
+pickRandomColor();
 
   const base = baseFilteredByRelicType(rows, dom.selType.value);
   const cats = categoriesFor(base);
@@ -623,14 +937,24 @@ async function load() {
   dom.cat3.addEventListener("change", () => updateUI("cat-change"));
 
   dom.sel1.addEventListener("change", () => {
+    // Any effect change forces curse re-pick for that slot
+    curseBySlot[0] = null;
     const chosen = getRow(dom.sel1.value);
     const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
     if (nextType) dom.selType.value = nextType;
     updateUI("effect-change");
   });
 
-  dom.sel2.addEventListener("change", () => updateUI("effect-change"));
-  dom.sel3.addEventListener("change", () => updateUI("effect-change"));
+  dom.sel2.addEventListener("change", () => {
+    // Any effect change forces curse re-pick for that slot
+    curseBySlot[1] = null;
+    updateUI("effect-change");
+  });
+  dom.sel3.addEventListener("change", () => {
+    // Any effect change forces curse re-pick for that slot
+    curseBySlot[2] = null;
+    updateUI("effect-change");
+  });
 
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", resetAll);
 

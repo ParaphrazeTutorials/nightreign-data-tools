@@ -1,55 +1,181 @@
+.chosen-effects > li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+/* ============================================================
+   Reliquary – Effect Line + Curse Button Alignment (FINAL)
+   ============================================================ */
+
+.effect-line {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.effect-icon {
+  align-self: center;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.effect-main {
+  display: flex;
+  align-items: center;
+}
+
+.effect-main .title {
+  display: flex;
+  align-items: center;        /* aligns with icon center */
+  gap: 0.6rem;
+  line-height: 1.35;
+}
+
+.title-text {
+  display: inline-block;
+}
+
+/* Curse subtitle */
+.curse-sub {
+  color: #b58cff;
+  font-style: italic;
+
+  /* Keep the curse text as close as possible to the effect title */
+  margin-top: -0.32rem;
+  line-height: 1.05;
+}
+
+/* Curse button */
+/* Curse button: hard reset margins so it can't drift relative to icon/text */
+/* Curse button: styled to match the "Invalid" validity pill */
+.curse-btn {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(92, 22, 22, 0.90);
+  color: rgba(255,255,255,0.92);
+
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.curse-btn:hover {
+  background: rgba(120, 30, 30, 0.92);
+}
+
+.curse-btn:active {
+  background: rgba(70, 16, 16, 0.92);
+}
+/* Align icon + text + curse button as a single row */
+.effect-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+/* Effect row: lock "title + curse button" to the same top row, with Raw Data on its own row */
+.effect-main--row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas:
+    "text btn indicators"
+    "meta meta indicators";
+  column-gap: 0.75rem;
+  row-gap: 0.35rem;
+  align-items: center;
+}
+
+.effect-main--row > .effect-text { grid-area: text; min-width: 0; }
+.effect-main--row > .meta { grid-area: meta; }
+.effect-main--row > .curse-btn { grid-area: btn; align-self: center; justify-self: end; }
+.effect-main--row > .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
+
+/* Fallback: if a title is used directly (no .effect-text wrapper), treat it like the text area */
+.effect-main--row > .title {
+  grid-area: text;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.effect-main--row .effect-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.effect-main--row .title {
+  display: flex;
+  align-items: center;
+}
+
 /* ------------------------------------------------------------
-   Reliquary — Components (Start Over button recolor)
-   Tan + Black parchment theme
+   RAW DATA mode: true multi-row grid so the curse button aligns
+   to the TITLE line (row 1) while the curse subtitle is row 2.
+   Markup stays the same via display: contents on .effect-text.
    ------------------------------------------------------------ */
 
-/* Target ONLY the Start Over / reset button */
-button.start-over,
-.btn-reset {
-  background: linear-gradient(
-    180deg,
-    #d6c29a 0%,
-    #b9a47a 55%,
-    #1a1a1a 100%
-  );
-  color: #111;
-  border: 1px solid rgba(0, 0, 0, 0.55);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 6px 16px rgba(0, 0, 0, 0.45);
+#results.is-raw .effect-main--row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas:
+    "title btn indicators"
+    "curse curse indicators"
+    "meta  meta  indicators";
+  /* Center items within each grid row so the button stays locked to the title line */
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.35rem;
 }
 
-/* Hover: slightly darker parchment, more contrast */
-button.start-over:hover,
-.btn-reset:hover {
-  background: linear-gradient(
-    180deg,
-    #cdb88f 0%,
-    #a79267 55%,
-    #111 100%
-  );
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 8px 18px rgba(0, 0, 0, 0.55);
+/* Split the text block into its children as grid items */
+#results.is-raw .effect-main--row .effect-text {
+  display: contents;
 }
 
-/* Active: pressed, ink-heavy */
-button.start-over:active,
-.btn-reset:active {
-  background: linear-gradient(
-    180deg,
-    #bca577 0%,
-    #8f7b55 60%,
-    #000 100%
-  );
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.6);
-  transform: translateY(1px);
+/* Place each piece on its intended grid row */
+#results.is-raw .effect-main--row .title     { grid-area: title; min-width: 0; align-self: center; }
+#results.is-raw .effect-main--row .curse-sub { grid-area: curse; align-self: start; }
+#results.is-raw .effect-main--row .meta      { grid-area: meta; align-self: start; }
+#results.is-raw .effect-main--row .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
+
+/* Button sits on the title row */
+#results.is-raw .effect-main--row .curse-btn {
+  grid-area: btn;
+  align-self: center;
+  justify-self: end;
+  margin-top: 0; /* no drift */
 }
 
-/* Focus-visible for accessibility */
-button.start-over:focus-visible,
-.btn-reset:focus-visible {
-  outline: 2px solid rgba(214, 194, 154, 0.9);
-  outline-offset: 2px;
+/* ------------------------------------------------------------
+   RAW DATA mode: pin icon + content to the same top baseline.
+   Without this, the <li> flex alignment will center the icon
+   against the full height of the (title+curse+meta) block.
+   ------------------------------------------------------------ */
+
+#results.is-raw .chosen-effects > li {
+  align-items: flex-start;
+}
+
+#results.is-raw .chosen-effects > li .effect-icon {
+  margin-top: 0.15rem; /* optical nudge to match title cap-height */
+  flex: 0 0 auto;
 }

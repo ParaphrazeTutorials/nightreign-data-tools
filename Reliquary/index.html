@@ -19,25 +19,15 @@
   <body>
     <main class="app-shell app-grid">
 
-      <!-- HERO -->
-      <header class="hero">
-        <img
-          class="hero-art"
-          src="../Assets/home/Reliquary.png"
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          decoding="async"
-          onerror="this.remove()"
-        />
-
-        <div class="hero-content">
-          <h1>The Round Table Codex</h1>
-          <h2>Reliquary</h2>
-        </div>
-
-        <div id="heroBuild" class="hero-build" aria-label="Release channel and game version"></div>
-      </header>
+      <!-- HERO (global renderer) -->
+      <header
+        id="globalHero"
+        class="hero"
+        data-hero-image="../Assets/home/Reliquary.png"
+        data-hero-h1="The Round Table Codex"
+        data-hero-h2="Reliquary"
+        data-hero-build="true"
+      ></header>
 
       <!-- NAV (global) -->
       <nav id="globalNav" class="tool-nav" aria-label="Primary navigation"></nav>
@@ -236,8 +226,8 @@
       </section>
 
     </main>
-
+    <script type="module" src="../scripts/hero.js"></script>
     <script type="module" src="./reliquary.js"></script>
     <script type="module" src="../scripts/chrome.js"></script>
-  </body>
+</body>
 </html>

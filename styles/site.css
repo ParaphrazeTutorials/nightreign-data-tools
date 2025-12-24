@@ -258,6 +258,11 @@ footer {
   color: rgba(214, 92, 92, 0.95);
 }
 
+/* LIVE uses the same pill styling, but with a green-tinted gradient */
+.hero-build.is-live {
+  background: linear-gradient(180deg, rgba(16, 120, 60, 0.38), rgba(8, 16, 10, 0.55));
+}
+
 /* Compact global footer */
 .site-footer {
   margin-top: 1.1rem;

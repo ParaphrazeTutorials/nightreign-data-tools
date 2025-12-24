@@ -158,6 +158,22 @@
   box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
 }
 
+/* ------------------------------------------------------------
+   Invalid — Curse Required but Missing (no curse selected yet)
+   Match standard Invalid gradient exactly
+   ------------------------------------------------------------ */
+
+.chosen-effects li:has(.curse-btn):not(:has(.curse-sub)) {
+  background: linear-gradient(
+    90deg,
+    rgba(92, 22, 22, 0.58) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  border-color: rgba(92, 22, 22, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
+}
+
 
 /* ✅ Correct selector (your previous one was malformed) */
 .chosen-effects li:has(.move-indicator.move-ok):not(:has(.move-indicator.move-up)):not(:has(.move-indicator.move-down)):not(:has(.validity-badge--row.is-invalid)) {
@@ -322,4 +338,82 @@
   align-items: center;
   gap: 0.65rem;
   align-self: center;
+}
+
+/* ------------------------------------------------------------
+   RIGHT RAIL: Row indicators (badge/arrows/check) pinned to the far right
+   ------------------------------------------------------------ */
+#results .chosen-effects li {
+  position: relative;
+}
+
+#results .chosen-effects li .effect-line {
+  /* reserve space so text/buttons never collide with the right rail */
+  padding-right: 8.75rem;
+}
+
+#results .chosen-effects li .row-indicators {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ------------------------------------------------------------
+   Raw Data — Curse meta labels (labels only; values unchanged)
+   ------------------------------------------------------------ */
+
+#results.is-raw .meta.meta--curse .curse-label {
+  color: rgba(181, 140, 255, 1);
+  opacity: 1;
+}
+
+
+
+/* ------------------------------------------------------------
+   Raw Data — keep Curse button position stable when a curse is selected
+   The raw layout uses a grid (components.css) with a 1fr first column which can
+   push the button as content grows (e.g., curse lines). When a curse meta row is
+   present, switch to auto/auto/1fr so the button stays adjacent to the title.
+   ------------------------------------------------------------ */
+
+#results.is-raw .effect-main--row:has(.meta--curse) {
+  grid-template-columns: auto auto 1fr !important;
+}
+
+#results.is-raw .effect-main--row:has(.meta--curse) .curse-btn {
+  align-self: center !important;
+  justify-self: start !important;
+}
+
+
+
+/* ------------------------------------------------------------
+   Curse Button — Purple gradient when a curse is selected
+   Keep "Select a Curse" red; switch only after selection.
+   Uses the same left-to-right multi-stop gradient language as other states,
+   with a slightly darker purple.
+   ------------------------------------------------------------ */
+
+#results .effect-line:has(.curse-sub) .curse-btn {
+  background: linear-gradient(
+    90deg,
+    rgba(112, 70, 168, 0.92) 0%,
+    rgba(0, 0, 0, 0.18) 62%,
+    rgba(0, 0, 0, 0.45) 100%
+  ) !important;
+  border-color: rgba(140, 110, 210, 0.55) !important;
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.22) !important;
+}
+
+#results .effect-line:has(.curse-sub) .curse-btn:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(132, 86, 190, 0.95) 0%,
+    rgba(0, 0, 0, 0.16) 62%,
+    rgba(0, 0, 0, 0.42) 100%
+  ) !important;
 }
