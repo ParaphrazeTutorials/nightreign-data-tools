@@ -67,6 +67,8 @@ let rowsAll = [];
 let byIdAll = new Map();
 let curses = [];
 const curseBySlot = [null, null, null];
+const curseCatBySlot = ["", "", ""]; // remembered per slot ("" = All)
+
 let currentRandomColor = "Red";
 
 function pickRandomColor() {
@@ -254,23 +256,42 @@ function ensureCurseDialog() {
     <form method="dialog" class="curse-dialog__form">
       <header class="curse-dialog__header">
         <h4 class="curse-dialog__title" id="curseDialogTitle">Select a Curse</h4>
+        <button type="button" class="curse-dialog__close" aria-label="Close">✕</button>
       </header>
 
       <div class="curse-dialog__body">
-        <div class="curse-dialog__list" id="curseDialogList"></div>
+        <div class="curse-dialog__controls">
+          <label class="curse-field">
+            <span class="curse-field__label">Curse Category</span>
+            <select id="curseCategorySelect">
+              <option value="">All</option>
+            </select>
+          </label>
+
+          <label class="curse-field">
+            <span class="curse-field__label">Curse Effect</span>
+            <select id="curseEffectSelect">
+              <option value="">Select a Curse…</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <footer class="curse-dialog__footer">
-        <button value="cancel" class="secondary" type="submit">Cancel</button>
+        <button type="button" class="secondary" id="curseCancelBtn">Cancel</button>
+        <button type="submit" class="primary" id="curseSubmitBtn" disabled>Apply Curse</button>
       </footer>
     </form>
   `;
   document.body.appendChild(d);
 
   curseDialog = d;
-  curseDialogList = d.querySelector("#curseDialogList");
   curseDialogTitle = d.querySelector("#curseDialogTitle");
+
+  d.querySelector(".curse-dialog__close").onclick =
+  d.querySelector("#curseCancelBtn").onclick = () => d.close("cancel");
 }
+
 
 function computeBlockedCompatForCurse(slotIdx) {
   const blocked = new Set();
@@ -316,13 +337,17 @@ function computeBlockedCompatForCurse(slotIdx) {
 
 function openCurseDialog(slotIdx) {
   ensureCurseDialog();
-  if (!curseDialogList) return;
+  if (!curseDialog) return;
+
+  const catSel = curseDialog.querySelector("#curseCategorySelect");
+  const effectSel = curseDialog.querySelector("#curseEffectSelect");
+  if (!catSel || !effectSel) return;
 
   if (curseDialogTitle) curseDialogTitle.textContent = `Select a Curse for ${slotLabel(slotIdx)}`;
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
 
-  // Curses should be Depth of Night; still respect the current relic-type filter.
+  // Respect current relic-type filter and compatibility rules.
   const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
     .filter(r => {
       const cid = compatId(r);
@@ -331,37 +356,71 @@ function openCurseDialog(slotIdx) {
     })
     .sort((x, y) => getRollValue(x) - getRollValue(y));
 
-  const current = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
+  const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
 
-  if (eligibleCurses.length === 0) {
-    curseDialogList.innerHTML = `
-      <div class="curse-dialog__empty">
-        No curses available based on current Compatibility selections.
-      </div>
-    `;
-  } else {
-    curseDialogList.innerHTML = eligibleCurses.map(r => {
-      const id = String(r.EffectID);
-      const name = r.EffectDescription ?? `(Effect ${id})`;
-      const checked = id === current ? "checked" : "";
-      return `
-        <label class="curse-pick">
-          <input type="radio" name="cursePick" value="${id}" ${checked} />
-          <span class="curse-pick__label">${name}</span>
-        </label>
-      `;
-    }).join("");
+  // If we already have a selected curse, default the category to that curse's category.
+  if (!curseCatBySlot[slotIdx] && currentId) {
+    const curRow = getAnyRow(currentId);
+    const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
+    curseCatBySlot[slotIdx] = curCat;
   }
 
-  // Handle selection
-  const radios = curseDialogList.querySelectorAll('input[name="cursePick"]');
-  radios.forEach(radio => {
-    radio.addEventListener("change", () => {
-      curseBySlot[slotIdx] = radio.value;
-      if (curseDialog && curseDialog.open) curseDialog.close();
-      updateUI("curse-change");
-    });
-  });
+  // Build category list from eligible curses
+  const cats = categoriesFor(eligibleCurses);
+
+  catSel.innerHTML = `<option value="">All</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join("");
+  catSel.value = curseCatBySlot[slotIdx] || "";
+
+  function renderEffectOptions() {
+    const catVal = catSel.value || "";
+    curseCatBySlot[slotIdx] = catVal;
+
+    const filtered = applyCategory(eligibleCurses, catVal);
+
+    if (filtered.length === 0) {
+      effectSel.innerHTML = `<option value="">No curses available</option>`;
+      effectSel.value = "";
+      effectSel.disabled = true;
+      return;
+    }
+
+    effectSel.disabled = false;
+    effectSel.innerHTML =
+      `<option value="">Select a Curse…</option>` +
+      filtered.map(r => {
+        const id = String(r.EffectID);
+        const name = r.EffectDescription ?? `(Effect ${id})`;
+        return `<option value="${id}">${name}</option>`;
+      }).join("");
+
+    // Keep current selection if it still exists under this filter
+    if (currentId && [...effectSel.options].some(o => o.value === currentId)) {
+      effectSel.value = currentId;
+    } else {
+      effectSel.value = "";
+    }
+  }
+
+  // initial render
+  renderEffectOptions();
+
+  // events
+  catSel.onchange = () => renderEffectOptions();
+
+  effectSel.onchange = () => {
+    const v = String(effectSel.value || "");
+    const submit = curseDialog.querySelector("#curseSubmitBtn");
+    submit.disabled = !v;
+  };
+
+  const submitBtn = curseDialog.querySelector("#curseSubmitBtn");
+  submitBtn.onclick = () => {
+    const v = String(effectSel.value || "");
+    if (!v) return;
+    curseBySlot[slotIdx] = v;
+    curseDialog.close("apply");
+    updateUI("curse-change");
+  };
 
   curseDialog.showModal();
 }
