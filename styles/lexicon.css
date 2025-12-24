@@ -1,0 +1,257 @@
+/* ------------------------------------------------------------
+   The Lexicon — Table (read-only)
+   Includes: session-only zoom presets (S/M/L buttons)
+   Default density: Small (headers 0.55rem, values 0.50rem)
+   ------------------------------------------------------------ */
+
+/* Single-column shell safety */
+.tool-shell.tool-shell--single {
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow-x: hidden;
+}
+
+.tool-shell.tool-shell--single > * {
+  grid-column: 1 / -1;
+}
+
+/* Panel container + zoom variables */
+.lexicon-wrap {
+  /* Zoom vars (defaults = Small) */
+  --lex-body-rem: 0.50rem;
+  --lex-head-rem: 0.55rem;
+  --lex-h3-rem: 0.70rem;
+  --lex-meta-rem: 0.60rem;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.75rem;
+
+  padding: 0.45rem 0.5rem;
+  width: 100%;
+  max-inline-size: min(1200px, 100%);
+  margin-inline: auto;
+  overflow-x: hidden;
+}
+
+/* Zoom presets (JS toggles class on .lexicon-wrap) */
+.lexicon-wrap.zoom-small {
+  --lex-body-rem: 0.50rem;
+  --lex-head-rem: 0.55rem;
+  --lex-h3-rem: 0.70rem;
+  --lex-meta-rem: 0.60rem;
+}
+
+.lexicon-wrap.zoom-medium {
+  --lex-body-rem: 0.62rem;
+  --lex-head-rem: 0.66rem;
+  --lex-h3-rem: 0.82rem;
+  --lex-meta-rem: 0.72rem;
+}
+
+.lexicon-wrap.zoom-large {
+  --lex-body-rem: 0.74rem;
+  --lex-head-rem: 0.78rem;
+  --lex-h3-rem: 0.94rem;
+  --lex-meta-rem: 0.84rem;
+}
+
+/* Header bar */
+.lexicon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.lexicon-header h3 {
+  margin: 0;
+  font-size: var(--lex-h3-rem);
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.lexicon-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Hide the old meta display entirely (kept in DOM for future use) */
+.lexicon-meta {
+  display: none;
+}
+
+/* Zoom buttons: tiny, dense */
+.lexicon-zoom-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.lexicon-zoom-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+
+  padding: 0.10rem 0.28rem;
+  line-height: 1.0;
+
+  font-size: var(--lex-meta-rem);
+  font-weight: 700;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.lexicon-zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lexicon-zoom-btn.is-active,
+.lexicon-zoom-btn[aria-pressed="true"] {
+  background: rgba(181, 140, 255, 0.18);
+  border-color: rgba(181, 140, 255, 0.45);
+}
+
+.lexicon-zoom-btn:focus {
+  outline: 2px solid rgba(181, 140, 255, 0.55);
+  outline-offset: 1px;
+}
+
+/* Scroll container */
+.lexicon-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  max-height: clamp(360px, 62vh, 760px);
+  overflow: auto;
+
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* TABLE */
+table.lexicon-table {
+  width: max-content;
+  min-width: 660px;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  font-size: var(--lex-body-rem);
+  line-height: 1.1;
+  table-layout: fixed;
+}
+
+/* COLUMN HEADERS */
+table.lexicon-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  background: rgba(12, 14, 18, 0.92);
+  backdrop-filter: blur(6px);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+
+  font-size: var(--lex-head-rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+
+  white-space: nowrap;
+  padding: 0.12rem 0.28rem;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Body cells */
+table.lexicon-table th,
+table.lexicon-table td {
+  padding: 0.18rem 0.28rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: top;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Hover */
+table.lexicon-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Long text columns */
+.lexicon-cell--text {
+  white-space: normal;
+  min-width: 180px;
+  max-width: 300px;
+  overflow-wrap: anywhere;
+}
+
+/* Non-text cells */
+table.lexicon-table td:not(.lexicon-cell--text) {
+  white-space: nowrap;
+}
+
+/* Mono-ish IDs */
+.lexicon-cell--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+}
+
+.lexicon-empty {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Sortable headers */
+.lexicon-th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.lexicon-th:focus {
+  outline: 2px solid rgba(181, 140, 255, 0.55);
+  outline-offset: -2px;
+}
+
+.lexicon-th__glyph {
+  margin-left: 0.15rem;
+  font-size: 0.6em;
+  opacity: 0.8;
+}
+
+.lexicon-th.is-sorted {
+  box-shadow: inset 0 -1px 0 rgba(181, 140, 255, 0.45);
+}
+
+
+/* Export button (compact) */
+.lexicon-export-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0.55rem;
+
+  padding: 0.10rem 0.45rem;
+  line-height: 1.0;
+
+  font-size: var(--lex-meta-rem);
+  font-weight: 650;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.lexicon-export-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lexicon-export-btn:focus {
+  outline: 2px solid rgba(181, 140, 255, 0.55);
+  outline-offset: 1px;
+}

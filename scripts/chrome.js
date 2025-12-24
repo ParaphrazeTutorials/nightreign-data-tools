@@ -16,15 +16,24 @@ function inFolder(folderName) {
 
 function buildNavHrefs() {
   const inReliquary = inFolder("Reliquary");
+  const inLexicon = inFolder("Lexicon");
+
+  // Base routing: root, /Reliquary/, /Lexicon/
+  const isRoot = !inReliquary && !inLexicon;
+
+  const home = isRoot ? "./index.html" : "../index.html";
+  const reliquary = inReliquary ? "./index.html" : (isRoot ? "./Reliquary/index.html" : "../Reliquary/index.html");
+  const lexicon = inLexicon ? "./index.html" : (isRoot ? "./Lexicon/index.html" : "../Lexicon/index.html");
 
   return {
-    home: inReliquary ? "../index.html" : "./index.html",
-    reliquary: inReliquary ? "./index.html" : "./Reliquary/index.html",
+    home,
+    reliquary,
+    lexicon,
     // placeholders
     menagerie: "#",
     armory: "#",
     grimoire: "#",
-    activeKey: inReliquary ? "reliquary" : "home"
+    activeKey: inReliquary ? "reliquary" : (inLexicon ? "lexicon" : "home")
   };
 }
 
@@ -38,6 +47,7 @@ function renderNav() {
     <ul>
       <li><a class="${hrefs.activeKey === "home" ? "active" : ""}" href="${hrefs.home}">Home</a></li>
       <li><a class="${hrefs.activeKey === "reliquary" ? "active" : ""}" href="${hrefs.reliquary}">Reliquary</a></li>
+      <li><a class="${hrefs.activeKey === "lexicon" ? "active" : ""}" href="${hrefs.lexicon}">The Lexicon</a></li>
       <li><a href="${hrefs.menagerie}" aria-disabled="true" tabindex="-1">Menagerie</a></li>
       <li><a href="${hrefs.armory}" aria-disabled="true" tabindex="-1">Armory</a></li>
       <li><a href="${hrefs.grimoire}" aria-disabled="true" tabindex="-1">Grimoire</a></li>

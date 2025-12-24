@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>The Lexicon</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="../styles/site.css">
+    <link rel="stylesheet" href="../styles/lexicon.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <main class="app-shell app-grid">
+
+      <!-- HERO (global renderer) -->
+      <header
+        id="globalHero"
+        class="hero"
+        data-hero-image="../Assets/home/Lexicon.png"
+        data-hero-h1="The Round Table Codex"
+        data-hero-h2="The Lexicon"
+        data-hero-build="true"
+      ></header>
+
+      <!-- NAV (global) -->
+      <nav id="globalNav" class="tool-nav" aria-label="Primary navigation"></nav>
+
+      <!-- Lexicon is a single-panel page -->
+      <section class="tool-shell tool-shell--single">
+
+        <section class="lexicon-wrap zoom-small">
+          <div class="lexicon-header">
+            <h3>Dataset Table</h3>
+
+            <div class="lexicon-controls" aria-label="Table controls">
+              <div class="lexicon-zoom-buttons" role="group" aria-label="Text size">
+                <button type="button" class="lexicon-zoom-btn" data-zoom="small" aria-pressed="true" title="Small">S</button>
+                <button type="button" class="lexicon-zoom-btn" data-zoom="medium" aria-pressed="false" title="Medium">M</button>
+                <button type="button" class="lexicon-zoom-btn" data-zoom="large" aria-pressed="false" title="Large">L</button>
+              </div>
+              <button type="button" class="lexicon-export-btn" id="lexiconExportCsv" title="Export current view to CSV">Export CSV</button>
+              <div id="lexiconMeta" class="lexicon-meta">Loading…</div>
+            </div>
+          </div>
+
+          <div class="lexicon-table-wrap" role="region" aria-label="Lexicon data table" tabindex="0">
+            <table class="lexicon-table">
+              <thead id="lexiconHead"></thead>
+              <tbody id="lexiconBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- FOOTER (global) -->
+        <footer id="globalFooter" class="site-footer"></footer>
+
+      </section>
+
+    </main>
+
+    <script type="module" src="../scripts/hero.js"></script>
+    <script type="module" src="./lexicon.js"></script>
+    <script type="module" src="../scripts/chrome.js"></script>
+  </body>
+</html>
