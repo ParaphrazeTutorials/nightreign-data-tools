@@ -255,3 +255,278 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   outline: 2px solid rgba(181, 140, 255, 0.55);
   outline-offset: 1px;
 }
+
+/* ------------------------------------------------------------
+   Lexicon — Two-column shell + 2x2 tiles + Theater mode
+   (Overrides appended to preserve existing table styling)
+   ------------------------------------------------------------ */
+
+/* Two-column shell */
+.tool-shell.lexicon-shell {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+@media (max-width: 920px) {
+  .tool-shell.lexicon-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar */
+.lexicon-sidebar {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+}
+
+.lexicon-sidebar__header h3 {
+  margin: 0 0 0.25rem 0;
+}
+
+.lexicon-sidebar__sub {
+  margin: 0 0 0.75rem 0;
+  opacity: 0.78;
+  font-size: 0.9rem;
+}
+
+.lexicon-modules {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.lexicon-module-card {
+  text-align: left;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+  padding: 0.75rem 0.8rem;
+  cursor: pointer;
+}
+
+.lexicon-module-card__title {
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.lexicon-module-card__meta {
+  margin-top: 0.15rem;
+  opacity: 0.78;
+  font-size: 0.85rem;
+}
+
+.lexicon-module-card.is-active {
+  border-color: rgba(181, 140, 255, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(181, 140, 255, 0.18);
+  background: linear-gradient(
+    90deg,
+    rgba(112, 70, 168, 0.22) 0%,
+    rgba(0, 0, 0, 0.22) 62%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+}
+
+.lexicon-module-card[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Tiles grid (2x2) — constrained to viewport so all 4 tiles fit */
+.lexicon-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 0.9rem;
+  align-items: stretch;
+
+  /* Fit 4 tiles within the viewport (hero + nav above, footer below) */
+  height: calc(100vh - 360px);
+  min-height: 0;
+}
+
+@media (max-width: 920px) {
+  .lexicon-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.lex-tile {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* critical: allow grid rows to constrain height */
+}
+
+.lex-tile__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  background: rgba(0, 0, 0, 0.22);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.lex-tile__title h3 {
+  margin: 0;
+}
+
+.lex-tile__subtitle {
+  margin-top: 0.2rem;
+  font-size: 0.9rem;
+  opacity: 0.78;
+}
+
+.lex-tile__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.lex-tile__expand {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.lex-tile__body {
+  padding: 0.85rem 0.9rem;
+  flex: 1 1 auto;
+  min-height: 0;   /* critical: enables inner scrollers */
+  overflow: hidden;
+}
+
+/* Table tile: remove extra chrome and let the table scroll within the tile */
+.lex-tile[data-tile="table"] .lex-tile__body {
+  padding: 0;
+}
+
+.lex-tile[data-tile="table"] .lexicon-wrap {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.85rem 0.9rem;
+  max-inline-size: none;
+  margin-inline: 0;
+}
+
+/* Override the old vh-based max-height: table should fill the tile body */
+.lex-tile[data-tile="table"] .lexicon-table-wrap {
+  height: 100%;
+  max-height: none;
+  overflow: auto;
+}
+
+/* Downloads tile */
+.lex-downloads {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.lexicon-export-btn.secondary {
+  background: rgba(0,0,0,0.18);
+}
+
+.lex-tile__help {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+  opacity: 0.78;
+}
+
+/* Docs tile */
+.lex-docs h4 {
+  margin-top: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+
+.lex-docs__disclaimer {
+  opacity: 0.9;
+}
+
+/* Insights tile */
+.lex-insights__placeholder {
+  opacity: 0.78;
+}
+
+.lex-insights__kpi {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.lex-kpi {
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  border-radius: 0.75rem;
+  padding: 0.7rem 0.75rem;
+}
+
+.lex-kpi__label {
+  font-size: 0.82rem;
+  opacity: 0.78;
+}
+
+.lex-kpi__value {
+  font-size: 1.15rem;
+  font-weight: 900;
+  margin-top: 0.15rem;
+}
+
+.lex-insights__table {
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.lex-insights__table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lex-insights__table th,
+.lex-insights__table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.lex-insights__table th {
+  opacity: 0.85;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.lex-insights__table td code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+/* Theater mode: one tile expands; others hidden */
+.lexicon-grid.is-theater .lex-tile {
+  display: none;
+}
+
+.lexicon-grid.is-theater .lex-tile.is-expanded {
+  display: flex;
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  height: calc(100vh - 360px);
+  min-height: 0;
+}

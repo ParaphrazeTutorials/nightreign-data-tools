@@ -27,30 +27,167 @@
       <!-- NAV (global) -->
       <nav id="globalNav" class="tool-nav" aria-label="Primary navigation"></nav>
 
-      <!-- Lexicon is a single-panel page -->
-      <section class="tool-shell tool-shell--single">
+      <!-- Lexicon shell (two-column) -->
+      <section class="tool-shell lexicon-shell">
 
-        <section class="lexicon-wrap zoom-small">
-          <div class="lexicon-header">
-            <h3>Dataset Table</h3>
+        <!-- LEFT: module picker -->
+        <aside class="lexicon-sidebar" aria-label="Lexicon module picker">
+          <div class="lexicon-sidebar__header">
+            <h3>Modules</h3>
+            <p class="lexicon-sidebar__sub">Pick a dataset to browse.</p>
+          </div>
 
-            <div class="lexicon-controls" aria-label="Table controls">
-              <div class="lexicon-zoom-buttons" role="group" aria-label="Text size">
-                <button type="button" class="lexicon-zoom-btn" data-zoom="small" aria-pressed="true" title="Small">S</button>
-                <button type="button" class="lexicon-zoom-btn" data-zoom="medium" aria-pressed="false" title="Medium">M</button>
-                <button type="button" class="lexicon-zoom-btn" data-zoom="large" aria-pressed="false" title="Large">L</button>
+          <div class="lexicon-modules" role="list">
+            <button class="lexicon-module-card is-active" type="button" data-module="reliquary" role="listitem">
+              <div class="lexicon-module-card__title">Reliquary</div>
+              <div class="lexicon-module-card__meta">Effects dataset</div>
+            </button>
+
+            <button class="lexicon-module-card" type="button" data-module="menagerie" role="listitem" aria-disabled="true" tabindex="-1">
+              <div class="lexicon-module-card__title">Menagerie</div>
+              <div class="lexicon-module-card__meta">Coming soon</div>
+            </button>
+
+            <button class="lexicon-module-card" type="button" data-module="armory" role="listitem" aria-disabled="true" tabindex="-1">
+              <div class="lexicon-module-card__title">Armory</div>
+              <div class="lexicon-module-card__meta">Coming soon</div>
+            </button>
+
+            <button class="lexicon-module-card" type="button" data-module="grimoire" role="listitem" aria-disabled="true" tabindex="-1">
+              <div class="lexicon-module-card__title">Grimoire</div>
+              <div class="lexicon-module-card__meta">Coming soon</div>
+            </button>
+          </div>
+        </aside>
+
+        <!-- RIGHT: 2x2 tiles -->
+        <section class="lexicon-grid" id="lexiconGrid" aria-label="Lexicon tiles">
+
+          <!-- TILE 1: Data Table -->
+          <article class="lex-tile is-expanded-target" data-tile="table">
+            <header class="lex-tile__header">
+              <div class="lex-tile__title">
+                <h3>Data Table</h3>
+                <div id="lexiconMeta" class="lexicon-meta">Loading…</div>
               </div>
-              <button type="button" class="lexicon-export-btn" id="lexiconExportCsv" title="Export current view to CSV">Export CSV</button>
-              <div id="lexiconMeta" class="lexicon-meta">Loading…</div>
-            </div>
-          </div>
 
-          <div class="lexicon-table-wrap" role="region" aria-label="Lexicon data table" tabindex="0">
-            <table class="lexicon-table">
-              <thead id="lexiconHead"></thead>
-              <tbody id="lexiconBody"></tbody>
-            </table>
-          </div>
+              <div class="lex-tile__actions">
+                <div class="lexicon-zoom-buttons" role="group" aria-label="Text size">
+                  <button type="button" class="lexicon-zoom-btn" data-zoom="small" aria-pressed="true" title="Small">S</button>
+                  <button type="button" class="lexicon-zoom-btn" data-zoom="medium" aria-pressed="false" title="Medium">M</button>
+                  <button type="button" class="lexicon-zoom-btn" data-zoom="large" aria-pressed="false" title="Large">L</button>
+                </div>
+
+                <button type="button" class="lex-tile__expand" data-expand="table" aria-label="Expand Data Table" title="Expand">
+                  ⤢
+                </button>
+              </div>
+            </header>
+
+            <div class="lex-tile__body">
+              <section class="lexicon-wrap zoom-small">
+                <div class="lexicon-table-wrap" role="region" aria-label="Lexicon data table" tabindex="0">
+                  <table class="lexicon-table">
+                    <thead id="lexiconHead"></thead>
+                    <tbody id="lexiconBody"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+          </article>
+
+          <!-- TILE 2: Downloads -->
+          <article class="lex-tile is-expanded-target" data-tile="downloads">
+            <header class="lex-tile__header">
+              <div class="lex-tile__title">
+                <h3>Downloads</h3>
+                <div class="lex-tile__subtitle">Export the current view or full dataset.</div>
+              </div>
+
+              <div class="lex-tile__actions">
+                <button type="button" class="lex-tile__expand" data-expand="downloads" aria-label="Expand Downloads" title="Expand">
+                  ⤢
+                </button>
+              </div>
+            </header>
+
+            <div class="lex-tile__body">
+              <div class="lex-downloads">
+                <button type="button" class="lexicon-export-btn" id="lexiconExportCsv" title="Export current view to CSV">
+                  Export CSV (current view)
+                </button>
+
+                <button type="button" class="lexicon-export-btn secondary" id="lexiconExportJson" title="Download full dataset JSON">
+                  Download JSON (full)
+                </button>
+
+                <p class="lex-tile__help">
+                  CSV respects your current sort. JSON downloads the full dataset as-is.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- TILE 3: Documentation -->
+          <article class="lex-tile is-expanded-target" data-tile="docs">
+            <header class="lex-tile__header">
+              <div class="lex-tile__title">
+                <h3>Documentation</h3>
+                <div class="lex-tile__subtitle">What you’re looking at, and how to use it.</div>
+              </div>
+
+              <div class="lex-tile__actions">
+                <button type="button" class="lex-tile__expand" data-expand="docs" aria-label="Expand Documentation" title="Expand">
+                  ⤢
+                </button>
+              </div>
+            </header>
+
+            <div class="lex-tile__body">
+              <div class="lex-docs">
+                <p>
+                  The Lexicon is a read-only browser for Nightreign datasets used by the Codex tools.
+                  Start with the Data Table to explore columns and values, then export what you need.
+                </p>
+
+                <h4>Sorting</h4>
+                <p>
+                  Click a column header to sort ascending, click again for descending, and a third time to clear sorting.
+                  Sorting is session-only and resets on refresh.
+                </p>
+
+                <h4>Disclaimer</h4>
+                <p class="lex-docs__disclaimer">
+                  Unofficial community tools for Elden Ring: Nightreign. This project does not modify your game,
+                  connect to your account, or guarantee online safety. You are responsible for how you use the
+                  information provided.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- TILE 4: Insights -->
+          <article class="lex-tile is-expanded-target" data-tile="insights">
+            <header class="lex-tile__header">
+              <div class="lex-tile__title">
+                <h3>Insights</h3>
+                <div class="lex-tile__subtitle">Quick dataset summary.</div>
+              </div>
+
+              <div class="lex-tile__actions">
+                <button type="button" class="lex-tile__expand" data-expand="insights" aria-label="Expand Insights" title="Expand">
+                  ⤢
+                </button>
+              </div>
+            </header>
+
+            <div class="lex-tile__body">
+              <div id="lexiconInsights" class="lex-insights">
+                <div class="lex-insights__placeholder">Loading…</div>
+              </div>
+            </div>
+          </article>
+
         </section>
 
         <!-- FOOTER (global) -->
