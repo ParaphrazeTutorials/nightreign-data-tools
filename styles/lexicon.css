@@ -365,17 +365,45 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 }
 
 .lex-tile__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.8rem 0.9rem;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 0.25rem;
+  padding: 0.6rem 0.85rem;
   background: rgba(0, 0, 0, 0.22);
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.lex-tile__title h3 {
+.lex-tile__header-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lex-tile__header-main h3 {
   margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+
+.lex-tile__header-sub {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 1.1rem; /* keeps all headers same height */
+}
+
+.lex-tile__subtext {
+  font-size: 0.85rem;
+  opacity: 0.78;
+}
+
+.lex-tile__header-sub .lexicon-meta {
+  font-size: 0.85rem;
+  opacity: 0.72;
+  white-space: nowrap;
 }
 
 .lex-tile__subtitle {
@@ -388,20 +416,30 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
 
-.lex-tile__expand {
-  width: 2.25rem;
-  height: 2.25rem;
-  display: grid;
-  place-items: center;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  font-weight: 900;
-  line-height: 1;
+.lex-tile__expand svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  stroke: rgba(220,220,240,0.95);
+  stroke-width: 2;
+  fill: none;
+}
+
+.lex-tile__expand:hover {
+  border-color: rgba(181,140,255,0.45);
+  box-shadow: 0 0 0 2px rgba(181,140,255,0.15);
+  transform: translateY(-1px);
+}
+
+.lex-tile__expand:hover svg {
+  stroke: #ffffff;
+}
+
+.lex-tile__expand:active {
+  transform: translateY(0);
 }
 
 .lex-tile__body {
@@ -529,4 +567,177 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   grid-row: 1 / -1;
   height: calc(100vh - 360px);
   min-height: 0;
+}
+
+/* Header-row expand alignment */
+.lex-tile__header-main {
+  position: relative;
+}
+
+.lex-tile__header-main .lex-tile__header-main:hover
+
+/* ------------------------------------------------------------
+   Lexicon — Expand icon (hard reset, icon-only)
+   ------------------------------------------------------------ */
+
+.lex-tile__expand svg {
+  width: 100%;
+  height: 100%;
+  stroke: rgba(220,220,240,0.95);
+  stroke-width: 2;
+  fill: none;
+}
+
+/* Expand icon — final cleanup */
+.lex-tile__expand svg {
+  width: 200%;
+  height: 200%;
+}
+
+/* Expand icon — square hitbox + proper scaling */
+.lex-tile__expand svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+/* ------------------------------------------------------------
+   Lexicon — Header row vertical alignment fix
+   ------------------------------------------------------------ */
+
+.lex-tile__header-main {
+  display: flex;
+  align-items: center; /* force true vertical centering */
+}
+
+/* Prevent title line-height from pulling the row */
+.lex-tile__header-main h3,
+.lex-tile__header-main .lex-tile__title {
+  line-height: 1.1;
+}
+
+/* Optical nudge for expand icon (baseline compensation) */
+
+/* ------------------------------------------------------------
+   Lexicon — Expand control (non-button, framework-safe)
+   ------------------------------------------------------------ */
+
+.lex-tile__expand {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.lex-tile__expand:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.lex-tile__expand:focus-visible {
+  outline: 2px solid rgba(181,140,255,0.6);
+  outline-offset: 2px;
+}
+
+.lex-tile__expand svg {
+  width: 1.8rem;
+  height: 1.8rem;
+  stroke: rgba(220,220,240,0.95);
+  stroke-width: 2;
+  fill: none;
+}
+
+/* ------------------------------------------------------------
+   Lexicon — Header controls normalization
+   ------------------------------------------------------------ */
+
+.lex-tile__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.lex-tile__controls > * {
+  align-self: center;
+}
+
+/* ------------------------------------------------------------
+   Lexicon — Canonical header alignment (safe)
+   ------------------------------------------------------------ */
+
+.lex-tile__header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lex-tile__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* ------------------------------------------------------------
+   Lexicon — FINAL: header control alignment + expand centering
+   (wins over earlier rules; avoids framework baseline quirks)
+   ------------------------------------------------------------ */
+
+.lex-tile__header .lex-tile__header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lex-tile__header .lex-tile__controls,
+.lex-tile__header .lex-tile__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.lex-tile__header .lex-tile__controls > *,
+.lex-tile__header .lex-tile__actions > * {
+  align-self: center;
+}
+
+/* Expand: true square, centered icon, no background bleed */
+.lex-tile__expand {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+  border-radius: 8px;
+  border: 1px solid rgb(1, 114, 173);
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 120ms ease, transform 120ms ease, border-color 120ms ease;
+  transform: none;
+}
+
+.lex-tile__expand:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.lex-tile__expand:focus-visible {
+  outline: 2px solid rgba(181,140,255,0.6);
+  outline-offset: 2px;
+}
+
+.lex-tile__expand svg {
+  display: block;
+  width: 32px;
+  height: 32px;
+  stroke: rgba(220, 220, 240, 0.95);
+  stroke-width: 2;
+  fill: none;
 }
