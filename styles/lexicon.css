@@ -335,6 +335,26 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 }
 
 /* Tiles grid (2x2) — constrained to viewport so all 4 tiles fit */
+
+
+/* ------------------------------------------------------------
+   Lexicon — Top edge alignment with sidebar
+   Home.css adds margin-top to .tool-shell section/article; Lexicon's right grid
+   is a <section>, so it gets pushed down. Zero it here.
+   ------------------------------------------------------------ */
+.tool-shell.lexicon-shell > .lexicon-grid {
+  margin-top: 0;
+}
+
+/* ------------------------------------------------------------
+   Lexicon — Grid alignment reset
+   Ensure left sidebar and right grid align at the very top by
+   removing any UA/framework margins on <article>.
+   ------------------------------------------------------------ */
+.lexicon-grid > .lex-tile {
+  margin: 0;
+}
+
 .lexicon-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
