@@ -13,7 +13,7 @@ const dom = {
   // layout
   grid: document.getElementById("lexiconGrid"),
   moduleButtons: Array.from(document.querySelectorAll(".lexicon-module-card[data-module]")),
-  expandButtons: Array.from(document.querySelectorAll("[data-expand]")),
+  expandButtons: Array.from(document.querySelectorAll(".lex-tile__expand")),
 
   // table
   wrap: document.querySelector(".lexicon-wrap"),
@@ -362,6 +362,12 @@ function toggleSort(col) {
    Theater mode
 ------------------------- */
 
+function tileIdForExpandButton(btn) {
+  if (!btn) return "";
+  const tile = btn.closest(".lex-tile[data-tile]");
+  return tile ? String(tile.getAttribute("data-tile") || "") : "";
+}
+
 function setExpandedTile(tileIdOrNull) {
   state.expandedTile = tileIdOrNull || null;
 
@@ -377,9 +383,10 @@ function setExpandedTile(tileIdOrNull) {
   dom.grid.classList.toggle("is-theater", !!state.expandedTile);
 
   for (const b of dom.expandButtons) {
-    const id = b.getAttribute("data-expand");
+    const id = tileIdForExpandButton(b);
     const isExpanded = !!state.expandedTile && id === state.expandedTile;
-    b.textContent = isExpanded ? "⤡" : "⤢";
+
+    b.classList.toggle("is-expanded", isExpanded);
     b.setAttribute("title", isExpanded ? "Collapse" : "Expand");
     b.setAttribute("aria-label", isExpanded ? "Collapse panel" : "Expand panel");
   }
@@ -387,12 +394,20 @@ function setExpandedTile(tileIdOrNull) {
 
 function bindTheaterMode() {
   for (const b of dom.expandButtons) {
-    b.addEventListener("click", () => {
-      const id = b.getAttribute("data-expand");
+    const activate = () => {
+      const id = tileIdForExpandButton(b);
       if (!id) return;
 
       if (state.expandedTile === id) setExpandedTile(null);
       else setExpandedTile(id);
+    };
+
+    b.addEventListener("click", activate);
+    b.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        activate();
+      }
     });
   }
 
