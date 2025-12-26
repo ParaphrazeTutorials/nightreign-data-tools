@@ -290,9 +290,12 @@ footer {
 
 
 /* ------------------------------------------------------------
-   Footer layout fix — ensure full-width span
+   Hero build pill — normalize font weight everywhere
+   (Lexicon override fix)
    ------------------------------------------------------------ */
-.site-footer {
-  grid-column: 1 / -1;
-  width: 100%;
+.hero .hero-build,
+.hero .hero-build *,
+header.hero .hero-build,
+header.hero .hero-build * {
+  font-weight: 400 !important;
 }
