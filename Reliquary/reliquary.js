@@ -1,4 +1,4 @@
-import { DATA_URL, relicDefaultPath, visualRelicType, RELEASE_CHANNEL, GAME_VERSION } from "./reliquary.assets.js";
+import { DATA_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
 import {
   COLORS,
   compatId,
@@ -20,47 +20,10 @@ import { getDom } from "./reliquary.dom.js";
 
 const dom = getDom();
 
-function initHeaderBuildTag() {
-  const el = document.getElementById("heroBuild");
-  if (!el) return;
-
-  // Environment detection (deployment-based):
-  // - Local dev (localhost / 127.0.0.1 / ::1) => BETA
-  // - Dev GitHub Pages repo (nightreign-data-tools-dev) => BETA
-  // - Prod GitHub Pages repo (nightreign-data-tools) => LIVE
-  // - Otherwise => fall back to configured RELEASE_CHANNEL
-  const host = String(window.location.hostname || "").toLowerCase();
-  const path = String(window.location.pathname || "").toLowerCase();
-  const isLocal = host === "localhost" || host === "127.0.0.1" || host === "::1";
-  const isDevDeploy = path.startsWith("/nightreign-data-tools-dev/");
-  const isProdDeploy = path.startsWith("/nightreign-data-tools/");
-
-  const channel = (isLocal || isDevDeploy)
-    ? "BETA"
-    : (isProdDeploy
-        ? "LIVE"
-        : String(RELEASE_CHANNEL || "").trim().toUpperCase());
-const version = String(GAME_VERSION || "").trim();
-
-  el.classList.toggle("is-beta", channel === "BETA");
-  el.classList.toggle("is-live", channel === "LIVE");
-
-  const statusText = channel || "BETA";
-  const versionText = version ? `Game Version ${version}` : "Game Version";
-
-  el.innerHTML = `
-    <span class="hero-build__status">${statusText}</span>
-    <span class="hero-build__sep">|</span>
-    <span class="hero-build__version">${versionText}</span>
-  `;
-}
 
 const resultsEl = document.getElementById("results");
 const resultsHeader = document.querySelector("#results .panel-header");
 const validityBadge = document.getElementById("relicValidity");
-
-initHeaderBuildTag();
-
 let rows = [];
 let byId = new Map();
 let rowsAll = [];

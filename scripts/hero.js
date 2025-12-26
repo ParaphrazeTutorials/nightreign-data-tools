@@ -52,9 +52,9 @@ function renderHero() {
     </div>
 
     ${showBuild ? (() => {
-      const status = (el.getAttribute("data-hero-status") || GLOBAL_BUILD_STATUS || "BETA").toUpperCase();
-      const version = (el.getAttribute("data-hero-version") || GLOBAL_BUILD_VERSION || "").trim();
-      const game = (el.getAttribute("data-hero-game") || GLOBAL_GAME_VERSION || "").trim();
+      const status = String(GLOBAL_BUILD_STATUS || "BETA").trim().toUpperCase();
+      const version = String(GLOBAL_BUILD_VERSION || "").trim();
+      const game = String(GLOBAL_GAME_VERSION || "").trim();
       const cls = status === "LIVE" ? "is-live" : "is-beta";
       return `
         <div id="heroBuild" class="hero-build ${cls}" aria-label="Release channel and game version">
