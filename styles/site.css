@@ -18,9 +18,9 @@
      Global Hero Art Controls (CANONICAL)
      ------------------------------------------------------------ */
   /* Canonical global hero art controls */
-  --hero-art-zoom: 0.3;
+  --hero-art-zoom: 0.4;
   --hero-art-x: 65%;
-  --hero-art-y: 80%;
+  --hero-art-y: 100%;
 }
 
 

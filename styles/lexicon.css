@@ -847,14 +847,40 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   width: 22px;
   height: 22px;
 }
+
 /* ------------------------------------------------------------
-   Lexicon — Footer span fix
-   The footer lives inside the Lexicon shell grid; ensure it spans both columns.
+   Lexicon — Left sidebar app tiles (Home card style)
    ------------------------------------------------------------ */
 
-.lexicon-shell > .site-footer,
-.lexicon-shell footer.site-footer {
-  grid-column: 1 / -1;
+.lexicon-apps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.lexicon-apps .app-tile {
   width: 100%;
-  justify-self: stretch;
+  text-align: left;
+  cursor: pointer;
+
+  /* Button reset so it behaves like the Home link tile */
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  background-color: transparent; /* image is via background-image */
+}
+
+.lexicon-sidebar .app-tile {
+  min-height: 120px; /* slightly tighter than Home */
+}
+
+.lexicon-apps .app-tile:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.28);
+  outline-offset: 2px;
+}
+
+.lexicon-apps .lexicon-module-card.is-active {
+  border-color: rgba(255,255,255,0.26);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
 }
