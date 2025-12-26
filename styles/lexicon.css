@@ -741,3 +741,59 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   stroke-width: 2;
   fill: none;
 }
+
+/* Header: keep S/M/L vertically centered with expand square */
+.lex-tile__header .lexicon-zoom-buttons {
+  height: 44px;            /* match expand hitbox */
+  display: inline-flex;
+  align-items: center;
+}
+
+.lex-tile__header .lexicon-zoom-btn {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 0.35rem;      /* keep pill width, but remove vertical padding */
+  display: grid;
+  place-items: center;
+}
+
+/* ------------------------------------------------------------
+   Lexicon — FINAL: S/M/L zoom button centering (wins)
+   ------------------------------------------------------------ */
+
+.lexicon-zoom-btn {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 0.35rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ------------------------------------------------------------
+   Lexicon — Zoom buttons (S/M/L) hard-centering + remove drift
+   ------------------------------------------------------------ */
+
+.lexicon-zoom-buttons {
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+}
+
+.lexicon-zoom-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1 !important;
+  font-size: 14px;
+}
