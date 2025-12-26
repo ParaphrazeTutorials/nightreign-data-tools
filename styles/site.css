@@ -287,3 +287,12 @@ footer {
 .site-footer .footer-credits {
   opacity: 0.78;
 }
+
+
+/* ------------------------------------------------------------
+   Footer layout fix — ensure full-width span
+   ------------------------------------------------------------ */
+.site-footer {
+  grid-column: 1 / -1;
+  width: 100%;
+}

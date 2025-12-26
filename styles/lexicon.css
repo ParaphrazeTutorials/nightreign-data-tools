@@ -375,6 +375,8 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 
 
 
+
+
 .lex-tile__header-main {
   display: flex;
   align-items: baseline;
@@ -385,9 +387,11 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 .lex-tile__header-main h3 {
   margin: 0;
   font-size: 0.95rem;
-  line-height: 1.10;
+  line-height: 1.1;
   letter-spacing: 0.01em;
 }
+
+
 
 
 
@@ -396,16 +400,21 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
-  min-height: 0.85rem; /* keeps headers consistent but tighter */
+  min-height: unset;
+  margin-top: -0.1rem;
 }
+
+
 
 
 
 .lex-tile__subtext {
   font-size: 0.78rem;
   opacity: 0.78;
-  line-height: 1.12;
+  line-height: 1.1;
 }
+
+
 
 
 
@@ -814,6 +823,20 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 
 /* ------------------------------------------------------------
    Override (last wins): shrink expand icon to match S/M/L scale
+   ------------------------------------------------------------ */
+.lex-tile__expand {
+  width: 31px;
+  height: 31px;
+}
+
+.lex-tile__expand svg {
+  width: 22px;
+  height: 22px;
+}
+
+
+/* ------------------------------------------------------------
+   Final header controls sizing (last wins)
    ------------------------------------------------------------ */
 .lex-tile__expand {
   width: 31px;
