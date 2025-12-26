@@ -18,9 +18,9 @@
      Global Hero Art Controls (CANONICAL)
      ------------------------------------------------------------ */
   /* Canonical global hero art controls */
-  --hero-art-zoom: 0.5;
+  --hero-art-zoom: 0.3;
   --hero-art-x: 65%;
-  --hero-art-y: 90%;
+  --hero-art-y: 80%;
 }
 
 
@@ -46,12 +46,16 @@
    Hero
    ------------------------------------------------------------ */
 
+/* ------------------------------------------------------------
+   Hero
+   ------------------------------------------------------------ */
+
 .hero {
-  position: relative;
+  position: relative; /* anchor for pill */
   overflow: hidden;
 
-  min-height: 200px;
-  padding: 1.4rem 1.25rem;
+  /* reduced vertical real estate */
+  padding: 1.05rem 1.25rem 0.85rem;
 
   border-radius: 0.5rem;
   color: white;
@@ -62,11 +66,9 @@
     rgba(0, 0, 0, 0.40) 45%,
     rgba(0, 0, 0, 0.10) 100%
   );
-
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
 }
+
+
 
 
 /* ------------------------------------------------------------
@@ -185,22 +187,18 @@ footer {
    Hero build tag (page status + DB/Game version)
    ------------------------------------------------------------ */
 
-.hero-build{
+/* ------------------------------------------------------------
+   Hero build pill
+   ------------------------------------------------------------ */
+
+.hero-build {
   position: absolute;
-  left: 1.05rem;
-  bottom: 0.9rem;
-  z-index: 2;
-
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.55rem;
-
-  font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
-
-  text-shadow: 0 6px 18px rgba(0,0,0,0.55);
+  top: 0.75rem;
+  right: 1.05rem;
+  z-index: 5;
 }
+
+
 
 .hero-build__status{
   text-transform: uppercase;
