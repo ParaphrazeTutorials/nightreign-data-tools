@@ -847,3 +847,14 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   width: 22px;
   height: 22px;
 }
+/* ------------------------------------------------------------
+   Lexicon — Footer span fix
+   The footer lives inside the Lexicon shell grid; ensure it spans both columns.
+   ------------------------------------------------------------ */
+
+.lexicon-shell > .site-footer,
+.lexicon-shell footer.site-footer {
+  grid-column: 1 / -1;
+  width: 100%;
+  justify-self: stretch;
+}

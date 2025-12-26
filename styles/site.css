@@ -17,10 +17,12 @@
   /* ------------------------------------------------------------
      Global Hero Art Controls (CANONICAL)
      ------------------------------------------------------------ */
+  /* Canonical global hero art controls */
   --hero-art-zoom: 0.3;
   --hero-art-x: 65%;
   --hero-art-y: 80%;
 }
+
 
 /* ------------------------------------------------------------
    Layout
@@ -39,16 +41,25 @@
   padding-inline: clamp(0.75rem, 2.2vw, 2.75rem);
 }
 
+
+/* ------------------------------------------------------------
+   Hero
+   ------------------------------------------------------------ */
+
 /* ------------------------------------------------------------
    Hero
    ------------------------------------------------------------ */
 
 .hero {
-  position: relative;
+  position: relative; /* anchor for pill */
   overflow: hidden;
+
+  /* reduced vertical real estate */
   padding: 1.05rem 1.25rem 0.85rem;
+
   border-radius: 0.5rem;
   color: white;
+
   background: linear-gradient(
     90deg,
     rgba(0, 0, 0, 0.70) 0%,
@@ -57,20 +68,31 @@
   );
 }
 
+
+
+
 /* ------------------------------------------------------------
-   Hero Art
+   Hero Art (IMG-based, per-page src)
    ------------------------------------------------------------ */
 
 .hero-art {
   position: absolute;
   z-index: 0;
+
   left: var(--hero-art-x);
   top: var(--hero-art-y);
+
+  width: auto;
+  height: auto;
   min-width: 100%;
   min-height: 100%;
+
   transform: translate(-50%, -50%) scale(var(--hero-art-zoom));
+  transform-origin: center;
+
   pointer-events: none;
 }
+
 
 /* ------------------------------------------------------------
    Hero Text
@@ -91,6 +113,7 @@
 .hero h1 {
   font-size: 1.85rem;
   line-height: 1.1;
+  letter-spacing: 0.01em;
 }
 
 .hero h2 {
@@ -101,35 +124,31 @@
   letter-spacing: 0.06em;
 }
 
+
 /* ------------------------------------------------------------
-   Navigation
+   Navigation (BACKGROUND BOX TIGHTENED)
    ------------------------------------------------------------ */
 
 .tool-nav {
   background-color: var(--color-accent-primary);
-  padding: 0.28rem 1.25rem;
+  padding: 0.28rem 1rem; /* small, but less cramped */
   border-radius: 0.5rem;
 }
 
 .tool-nav ul {
   display: flex;
-  column-gap: 1.25rem;
+  column-gap: 0.95rem;
   row-gap: 0.35rem;
+
   margin: 0;
   padding: 0;
+
   list-style: none;
   align-items: center;
   flex-wrap: wrap;
 }
 
-/* 🔧 vertical height control lives here */
-.tool-nav li {
-  margin: 0;
-  padding: 5px 0; /* ← requested */
-  list-style: none;
-  display: flex;
-  align-items: center;
-}
+
 
 .tool-nav a {
   color: rgba(255,255,255,0.92);
@@ -137,11 +156,17 @@
   font-weight: 600;
   font-size: 0.85rem;
   line-height: 1.1;
+
+  /* Small, but not squished */
   padding: 0.22rem 0.52rem;
+
   display: inline-flex;
   align-items: center;
+
+  /* No pill/border treatment */
   background: transparent;
   border: 0;
+
   transition: color 120ms ease, text-decoration-color 120ms ease, opacity 120ms ease;
 }
 
@@ -166,6 +191,7 @@
   pointer-events: none;
 }
 
+
 /* ------------------------------------------------------------
    Footer
    ------------------------------------------------------------ */
@@ -177,6 +203,10 @@ footer {
 }
 
 /* ------------------------------------------------------------
+   Hero build tag (page status + DB/Game version)
+   ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
    Hero build pill
    ------------------------------------------------------------ */
 
@@ -185,6 +215,57 @@ footer {
   top: 0.75rem;
   right: 1.05rem;
   z-index: 5;
+
+  /* scale entire pill */
+  transform: scale(0.5);
+  transform-origin: top right;
+}
+
+
+
+.hero-build__status{
+  text-transform: uppercase;
+}
+
+.hero-build__sep{
+  opacity: 0.55;
+  font-weight: 900;
+}
+
+.hero-build__version{
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  opacity: 0.88;
+}
+
+.hero-build.is-beta .hero-build__status{
+  color: rgba(214, 92, 92, 0.95); /* medium red */
+}
+
+.hero-build.is-live .hero-build__status{
+  color: rgba(255, 255, 255, 0.92); /* medium white */
+}
+
+/* ------------------------------------------------------------
+   Overrides / upgrades (app-wide)
+   ------------------------------------------------------------ */
+
+/* Stronger nav styling (Pico can make links blue). */
+.tool-nav ul li a,
+.tool-nav ul li a:visited {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+}
+
+.tool-nav ul li a[aria-disabled="true"],
+.tool-nav ul li a[aria-disabled="true"]:visited {
+  color: rgba(255, 255, 255, 0.42);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Beta/Live pill behind the hero build string */
+.hero-build {
   padding: 0.55rem 0.85rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -193,7 +274,72 @@ footer {
   backdrop-filter: blur(6px);
 }
 
+/* Make BETA pop while keeping the rest readable */
+.hero-build.is-beta .hero-build__status {
+  color: rgba(214, 92, 92, 0.95);
+}
+
+/* LIVE uses the same pill styling, but with a green-tinted gradient */
+.hero-build.is-live {
+  background: linear-gradient(180deg, rgba(16, 120, 60, 0.38), rgba(8, 16, 10, 0.55));
+}
+
+/* Compact global footer */
+.site-footer {
+  margin-top: 1.1rem;
+  padding: 0.55rem 0 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.site-footer .footer-inner {
+  max-width: var(--shell-max, 1600px);
+  margin: 0 auto;
+  padding: 0 var(--shell-pad, 18px);
+}
+
+.site-footer p {
+  margin: 0.15rem 0;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  opacity: 0.72;
+}
+
+.site-footer .footer-credits {
+  opacity: 0.78;
+}
+
+
+/* ------------------------------------------------------------
+   Hero build pill — normalize font weight everywhere
+   (Lexicon override fix)
+   ------------------------------------------------------------ */
 .hero .hero-build,
-.hero .hero-build * {
+.hero .hero-build *,
+header.hero .hero-build,
+header.hero .hero-build * {
   font-weight: 400 !important;
+}
+
+.tool-nav li {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+  display: flex; /* prevents inherited block padding weirdness */
+  align-items: center;
+}
+
+.tool-nav ul li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+
+/* Lexicon footer alignment fix */
+.site-footer .footer-inner {
+  max-width: none;
+  margin: 0 auto;
+  padding-inline: clamp(0.75rem, 2.2vw, 2.75rem);
 }
