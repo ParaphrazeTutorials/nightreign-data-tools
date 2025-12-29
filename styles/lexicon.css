@@ -137,13 +137,13 @@
 /* TABLE */
 table.lexicon-table {
   width: max-content;
-  min-width: 660px;
+  min-width: 1000px;
   border-collapse: separate;
   border-spacing: 0;
 
   font-size: var(--lex-body-rem);
   line-height: 1.1;
-  table-layout: fixed;
+  table-layout: auto; /* allow natural column sizing so width can overflow */
 }
 
 /* COLUMN HEADERS */
@@ -400,19 +400,26 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   min-height: 0; /* critical: allow grid rows to constrain height */
 }
 
+/* Allow the table tile to show scrollbars fully */
+/* Keep tile overflow clipped; scroll happens in the inner wrap */
+.lex-tile[data-tile="table"] {
+  overflow: hidden;
+  padding-bottom: 0.05rem !important; /* tighten bottom only; leave other sides as default */
+}
+
 .lex-tile__header {
   display: grid;
   grid-template-rows: auto auto;
   gap: 0.15rem;
-  padding: 0.45rem 0.75rem;
+  padding: 0.28rem 0.40rem;
   background: rgba(0, 0, 0, 0.22);
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 /* Table tile: trim header bottom padding so the grid can sit higher */
 .lex-tile[data-tile="table"] .lex-tile__header {
-  padding: 0.32rem 0.65rem 0.12rem;
-  margin-bottom: 0.2rem;
+  padding: 0.16rem 0.35rem 0.05rem;
+  margin-bottom: 0.05rem;
 }
 
 
@@ -509,6 +516,7 @@ input.lexicon-search,
   gap: 0.5rem;
   min-height: unset;
   margin-top: -0.1rem;
+  margin-bottom: 0.18rem; /* add slight breathing room below subheader */
 }
 
 
@@ -684,7 +692,7 @@ input.lexicon-search,
 }
 
 .lex-tile__body {
-  padding: 0.85rem 0.9rem;
+  padding: 0.08rem 0.10rem;
   flex: 1 1 auto;
   min-height: 0;   /* critical: enables inner scrollers */
   overflow: hidden;
@@ -692,34 +700,50 @@ input.lexicon-search,
 
 /* Table tile: remove extra chrome and let the table scroll within the tile */
 .lex-tile[data-tile="table"] .lex-tile__body {
-  padding: 0 0.12rem 0.32rem;
-  overflow: visible;
+  padding: 0.04rem 0.04rem 0.02rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .lex-tile[data-tile="table"] .lexicon-wrap {
   border: none;
   border-radius: 0;
   background: transparent;
-  padding: 0rem 0.12rem 0.05rem;
+  padding: 0 0 0.02rem 0;
   max-inline-size: none;
   margin-inline: 0;
   width: 100%;
   display: block;
   overflow-x: auto !important;
   overflow-y: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* Override the old vh-based max-height: table should fill the tile body */
 .lex-tile[data-tile="table"] .lexicon-table-wrap {
   height: 100%;
-  max-height: clamp(340px, 70vh, 1100px);
+  max-height: 100%;
+  overflow-x: auto !important;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: 0; /* remove extra bottom inset for tight fit */
+}
+
+.lexicon-grid.is-theater .lex-tile.is-expanded[data-tile="table"] .lexicon-table-wrap {
+  height: 100%;
+  max-height: 100%;
   overflow-x: auto !important;
   overflow-y: auto;
 }
 
-.lexicon-grid.is-theater .lex-tile.is-expanded[data-tile="table"] .lexicon-table-wrap {
-  height: calc(100vh - 260px);
-  max-height: calc(100vh - 260px);
+.lexicon-grid.is-theater .lex-tile.is-expanded[data-tile="table"] .lexicon-wrap {
+  height: 100%;
+  max-height: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
 }
 
 /* Downloads tile */
