@@ -45,11 +45,102 @@ const state = {
   sortDir: 0, // 0 none, 1 asc, -1 desc
   typeByCol: new Map(), // col -> "number" | "string"
   zoom: "small", // "small" | "medium" | "large"
+  filters: new Map(),
   searchTerm: "",
 
   // theater
   expandedTile: null // "table" | "downloads" | "docs" | "insights" | null
 };
+
+// Single floating filter input appended to body (portal) so it never overlaps headers when hidden
+let floatingFilter = null;
+let floatingFilterCol = null;
+let floatingAnchorTh = null;
+let floatingAnchorBtn = null;
+
+function hideFloatingFilter() {
+  if (!floatingFilter) return;
+  floatingFilter.hidden = true;
+  floatingFilter.style.display = "none";
+  floatingFilter.setAttribute("aria-hidden", "true");
+  if (floatingAnchorTh) floatingAnchorTh.classList.remove("is-filtering");
+  if (floatingAnchorBtn) floatingAnchorBtn.classList.remove("is-open");
+  floatingAnchorTh = null;
+  floatingAnchorBtn = null;
+  floatingFilterCol = null;
+}
+
+function ensureFloatingFilter() {
+  if (floatingFilter) return floatingFilter;
+
+  floatingFilter = document.createElement("input");
+  floatingFilter.type = "text";
+  floatingFilter.className = "lexicon-floating-filter";
+  floatingFilter.autocomplete = "off";
+  floatingFilter.spellcheck = false;
+  floatingFilter.inputMode = "search";
+  floatingFilter.hidden = true;
+  floatingFilter.style.display = "none";
+  floatingFilter.setAttribute("aria-hidden", "true");
+
+  floatingFilter.addEventListener("input", () => {
+    const value = floatingFilter.value || "";
+    const trimmed = value.trim();
+    if (!floatingFilterCol) return;
+
+    if (trimmed === "") {
+      state.filters.delete(floatingFilterCol);
+      hideFloatingFilter();
+      render();
+      return;
+    }
+
+    state.filters.set(floatingFilterCol, value);
+    render();
+  });
+
+  floatingFilter.addEventListener("blur", () => {
+    if (floatingFilterCol && (floatingFilter.value || "").trim() === "") {
+      state.filters.delete(floatingFilterCol);
+    }
+    hideFloatingFilter();
+  });
+
+  window.addEventListener("scroll", hideFloatingFilter, true);
+  window.addEventListener("resize", hideFloatingFilter);
+
+  document.body.appendChild(floatingFilter);
+  return floatingFilter;
+}
+
+function openFloatingFilter(col, th, btn) {
+  ensureFloatingFilter();
+
+  const rect = btn.getBoundingClientRect();
+  floatingFilterCol = col;
+  floatingAnchorTh = th;
+  floatingAnchorBtn = btn;
+
+  const current = state.filters.get(col) || "";
+  floatingFilter.value = current;
+
+  floatingFilter.hidden = false;
+  floatingFilter.removeAttribute("aria-hidden");
+  floatingFilter.style.display = "inline-block";
+
+  const top = rect.bottom + window.scrollY + 4;
+  const left = rect.left + window.scrollX;
+  const minW = Math.max(rect.width + 60, 150);
+  floatingFilter.style.top = `${top}px`;
+  floatingFilter.style.left = `${left}px`;
+  floatingFilter.style.minWidth = `${minW}px`;
+
+  th.classList.add("is-filtering");
+  btn.classList.add("is-open");
+
+  floatingFilter.focus();
+  floatingFilter.select();
+}
 
 function csvEscape(value) {
   const s = value == null ? "" : String(value);
@@ -100,6 +191,21 @@ function inferColumns(rows) {
     }
   }
   return cols;
+}
+
+const PRIORITY_COLUMNS = ["EffectID", "EffectCategory", "EffectDescription"];
+
+function reorderColumns(columns) {
+  const priLower = new Set(PRIORITY_COLUMNS.map(c => c.toLowerCase()));
+
+  const prioritized = [];
+  for (const target of PRIORITY_COLUMNS) {
+    const found = columns.find(c => c.toLowerCase() === target.toLowerCase());
+    if (found) prioritized.push(found);
+  }
+
+  const rest = columns.filter(c => !priLower.has(c.toLowerCase()));
+  return [...prioritized, ...rest];
 }
 
 function inferTypeForColumn(rows, col) {
@@ -216,8 +322,15 @@ function thHtml(key) {
         role="button" tabindex="0"
         data-col="${escapeHtml(key)}"
         aria-sort="${isActive ? (state.sortDir === 1 ? "ascending" : "descending") : "none"}">
-      <span class="lexicon-th__label">${escapeHtml(key)}</span>
-      <span class="lexicon-th__glyph" aria-hidden="true">${glyph}</span>
+      <div class="lexicon-th__inner">
+        <span class="lexicon-th__label">${escapeHtml(key)}</span>
+        <div class="lexicon-th__controls">
+          <button class="lexicon-col-filter" type="button" title="Filter ${escapeHtml(key)}" aria-label="Filter ${escapeHtml(key)}" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M8 12h8m-4 7h0"/></svg>
+          </button>
+          <span class="lexicon-th__glyph" aria-hidden="true">${glyph}</span>
+        </div>
+      </div>
     </th>
   `;
 }
@@ -238,6 +351,7 @@ function tdHtml(key, value) {
 
 function renderHead(columns) {
   if (!dom.tableHead) return;
+  ensureFloatingFilter();
   dom.tableHead.innerHTML = `<tr>${columns.map(thHtml).join("")}</tr>`;
 
   dom.tableHead.querySelectorAll("th[data-col]").forEach(th => {
@@ -249,6 +363,26 @@ function renderHead(columns) {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         activate();
+      }
+    });
+
+    const btn = th.querySelector(".lexicon-col-filter");
+    if (!btn) return;
+
+    const val = state.filters.get(col) || "";
+    const active = val.trim() !== "";
+
+    btn.classList.toggle("is-active", active);
+    th.classList.toggle("has-filter", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const isSame = floatingFilterCol === col && floatingAnchorBtn === btn && !floatingFilter?.hidden;
+      hideFloatingFilter();
+      if (!isSame) {
+        openFloatingFilter(col, th, btn);
       }
     });
   });
@@ -275,8 +409,25 @@ function rowMatchesSearch(row, term) {
 
 function getFilteredRows() {
   const term = state.searchTerm.trim();
-  if (!term) return state.rawRows;
-  return state.rawRows.filter(r => rowMatchesSearch(r, term));
+  const activeFilters = Array.from(state.filters.entries()).filter(([, v]) => v && v.trim() !== "");
+
+  if (!term && activeFilters.length === 0) return state.rawRows;
+
+  return state.rawRows.filter(r => {
+    if (term && !rowMatchesSearch(r, term)) return false;
+
+    for (const [col, value] of activeFilters) {
+      const needle = value.trim().toLowerCase();
+      const cell = r?.[col];
+      if (needle === "") continue;
+      if (cell == null) return false;
+
+      const cellStr = String(cell).toLowerCase();
+      if (!cellStr.includes(needle)) return false;
+    }
+
+    return true;
+  });
 }
 
 function getCurrentViewRows() {
@@ -296,9 +447,22 @@ function updateMeta() {
     : "";
 
   const modText = state.module ? `• Module: ${state.module}` : "";
-  const filterText = rows !== total ? `• Filtered from ${total}` : "";
+  const filtersActive = state.filters.size ? "• Filters on" : "";
+  const filteredCount = rows !== total ? `• Filtered from ${total}` : "";
 
-  dom.meta.textContent = `${rows} rows • ${cols} columns ${modText} ${filterText} ${sortText}`.replace(/\s+/g, " ").trim();
+  dom.meta.textContent = `${rows} rows • ${cols} columns ${modText} ${filtersActive} ${filteredCount} ${sortText}`.replace(/\s+/g, " ").trim();
+}
+
+/* -------------------------
+   Search
+------------------------- */
+
+function bindSearch() {
+  if (!dom.searchInput) return;
+  dom.searchInput.addEventListener("input", () => {
+    state.searchTerm = String(dom.searchInput.value || "");
+    render();
+  });
 }
 
 function renderInsights() {
@@ -385,16 +549,8 @@ function toggleSort(col) {
 }
 
 /* -------------------------
-   Search
+  Filters (per-column buttons)
 ------------------------- */
-
-function bindSearch() {
-  if (!dom.searchInput) return;
-  dom.searchInput.addEventListener("input", () => {
-    state.searchTerm = String(dom.searchInput.value || "");
-    render();
-  });
-}
 
 /* -------------------------
    Theater mode
@@ -508,7 +664,10 @@ async function loadData() {
 
   const rows = await res.json();
   state.rawRows = Array.isArray(rows) ? rows : [];
-  state.columns = inferColumns(state.rawRows);
+  state.columns = reorderColumns(inferColumns(state.rawRows));
+  state.filters.clear();
+  state.searchTerm = "";
+  if (dom.searchInput) dom.searchInput.value = "";
   computeTypeMap(state.rawRows, state.columns);
 
   render();
