@@ -868,6 +868,55 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   height: 22px;
 }
 
+
+/* ------------------------------------------------------------
+   Lexicon — Card Art Controls (sidebar tiles)
+   Match hero-style controls: zoom + x + y
+   ------------------------------------------------------------ */
+
+.lexicon-sidebar {
+  /* Canonical-style controls for card art */
+  --card-art-zoom: 0.9;
+  --card-art-x: 60%;
+  --card-art-y: 50%;
+}
+
+/* Disable Home tile background-image in Lexicon sidebar; we render art via ::after */
+.lexicon-sidebar .app-tile {
+  background-image: none !important;
+  background-color: transparent;
+}
+
+/* Art layer */
+.lexicon-sidebar .app-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: var(--card-art-src);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  /* hero-like anchor + scale */
+  left: var(--card-art-x);
+  top: var(--card-art-y);
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  min-height: 100%;
+
+  transform: translate(-50%, -50%) scale(var(--card-art-zoom));
+  transform-origin: center;
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure overlay sits above art, and text above overlay (Lexicon only) */
+.lexicon-sidebar .app-tile::before { z-index: 1; }
+.lexicon-sidebar .app-tile__text  { z-index: 2; }
+
 /* ------------------------------------------------------------
    Lexicon — Left sidebar app tiles (Home card style)
    ------------------------------------------------------------ */
@@ -903,4 +952,255 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 .lexicon-apps .lexicon-module-card.is-active {
   border-color: rgba(255,255,255,0.26);
   box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
+}
+
+
+/* ------------------------------------------------------------
+   Lexicon — Sidebar card stacking fix (text above art)
+   ------------------------------------------------------------ */
+.lexicon-sidebar .app-tile {
+  position: relative;
+  isolation: isolate;
+}
+
+.lexicon-sidebar .app-tile::after {
+  z-index: 0;
+}
+
+.lexicon-sidebar .app-tile::before {
+  z-index: 1;
+}
+
+.lexicon-sidebar .app-tile__text {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ------------------------------------------------------------
+   Lexicon — Sidebar card stacking (override, last-wins)
+   Force art + overlay behind all content in the button.
+   ------------------------------------------------------------ */
+.lexicon-sidebar .app-tile {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+
+.lexicon-sidebar .app-tile::after {
+  z-index: -2;
+}
+
+.lexicon-sidebar .app-tile::before {
+  z-index: -1;
+}
+
+.lexicon-sidebar .app-tile__meta,
+.lexicon-sidebar .app-tile__text {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ------------------------------------------------------------
+   Lexicon v2 — Sidebar tiles: half height, title-only, bottom-left
+   ------------------------------------------------------------ */
+
+.lexicon-sidebar .app-tile {
+  min-height: 60px;                 /* ~half of prior 120px */
+  padding: 0.55rem 0.65rem;         /* tighter vertical space */
+}
+
+/* Make the tile content sit at the bottom-left */
+.lexicon-sidebar .app-tile__meta {
+  margin-top: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.lexicon-sidebar .app-tile__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+/* Remove subheader/secondary line inside the tile */
+.lexicon-sidebar .app-tile__text > div:not(.app-tile__title) {
+  display: none;
+}
+
+/* Keep the title crisp in the smaller tile */
+.lexicon-sidebar .app-tile__title {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------
+   Lexicon v3 — Sidebar tiles: tighter vertical spacing
+   ------------------------------------------------------------ */
+
+/* Reduce vertical gap between sidebar cards */
+.lexicon-apps {
+  gap: 0.4rem; /* tighter than prior ~0.75rem */
+}
+
+/* ------------------------------------------------------------
+   Lexicon v7 — Sidebar card art controls (X/Y/Zoom) with bleed
+   Restore X control by returning to element-anchor panning,
+   but oversize the art layer so panning can't reveal blank edges.
+   ------------------------------------------------------------ */
+
+/* Art layer (override, last wins) */
+.lexicon-sidebar .app-tile::after {
+  content: "";
+  position: absolute;
+
+  /* Oversize the layer so X/Y panning never exposes empty space */
+  width: 220%;
+  height: 220%;
+
+  /* Anchor point driven by controls */
+  left: var(--card-art-x);
+  top: var(--card-art-y);
+
+  /* Center on anchor, then zoom */
+  transform: translate(-50%, -50%) scale(var(--card-art-zoom));
+  transform-origin: center;
+
+  background-image: var(--card-art-src);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  pointer-events: none;
+
+  /* Keep art behind overlay + text */
+  z-index: -2;
+}
+
+/* Overlay behind text, above art */
+.lexicon-sidebar .app-tile::before { z-index: -1; }
+
+/* ------------------------------------------------------------
+   Lexicon v8 — Increase art bleed further to prevent zoom cutoff
+   (tiles are short; zoom needs more overscan headroom)
+   ------------------------------------------------------------ */
+
+.lexicon-sidebar .app-tile::after {
+  width: 340%;
+  height: 340%;
+}
+
+/* ------------------------------------------------------------
+   Lexicon v9 — Sidebar cards: REMOVE image logic (Lexicon only)
+   Keep existing card sizing/spacing; apply active/inactive gradients.
+   ------------------------------------------------------------ */
+
+/* Kill any tile images coming from Home styles (Lexicon sidebar only) */
+.lexicon-sidebar .app-tile {
+  background-image: none !important;
+  /* Inactive gradient */
+  background: linear-gradient(
+    90deg,
+    rgba(22, 24, 30, 0.85) 0%,
+    rgba(14, 16, 20, 0.95) 100%
+  );
+}
+
+/* Remove the Lexicon-only art layer entirely */
+.lexicon-sidebar .app-tile::after {
+  content: none !important;
+}
+
+/* Active module gradient */
+.lexicon-sidebar .lexicon-module-card.is-active {
+  background: linear-gradient(
+    90deg,
+    rgba(112, 70, 168, 0.45) 0%,
+    rgba(60, 30, 95, 0.55) 45%,
+    rgba(10, 10, 16, 0.75) 100%
+  );
+}
+
+/* ------------------------------------------------------------
+   Lexicon v10 — Sidebar gradients actually visible
+   Home card overlay (::before) was still masking backgrounds.
+   Remove overlay ONLY for Lexicon sidebar cards.
+   ------------------------------------------------------------ */
+
+/* Remove dark overlay layer so gradients show */
+.lexicon-sidebar .app-tile::before {
+  content: none !important;
+}
+
+/* Re-assert inactive gradient (last-wins safety) */
+.lexicon-sidebar .app-tile {
+  background: linear-gradient(
+    90deg,
+    rgba(22, 24, 30, 0.85) 0%,
+    rgba(14, 16, 20, 0.95) 100%
+  ) !important;
+}
+
+/* Re-assert active gradient */
+.lexicon-sidebar .lexicon-module-card.is-active {
+  background: linear-gradient(
+    90deg,
+    rgba(112, 70, 168, 0.45) 0%,
+    rgba(60, 30, 95, 0.55) 45%,
+    rgba(10, 10, 16, 0.75) 100%
+  ) !important;
+}
+
+/* ------------------------------------------------------------
+   Lexicon v11 — Sidebar cards: visible inactive gradient + centered text
+   ------------------------------------------------------------ */
+
+/* Make inactive gradient more perceptible */
+.lexicon-sidebar .app-tile {
+  background: linear-gradient(
+    90deg,
+    rgba(32, 36, 44, 0.95) 0%,
+    rgba(18, 20, 26, 0.95) 100%
+  ) !important;
+}
+
+/* Center title horizontally + vertically */
+.lexicon-sidebar .app-tile__meta {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lexicon-sidebar .app-tile__text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Keep active gradient as-is */
+.lexicon-sidebar .lexicon-module-card.is-active {
+  background: linear-gradient(
+    90deg,
+    rgba(112, 70, 168, 0.45) 0%,
+    rgba(60, 30, 95, 0.55) 45%,
+    rgba(10, 10, 16, 0.75) 100%
+  ) !important;
+}
+
+/* ------------------------------------------------------------
+   Lexicon v12 — Sidebar cards: left-align text, keep vertical centering
+   ------------------------------------------------------------ */
+
+.lexicon-sidebar .app-tile__meta {
+  justify-content: flex-start;
+}
+
+.lexicon-sidebar .app-tile__text {
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
 }
