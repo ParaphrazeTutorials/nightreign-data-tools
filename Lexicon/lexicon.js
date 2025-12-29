@@ -20,6 +20,7 @@ const dom = {
   tableHead: document.getElementById("lexiconHead"),
   tableBody: document.getElementById("lexiconBody"),
   meta: document.getElementById("lexiconMeta"),
+  searchInput: document.getElementById("lexiconSearch"),
 
   // downloads
   exportCsvBtn: document.getElementById("lexiconExportCsv"),
@@ -44,6 +45,7 @@ const state = {
   sortDir: 0, // 0 none, 1 asc, -1 desc
   typeByCol: new Map(), // col -> "number" | "string"
   zoom: "small", // "small" | "medium" | "large"
+  searchTerm: "",
 
   // theater
   expandedTile: null // "table" | "downloads" | "docs" | "insights" | null
@@ -197,8 +199,9 @@ function bindDownloads() {
 
   if (dom.exportJsonBtn) {
     dom.exportJsonBtn.addEventListener("click", () => {
+      const rows = getCurrentViewRows();
       const stamp = new Date().toISOString().slice(0, 10);
-      const json = JSON.stringify(state.rawRows, null, 2);
+      const json = JSON.stringify(rows, null, 2);
       downloadText(`lexicon_${state.module}_${stamp}.json`, json, "application/json;charset=utf-8");
     });
   }
@@ -258,14 +261,34 @@ function renderBody(columns, rows) {
   dom.tableBody.innerHTML = out.join("");
 }
 
+function rowMatchesSearch(row, term) {
+  if (!term) return true;
+  const needle = term.toLowerCase();
+  for (const col of state.columns) {
+    const v = row?.[col];
+    if (v == null) continue;
+    const s = String(v).toLowerCase();
+    if (s.includes(needle)) return true;
+  }
+  return false;
+}
+
+function getFilteredRows() {
+  const term = state.searchTerm.trim();
+  if (!term) return state.rawRows;
+  return state.rawRows.filter(r => rowMatchesSearch(r, term));
+}
+
 function getCurrentViewRows() {
-  return stableSort(state.rawRows.slice(), state.sortKey, state.sortDir);
+  const filtered = getFilteredRows();
+  return stableSort(filtered, state.sortKey, state.sortDir);
 }
 
 function updateMeta() {
   if (!dom.meta) return;
 
-  const rows = state.rawRows.length;
+  const total = state.rawRows.length;
+  const rows = getFilteredRows().length;
   const cols = state.columns.length;
 
   const sortText = state.sortKey && state.sortDir
@@ -273,13 +296,16 @@ function updateMeta() {
     : "";
 
   const modText = state.module ? `• Module: ${state.module}` : "";
-  dom.meta.textContent = `${rows} rows • ${cols} columns ${modText} ${sortText}`.replace(/\s+/g, " ").trim();
+  const filterText = rows !== total ? `• Filtered from ${total}` : "";
+
+  dom.meta.textContent = `${rows} rows • ${cols} columns ${modText} ${filterText} ${sortText}`.replace(/\s+/g, " ").trim();
 }
 
 function renderInsights() {
   if (!dom.insights) return;
 
-  const rows = state.rawRows.length;
+  const filteredRows = getFilteredRows();
+  const rows = filteredRows.length;
   const cols = state.columns.length;
 
   if (!rows || !cols) {
@@ -289,7 +315,7 @@ function renderInsights() {
 
   const summaries = state.columns.map(col => {
     let nulls = 0;
-    for (const r of state.rawRows) {
+    for (const r of filteredRows) {
       const v = r?.[col];
       if (v == null || v === "") nulls++;
     }
@@ -356,6 +382,18 @@ function toggleSort(col) {
     if (state.sortDir === 0) state.sortKey = "";
   }
   render();
+}
+
+/* -------------------------
+   Search
+------------------------- */
+
+function bindSearch() {
+  if (!dom.searchInput) return;
+  dom.searchInput.addEventListener("input", () => {
+    state.searchTerm = String(dom.searchInput.value || "");
+    render();
+  });
 }
 
 /* -------------------------
@@ -431,6 +469,9 @@ function setActiveModule(moduleKey) {
   state.module = key;
   state.dataUrl = url;
 
+  state.searchTerm = "";
+  if (dom.searchInput) dom.searchInput.value = "";
+
   for (const b of dom.moduleButtons) {
     const mk = (b.getAttribute("data-module") || "").toLowerCase();
     b.classList.toggle("is-active", mk === key);
@@ -477,6 +518,7 @@ async function init() {
   bindZoomButtons();
   bindDownloads();
   bindTheaterMode();
+  bindSearch();
   bindModulePicker();
 
   setExpandedTile(null);

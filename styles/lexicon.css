@@ -393,6 +393,12 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
+/* Table tile: trim header bottom padding so the grid can sit higher */
+.lex-tile[data-tile="table"] .lex-tile__header {
+  padding: 0.32rem 0.65rem 0.12rem;
+  margin-bottom: 0.2rem;
+}
+
 
 
 
@@ -404,11 +410,76 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   gap: 0.75rem;
 }
 
+.lex-tile[data-tile="table"] .lex-tile__header-main {
+  align-items: center;
+}
+
+.lex-table-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lex-tile[data-tile="table"] .lex-tile__actions {
+  align-items: center;
+}
+
 .lex-tile__header-main h3 {
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.1;
   letter-spacing: 0.01em;
+}
+
+input.lexicon-search,
+.lexicon-search[type="search"],
+.lexicon-search {
+  min-width: 180px;
+  max-width: 260px;
+  width: 100%;
+  height: 28px !important;
+  padding: 0 8px !important;
+  border-radius: 0.35rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: rgba(0, 0, 0, 0.20) !important;
+  color: #f5f7fb !important;
+  font-size: 0.78rem !important;
+  line-height: 28px !important;
+  margin: 0 !important;
+  font-family: inherit;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  vertical-align: middle;
+  transform: translateY(0);
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+.lexicon-search::-webkit-search-decoration,
+.lexicon-search::-webkit-search-cancel-button,
+.lexicon-search::-webkit-search-results-button,
+.lexicon-search::-webkit-search-results-decoration {
+  display: none;
+}
+
+.lex-tile[data-tile="table"] .lexicon-search {
+  height: 28px !important;
+  padding: 0 8px !important;
+  align-self: center;
+}
+
+.lexicon-search::placeholder {
+  color: rgba(245, 247, 251, 0.7);
+}
+
+.lexicon-search:focus {
+  outline: 2px solid rgba(181, 140, 255, 0.55);
+  outline-offset: 2px;
 }
 
 
@@ -492,14 +563,14 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 
 /* Table tile: remove extra chrome and let the table scroll within the tile */
 .lex-tile[data-tile="table"] .lex-tile__body {
-  padding: 0;
+  padding: 0 0.12rem 0.32rem;
 }
 
 .lex-tile[data-tile="table"] .lexicon-wrap {
   border: none;
   border-radius: 0;
   background: transparent;
-  padding: 0.85rem 0.9rem;
+  padding: 0rem 0.12rem 0.05rem;
   max-inline-size: none;
   margin-inline: 0;
 }
