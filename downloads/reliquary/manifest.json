@@ -1,0 +1,45 @@
+{
+  "module": "reliquary",
+  "updatedAt": "2025-12-29T00:00:00Z",
+  "tableExports": [
+    {
+      "id": "full-table-json",
+      "label": "Full table (JSON)",
+      "description": "Complete Reliquary dataset as JSON.",
+      "format": "json",
+      "href": "/Data/reliquary.json"
+    }
+  ],
+  "rawGameFiles": [
+    {
+      "id": "attach-effect-name",
+      "label": "AttachEffectName.csv",
+      "description": "Raw game file: attach effect names.",
+      "format": "csv",
+      "href": "/downloads/reliquary/gamefiles/AttachEffectName.csv"
+    },
+    {
+      "id": "attach-effect-param",
+      "label": "AttachEffectParam.csv",
+      "description": "Raw game file: attach effect parameters.",
+      "format": "csv",
+      "href": "/downloads/reliquary/gamefiles/AttachEffectParam.csv"
+    },
+    {
+      "id": "attach-effect-table-param",
+      "label": "AttachEffectTableParam.csv",
+      "description": "Raw game file: attach effect table parameters.",
+      "format": "csv",
+      "href": "/downloads/reliquary/gamefiles/AttachEffectTableParam.csv"
+    }
+  ],
+  "supplementalFiles": [
+    {
+      "id": "compatibility",
+      "label": "compatibility.csv",
+      "description": "Supplemental compatibility mappings.",
+      "format": "csv",
+      "href": "/downloads/reliquary/supplemental/compatibility.csv"
+    }
+  ]
+}

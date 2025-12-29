@@ -1,0 +1,117 @@
+CompatibilityID,CompatibilityDescription
+100,Attack Power
+200,Starting Armaments(Imbue)
+300,Starting Armaments (Skills/Spells)
+800,Sorceries / Incantations
+900,Character-Specific
+6060300,Attributes
+6060400,Attributes
+6060500,Attributes
+6060600,Attributes
+6610400,Attributes
+6610500,Attributes
+6610600,Attributes
+6610700,Attributes
+6611100,Damage Negation
+6611400,Restoration
+6621000,Starting Item (Tear)
+6624000,Starting Item
+6630000,Weapon Discovery
+6820000,Demerits (Damage Negation)
+6820100,Demerits (Damage Negation)
+6820200,Demerits (Damage Negation)
+6820300,Demerits (Damage Negation)
+6820400,Demerits (Damage Negation)
+6820500,Demerits (Damage Negation)
+6820600,Demerits (Damage Negation)
+6830000,Demerits (Attributes)
+6830100,Demerits (Attributes)
+6830200,Demerits (Attributes)
+6830300,Demerits (Attributes)
+6830400,Demerits (Attributes)
+6840000,Demerits (Attributes)
+6840100,Demerits (Actions)
+6840200,Demerits (Actions)
+6850200,Demerits (Damage Negation)
+6850500,Demerits (Damage Negation)
+6850700,Demerits (Damage Negation)
+6850800,Demerits (Damage Negation)
+6850900,Demerits (Damage Negation)
+6851200,Demerits (Actions)
+6851300,Demerits (Actions)
+6851400,Demerits (Actions)
+6851700,Demerits (Actions)
+7000000,Attributes
+7000100,Attributes
+7000200,Attributes
+7000300,Attributes
+7000400,Attributes
+7000500,Attributes
+7000600,Attributes
+7000700,Attributes
+7000800,Character Skills / Ultimate Arts
+7000900,Character Skills / Ultimate Arts
+7001000,Attributes
+7002600,Damage Negation
+7002700,Damage Negation
+7002800,Damage Negation
+7002900,Damage Negation
+7003000,Status Ailment Resistances
+7003100,Status Ailment Resistances
+7003200,Status Ailment Resistances
+7003300,Status Ailment Resistances
+7003400,Status Ailment Resistances
+7003500,Status Ailment Resistances
+7003600,Status Ailment Resistances
+7005600,Restoration
+7006200,Damage Negation
+7010200,Team Members
+7012200,Team Members
+7012300,Damage Negation
+7030200,Restoration
+7030600,Character Skills / Ultimate Arts
+7030700,Actions
+7030800,Character Skills / Ultimate Arts
+7031900,Actions
+7035100,Restoration
+7036100,Actions
+7040300,Attack Power
+7040400,Attack Power
+7040500,Attack Power
+7043100,Attack Power
+7050000,Team Members
+7050100,Team Members
+7060100,Attributes
+7070000,Environment
+7082500,Weapon Specific
+7082700,Weapon Specific
+7090000,Character Skills / Ultimate Arts
+7090100,Team Members
+7100100,Restoration
+7110000,Team Members
+7120900,Starting Item
+7121000,Starting Item
+7121100,Starting Item
+7121200,Starting Item
+7121300,Starting Item
+7121400,Starting Item
+7121500,Starting Item
+7121600,Starting Item
+7121700,Starting Item
+7121800,Starting Item
+7121900,Starting Item
+7122000,Starting Item
+7122100,Starting Item
+7122200,Starting Item
+7122300,Starting Item
+7122400,Starting Item
+7122500,Starting Item
+7122600,Starting Item
+7126000,Starting Item
+7160000,Restoration
+7230000,Environment
+7240000,Damage Negation
+7260300,Actions
+7260400,Actions
+7340000,Weapon Specific
+7350000,Weapon Specific

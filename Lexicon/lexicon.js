@@ -23,8 +23,7 @@ const dom = {
   searchInput: document.getElementById("lexiconSearch"),
 
   // downloads
-  exportCsvBtn: document.getElementById("lexiconExportCsv"),
-  exportJsonBtn: document.getElementById("lexiconExportJson"),
+  downloadsDynamic: document.getElementById("lexiconDownloadsDynamic"),
 
   // zoom
   zoomButtons: Array.from(document.querySelectorAll(".lexicon-zoom-btn[data-zoom]")),
@@ -49,7 +48,10 @@ const state = {
   searchTerm: "",
 
   // theater
-  expandedTile: null // "table" | "downloads" | "docs" | "insights" | null
+  expandedTile: null, // "table" | "downloads" | "docs" | "insights" | null
+
+  // downloads
+  downloadsManifest: null
 };
 
 // Single floating filter input appended to body (portal) so it never overlaps headers when hidden
@@ -293,24 +295,82 @@ function bindZoomButtons() {
   }
 }
 
-function bindDownloads() {
-  if (dom.exportCsvBtn) {
-    dom.exportCsvBtn.addEventListener("click", () => {
-      const rows = getCurrentViewRows();
-      const csv = toCsv(state.columns, rows);
-      const stamp = new Date().toISOString().slice(0, 10);
-      downloadText(`lexicon_${state.module}_${stamp}.csv`, csv, "text/csv;charset=utf-8");
-    });
+function getManifestUrl(moduleKey) {
+  const key = String(moduleKey || "").toLowerCase();
+  if (!key) return "";
+  return new URL(`../downloads/${key}/manifest.json`, window.location.href).toString();
+}
+
+async function loadDownloadsManifest(moduleKey) {
+  state.downloadsManifest = null;
+  const url = getManifestUrl(moduleKey);
+  if (!url) {
+    renderDownloads();
+    return;
   }
 
-  if (dom.exportJsonBtn) {
-    dom.exportJsonBtn.addEventListener("click", () => {
-      const rows = getCurrentViewRows();
-      const stamp = new Date().toISOString().slice(0, 10);
-      const json = JSON.stringify(rows, null, 2);
-      downloadText(`lexicon_${state.module}_${stamp}.json`, json, "application/json;charset=utf-8");
-    });
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to load manifest (${res.status})`);
+    const manifest = await res.json();
+    state.downloadsManifest = manifest || null;
+  } catch (err) {
+    console.error(err);
+    state.downloadsManifest = null;
   }
+  renderDownloads();
+}
+
+function renderDownloadsSection(title, items) {
+  if (!items || items.length === 0) {
+    return `
+      <div class="lex-downloads__section">
+        <div class="lex-downloads__section-title">${escapeHtml(title)}</div>
+        <div class="lex-downloads__empty">Unavailable</div>
+      </div>
+    `;
+  }
+
+  const list = items.map(item => {
+    const label = item.label || item.id || "Download";
+    const href = item.href || "#";
+    const fmt = item.format ? String(item.format).toUpperCase() : "";
+    const size = item.size ? String(item.size) : "";
+    const meta = [fmt, size].filter(Boolean).join(" • ");
+    const desc = item.description || "";
+    return `
+      <a class="lex-downloads__item" href="${escapeHtml(href)}" download>
+        <span class="lex-downloads__item-label">${escapeHtml(label)}</span>
+        ${meta ? `<span class="lex-downloads__item-meta">${escapeHtml(meta)}</span>` : ""}
+        ${desc ? `<span class="lex-downloads__item-desc">${escapeHtml(desc)}</span>` : ""}
+      </a>
+    `;
+  }).join("");
+
+  return `
+    <div class="lex-downloads__section">
+      <div class="lex-downloads__section-title">${escapeHtml(title)}</div>
+      <div class="lex-downloads__list">${list}</div>
+    </div>
+  `;
+}
+
+function renderDownloads() {
+  if (!dom.downloadsDynamic) return;
+
+  const m = state.downloadsManifest;
+  if (!m) {
+    dom.downloadsDynamic.innerHTML = `<div class="lex-downloads__empty">No downloads available for this module.</div>`;
+    return;
+  }
+
+  const sections = [
+    renderDownloadsSection("Table data export", m.tableExports),
+    renderDownloadsSection("Raw game files", m.rawGameFiles),
+    renderDownloadsSection("Supplemental files", m.supplementalFiles)
+  ];
+
+  dom.downloadsDynamic.innerHTML = sections.join("");
 }
 
 function thHtml(key) {
@@ -533,6 +593,7 @@ function render() {
   renderBody(columns, sorted);
   updateMeta();
   renderInsights();
+  renderDownloads();
 }
 
 function toggleSort(col) {
@@ -635,8 +696,10 @@ function setActiveModule(moduleKey) {
 
   state.sortKey = "";
   state.sortDir = 0;
+  state.downloadsManifest = null;
 
   loadData().catch(console.error);
+  loadDownloadsManifest(key).catch(console.error);
 }
 
 function bindModulePicker() {
@@ -671,11 +734,11 @@ async function loadData() {
   computeTypeMap(state.rawRows, state.columns);
 
   render();
+  loadDownloadsManifest(state.module).catch(console.error);
 }
 
 async function init() {
   bindZoomButtons();
-  bindDownloads();
   bindTheaterMode();
   bindSearch();
   bindModulePicker();

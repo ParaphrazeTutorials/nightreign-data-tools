@@ -1,0 +1,1166 @@
+ID,Text,Source
+1,,Base
+2,,Base
+3,,Base
+100,,Base
+310000,Increased Maximum HP,Base
+310100,Increased Maximum FP,Base
+310200,Increased Maximum Stamina,Base
+310400,Increased Maximum HP,Base
+310401,Increased Maximum Stamina,Base
+311000,Improved Item Discovery,Base
+311100,More Runes From Defeated Enemies,Base
+311500,Improved Stamina Recovery,Base
+311600,Improved Blood Loss Resistance,Base
+311601,Improved Frost Resistance,Base
+311700,Improved Poison Resistance,Base
+311701,Improved Rot Resistance,Base
+311800,Improved Sleep Resistance,Base
+311801,Improved Madness Resistance,Base
+311900,Improved Death Blight Resistance,Base
+312000,Improved Poison & Rot Resistance,Base
+312001,Improved Blood Loss & Frost Resistance,Base
+312002,Improved Sleep & Madness Resistance,Base
+312100,Improved Poise,Base
+312300,Improved Skill Attack Power,Base
+312500,Improved Dexterity,Base
+312501,Successive Attacks Boost Attack Power,Base
+320000,Improved Magic Attack Power,Base
+320001,Impaired Physical Damage Negation,Base
+320100,Improved Lightning Attack Power,Base
+320101,Impaired Physical Damage Negation,Base
+320200,Improved Fire Attack Power,Base
+320201,Impaired Physical Damage Negation,Base
+320300,Improved Holy Attack Power,Base
+320301,Impaired Physical Damage Negation,Base
+320400,Improved Attack Power at Low HP,Base
+320500,Improved Attack Power at Full HP,Base
+320600,Improved Thrusting Counterattack,Base
+320700,Improved Guard Breaking,Base
+320800,Successive Attacks Boost Attack Power,Base
+320900,Improved Critical Hits,Base
+321000,Projectile Damage Drop-Off Reduced,Base
+321200,Improved Chain Attack Finishers,Base
+321300,Improved Charge Attacks,Base
+321500,Improved Ranged Weapon Attacks,Base
+321600,Blood Loss in Vicinity Increases Attack Power,Base
+321700,Poison & Rot in Vicinity Increases Attack Power,Base
+321800,Improved Jump Attacks,Base
+321900,Improved Roar & Breath Attacks,Base
+322000,Improved Guard Counters,Base
+322100,Improved Throwing Pots,Base
+322200,Improved Perfuming Arts,Base
+330000,Improved Sorceries,Base
+330400,Improved Incantations,Base
+330600,Extended Spell Duration,Base
+330700,Improved Spell Casting Speed,Base
+330800,Reduced Spell FP Cost,Base
+330801,Reduced Maximum HP,Base
+330900,Improved Charged Spells & Skills,Base
+340000,Improved Physical Damage Negation,Base
+340100,Improved Magic Damage Negation,Base
+340200,Improved Fire Damage Negation,Base
+340300,Improved Lightning Damage Negation,Base
+340400,Improved Holy Damage Negation,Base
+340500,Improved Affinity Damage Negation,Base
+340700,Improved Dodging,Base
+340701,Impaired Damage Negation,Base
+340800,Improved Damage Negation at Low HP,Base
+340900,Improved Damage Negation at Full HP,Base
+341000,Improved Guarding Ability,Base
+350000,Improved Flask HP Restoration,Base
+350200,Continuous HP Recovery,Base
+350300,Defeating Enemies Restores HP,Base
+350400,Successive Attack HP Restoration,Base
+350500,Critical Hit HP Restoration,Base
+350600,Critical Hit FP Restoration,Base
+360200,Reduced Skill FP Cost,Base
+360700,No Rune Loss or Level Down Upon Death,Base
+361100,Defeating Enemies Restores FP,Base
+370000,Improved Item Discovery,Base
+370001,More Runes From Defeated Enemies,Base
+370002,Continuous HP Loss,Base
+6000800,Character Skill Cooldown Reduction +4,Base
+6000801,Character Skill Cooldown Reduction +5,Base
+6000900,Ultimate Art Auto Charge +4,Base
+6000901,Ultimate Art Auto Charge +5,Base
+6001000,Poise +4,Base
+6001001,Poise +5,Base
+6001400,Physical Attack Up +4,Base
+6001401,,Base
+6001500,Magic Attack Power Up +3,Base
+6001501,Magic Attack Power Up +4,Base
+6001600,Fire Attack Power Up +3,Base
+6001601,Fire Attack Power Up +4,Base
+6001700,Lightning Attack Power Up +3,Base
+6001701,Lightning Attack Power Up +4,Base
+6001800,Holy Attack Power Up +3,Base
+6001801,Holy Attack Power Up +4,Base
+6002600,Improved Magic Damage Negation +1,Base
+6002601,Improved Magic Damage Negation +2,Base
+6002700,Improved Fire Damage Negation +1,Base
+6002701,Improved Fire Damage Negation +2,Base
+6002800,Improved Lightning Damage Negation +1,Base
+6002801,Improved Lightning Damage Negation +2,Base
+6002900,Improved Holy Damage Negation +1,Base
+6002901,Improved Holy Damage Negation +2,Base
+6003000,Improved Poison Resistance +1,Base
+6003001,Improved Poison Resistance +2,Base
+6003100,Improved Blood Loss Resistance +1,Base
+6003101,Improved Blood Loss Resistance +2,Base
+6003200,Improved Sleep Resistance +1,Base
+6003201,Improved Sleep Resistance +2,Base
+6003300,Improved Death Blight Resistance +1,Base
+6003301,Improved Death Blight Resistance +2,Base
+6003400,Improved Rot Resistance +1,Base
+6003401,Improved Rot Resistance +2,Base
+6003500,Improved Frost Resistance +1,Base
+6003501,Improved Frost Resistance +2,Base
+6003600,Improved Madness Resistance +1,Base
+6003601,Improved Madness Resistance +2,Base
+6005600,Partial HP Restoration upon Post-Damage Attacks +1,Base
+6005601,Partial HP Restoration upon Post-Damage Attacks +2,Base
+6006000,Improved Stance-Breaking when Two-Handing +1,Base
+6006001,Improved Stance-Breaking when Two-Handing +2,Base
+6006100,Improved Stance-Breaking when Wielding Two Armaments +1,Base
+6006101,Improved Stance-Breaking when Wielding Two Armaments +2,Base
+6012300,Improved Damage Negation at Low HP +1,Base
+6012301,Improved Damage Negation at Low HP +2,Base
+6030200,"HP restored when using medicinal boluses, etc. +1",Base
+6030201,"HP restored when using medicinal boluses, etc. +2",Base
+6030600,Successful guarding fills more of the Art gauge +1,Base
+6030601,Successful guarding fills more of the Art gauge +2,Base
+6030800,Critical hits fill more of the Art gauge +1,Base
+6030801,Critical hits fill more of the Art gauge +2,Base
+6030900,Physical attack power increases after using grease items +1,Base
+6030901,Physical attack power increases after using grease items +2,Base
+6031900,Critical Hits Earn Runes +1,Base
+6031901,Critical Hits Earn Runes +2,Base
+6032200,Taking attacks improves attack power +1,Base
+6032201,Taking attacks improves attack power +2,Base
+6035100,Critical Hit Boosts Stamina Recovery Speed +1,Base
+6035101,Critical Hit Boosts Stamina Recovery Speed +2,Base
+6040000,Improved Initial Standard Attack +1,Base
+6040001,Improved Initial Standard Attack +2,Base
+6040100,Improved Guard Counters +1,Base
+6040101,Improved Guard Counters +2,Base
+6040300,Improved Throwing Pot Damage +1,Base
+6040301,Improved Throwing Pot Damage +2,Base
+6040400,Improved Throwing Knife Damage +1,Base
+6040401,Improved Throwing Knife Damage +2,Base
+6040500,Improved Glintstone and Gravity Stone Damage +1,Base
+6040501,Improved Glintstone and Gravity Stone Damage +2,Base
+6043000,Improved Roar & Breath Attacks +1,Base
+6043001,Improved Roar & Breath Attacks +2,Base
+6043100,Improved Perfuming Arts +1,Base
+6043101,Improved Perfuming Arts +2,Base
+6060300,Max HP increased for each great enemy defeated at a Great Church.,Base
+6060400,Runes and Item Discovery increased for each great enemy defeated at a Fort,Base
+6060500,Arcane increased for each great enemy defeated at a Ruin,Base
+6060600,Max stamina increased for each great enemy defeated at a Great Encampment,Base
+6090000,Defeating enemies fills more of the Art gauge +1,Base
+6090001,Defeating enemies fills more of the Art gauge +2,Base
+6160000,HP Restoration upon Thrusting Counterattack +1,Base
+6160001,HP Restoration upon Thrusting Counterattack +2,Base
+6260000,Attack power up when facing poison-afflicted enemy +1,Base
+6260001,Attack power up when facing poison-afflicted enemy +2,Base
+6260300,Attack power up when facing scarlet rot-afflicted enemy +1,Base
+6260301,Attack power up when facing scarlet rot-afflicted enemy +2,Base
+6260400,Attack power up when facing frostbite-afflicted enemy +1,Base
+6260401,Attack power up when facing frostbite-afflicted enemy +2,Base
+6500000,[Wylder] Character Skill inflicts Blood Loss,Base
+6500100,[Guardian] Character Skill Boosts Damage Negation of Nearby Allies,Base
+6500200,[Ironeye] Character Skill Inflicts Heavy Poison Damage on Poisoned Enemies,Base
+6500300,[Duchess] Use Character Skill for Brief Invulnerability,Base
+6500400,[Raider] Hit With Character Skill to Reduce Enemy Attack Power,Base
+6500500,[Revenant] Increased Max FP upon Ability Activation,Base
+6500600,[Recluse] Collect Affinity Residues to Negate Affinity,Base
+6500700,[Executor] Slowly Restore HP upon Ability Activation,Base
+6500800,[Scholar] Reduced FP consumption when using Character Skill on self,DLC
+6500900,[Undertaker] Executing Art readies Character Skill,DLC
+6600000,Sleep in Vicinity Improves Attack Power,Base
+6600001,Sleep in Vicinity Improves Attack Power +1,Base
+6600002,Sleep in Vicinity Improves Attack Power +2,Base
+6600100,Madness in Vicinity Improves Attack Power,Base
+6600101,Madness in Vicinity Improves Attack Power +1,Base
+6600102,Madness in Vicinity Improves Attack Power +2,Base
+6610400,Increased Maximum HP,Base
+6610500,Increased Maximum FP,Base
+6610600,Increased Maximum Stamina,Base
+6610700,Reduced FP Consumption,Base
+6610701,Reduced FP Consumption +1,Base
+6610702,Reduced FP Consumption +2,Base
+6610800,Improved Affinity Attack Power,Base
+6610801,Improved Affinity Attack Power +1,Base
+6610802,Improved Affinity Attack Power +2,Base
+6611000,Improved Physical Damage Negation,Base
+6611001,Improved Physical Damage Negation +1,Base
+6611002,Improved Physical Damage Negation +2,Base
+6611100,Improved Affinity Damage Negation,Base
+6611101,Improved Affinity Damage Negation +1,Base
+6611102,Improved Affinity Damage Negation +2,Base
+6611200,Improved Sorceries,Base
+6611201,Improved Sorceries +1,Base
+6611202,Improved Sorceries +2,Base
+6611300,Improved Incantations,Base
+6611301,Improved Incantations +1,Base
+6611302,Improved Incantations +2,Base
+6611400,Improved Flask HP Restoration,Base
+6621000,Crimsonspill Crystal Tear in possession at start of expedition,Base
+6621100,Crimson Crystal Tear in possession at start of expedition,Base
+6621200,Cerulean Crystal Tear in possession at start of expedition,Base
+6621300,Speckled Hardtear in possession at start of expedition,Base
+6621400,Crimson Bubbletear in possession at start of expedition,Base
+6621500,Opaline Bubbletear in possession at start of expedition,Base
+6621600,Crimsonburst Crystal Tear in possession at start of expedition,Base
+6621700,Greenburst Crystal Tear in possession at start of expedition,Base
+6621800,Opaline Hardtear in possession at start of expedition,Base
+6621900,Thorny Cracked Tear in possession at start of expedition,Base
+6622000,Spiked Cracked Tear in possession at start of expedition,Base
+6622100,Windy Crystal Tear in possession at start of expedition,Base
+6622200,Ruptured Crystal Tear in possession at start of expedition,Base
+6622300,Leaden Hardtear in possession at start of expedition,Base
+6622400,Twiggy Cracked Tear in possession at start of expedition,Base
+6622500,Crimsonwhorl Bubbletear in possession at start of expedition,Base
+6622600,Cerulean Hidden Tear in possession at start of expedition,Base
+6622700,Stonebarb Cracked Tear in possession at start of expedition,Base
+6622800,Flame-Shrouding Cracked Tear in possession at start of expedition,Base
+6622900,Magic-Shrouding Cracked Tear in possession at start of expedition,Base
+6623000,Lightning-Shrouding Cracked Tear in possession at start of expedition,Base
+6623100,Holy-Shrouding Cracked Tear in possession at start of expedition,Base
+6623200,Greenspill Crystal Tear in possession at start of expedition,DLC
+6624000,Uplifting Aromatic in possession at start of expedition,Base
+6624100,Spark Aromatic in possession at start of expedition,Base
+6624200,Ironjar Aromatic in possession at start of expedition,Base
+6624300,Bloodboil Aromatic in possession at start of expedition,Base
+6624400,Poison Spraymist in possession at start of expedition,Base
+6624500,Acid Spraymist in possession at start of expedition,Base
+6630000,Dormant Power Helps Discover Daggers,Base
+6630100,Dormant Power Helps Discover Straight Swords,Base
+6630200,Dormant Power Helps Discover Greatswords,Base
+6630300,Dormant Power Helps Discover Colossal Swords,Base
+6630400,Dormant Power Helps Discover Curved Swords,Base
+6630500,Dormant Power Helps Discover Curved Greatswords,Base
+6630600,Dormant Power Helps Discover Katana,Base
+6630700,Dormant Power Helps Discover Twinblades,Base
+6630800,Dormant Power Helps Discover Thrusting Swords,Base
+6630900,Dormant Power Helps Discover Heavy Thrusting Swords,Base
+6631000,Dormant Power Helps Discover Axes,Base
+6631100,Dormant Power Helps Discover Greataxes,Base
+6631200,Dormant Power Helps Discover Hammers,Base
+6631300,Dormant Power Helps Discover Great Hammers,Base
+6631400,Dormant Power Helps Discover Flails,Base
+6631500,Dormant Power Helps Discover Spears,Base
+6631600,Dormant Power Helps Discover Great Spears,Base
+6631700,Dormant Power Helps Discover Halberds,Base
+6631800,Dormant Power Helps Discover Reapers,Base
+6631900,Dormant Power Helps Discover Fists,Base
+6632000,Dormant Power Helps Discover Claws,Base
+6632100,Dormant Power Helps Discover Whips,Base
+6632200,Dormant Power Helps Discover Colossal Weapons,Base
+6632300,Dormant Power Helps Discover Bows,Base
+6632400,Dormant Power Helps Discover Greatbows,Base
+6632500,Dormant Power Helps Discover Crossbows,Base
+6632600,Dormant Power Helps Discover Ballistas,Base
+6632700,Dormant Power Helps Discover Small Shields,Base
+6632800,Dormant Power Helps Discover Medium Shields,Base
+6632900,Dormant Power Helps Discover Greatshields,Base
+6633000,Dormant Power Helps Discover Staves,Base
+6633100,Dormant Power Helps Discover Sacred Seals,Base
+6633200,Dormant Power Helps Discover Torches,Base
+6640000,"[Wylder] Improved Mind, Reduced Vigor",Base
+6640100,"[Wylder] Improved Intelligence and Faith, Reduced Strength and Dexterity",Base
+6641000,"[Guardian] Improved Strength and Dexterity, Reduced Vigor",Base
+6641100,"[Guardian] Improved Mind and Faith, Reduced Vigor",Base
+6642000,"[Ironeye] Improved Arcane, Reduced Dexterity",Base
+6642100,"[Ironeye] Improved Vigor and Strength, Reduced Dexterity",Base
+6643000,"[Duchess] Improved Vigor and Strength, Reduced Mind",Base
+6643100,"[Duchess] Improved Mind and Faith, Reduced Intelligence",Base
+6644000,"[Raider] Improved Mind and Intelligence, Reduced Vigor and Endurance",Base
+6644100,"[Raider] Improved Arcane, Reduced Vigor",Base
+6645000,"[Revenant] Improved Vigor and Endurance, Reduced Mind",Base
+6645100,"[Revenant] Improved Strength, Reduced Faith",Base
+6646000,"[Recluse] Improved Vigor, Endurance, and Dexterity, Reduced Intelligence and Faith",Base
+6646100,"[Recluse] Improved Intelligence and Faith, Reduced Mind",Base
+6647000,"[Executor] Improved Vigor and Endurance, Reduced Arcane",Base
+6647100,"[Executor] Improved Dexterity and Arcane, Reduced Vigor",Base
+6647200,"[Scholar] Improved Mind, Reduced Vigor",DLC
+6647300,"[Scholar] Improved Endurance and Dexterity, Reduced Intelligence and Arcane",DLC
+6647400,"[Undertaker] Improved Dexterity, Reduced Vigor and Faith",DLC
+6647500,"[Undertaker] Improved Mind and Faith, Reduced Strength",DLC
+6800000,Reduced Vigor,Base
+6800200,Reduced Endurance,Base
+6810100,Impaired Damage Negation,Base
+6820000,Taking Damage Causes Poison Buildup,Base
+6820100,Taking Damage Causes Rot Buildup,Base
+6820200,Taking Damage Causes Frost Buildup,Base
+6820300,Taking Damage Causes Blood Loss Buildup,Base
+6820400,Taking Damage Causes Madness Buildup,Base
+6820500,Taking Damage Causes Sleep Buildup,Base
+6820600,Taking Damage Causes Death Buildup,Base
+6830000,Reduced Strength and Intelligence,Base
+6830100,Reduced Dexterity and Faith,Base
+6830200,Reduced Intelligence and Dexterity,Base
+6830300,Reduced Faith and Strength,Base
+6830400,Reduced Vigor and Arcane,Base
+6840000,Reduced Rune Acquisition,Base
+6840100,Reduced Flask HP Restoration,Base
+6840200,Ultimate Art Charging Impaired,Base
+6850000,Impaired Physical Damage Negation,Base
+6850100,Impaired Affinity Damage Negation,Base
+6850200,All Resistances Down,Base
+6850300,Reduced Flask HP Restoration,Base
+6850400,Surge Sprinting Drains More Stamina,Base
+6850500,Continuous HP Loss,Base
+6850600,Increased Drain on Stamina for Evasion,Base
+6850700,Reduced Damage Negation After Evading,Base
+6850800,Repeated Evasions Lower Damage Negation,Base
+6850900,Reduced Damage Negation for Flask Usages,Base
+6851000,Sleep Buildup for Flask Usages,Base
+6851100,Madness Buildup for Flask Usages,Base
+6851200,Lower Attack When Below Max HP,Base
+6851300,Poison Buildup When Below Max HP,Base
+6851400,Rot Buildup When Below Max HP,Base
+6851500,Max HP Reduces Attack Power,Base
+6851600,Near Death Spills Flask,Base
+6851700,Near Death Reduces Max HP,Base
+7000000,Vigor +1,Base
+7000001,Vigor +2,Base
+7000002,Vigor +3,Base
+7000090,Increased Maximum HP,Base
+7000091,,Base
+7000092,,Base
+7000093,,Base
+7000094,,Base
+7000095,,Base
+7000096,,Base
+7000097,,Base
+7000098,,Base
+7000099,,Base
+7000100,Mind +1,Base
+7000101,Mind +2,Base
+7000102,Mind +3,Base
+7000190,Increased Maximum FP,Base
+7000191,,Base
+7000192,,Base
+7000193,,Base
+7000194,,Base
+7000195,,Base
+7000196,,Base
+7000197,,Base
+7000198,,Base
+7000199,,Base
+7000200,Endurance +1,Base
+7000201,Endurance +2,Base
+7000202,Endurance +3,Base
+7000290,Increased Maximum Stamina,Base
+7000291,,Base
+7000292,,Base
+7000293,,Base
+7000294,,Base
+7000295,,Base
+7000296,,Base
+7000297,,Base
+7000298,,Base
+7000299,,Base
+7000300,Strength +1,Base
+7000301,Strength +2,Base
+7000302,Strength +3,Base
+7000400,Dexterity +1,Base
+7000401,Dexterity +2,Base
+7000402,Dexterity +3,Base
+7000500,Intelligence +1,Base
+7000501,Intelligence +2,Base
+7000502,Intelligence +3,Base
+7000600,Faith +1,Base
+7000601,Faith +2,Base
+7000602,Faith +3,Base
+7000700,Arcane +1,Base
+7000701,Arcane +2,Base
+7000702,Arcane +3,Base
+7000800,Character Skill Cooldown Reduction +1,Base
+7000801,Character Skill Cooldown Reduction +2,Base
+7000802,Character Skill Cooldown Reduction +3,Base
+7000900,Ultimate Art Auto Charge +1,Base
+7000901,Ultimate Art Auto Charge +2,Base
+7000902,Ultimate Art Auto Charge +3,Base
+7001000,Poise +1,Base
+7001001,Poise +2,Base
+7001002,Poise +3,Base
+7001400,Physical Attack Up,Base
+7001401,Physical Attack Up +1,Base
+7001402,Physical Attack Up +2,Base
+7001403,Physical Attack Up +3,Base
+7001500,Magic Attack Power Up,Base
+7001501,Magic Attack Power Up +1,Base
+7001502,Magic Attack Power Up +2,Base
+7001600,Fire Attack Power Up,Base
+7001601,Fire Attack Power Up +1,Base
+7001602,Fire Attack Power Up +2,Base
+7001700,Lightning Attack Power Up,Base
+7001701,Lightning Attack Power Up +1,Base
+7001702,Lightning Attack Power Up +2,Base
+7001800,Holy Attack Power Up,Base
+7001801,Holy Attack Power Up +1,Base
+7001802,Holy Attack Power Up +2,Base
+7001900,Attacks Inflict Poison,Base
+7001901,Attacks Inflict Poison +1,Base
+7001902,Attacks Inflict Poison +2,Base
+7002000,Attacks Inflict Blood Loss,Base
+7002001,Attacks Inflict Blood Loss +1,Base
+7002002,Attacks Inflict Blood Loss +2,Base
+7002100,Attacks Inflict Sleep,Base
+7002101,Attacks Inflict Sleep +1,Base
+7002102,Attacks Inflict Sleep +2,Base
+7002103,Attacks Inflict Sleep +3,Base
+7002200,Attacks Inflict Death Blight,Base
+7002300,Attacks Inflict Scarlet Rot,Base
+7002301,Attacks Inflict Scarlet Rot +1,Base
+7002302,Attacks Inflict Scarlet Rot +2,Base
+7002400,Attacks Inflict Frost,Base
+7002401,Attacks Inflict Frost +1,Base
+7002402,Attacks Inflict Frost +2,Base
+7002403,Attacks Inflict Frost +3,Base
+7002500,Attacks Inflict Madness,Base
+7002600,Magic Damage Negation Up,Base
+7002700,Fire Damage Negation Up,Base
+7002800,Lightning Damage Negation Up,Base
+7002900,Holy Damage Negation Up,Base
+7003000,Improved Poison Resistance,Base
+7003100,Improved Blood Loss Resistance,Base
+7003200,Improved Sleep Resistance,Base
+7003300,Improved Death Blight Resistance,Base
+7003400,Improved Rot Resistance,Base
+7003500,Improved Frost Resistance,Base
+7003600,Improved Madness Resistance,Base
+7005600,Partial HP Restoration upon Post-Damage Attacks,Base
+7006500,Continuous FP Recovery,DLC
+7006600,Improved Melee Attack Power,DLC
+7006700,Improved Skill Attack Power,DLC
+7010000,[Guardian] Improved Character Skill range,Base
+7010200,Flask Also Heals Allies,Base
+7010500,[Wylder] Art activation spreads fire in area,Base
+7010700,[Duchess] Successive dagger attack reprises event upon nearby enemies,Base
+7010800,"[Raider] Character Skill damage up, damage negation impaired during use",Base
+7010900,[Revenant] Expend own HP to fully heal nearby allies when activating Art,Base
+7011000,[Guardian] Increased duration for Character Skill,Base
+7011100,[Guardian] Damage negation for allies improved when using Ultimate Art,Base
+7011200,[Revenant] Trigger ghostflame explosion during Ultimate Art activation,Base
+7011400,[Guardian] Restores allies' HP when Character Skill is used,Base
+7011500,[Wylder] Character Skill inflicts Blood Loss,Base
+7011600,[Guardian] Creates whirlwind when charging halberd attacks,Base
+7011700,[Executor] Roaring restores HP while Art is active,Base
+7011900,[Guardian] Character Skill inflicts Holy damage,Base
+7012000,[Guardian] Slowly restores nearby allies' HP while Art is active,Base
+7012200,Slowly restore HP for self and nearby allies when HP is low,Base
+7012300,Improved Damage Negation at Low HP,Base
+7012400,Strong Attack Creates Wide Wave of Heat,Base
+7012500,Jumping Conjures Magic Projectiles,Base
+7012600,Attack Boost from Nearby Allies,Base
+7012700,Guard Counters Cast Light Pillar,Base
+7020000,[Wylder] Standard attacks enhanced with fiery follow-ups when using Character Skill (greatsword only),Base
+7030000,Improved Poise Near Totem Stela,Base
+7030200,"HP restored when using medicinal boluses, etc.",Base
+7030500,"[Wylder] Impaired damage negation, improved attack power & stamina after Art activation",Base
+7030600,Successful guarding fills more of the Art gauge,Base
+7030700,Draw enemy attention while guarding,Base
+7030800,Critical hits fill more of the Art gauge,Base
+7030900,Physical attack power increases after using grease items,Base
+7031200,[Revenant] Strengthens family and allies when Ultimate Art is activated,Base
+7031300,[Raider] Damage taken while using Character Skill improves attack power and stamina,Base
+7031400,[Wylder] Reduced cooldown time for Character Skill,Base
+7031600,Performing consecutive successful guards improves guard ability and deflects big attacks,Base
+7031700,Shockwave Produced From Successful Guarding,Base
+7031800,[Duchess] Become difficult to spot and silence footsteps after landing critical from behind,Base
+7031900,Critical Hits Earn Runes,Base
+7032200,Taking attacks improves attack power,Base
+7032300,[Wylder] Improved attack power when Character Skill is activated,Base
+7032400,[Wylder] Art gauge greatly filled when ability is activated,Base
+7032700,[Duchess] Defeating enemies while Art is active ups attack power,Base
+7032800,[Recluse] Collecting affinity residue activates Terra Magica,Base
+7032900,[Recluse] Suffer blood loss and increase attack power upon Art activation,Base
+7033000,[Wylder] Improved attack power when ability is activated,Base
+7033100,,Base
+7033200,[Wylder] +1 additional Character Skill use,Base
+7033300,[Guardian] Become the target of enemy aggression when ability is activated,Base
+7033400,[Guardian] Successful guards send out shockwaves while ability is active,Base
+7033600,[Duchess] Duration of Ultimate Art extended,Base
+7033700,Colossal armaments are coated in rock when performing charged attacks,Base
+7033800,[Raider] Permanently increase attack power when performing Character Skill's final attack,Base
+7033900,[Recluse] Extends duration of blood sigils,Base
+7034000,[Recluse] Collecting 4 Affinity Residues Improves Affinity Attack Power,Base
+7034100,[Recluse] Activating Ultimate Art raises Max HP,Base
+7034200,[Executor] Attack power up while Ultimate Art is active,Base
+7034300,[Executor] Improves effect of ability but lowers resistance to status ailments,Base
+7034400,[Executor] Character Skill Boosts Attack but Attacking Drains HP,Base
+7034500,"[Executor] While Character Skill is active, unlocking use of cursed sword restores HP",Base
+7034600,[Ironeye] Art Charge Activation Adds Poison Effect,Base
+7034700,[Ironeye] Boosts thrusting counterattacks after executing Art,Base
+7034800,Fire Critical Hit Grants Max Stamina Boost,Base
+7034900,Critical Hit HP Restoration,Base
+7035000,Critical Hit Adds Lightning Effect,Base
+7035100,Critical Hit Boosts Stamina Recovery Speed,Base
+7035200,Consecutive Guards Harden Skin,Base
+7035300,Critical Hit Creates Sleep Mist,Base
+7035400,"Gesture ""Crossed Legs"" Builds Up Madness",Base
+7035500,Madness Continually Recovers FP,Base
+7035600,Surge Sprint Landings Split Earth,Base
+7035700,Switching Weapons Adds an Affinity Attack,Base
+7035800,Boosts Attack Power of Added Affinity Attacks,Base
+7035900,Switching Weapons Boosts Attack Power,Base
+7036200,[Scholar] Prevent slowing of Character Skill progress,DLC
+7036300,[Scholar] Allies targeted by Character Skill gain boosted attack,DLC
+7036400,[Scholar] Continuous damage inflicted on targets threaded by Ultimate Art,DLC
+7036500,[Scholar] Earn runes for each additional specimen acquired with Character Skill,DLC
+7036800,[Undertaker] Activating Ultimate Art increases attack power,DLC
+7036900,[Undertaker] Attack power increased by landing the final blow of a chain attack,DLC
+7037000,[Undertaker] Physical attacks boosted while assist effect from incantation is active for self,DLC
+7037300,[Undertaker] Contact with allies restores their HP while Ultimate Art is activated,DLC
+7037700,Status Ailment Gauges Slowly Increase Attack Power,DLC
+7037800,Occasionally Nullify Attacks When Damage Negation is Lowered,DLC
+7040000,Improved Initial Standard Attack,Base
+7040100,Improved Guard Counters,Base
+7040200,Improved Critical Hits,Base
+7040290,Improved Critical Hits +1,Base
+7040291,,Base
+7040292,,Base
+7040293,,Base
+7040294,,Base
+7040295,,Base
+7040296,,Base
+7040297,,Base
+7040298,,Base
+7040299,,Base
+7040300,Improved Throwing Pot Damage,Base
+7040400,Improved Throwing Knife Damage,Base
+7040500,Improved Glintstone and Gravity Stone Damage,Base
+7043200,Improved Stonedigger Sorcery,Base
+7043300,Improved Carian Sword Sorcery,Base
+7043400,Improved Glintblade Sorcery,Base
+7043500,Improved Invisibility Sorcery,Base
+7043600,Improved Crystalian sorcery,Base
+7043700,Improved Gravity Sorcery,Base
+7043800,Improved Thorn Sorcery,Base
+7043900,Improved Night Sorcery,Base
+7044000,Improved Fundamentalist Incantations,Base
+7044100,Improved Dragon Cult Incantations,Base
+7044200,Improved Giants' Flame Incantations,Base
+7044300,Improved Godslayer Incantations,Base
+7044400,Improved Bestial Incantations,Base
+7044500,Improved Frenzied Flame Incantations,Base
+7044600,Improved Dragon Communion Incantations,Base
+7050000,"Raised stamina recovery for nearby allies, but not for self",Base
+7050100,Items confer effect to all nearby allies,Base
+7060000,Attack power increased for each evergaol prisoner defeated,Base
+7060100,Max FP increased for each Sorcerer's Rise unlocked,Base
+7060200,Attack power increased for each Night Invader defeated,Base
+7070000,Treasure marked upon map,Base
+7080000,Improved Attack Power with 3+ Daggers Equipped,Base
+7080100,Improved Attack Power with 3+ Straight Swords Equipped,Base
+7080200,Improved Attack Power with 3+ Greatswords Equipped,Base
+7080300,Improved Attack Power with 3+ Colossal Swords Equipped,Base
+7080400,Improved Attack Power with 3+ Curved Swords Equipped,Base
+7080500,Improved Attack Power with 3+ Curved Greatswords Equipped,Base
+7080600,Improved Attack Power with 3+ Katana Equipped,Base
+7080700,Improved Attack Power with 3+ Twinblades Equipped,Base
+7080800,Improved Attack Power with 3+ Thrusting Swords Equipped,Base
+7080900,Improved Attack Power with 3+ Heavy Thrusting Swords Equipped,Base
+7081000,Improved Attack Power with 3+ Axes Equipped,Base
+7081100,Improved Attack Power with 3+ Greataxes Equipped,Base
+7081200,Improved Attack Power with 3+ Hammers Equipped,Base
+7081300,Improved Attack Power with 3+ Great Hammers Equipped,Base
+7081400,Improved Attack Power with 3+ Flails Equipped,Base
+7081500,Improved Attack Power with 3+ Spears Equipped,Base
+7081700,Improved Attack Power with 3+ Great Spears Equipped,Base
+7081800,Improved Attack Power with 3+ Halberds Equipped,Base
+7081900,Improved Attack Power with 3+ Reapers Equipped,Base
+7082000,Improved Attack Power with 3+ Fists Equipped,Base
+7082100,Improved Attack Power with 3+ Claws Equipped,Base
+7082200,Improved Attack Power with 3+ Whips Equipped,Base
+7082300,Improved Attack Power with 3+ Colossal Weapons Equipped,Base
+7082400,Improved Attack Power with 3+ Bows Equipped,Base
+7082500,Max FP Up with 3+ Staves Equipped,Base
+7082600,Max FP Up with 3+ Sacred Seals Equipped,Base
+7082700,Max HP Up with 3+ Small Shields Equipped,Base
+7082800,Max HP Up with 3+ Medium Shields Equipped,Base
+7082900,Max HP Up with 3+ Greatshields Equipped,Base
+7090000,Defeating enemies fills more of the Art gauge,Base
+7090100,Defeating enemies restores HP for allies but not for self,Base
+7090300,Defeating enemies near Totem Stela restores HP,Base
+7100000,Critical hits deal huge damage on poisoned enemies,Base
+7100100,Stamina Recovery upon Landing Attacks,Base
+7100190,Stamina Recovery upon Landing Attacks +1,Base
+7110000,Increased rune acquisition for self and allies,Base
+7120000,Starting armament deals magic damage,Base
+7120100,Starting armament deals fire damage,Base
+7120101,Armament deals fire damage +1 at start of expedition,Base
+7120200,Starting armament deals lightning damage,Base
+7120300,Starting armament deals holy damage,Base
+7120400,Starting armament inflicts frost,Base
+7120500,Starting armament inflicts poison,Base
+7120600,Starting armament inflicts blood loss,Base
+7120700,Starting armament inflicts scarlet rot,Base
+7120900,Stonesword Key in possession at start of expedition,Base
+7121000,Small Pouch in possession at start of expedition,Base
+7121100,Fire Pots in possession at start of expedition,Base
+7121200,Magic Pots in possession at start of expedition,Base
+7121300,Lightning Pots in possession at start of expedition,Base
+7121400,Holy Water Pots in possession at start of expedition,Base
+7121500,Poisonbone Darts in possession at start of expedition,Base
+7121600,Crystal Darts in possession at start of expedition,Base
+7121700,Throwing Daggers in possession at start of expedition,Base
+7121800,Glintstone Scraps in possession at start of expedition,Base
+7121900,Gravity Stone Chunks in possession at start of expedition,Base
+7122000,Bewitching Branches in possession at start of expedition,Base
+7122100,Wraith Calling Bell in possession at start of expedition,Base
+7122200,Fire Grease in possession at start of expedition,Base
+7122300,Magic Grease in possession at start of expedition,Base
+7122400,Lightning Grease in possession at start of expedition,Base
+7122500,Holy Grease in possession at start of expedition,Base
+7122600,Shield Grease in possession at start of expedition,Base
+7122700,Changes compatible armament's skill to Glintblade Phalanx at start of expedition,Base
+7122800,Changes compatible armament's skill to Gravitas at start of expedition,Base
+7122900,Changes compatible armament's skill to Flaming Strike at start of expedition,Base
+7123000,Changes compatible armament's skill to Eruption at start of expedition,Base
+7123100,Changes compatible armament's skill to Thunderbolt at start of expedition,Base
+7123200,Changes compatible armament's skill to Lightning Slash at start of expedition,Base
+7123300,Changes compatible armament's skill to Sacred Blade at start of expedition,Base
+7123400,Changes compatible armament's skill to Prayerful Strike at start of expedition,Base
+7123500,Changes compatible armament's skill to Poisonous Mist at start of expedition,Base
+7123600,Changes compatible armament's skill to Poison Moth Flight at start of expedition,Base
+7123700,Changes compatible armament's skill to Blood Blade at start of expedition,Base
+7123800,Changes compatible armament's skill to Seppuku at start of expedition,Base
+7123900,Changes compatible armament's skill to Chilling Mist at start of expedition,Base
+7124000,Changes compatible armament's skill to Hoarfrost Stomp at start of expedition,Base
+7124100,Changes compatible armament's skill to White Shadow's Lure at start of expedition,Base
+7124300,Changes compatible armament's skill to Endure at start of expedition,Base
+7124400,Changes compatible armament's skill to Quickstep at start of expedition,Base
+7124500,Changes compatible armament's skill to Storm Stomp at start of expedition,Base
+7124600,Changes compatible armament's skill to Determination at start of expedition,Base
+7124700,Changes compatible armament's skill to Rain of Arrows at start of expedition,Base
+7126000,Starlight Shards in possession at start of expedition,Base
+7150000,Guard counter is given a boost based on current HP,Base
+7160000,HP Restoration upon Thrusting Counterattack,Base
+7170100,Attacks Inflict Rot when Damage is Taken,DLC
+7200000,HP Restoration with Head Shots,Base
+7200100,Improved Stance-Breaking with Head Shots,Base
+7220000,[Revenant] Power up while fighting alongside family,Base
+7230000,Rune discount for shop purchases while on expedition,Base
+7230001,Huge rune discount for shop purchases while on expedition,Base
+7240000,Improved Poise & Damage Negation When Knocked Back by Damage,Base
+7260000,Attack power up when facing poison-afflicted enemy,Base
+7260200,Attack power up when facing sleep-afflicted enemy,Base
+7260300,Attack power up when facing scarlet rot-afflicted enemy,Base
+7260400,Attack power up when facing frostbite-afflicted enemy,Base
+7260600,Attacks Create Magic Bursts Versus Sleeping Enemies,Base
+7260700,Frostbite in Vicinity Conceals Self,Base
+7260701,,Base
+7260702,,Base
+7260703,,Base
+7260704,,Base
+7260705,,Base
+7260706,,Base
+7260707,,Base
+7260708,,Base
+7260709,,Base
+7260710,Poison & Rot in Vicinity Increases Attack Power,Base
+7260900,Rot in Vicinity Causes Continuous HP Recovery,DLC
+7270100,[Ironeye] +1 additional Character Skill use,Base
+7280000,[Ironeye] Extends duration of weak point,Base
+7290000,[Duchess] Improved Character Skill Attack Power,Base
+7300000,[Duchess] Character Skill inflicts sleep upon enemies,Base
+7310000,[Raider] Duration of Ultimate Art extended,Base
+7320000,[Revenant] Ability activation chance increased,Base
+7330000,Improved Dagger Attack Power,Base
+7330100,Improved Straight Sword Attack Power,Base
+7330200,Improved Greatsword Attack Power,Base
+7330300,Improved Colossal Sword Attack Power,Base
+7330400,Improved Curved Sword Attack Power,Base
+7330500,Improved Curved Greatsword Attack Power,Base
+7330600,Improved Katana Attack Power,Base
+7330700,Improved Twinblade Attack Power,Base
+7330800,Improved Thrusting Sword Attack Power,Base
+7330900,Improved Heavy Thrusting Sword Attack Power,Base
+7331000,Improved Axe Attack Power,Base
+7331100,Improved Greataxe Attack Power,Base
+7331200,Improved Hammer Attack Power,Base
+7331300,Improved Great Hammer Attack Power,Base
+7331400,Improved Flail Attack Power,Base
+7331500,Improved Spear Attack Power,Base
+7331600,Improved Pike Attack Power,Base
+7331700,Improved Great Spear Attack Power,Base
+7331800,Improved Halberd Attack Power,Base
+7331900,Improved Reaper Attack Power,Base
+7332000,Improved Fist Attack Power,Base
+7332100,Improved Claw Attack Power,Base
+7332200,Improved Whip Attack Power,Base
+7332300,Improved Colossal Weapon Attack Power,Base
+7332400,Improved Bow Attack Power,Base
+7332500,Improved Greatbow Attack Power,Base
+7332600,Improved Crossbow Attack Power,Base
+7332700,Improved Ballista Attack Power,Base
+7340000,HP Restoration upon Dagger Attacks,Base
+7340100,HP Restoration upon Straight Sword Attacks,Base
+7340200,HP Restoration upon Greatsword Attacks,Base
+7340300,HP Restoration upon Colossal Sword Attacks,Base
+7340400,HP Restoration upon Curved Sword Attacks,Base
+7340500,HP Restoration upon Curved Greatsword Attacks,Base
+7340600,HP Restoration upon Katana Attacks,Base
+7340700,HP Restoration upon Twinblade Attacks,Base
+7340800,HP Restoration upon Thrusting Sword Attacks,Base
+7340900,HP Restoration upon Heavy Thrusting Sword Attacks,Base
+7341000,HP Restoration upon Axe Attacks,Base
+7341100,HP Restoration upon Greataxe Attacks,Base
+7341200,HP Restoration upon Hammer Attacks,Base
+7341300,HP Restoration upon Great Hammer Attacks,Base
+7341400,HP Restoration upon Flail Attacks,Base
+7341500,HP Restoration upon Spear Attacks,Base
+7341600,HP Restoration upon Pike Attacks,Base
+7341700,HP Restoration upon Great Spear Attacks,Base
+7341800,HP Restoration upon Halberd Attacks,Base
+7341900,HP Restoration upon Reaper Attacks,Base
+7342000,HP Restoration upon Fist Attacks,Base
+7342100,HP Restoration upon Claw Attacks,Base
+7342200,HP Restoration upon Whip Attacks,Base
+7342300,HP Restoration upon Colossal Weapon Attacks,Base
+7342400,HP Restoration upon Bow Attacks,Base
+7342500,HP Restoration upon Greatbow Attacks,Base
+7342600,HP Restoration upon Crossbow Attacks,Base
+7342700,HP Restoration upon Ballista Attacks,Base
+7350000,FP Restoration upon Dagger Attacks,Base
+7350100,FP Restoration upon Straight Sword Attacks,Base
+7350200,FP Restoration upon Greatsword Attacks,Base
+7350300,FP Restoration upon Colossal Sword Attacks,Base
+7350400,FP Restoration upon Curved Sword Attacks,Base
+7350500,FP Restoration upon Curved Greatsword Attacks,Base
+7350600,FP Restoration upon Katana Attacks,Base
+7350700,FP Restoration upon Twinblade Attacks,Base
+7350800,FP Restoration upon Thrusting Sword Attacks,Base
+7350900,FP Restoration upon Heavy Thrusting Sword Attacks,Base
+7351000,FP Restoration upon Axe Attacks,Base
+7351100,FP Restoration upon Greataxe Attacks,Base
+7351200,FP Restoration upon Hammer Attacks,Base
+7351300,FP Restoration upon Great Hammer Attacks,Base
+7351400,FP Restoration upon Flail Attacks,Base
+7351500,FP Restoration upon Spear Attacks,Base
+7351600,FP Restoration upon Pike Attacks,Base
+7351700,FP Restoration upon Great Spear Attacks,Base
+7351800,FP Restoration upon Halberd Attacks,Base
+7351900,FP Restoration upon Reaper Attacks,Base
+7352000,FP Restoration upon Fist Attacks,Base
+7352100,FP Restoration upon Claw Attacks,Base
+7352200,FP Restoration upon Whip Attacks,Base
+7352300,FP Restoration upon Colossal Weapon Attacks,Base
+7352400,FP Restoration upon Bow Attacks,Base
+7352500,FP Restoration upon Greatbow Attacks,Base
+7352600,FP Restoration upon Crossbow Attacks,Base
+7352700,FP Restoration upon Ballista Attacks,Base
+7360600,Changes compatible armament's sorcery to Magic Glintblade at start of expedition,DLC
+7360900,Changes compatible armament's sorcery to Carian Greatsword at start of expedition,DLC
+7361200,Changes compatible armament's sorcery to Night Shard at start of expedition,DLC
+7361300,Changes compatible armament's sorcery to Magma Shot at start of expedition,DLC
+7361500,Changes compatible armament's sorcery to Glintstone Icecrag at start of expedition,DLC
+7361800,Changes compatible armament's sorcery to Gravity Well at start of expedition,DLC
+7362100,Changes compatible armament's sorcery to Briars of Punishment at start of expedition,DLC
+7370000,Changes compatible armament's incantation to Blessing's Boon at start of expedition,DLC
+7370200,Changes compatible armament's incantation to Aspects of the Crucible: Horns at start of expedition,DLC
+7370300,Changes compatible armament's incantation to Wrath of Gold at start of expedition,DLC
+7370400,Changes compatible armament's incantation to Lightning Spear at start of expedition,DLC
+7370500,Changes compatible armament's incantation to Lightning Strike at start of expedition,DLC
+7370600,"Changes compatible armament's incantation to O, Flame! at start of expedition",DLC
+7370800,Changes compatible armament's incantation to Black Flame at start of expedition,DLC
+7370900,Changes compatible armament's incantation to Beast Claw at start of expedition,DLC
+7371200,Changes compatible armament's incantation to Swarm of Flies at start of expedition,DLC
+7371500,Changes compatible armament's incantation to Dragonfire at start of expedition,DLC
+8000000,Increased Maximum HP,Base
+8010000,Increased Maximum FP,Base
+8010100,Reduced FP Consumption,Base
+8020000,Increased Maximum Stamina,Base
+8020100,Reduced Stamina Consumption,Base
+8020200,Improved Stamina Recovery,Base
+8100000,Improved Physical Attack Power,Base
+8100100,Improved Magic Attack Power,Base
+8100200,Improved Fire Attack Power,Base
+8100300,Improved Lightning Attack Power,Base
+8100400,Improved Holy Attack Power,Base
+8110000,Attacks Inflict Poison,Base
+8110100,Attacks Inflict Blood Loss,Base
+8110200,Attacks Inflict Sleep,Base
+8110300,Attacks Inflict Death Blight,Base
+8110400,Attacks Inflict Rot,Base
+8110500,Attacks Inflict Frost,Base
+8110600,Attacks Inflict Madness,Base
+8110700,Add Fire to Weapon,Base
+8110800,Add Magic to Weapon,Base
+8110900,Add Lightning to Weapon,Base
+8111000,Add Holy to Weapon,Base
+8120000,Improved Stance-Breaking,Base
+8130000,Improved Critical Hits,Base
+8140000,Improved Guard Breaking,Base
+8150000,Attack Boost [Lifeforms Born of Falling Stars],Base
+8150100,Attack Boost [Those Who Live in Death],Base
+8150300,Attack Boost [Dragons],Base
+8200000,Improved Physical Damage Negation,Base
+8200100,Improved Magic Damage Negation,Base
+8200200,Improved Fire Damage Negation,Base
+8200300,Improved Lightning Damage Negation,Base
+8200400,Improved Holy Damage Negation,Base
+8200500,Improved Affinity Damage Negation,Base
+8210000,Improved Poison Resistance,Base
+8210100,Improved Blood Loss Resistance,Base
+8210200,Improved Sleep Resistance,Base
+8210300,Improved Death Blight Resistance,Base
+8210400,Improved Rot Resistance,Base
+8210500,Improved Frost Resistance,Base
+8210600,Improved Madness Resistance,Base
+8220000,Improved Guarding Ability,Base
+8220001,Improved Guarding Ability +1,Base
+8220002,Improved Guarding Ability +2,Base
+8230000,Improved Poise,Base
+8300000,Improved Attack Power when Two-Handing,Base
+8300100,Improved Stance-Breaking when Two-Handing,Base
+8310000,Attack Up when Wielding Two Armaments,Base
+8310100,Improved Stance-Breaking when Wielding Two Armaments,Base
+8320000,Improved Chain Attack Finishers,Base
+8320100,Improved Charge Attacks,Base
+8320200,Strong Attacks Improve Poise,Base
+8320300,Improved Jump Attacks,Base
+8320400,Dmg Negation Up upon Landing Charge Attacks,Base
+8320500,Improved Melee Attack Power,DLC
+8320600,Improved Dash Attacks,DLC
+8320700,Improved Rolling Attacks,DLC
+8330000,Improved Sorceries,Base
+8330100,Improved Incantations,Base
+8330200,Improved Charged Sorceries,Base
+8330300,Improved Charged Incantation,Base
+8330400,Improved Spell Casting Speed,Base
+8330500,Extended Spell Duration,Base
+8330600,Reduced Spell FP Cost,Base
+8330700,Communion Grants Anti-Dragon Effect,Base
+8330900,Dmg Negation Up While Casting Spells,Base
+8340000,Improved Ranged Weapon Attacks,Base
+8340100,Projectile Damage Drop-Off Reduced,Base
+8350000,Improved Skill Attack Power,Base
+8350100,Improved Charged Skill Attack Power,Base
+8350200,Reduced Skill FP Cost,Base
+8350300,Skill Activation Improves Poise,Base
+8350400,Parries Activate Golden Retaliation,Base
+8360000,Faster Art Gauge Buildup,Base+DLC
+8370000,Character Skill Cooldown Reduction,Base
+8380000,Improved Roar & Breath Attacks,Base
+8390000,Improved Throwing Pots,Base
+8400000,Improved Perfuming Arts,Base
+8410000,Improved Dodging,Base
+8410100,Lightning upon Dodging,Base
+8420000,Improved Guard Counters,Base
+8420100,Guard Counters Activate Holy Attacks,Base
+8420200,Guard Counters Launch Summoning Attack,Base
+8430000,Improved Thrusting Counterattack,Base
+8440000,Improved Flask HP Restoration,Base
+8440100,Flask Also Heals Allies,Base
+8440200,Gradual Restoration by Flask,Base
+8450000,Magma Surge Sprint,Base
+8450100,Ice Storm Surge Sprint,Base
+8460000,Darkness Conceals Caster While Walking,Base
+8460100,Savage Pillars of Flame Rise While Walking,Base
+8460200,Flame of Frenzy While Walking,Base
+8460300,Wraiths While Walking,Base
+8460400,Vicious Star Rain Pours While Walking,Base
+8460500,Storm of Red Lightning While Walking,Base
+8500000,More Runes From Defeated Enemies,Base
+8510000,Improved Item Discovery,Base
+8520000,Less Likely to Be Targeted,Base
+8530000,Multiple Periodical Glintblades,Base
+8530100,Many Periodical Glintblades,Base
+8530200,Periodical Giant Glintblades,Base
+8540000,Continuous HP Recovery,Base
+8600100,HP Restoration upon Landing Attacks,Base
+8600200,FP Restoration upon Landing Attacks,Base
+8600300,Sudden Enemy Death upon Landing Attacks,Base
+8610000,HP Restoration upon Successive Attacks,Base
+8610100,FP Restoration upon Successive Attacks,Base
+8610200,Successive Attacks Boost Attack Power,Base
+8610300,Magic Attack Follows Charge Attacks that Land,Base
+8610400,Fire Attack Follows Charge Attacks that Land,Base
+8610500,Lightning Follows Charge Attacks that Land,Base
+8610600,Holy Attack Follows Charge Attacks that Land,Base
+8610700,Successive Attacks Negate Damage,Base
+8620000,Taking Damage Restores FP,Base
+8620100,Taking Damage Boosts Damage Negation,Base
+8630000,Defeating Enemies Restores HP,Base
+8630100,Defeating Enemies Restores FP,Base
+8630200,Attacks Summon Wraiths,Base
+8630300,Attacks Release Mist of Charm,Base
+8630400,Attacks Call Vengeful Spirits,Base
+8630500,Attacks Generate Lava,Base
+8630600,Attacks Release Mist of Frost,Base
+8630700,Attacks Unleash Lightning,Base
+8630800,Attacks Generate Golden Shockwave,Base
+8640000,Critical Hit HP Restoration,Base
+8640100,Critical Hit FP Restoration,Base
+8640200,Increased Damage After Critical Hit,Base
+8640300,Sacred Order upon Holy Critical Hit,Base
+8640400,Magma upon Fire Critical Hit,Base
+8640500,Lightning Critical Hit Imbues Armament,Base
+8640600,Crystal Shards upon Magic Critical Hit,Base
+8640700,Poison Mist upon Poison Critical Hit,Base
+8640800,Blood Loss Crit: Thorns of Punishment,Base
+8640900,Rot Critical Hit Fires Pest Threads,Base
+8641000,Ice Storm upon Critical Hit with Frost,Base
+8641100,Madness Crit. Hit Fires Frenzied Flame,Base
+8641200,Death Crit. Hit Calls Death Lightning,Base
+8650000,HP Recovery From Successful Guarding,Base
+8650100,FP Recovery From Successful Guarding,Base
+8652000,Successful Guarding Ups Poise,Base
+8652100,Successful Guarding Ups Dmg Negation,Base
+8660000,Improved Attack Power at Low HP,Base
+8660101,Improved Damage Negation at Low HP,Base
+8660200,Critical Hits Inflict Blood Loss,Base
+8660300,Creates Holy Ground at Low HP,Base
+8660400,Low HP Crit. Hit Fully Restores HP,Base
+8670000,Improved Attack Power at Full HP,Base
+8670101,Improved Damage Negation at Full HP,Base
+8690000,Poison Produces a Mist of Poison,Base
+8690100,Madness Produces a Frenzied Burst,Base
+8690200,Rot Produces a Mist of Scarlet Rot,Base
+8690300,Frostbite Produces a Mist of Frost,Base
+8690400,Sleep Produces a Mist of Sleep,Base
+8700000,Poison Increases Attack Power,Base
+8710000,Blood Loss Increases Attack Power,Base
+8720000,Sleep Increases Attack Power,Base
+8740000,Frostbite Increases Attack Power,Base
+8750000,Madness Increases Attack Power,Base
+8760000,Reduced Maximum HP,Base
+8760100,Reduced Maximum FP,Base
+8760200,Reduced Maximum Stamina,Base
+8761000,Impaired Physical Damage Negation,Base
+8761100,Impaired Affinity Damage Negation,Base
+8762000,All Resistances Down,Base
+8763000,Reduced Flask HP Restoration,Base
+8764000,Surge Sprinting Drains More Stamina,Base
+8765000,Ultimate Art Charging Impaired,Base
+8766000,Continuous HP Loss,Base
+8770000,Night's Tide Damage Increased,Base
+8771000,Damage Increased by Night's Encroachment,Base
+8800000,Increased Drain on Stamina for Evasion,Base
+8800100,Reduced Damage Negation After Evading,Base
+8800200,Repeated Evasions Lower Damage Negation,Base
+8801000,Reduced Damage Negation for Flask Usages,Base
+8801100,Sleep Buildup for Flask Usages,Base
+8801200,Madness Buildup for Flask Usages,Base
+8810000,Lower Attack When Below Max HP,Base
+8810200,Slower Art Gauge When Below Max HP,Base
+8810300,Poison Buildup When Below Max HP,Base
+8810400,Rot Buildup When Below Max HP,Base
+8811000,Max HP Reduces Attack Power,Base
+8811200,Max HP Slows Ultimate Art Gauge,Base
+8813100,Lower Stamina Impairs Dmg Negation,Base
+8821000,Attacks Impaired on Occasion,Base
+8821100,Landed Attacks Build Up Frost,Base
+8821200,Landed Attacks Build Up Blood Loss,Base
+8830000,Ailments Cause Increased Damage,Base
+8831000,Near Death Reduces Art Gauge,Base
+8831100,Near Death Spills Flask,Base
+8831200,Near Death Reduces Max HP,Base
+8880000,Ice Storm upon Charge Attacks,Base+DLC
+8880100,Ring of Light upon Charged Slash,Base
+8880200,Black Flames upon Charge Attacks,Base+DLC
+8880300,Phantom Attack upon Charge Attacks,Base+DLC
+8880400,Roaring Flames upon Charged Slash,Base
+8881000,Holy Shockwave upon Charge Attacks,Base+DLC
+8881100,Projectiles upon Charged Strike,Base
+8881200,Luring Enemies upon Charge Attacks,Base+DLC
+8881300,Shockwave upon Charged Strike,Base
+8881400,Phantom Attack upon Charged Strike,Base
+8881500,Magma upon Charge Attacks,Base+DLC
+8881600,Magic Bubbles upon Charged Strike,Base
+8882000,Phantom Attack upon Charged Thrust,Base
+8882100,Lightning upon Charge Attacks,Base+DLC
+8882200,Acid Mist upon Charged Thrust,Base
+8882300,Pest Threads upon Charged Thrust,Base
+8882400,Poison Mist upon Charged Thrust,Base
+8882500,Charge Attacks Invoke Sleep Mist,Base+DLC
+8883000,Projectiles Launched upon Charge Attacks,Base
+8883100,Lightning upon Precision Aiming,Base
+8883200,Poison Mist upon Precision Aiming,Base
+8883300,Rot Mist upon Precision Aiming,Base
+8883400,Bloodflies upon Precision Aiming,Base
+8884000,Shielding Improves Damage Negation,Base
+8884100,Shielding Invokes Indomitable Vow,Base
+8884200,Shielding Creates Holy Ground,Base
+8884300,Broken Stance Activates Endure,Base
+8885000,Flask Healing Also Restores FP,Base
+8885100,Failing to Cast Spell Restores FP,Base
+8885200,Continued Guarding Grants Increased Potency of Sorceries/Incantations and Faster Casting,Base+DLC
+8920100,Improved Affinity Attack Power,Base
+8921400,Critical Hits Boost Attack Power,Base
+8960100,Changed Strong Attacks,Base
+8960200,Strong Jump Attacks Create Shockwave,Base
+9021400,Power of Night and Flame,Base
+9030900,Power of Dark Moon,Base
+9031000,Power of the Greater Will,Base
+9031400,Power of the Blasphemous,Base
+9031500,Power of House Marais,Base
+9031700,Power of the Golden Order,Base
+9040200,Power of Destined Death,Base
+9040500,Power of the Starscourge,Base
+9040800,Power of Destruction,Base
+9041000,Power of Vengeance,Base
+9060400,Power of the Dragonlord,Base
+9071000,Power of Despair,Base
+9081000,Power of the Omen King,Base
+9090200,Power of the Undefeated,Base
+9111500,Power of the Queen,Base
+9122000,Power of the Blasphemous,Base
+9130300,Power of the Lightless Void,Base
+9150400,Power of the Golden Lineage,Base
+9151100,Power of the Ancestral Spirit,Base
+9160900,Power of the Great Ancient Dragon,Base
+9170100,Power of the Blood Lord,Base
+9200600,Power of the Giant,Base
+9210600,Power of the Flying Dragon,Base
+9230500,Power of the First Lord,Base
+9330900,Power of Full Moon,Base
+9420000,Power of the General,Base
+9990100,The Wylder's Grief,Base
+9990200,The Guardian's Grief,Base
+9990300,The Ironeye's Grief,Base
+9990400,The Duchess' Grief,Base
+9990500,The Raider's Grief,Base
+9990600,The Revenant's Grief,Base
+9990700,The Recluse's Grief,Base
+9990800,The Executor's Grief,Base
+9990900,The Scholar's Grief,DLC
+9991000,The Undertaker's Grief,DLC
+18000000,Increased Maximum HP,Base
+18010000,Increased Maximum FP,Base
+18010100,Reduced FP Consumption,Base
+18020000,Increased Maximum Stamina,Base
+18020200,Improved Stamina Recovery,Base
+18100000,Physical Attack Up,Base
+18100500,Improved Affinity Attack Power,Base
+18120000,Improved Stance-Breaking,Base
+18200000,Improved Physical Damage Negation,Base
+18200500,Improved Affinity Damage Negation,Base
+18210700,All Resistances Up,Base
+18230000,Improved Poise,Base
+18330103,Improved Sorceries & Incantations,Base
+18330500,Increased Sorcery & Incantation Duration,Base
+18330700,Communion Grants Anti-Dragon Effect,Base
+18350400,Successful Parries Activate Golden Retaliation,Base
+18420100,Guard Counters Activate Holy Attacks,Base
+18420200,Guard Counters Launch Summoning Attack,Base
+18430000,Improved Thrusting Counterattack,Base
+18440000,Improved Flask HP Restoration,Base
+18500000,More Runes From Defeated Enemies,Base
+18640000,Critical Hit HP Restoration,Base
+18640100,Critical Hit FP Restoration,Base
+18640200,Increased Damage After Critical Hit,Base
+18650000,HP Recovery From Successful Guarding,Base
+18650100,FP Recovery From Successful Guarding,Base
+18660200,Critical Hits Inflict Blood Loss,Base
+18660300,Creates Holy Ground at Low HP,Base
+18700000,Poison & Rot Trigger Continuous HP Recovery,Base
+18710000,Blood Loss in Vicinity Increases Attack Power,Base
+19700000,Vigor,Base
+19700001,,Base
+19700002,,Base
+19700003,,Base
+19700004,,Base
+19700005,,Base
+19700006,,Base
+19700007,,Base
+19700008,,Base
+19700009,,Base
+19700010,Mind,Base
+19700011,,Base
+19700012,,Base
+19700013,,Base
+19700014,,Base
+19700015,,Base
+19700016,,Base
+19700017,,Base
+19700018,,Base
+19700019,,Base
+19700020,Endurance,Base
+19700021,,Base
+19700022,,Base
+19700023,,Base
+19700024,,Base
+19700025,,Base
+19700026,,Base
+19700027,,Base
+19700028,,Base
+19700029,,Base
+19700030,Strength,Base
+19700031,,Base
+19700032,,Base
+19700033,,Base
+19700034,,Base
+19700035,,Base
+19700036,,Base
+19700037,,Base
+19700038,,Base
+19700039,,Base
+19700040,Dexterity,Base
+19700041,,Base
+19700042,,Base
+19700043,,Base
+19700044,,Base
+19700045,,Base
+19700046,,Base
+19700047,,Base
+19700048,,Base
+19700049,,Base
+19700050,Intelligence,Base
+19700051,,Base
+19700052,,Base
+19700053,,Base
+19700054,,Base
+19700055,,Base
+19700056,,Base
+19700057,,Base
+19700058,,Base
+19700059,,Base
+19700060,Faith,Base
+19700061,,Base
+19700062,,Base
+19700063,,Base
+19700064,,Base
+19700065,,Base
+19700066,,Base
+19700067,,Base
+19700068,,Base
+19700069,,Base
+19700070,Arcane,Base
+19700071,,Base
+19700072,,Base
+19700073,,Base
+19700074,,Base
+19700075,,Base
+19700076,,Base
+19700077,,Base
+19700078,,Base
+19700079,,Base
+19700080,Character Skill Cooldown Reduction,Base
+19700081,,Base
+19700082,,Base
+19700083,,Base
+19700084,,Base
+19700085,,Base
+19700086,,Base
+19700087,,Base
+19700088,,Base
+19700089,,Base
+19700090,Ultimate Art Auto Charge,Base
+19700091,,Base
+19700092,,Base
+19700093,,Base
+19700094,,Base
+19700095,,Base
+19700096,,Base
+19700097,,Base
+19700098,,Base
+19700099,,Base
+19700100,Poise,Base
+19799999,All Options,Base
