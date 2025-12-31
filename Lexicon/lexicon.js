@@ -12,11 +12,23 @@ const DATASETS = {
 // Optional column definitions per module. Add entries as needed.
 const COLUMN_DEFINITIONS = {
   reliquary: {
-    // Example:
-    // EffectID: {
-    //   description: "Unique identifier for the effect.",
-    //   source: "Data/reliquary.json"
-    // }
+    EffectID: { description: "", source: "AttachEffectParam.csv" },
+    OverrideBaseEffectID: { description: "", source: "AttachEffectParam.csv" },
+    RawRollOrder: { description: "", source: "Calculated (See Query)" },
+    CompatibilityID: { description: "", source: "AttachEffectParam.csv" },
+    EffectCategory: { description: "", source: "Compatibility.csv" },
+    EffectDescription: { description: "", source: "AttachEffectName.csv" },
+    ChanceWeight_110: { description: "", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_210: { description: "", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_310: { description: "", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_2000000: { description: "", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_2200000: { description: "", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_3000000: { description: "", source: "AttachEffectTableParam.csv" },
+    StatusIconID: { description: "", source: "AttachEffectParam.csv" },
+    CurseRequired: { description: "", source: "Calculated (See Query)" },
+    Curse: { description: "", source: "Calculated (See Query)" },
+    RelicType: { description: "", source: "Calculated (See Query)" },
+    RollOrder: { description: "Calculated (See Query)", source: "" }
   }
 };
 
@@ -376,6 +388,22 @@ async function loadDownloadsManifest(moduleKey) {
   renderDownloadsModal();
 }
 
+function getDownloadFilename(item) {
+  if (!item) return "";
+  if (item.filename) return String(item.filename);
+  const href = item.href || "";
+  if (!href) return item.label || "";
+  try {
+    const url = new URL(href, window.location.href);
+    const parts = (url.pathname || "").split("/").filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1];
+  } catch (err) {
+    const parts = String(href).split("/").filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1];
+  }
+  return item.label || "";
+}
+
 function renderDownloadsSection(title, items) {
   if (!items || items.length === 0) {
     return `
@@ -387,7 +415,7 @@ function renderDownloadsSection(title, items) {
   }
 
   const list = items.map(item => {
-    const label = item.label || item.id || "Download";
+    const label = item.title || item.label || item.id || "Download";
     const href = item.href || "#";
     const fmt = item.format ? String(item.format).toUpperCase() : "";
     const size = item.size ? String(item.size) : "";
@@ -395,9 +423,14 @@ function renderDownloadsSection(title, items) {
     const desc = item.description || "";
     return `
       <a class="lex-downloads__item" href="${escapeHtml(href)}" download>
-        <span class="lex-downloads__item-label">${escapeHtml(label)}</span>
-        ${meta ? `<span class="lex-downloads__item-meta">${escapeHtml(meta)}</span>` : ""}
-        ${desc ? `<span class="lex-downloads__item-desc">${escapeHtml(desc)}</span>` : ""}
+        <div class="lex-downloads__item-row">
+          <span class="lex-downloads__item-title">${escapeHtml(label)}</span>
+          ${meta ? `<span class="lex-downloads__item-meta">${escapeHtml(meta)}</span>` : ""}
+        </div>
+        <div class="lex-downloads__item-row lex-downloads__item-row--desc">
+          <span class="lex-downloads__item-desc">${escapeHtml(desc)}</span>
+          <span class="lex-downloads__item-download" aria-hidden="true"></span>
+        </div>
       </a>
     `;
   }).join("");
@@ -425,9 +458,9 @@ function renderDownloadsModal() {
   }
 
   const sections = [
-    renderDownloadsSection("Table data export", m.tableExports),
-    renderDownloadsSection("Raw game files", m.rawGameFiles),
-    renderDownloadsSection("Supplemental files", m.supplementalFiles)
+    renderDownloadsSection("Table Data Export", m.tableExports),
+    renderDownloadsSection("Raw Game Files", m.rawGameFiles),
+    renderDownloadsSection("Supplemental Files", m.supplementalFiles)
   ];
 
   dom.modalBody.innerHTML = sections.join("");

@@ -1,11 +1,12 @@
 {
   "module": "reliquary",
-  "updatedAt": "2025-12-29T00:00:00Z",
+  "updatedAt": "2025-12-31T00:00:00Z",
   "tableExports": [
     {
       "id": "full-table-json",
-      "label": "Full table (JSON)",
-      "description": "Complete Reliquary dataset as JSON.",
+      "title": "All Reliquary Data",
+      "filename": "reliquary.json",
+      "description": "The complete Reliquary dataset as a JSON file.",
       "format": "json",
       "href": "/Data/reliquary.json"
     }
@@ -13,21 +14,24 @@
   "rawGameFiles": [
     {
       "id": "attach-effect-name",
-      "label": "AttachEffectName.csv",
-      "description": "Raw game file: attach effect names.",
+      "title": "Attach Effect Names",
+      "filename": "AttachEffectName.csv",
+      "description": "This is a file directly exported from SmithBox, and contains the names of each effect.",
       "format": "csv",
       "href": "/downloads/reliquary/gamefiles/AttachEffectName.csv"
     },
     {
       "id": "attach-effect-param",
-      "label": "AttachEffectParam.csv",
+      "title": "Attach effect parameters",
+      "filename": "AttachEffectParam.csv",
       "description": "Raw game file: attach effect parameters.",
       "format": "csv",
       "href": "/downloads/reliquary/gamefiles/AttachEffectParam.csv"
     },
     {
       "id": "attach-effect-table-param",
-      "label": "AttachEffectTableParam.csv",
+      "title": "Attach effect table parameters",
+      "filename": "AttachEffectTableParam.csv",
       "description": "Raw game file: attach effect table parameters.",
       "format": "csv",
       "href": "/downloads/reliquary/gamefiles/AttachEffectTableParam.csv"
@@ -36,10 +40,19 @@
   "supplementalFiles": [
     {
       "id": "compatibility",
-      "label": "compatibility.csv",
+      "title": "Compatibility mappings",
+      "filename": "compatibility.csv",
       "description": "Supplemental compatibility mappings.",
       "format": "csv",
       "href": "/downloads/reliquary/supplemental/compatibility.csv"
+    },
+    {
+      "id": "reliquary-query",
+      "title": "Reliquary SQL export",
+      "filename": "reliquary.sql",
+      "description": "SQL query for Reliquary dataset extraction.",
+      "format": "sql",
+      "href": "/downloads/reliquary/queries/reliquary.sql"
     }
   ]
 }
