@@ -562,11 +562,13 @@ function tdHtml(key, value) {
   const v = value == null ? "" : String(value);
   const isLongText = key.toLowerCase().includes("description");
   const isIdish = key.toLowerCase().endsWith("id") || /^[0-9]+$/.test(v);
+  const isNumeric = state.typeByCol.get(key) === "number";
   const isSortedCol = state.sortKey === key && state.sortDir !== 0;
 
   const cls = [
     isLongText ? "lexicon-cell--text" : "",
     isIdish ? "lexicon-cell--mono" : "",
+    isNumeric ? "lexicon-cell--number" : "",
     isSortedCol ? "lexicon-td--sorted" : ""
   ].filter(Boolean).join(" ");
 
@@ -636,11 +638,12 @@ function updateFrozenOffsets() {
   const firstTh = dom.tableHead.querySelector("th:nth-child(1)");
   const secondTh = dom.tableHead.querySelector("th:nth-child(2)");
 
+  const buffer = 2; // minimal gap to align with body while preventing overlap
   const col1 = firstTh ? firstTh.getBoundingClientRect().width : 0;
   const col2 = secondTh ? secondTh.getBoundingClientRect().width : 0;
 
-  table.style.setProperty("--lex-freeze-col1", `${col1}px`);
-  table.style.setProperty("--lex-freeze-col2", `${col1 + col2}px`);
+  table.style.setProperty("--lex-freeze-col1", `${col1 + buffer}px`);
+  table.style.setProperty("--lex-freeze-col2", `${col1 + col2 + buffer}px`);
 }
 
 function rowMatchesSearch(row, term) {
