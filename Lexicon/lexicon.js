@@ -9,12 +9,47 @@ const DATASETS = {
   grimoire: ""
 };
 
+// Optional column definitions per module. Add entries as needed.
+const COLUMN_DEFINITIONS = {
+  reliquary: {
+    // Example:
+    // EffectID: {
+    //   description: "Unique identifier for the effect.",
+    //   source: "Data/reliquary.json"
+    // }
+  }
+};
+
+// Optional display labels per module. Map raw column name -> display label.
+const COLUMN_DISPLAY_NAMES = {
+  reliquary: {
+    EffectID: "EffectID",
+    OverrideBaseEffectID: "OverrideID",
+    RawRollOrder: "RawRollOrder",
+    CompatibilityID: "CompatibilityID",
+    EffectCategory: "Category",
+    EffectDescription: "Description",
+    ChanceWeight_110: "Weight 1",
+    ChanceWeight_210: "Weight 2",
+    ChanceWeight_310: "Weight 3",
+    ChanceWeight_2000000: "Weight 4",
+    ChanceWeight_2200000: "Weight 5",
+    ChanceWeight_3000000: "Weight 6",
+    StatusIconID: "StatusIconID",
+    CurseRequired: "CurseRequired",
+    Curse: "Curse",
+    RelicType: "Type",
+    RollOrder: "RollOrder"
+  }
+};
+
 const dom = {
   // layout
   moduleButtons: Array.from(document.querySelectorAll(".lexicon-module-card[data-module]")),
 
   // table
   wrap: document.querySelector(".lexicon-wrap"),
+  table: document.querySelector(".lexicon-table"),
   tableHead: document.getElementById("lexiconHead"),
   tableBody: document.getElementById("lexiconBody"),
   meta: document.getElementById("lexiconMeta"),
@@ -25,7 +60,14 @@ const dom = {
   modalRoot: document.getElementById("lexModal"),
   modalBody: document.getElementById("lexModalBody"),
   modalClose: document.querySelector(".lex-modal__close"),
-  modalBackdrop: document.querySelector(".lex-modal__backdrop"),
+  modalBackdrop: document.querySelector("#lexModal .lex-modal__backdrop"),
+
+  // column info modal
+  infoModalRoot: document.getElementById("lexInfoModal"),
+  infoModalBody: document.getElementById("lexInfoModalBody"),
+  infoModalTitle: document.getElementById("lexInfoTitle"),
+  infoModalClose: document.querySelector("#lexInfoModal .lex-modal__close"),
+  infoModalBackdrop: document.querySelector("#lexInfoModal .lex-modal__backdrop"),
 
   // zoom
   zoomButtons: Array.from(document.querySelectorAll(".lexicon-zoom-btn[data-zoom]")),
@@ -195,7 +237,13 @@ function inferColumns(rows) {
   return cols;
 }
 
-const PRIORITY_COLUMNS = ["EffectID", "EffectCategory", "EffectDescription"];
+function getDisplayLabel(col) {
+  const mod = state.module || "";
+  const map = COLUMN_DISPLAY_NAMES[mod] || {};
+  return map[col] || col;
+}
+
+const PRIORITY_COLUMNS = ["EffectID", "EffectDescription","EffectCategory","RelicType","ChanceWeight_110","ChanceWeight_210","ChanceWeight_310","ChanceWeight_2000000","ChanceWeight_2200000","ChanceWeight_3000000"];
 
 function reorderColumns(columns) {
   const priLower = new Set(PRIORITY_COLUMNS.map(c => c.toLowerCase()));
@@ -393,6 +441,66 @@ function closeDownloadsModal() {
   document.body.style.overflow = "";
 }
 
+/* -------------------------
+   Column info modal
+------------------------- */
+
+function getColumnDefinition(col) {
+  const mod = state.module || "";
+  const map = COLUMN_DEFINITIONS[mod] || {};
+  const entry = map[col];
+  if (!entry) return { description: "", source: "" };
+  if (typeof entry === "string") return { description: entry, source: "" };
+  const description = entry.description || "";
+  const source = entry.source || "";
+  return { description, source };
+}
+
+function closeInfoModal() {
+  if (!dom.infoModalRoot) return;
+  dom.infoModalRoot.classList.remove("is-open");
+  dom.infoModalRoot.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function openInfoModal(col) {
+  if (!dom.infoModalRoot || !col) return;
+
+  const def = getColumnDefinition(col);
+  const type = state.typeByCol.get(col) || "string";
+  const defHtml = def.description ? escapeHtml(def.description) : "No description provided.";
+  const sourceHtml = def.source ? escapeHtml(def.source) : "Not specified.";
+  const label = getDisplayLabel(col);
+  const rawNameHtml = escapeHtml(col);
+
+  if (dom.infoModalTitle) dom.infoModalTitle.textContent = label;
+
+  if (dom.infoModalBody) {
+    dom.infoModalBody.innerHTML = `
+      <div class="lex-info__row"><strong>Data Type:</strong> <code>${escapeHtml(type)}</code></div>
+      <div class="lex-info__row"><strong>Raw Column Name:</strong> ${rawNameHtml}</div>
+      <div class="lex-info__row"><strong>Data Source:</strong> ${sourceHtml}</div>
+      <div class="lex-info__row"><strong>Description:</strong> ${defHtml}</div>
+    `;
+  }
+
+  dom.infoModalRoot.classList.add("is-open");
+  dom.infoModalRoot.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  dom.infoModalClose?.focus();
+}
+
+function bindInfoModal() {
+  dom.infoModalClose?.addEventListener("click", closeInfoModal);
+  dom.infoModalBackdrop?.addEventListener("click", closeInfoModal);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && dom.infoModalRoot?.classList.contains("is-open")) {
+      closeInfoModal();
+    }
+  });
+}
+
 function openDownloadsModal() {
   if (!dom.modalRoot) return;
   dom.modalRoot.classList.add("is-open");
@@ -425,16 +533,19 @@ function bindDownloadsModal() {
 function thHtml(key) {
   const isActive = state.sortKey === key && state.sortDir !== 0;
   const glyph = !isActive ? "" : (state.sortDir === 1 ? "▲" : "▼");
+  const label = getDisplayLabel(key);
 
   return `
     <th scope="col" class="lexicon-th ${isActive ? "is-sorted" : ""}"
         role="button" tabindex="0"
         data-col="${escapeHtml(key)}"
+        title="${escapeHtml(key)}"
         aria-sort="${isActive ? (state.sortDir === 1 ? "ascending" : "descending") : "none"}">
       <div class="lexicon-th__inner">
-        <span class="lexicon-th__label">${escapeHtml(key)}</span>
+        <span class="lexicon-th__label">${escapeHtml(label)}</span>
         <div class="lexicon-th__controls">
-          <button class="lexicon-col-filter" type="button" title="Filter ${escapeHtml(key)}" aria-label="Filter ${escapeHtml(key)}" aria-pressed="false">
+          <button class="lexicon-col-info" type="button" title="Column info" aria-label="Column info">i</button>
+          <button class="lexicon-col-filter" type="button" title="Filter ${escapeHtml(label)}" aria-label="Filter ${escapeHtml(label)}" aria-pressed="false">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M8 12h8m-4 7h0"/></svg>
           </button>
           <span class="lexicon-th__glyph" aria-hidden="true">${glyph}</span>
@@ -475,6 +586,15 @@ function renderHead(columns) {
       }
     });
 
+    const infoBtn = th.querySelector(".lexicon-col-info");
+    if (infoBtn) {
+      infoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        openInfoModal(col);
+      });
+    }
+
     const btn = th.querySelector(".lexicon-col-filter");
     if (!btn) return;
 
@@ -502,6 +622,20 @@ function renderBody(columns, rows) {
   const out = [];
   for (const r of rows) out.push(`<tr>${columns.map(k => tdHtml(k, r?.[k])).join("")}</tr>`);
   dom.tableBody.innerHTML = out.join("");
+}
+
+function updateFrozenOffsets() {
+  const table = dom.tableHead?.closest("table") || dom.table;
+  if (!table || !dom.tableHead) return;
+
+  const firstTh = dom.tableHead.querySelector("th:nth-child(1)");
+  const secondTh = dom.tableHead.querySelector("th:nth-child(2)");
+
+  const col1 = firstTh ? firstTh.getBoundingClientRect().width : 0;
+  const col2 = secondTh ? secondTh.getBoundingClientRect().width : 0;
+
+  table.style.setProperty("--lex-freeze-col1", `${col1}px`);
+  table.style.setProperty("--lex-freeze-col2", `${col1 + col2}px`);
 }
 
 function rowMatchesSearch(row, term) {
@@ -643,6 +777,7 @@ function render() {
   updateMeta();
   renderInsights();
   renderDownloadsModal();
+  updateFrozenOffsets();
 }
 
 function toggleSort(col) {
@@ -689,6 +824,7 @@ function setActiveModule(moduleKey) {
   state.downloadsLoading = false;
 
   closeDownloadsModal();
+  closeInfoModal();
 
   loadData().catch(console.error);
   loadDownloadsManifest(key).catch(console.error);
@@ -734,6 +870,7 @@ async function init() {
   bindSearch();
   bindModulePicker();
   bindDownloadsModal();
+  bindInfoModal();
 
   await loadData();
 }

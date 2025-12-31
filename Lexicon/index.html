@@ -114,6 +114,7 @@
                   <input id="lexiconSearch" class="lexicon-search" type="search" placeholder="Search all columns" aria-label="Search all columns" />
                 </div>
                 <div class="lex-tile__actions">
+                  <button id="lexDownloadsButton" class="lexicon-export-btn secondary" type="button">Download Files</button>
                   <div aria-label="Text size" class="lexicon-zoom-buttons" role="group">
                     <button aria-pressed="true" class="lexicon-zoom-btn is-active" data-zoom="small" title="Small" type="button">S</button>
                     <button aria-pressed="false" class="lexicon-zoom-btn" data-zoom="medium" title="Medium" type="button">M</button>
@@ -138,9 +139,7 @@
               </section>
             </div>
 
-            <footer class="lex-table__footer">
-              <button id="lexDownloadsButton" class="lexicon-export-btn secondary" type="button">Open Downloads</button>
-            </footer>
+            
           </article>
         </section>
       </section>
@@ -159,6 +158,18 @@
           <button class="lex-modal__close" type="button" aria-label="Close">×</button>
         </header>
         <div class="lex-modal__body" id="lexModalBody">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Column info modal -->
+    <div id="lexInfoModal" class="lex-modal lex-modal--info" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="lex-modal__backdrop" data-close="backdrop"></div>
+      <div class="lex-modal__card" role="document">
+        <header class="lex-modal__header">
+          <h3 class="lex-modal__title" id="lexInfoTitle">Column info</h3>
+          <button class="lex-modal__close" type="button" aria-label="Close">×</button>
+        </header>
+        <div class="lex-modal__body" id="lexInfoModalBody">No column selected.</div>
       </div>
     </div>
 
