@@ -11,9 +11,7 @@ const DATASETS = {
 
 const dom = {
   // layout
-  grid: document.getElementById("lexiconGrid"),
   moduleButtons: Array.from(document.querySelectorAll(".lexicon-module-card[data-module]")),
-  expandButtons: Array.from(document.querySelectorAll(".lex-tile__expand")),
 
   // table
   wrap: document.querySelector(".lexicon-wrap"),
@@ -22,8 +20,12 @@ const dom = {
   meta: document.getElementById("lexiconMeta"),
   searchInput: document.getElementById("lexiconSearch"),
 
-  // downloads
-  downloadsDynamic: document.getElementById("lexiconDownloadsDynamic"),
+  // downloads button + modal
+  downloadsButton: document.getElementById("lexDownloadsButton"),
+  modalRoot: document.getElementById("lexModal"),
+  modalBody: document.getElementById("lexModalBody"),
+  modalClose: document.querySelector(".lex-modal__close"),
+  modalBackdrop: document.querySelector(".lex-modal__backdrop"),
 
   // zoom
   zoomButtons: Array.from(document.querySelectorAll(".lexicon-zoom-btn[data-zoom]")),
@@ -47,11 +49,9 @@ const state = {
   filters: new Map(),
   searchTerm: "",
 
-  // theater
-  expandedTile: null, // "table" | "downloads" | "docs" | "insights" | null
-
   // downloads
-  downloadsManifest: null
+  downloadsManifest: null,
+  downloadsLoading: false
 };
 
 // Single floating filter input appended to body (portal) so it never overlaps headers when hidden
@@ -303,9 +303,12 @@ function getManifestUrl(moduleKey) {
 
 async function loadDownloadsManifest(moduleKey) {
   state.downloadsManifest = null;
+  state.downloadsLoading = true;
+  renderDownloadsModal();
   const url = getManifestUrl(moduleKey);
   if (!url) {
-    renderDownloads();
+    state.downloadsLoading = false;
+    renderDownloadsModal();
     return;
   }
 
@@ -318,7 +321,8 @@ async function loadDownloadsManifest(moduleKey) {
     console.error(err);
     state.downloadsManifest = null;
   }
-  renderDownloads();
+  state.downloadsLoading = false;
+  renderDownloadsModal();
 }
 
 function renderDownloadsSection(title, items) {
@@ -355,12 +359,17 @@ function renderDownloadsSection(title, items) {
   `;
 }
 
-function renderDownloads() {
-  if (!dom.downloadsDynamic) return;
+function renderDownloadsModal() {
+  if (!dom.modalBody) return;
+
+  if (state.downloadsLoading) {
+    dom.modalBody.innerHTML = `<div class="lex-downloads__empty">Loading downloads…</div>`;
+    return;
+  }
 
   const m = state.downloadsManifest;
   if (!m) {
-    dom.downloadsDynamic.innerHTML = `<div class="lex-downloads__empty">No downloads available for this module.</div>`;
+    dom.modalBody.innerHTML = `<div class="lex-downloads__empty">No downloads available for this module.</div>`;
     return;
   }
 
@@ -370,7 +379,47 @@ function renderDownloads() {
     renderDownloadsSection("Supplemental files", m.supplementalFiles)
   ];
 
-  dom.downloadsDynamic.innerHTML = sections.join("");
+  dom.modalBody.innerHTML = sections.join("");
+}
+
+/* -------------------------
+   Downloads modal
+------------------------- */
+
+function closeDownloadsModal() {
+  if (!dom.modalRoot) return;
+  dom.modalRoot.classList.remove("is-open");
+  dom.modalRoot.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function openDownloadsModal() {
+  if (!dom.modalRoot) return;
+  dom.modalRoot.classList.add("is-open");
+  dom.modalRoot.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  renderDownloadsModal();
+
+  if (!state.downloadsManifest && !state.downloadsLoading) {
+    loadDownloadsManifest(state.module).catch(console.error);
+  }
+
+  dom.modalClose?.focus();
+}
+
+function bindDownloadsModal() {
+  if (dom.downloadsButton) {
+    dom.downloadsButton.addEventListener("click", openDownloadsModal);
+  }
+
+  dom.modalClose?.addEventListener("click", closeDownloadsModal);
+  dom.modalBackdrop?.addEventListener("click", closeDownloadsModal);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && dom.modalRoot?.classList.contains("is-open")) {
+      closeDownloadsModal();
+    }
+  });
 }
 
 function thHtml(key) {
@@ -593,7 +642,7 @@ function render() {
   renderBody(columns, sorted);
   updateMeta();
   renderInsights();
-  renderDownloads();
+  renderDownloadsModal();
 }
 
 function toggleSort(col) {
@@ -612,66 +661,6 @@ function toggleSort(col) {
 /* -------------------------
   Filters (per-column buttons)
 ------------------------- */
-
-/* -------------------------
-   Theater mode
-------------------------- */
-
-function tileIdForExpandButton(btn) {
-  if (!btn) return "";
-  const tile = btn.closest(".lex-tile[data-tile]");
-  return tile ? String(tile.getAttribute("data-tile") || "") : "";
-}
-
-function setExpandedTile(tileIdOrNull) {
-  state.expandedTile = tileIdOrNull || null;
-
-  if (!dom.grid) return;
-
-  const tiles = Array.from(dom.grid.querySelectorAll(".lex-tile[data-tile]"));
-  for (const t of tiles) {
-    const id = t.getAttribute("data-tile");
-    const isExpanded = state.expandedTile && id === state.expandedTile;
-    t.classList.toggle("is-expanded", !!isExpanded);
-  }
-
-  dom.grid.classList.toggle("is-theater", !!state.expandedTile);
-
-  for (const b of dom.expandButtons) {
-    const id = tileIdForExpandButton(b);
-    const isExpanded = !!state.expandedTile && id === state.expandedTile;
-
-    b.classList.toggle("is-expanded", isExpanded);
-    b.setAttribute("title", isExpanded ? "Collapse" : "Expand");
-    b.setAttribute("aria-label", isExpanded ? "Collapse panel" : "Expand panel");
-  }
-}
-
-function bindTheaterMode() {
-  for (const b of dom.expandButtons) {
-    const activate = () => {
-      const id = tileIdForExpandButton(b);
-      if (!id) return;
-
-      if (state.expandedTile === id) setExpandedTile(null);
-      else setExpandedTile(id);
-    };
-
-    b.addEventListener("click", activate);
-    b.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        activate();
-      }
-    });
-  }
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && state.expandedTile) {
-      setExpandedTile(null);
-    }
-  });
-}
 
 /* -------------------------
    Module picker
@@ -697,6 +686,9 @@ function setActiveModule(moduleKey) {
   state.sortKey = "";
   state.sortDir = 0;
   state.downloadsManifest = null;
+  state.downloadsLoading = false;
+
+  closeDownloadsModal();
 
   loadData().catch(console.error);
   loadDownloadsManifest(key).catch(console.error);
@@ -739,11 +731,10 @@ async function loadData() {
 
 async function init() {
   bindZoomButtons();
-  bindTheaterMode();
   bindSearch();
   bindModulePicker();
+  bindDownloadsModal();
 
-  setExpandedTile(null);
   await loadData();
 }
 

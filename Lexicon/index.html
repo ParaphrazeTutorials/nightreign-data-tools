@@ -104,11 +104,9 @@
           </div>
         </aside>
 
-        <!-- RIGHT: 2x2 TILE GRID -->
-        <section id="lexiconGrid" class="lexicon-grid" aria-label="Lexicon panels">
-
-          <!-- TILE: DATA TABLE -->
-          <article class="lex-tile" data-tile="table">
+        <!-- RIGHT: Single dominant Data Table -->
+        <section class="lexicon-main" aria-label="Lexicon data">
+          <article class="lex-tile lex-tile--full" data-tile="table">
             <header class="lex-tile__header">
               <div class="lex-tile__header-main">
                 <div class="lex-table-title">
@@ -121,11 +119,6 @@
                     <button aria-pressed="false" class="lexicon-zoom-btn" data-zoom="medium" title="Medium" type="button">M</button>
                     <button aria-pressed="false" class="lexicon-zoom-btn" data-zoom="large" title="Large" type="button">L</button>
                   </div>
-                  <button class="lex-tile__expand" type="button" title="Expand" aria-label="Expand panel">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path>
-                    </svg>
-                  </button>
                 </div>
               </div>
               <div class="lex-tile__header-sub">
@@ -144,92 +137,11 @@
                 </div>
               </section>
             </div>
+
+            <footer class="lex-table__footer">
+              <button id="lexDownloadsButton" class="lexicon-export-btn secondary" type="button">Open Downloads</button>
+            </footer>
           </article>
-
-          <!-- TILE: DOWNLOADS -->
-          <article class="lex-tile" data-tile="downloads">
-            <header class="lex-tile__header">
-              <div class="lex-tile__header-main">
-                <h3>Downloads</h3>
-                <div class="lex-tile__actions">
-                  <button class="lex-tile__expand" type="button" title="Expand" aria-label="Expand panel">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="lex-tile__header-sub">
-                <div class="lex-tile__subtext">Export the current dataset view.</div>
-              </div>
-            </header>
-
-            <div class="lex-tile__body">
-              <div class="lex-downloads" id="lexiconDownloadsDynamic">Loading downloads…</div>
-            </div>
-          </article>
-
-          <!-- TILE: DOCUMENTATION -->
-          <article class="lex-tile" data-tile="docs">
-            <header class="lex-tile__header">
-              <div class="lex-tile__header-main">
-                <h3>Documentation</h3>
-                <div class="lex-tile__actions">
-                  <button class="lex-tile__expand" type="button" title="Expand" aria-label="Expand panel">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="lex-tile__header-sub">
-                <div class="lex-tile__subtext">What you're looking at and how to use it.</div>
-              </div>
-            </header>
-
-            <div class="lex-tile__body">
-              <div class="lex-docs">
-                <p>
-                  The Lexicon is a read-only browser for Nightreign datasets used by the Codex tools.
-                  Start with the <strong>Data Table</strong> to explore columns and values, then export what you need.
-                </p>
-                <h4>Notes</h4>
-                <ul>
-                  <li>Sorting is session-only and resets on refresh.</li>
-                  <li>Text size controls affect only the table tile.</li>
-                </ul>
-                <p class="lex-docs__disclaimer">
-                  If you spot a data issue, please share feedback in Discord until in-app feedback is wired.
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <!-- TILE: INSIGHTS -->
-          <article class="lex-tile" data-tile="insights">
-            <header class="lex-tile__header">
-              <div class="lex-tile__header-main">
-                <h3>Insights</h3>
-                <div class="lex-tile__actions">
-                  <button class="lex-tile__expand" type="button" title="Expand" aria-label="Expand panel">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="lex-tile__header-sub">
-                <div class="lex-tile__subtext">Quick statistics and column health.</div>
-              </div>
-            </header>
-
-            <div class="lex-tile__body">
-              <div id="lexiconInsights" class="lex-insights__placeholder">
-                Loading insights…
-              </div>
-            </div>
-          </article>
-
         </section>
       </section>
 
@@ -237,6 +149,18 @@
       <footer id="globalFooter" class="site-footer"></footer>
 
     </main>
+
+    <!-- Downloads modal -->
+    <div id="lexModal" class="lex-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="lex-modal__backdrop" data-close="backdrop"></div>
+      <div class="lex-modal__card" role="document">
+        <header class="lex-modal__header">
+          <h3 class="lex-modal__title">Downloads</h3>
+          <button class="lex-modal__close" type="button" aria-label="Close">×</button>
+        </header>
+        <div class="lex-modal__body" id="lexModalBody">Loading…</div>
+      </div>
+    </div>
 
     <script type="module" src="../scripts/hero.js"></script>
     <script type="module" src="../scripts/chrome.js"></script>
