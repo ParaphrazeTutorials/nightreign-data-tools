@@ -123,6 +123,7 @@ function ensureFloatingFilter() {
   floatingFilter.autocomplete = "off";
   floatingFilter.spellcheck = false;
   floatingFilter.inputMode = "search";
+  floatingFilter.placeholder = "Filter column...";
   floatingFilter.hidden = true;
   floatingFilter.style.display = "none";
   floatingFilter.setAttribute("aria-hidden", "true");
@@ -167,6 +168,8 @@ function openFloatingFilter(col, th, btn) {
 
   const current = state.filters.get(col) || "";
   floatingFilter.value = current;
+  const label = getDisplayLabel(col);
+  floatingFilter.placeholder = `Filter ${label}...`;
 
   floatingFilter.hidden = false;
   floatingFilter.removeAttribute("aria-hidden");
@@ -546,7 +549,7 @@ function thHtml(key) {
         <div class="lexicon-th__controls">
           <button class="lexicon-col-info" type="button" title="Column info" aria-label="Column info">i</button>
           <button class="lexicon-col-filter" type="button" title="Filter ${escapeHtml(label)}" aria-label="Filter ${escapeHtml(label)}" aria-pressed="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M8 12h8m-4 7h0"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v5l-4 2v-7z"/></svg>
           </button>
           <span class="lexicon-th__glyph" aria-hidden="true">${glyph}</span>
         </div>
@@ -559,10 +562,12 @@ function tdHtml(key, value) {
   const v = value == null ? "" : String(value);
   const isLongText = key.toLowerCase().includes("description");
   const isIdish = key.toLowerCase().endsWith("id") || /^[0-9]+$/.test(v);
+  const isSortedCol = state.sortKey === key && state.sortDir !== 0;
 
   const cls = [
     isLongText ? "lexicon-cell--text" : "",
-    isIdish ? "lexicon-cell--mono" : ""
+    isIdish ? "lexicon-cell--mono" : "",
+    isSortedCol ? "lexicon-td--sorted" : ""
   ].filter(Boolean).join(" ");
 
   const content = v ? escapeHtml(v) : `<span class="lexicon-empty">∅</span>`;
