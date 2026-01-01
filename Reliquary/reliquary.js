@@ -260,6 +260,9 @@ let effectMenu;
 let effectMenuSlot = null;
 let effectMenuAnchorBtn = null;
 let effectMenuFlyout = null;
+let curseMenu;
+let curseMenuSlot = null;
+let curseMenuAnchorBtn = null;
 
 function ensureCurseDialog() {
   if (curseDialog) return;
@@ -385,6 +388,216 @@ function computeBlockedCompatForCurse(slotIdx) {
   return blocked;
 }
 
+function closeCurseMenu() {
+  if (curseMenu) curseMenu.remove();
+  curseMenu = null;
+  curseMenuSlot = null;
+  curseMenuAnchorBtn = null;
+
+  document.removeEventListener("keydown", handleCurseMenuKeydown, true);
+  document.removeEventListener("pointerdown", handleCurseMenuPointerDown, true);
+}
+
+function handleCurseMenuKeydown(evt) {
+  if (evt.key === "Escape") closeCurseMenu();
+}
+
+function handleCurseMenuPointerDown(evt) {
+  if (!curseMenu) return;
+  const target = evt.target;
+  if (curseMenu.contains(target)) return;
+  if (curseMenuAnchorBtn && curseMenuAnchorBtn.contains(target)) return;
+  closeCurseMenu();
+}
+
+function openCurseMenu(slotIdx, anchorBtn) {
+  closeCurseMenu();
+  closeEffectMenu();
+
+  const blockedCompat = computeBlockedCompatForCurse(slotIdx);
+  const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
+    .filter(r => {
+      const cid = compatId(r);
+      if (!cid) return true;
+      return !blockedCompat.has(String(cid));
+    })
+    .sort((x, y) => getRollValue(x) - getRollValue(y));
+
+  if (!eligibleCurses.length) return;
+
+  const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
+  if (!curseCatBySlot[slotIdx] && currentId) {
+    const curRow = getAnyRow(currentId);
+    const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
+    curseCatBySlot[slotIdx] = curCat;
+  }
+
+  const categories = categoriesFor(eligibleCurses);
+  const catOptions = ["__all", ...categories];
+  const hasUncategorized = eligibleCurses.some(r => !effectCategoryForRow(r));
+  if (hasUncategorized && !catOptions.includes("Uncategorized")) catOptions.push("Uncategorized");
+
+  let activeCategory = (curseCatBySlot[slotIdx] && catOptions.includes(curseCatBySlot[slotIdx]))
+    ? curseCatBySlot[slotIdx]
+    : (catOptions[0] || "__all");
+  let searchTerm = "";
+
+  const cursePalette = ["#4b2f70", "#6a3fa3", "#8d5fd3"]; // three distinct purples
+  const categoryThemes = (() => {
+    const map = new Map();
+    const baseTheme = themeFromBase("#7a4bc6");
+    map.set("__default", baseTheme);
+    map.set("__all", baseTheme);
+    map.set("Uncategorized", baseTheme);
+
+    catOptions.forEach((cat, idx) => {
+      if (map.has(cat)) return;
+      const base = cursePalette[idx % cursePalette.length];
+      map.set(cat, themeFromBase(base));
+    });
+
+    return map;
+  })();
+
+  curseMenuSlot = slotIdx;
+  curseMenuAnchorBtn = anchorBtn;
+
+  curseMenu = document.createElement("div");
+  curseMenu.className = "effect-menu effect-menu--wide";
+  curseMenu.setAttribute("role", "dialog");
+  curseMenu.innerHTML = `
+    <div class="effect-menu__search-bar effect-menu__search-bar--shared">
+      <input type="search" class="effect-menu__search-input" placeholder="Search curses..." aria-label="Search curses" data-curse-search="shared" />
+    </div>
+    <div class="effect-menu__layout">
+      <div class="effect-menu__column effect-menu__column--cats" aria-label="Curse categories"></div>
+      <div class="effect-menu__column effect-menu__column--effects">
+        <div class="effect-menu__effects"></div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(curseMenu);
+
+  const catsEl = curseMenu.querySelector(".effect-menu__column--cats");
+  const effectsListEl = curseMenu.querySelector(".effect-menu__effects");
+  const searchInputs = [...curseMenu.querySelectorAll("[data-curse-search]")];
+
+  if (!catsEl || !effectsListEl) {
+    closeCurseMenu();
+    return;
+  }
+
+  const computeCounts = (list) => {
+    const m = new Map();
+    for (const r of list) {
+      const c = effectCategoryForRow(r) || "Uncategorized";
+      m.set(c, (m.get(c) || 0) + 1);
+    }
+    return m;
+  };
+
+  let filteredEligible = eligibleCurses.slice();
+  let countsByCat = computeCounts(filteredEligible);
+
+  const filterEligible = () => {
+    const term = (searchTerm || "").trim().toLowerCase();
+    if (!term) return eligibleCurses;
+    return eligibleCurses.filter(r => {
+      const name = (r.EffectDescription || "").toString().toLowerCase();
+      const id = String(r.EffectID || "").toLowerCase();
+      const cat = effectCategoryForRow(r).toLowerCase();
+      return name.includes(term) || id.includes(term) || cat.includes(term);
+    });
+  };
+
+  const renderEffectList = () => {
+    renderEffectMenuEffects(effectsListEl, filteredEligible, activeCategory, currentId, (id) => {
+      curseBySlot[slotIdx] = id;
+      curseCatBySlot[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
+      closeCurseMenu();
+      updateUI("curse-change");
+    }, categoryThemes);
+  };
+
+  const renderCategories = () => {
+    catsEl.innerHTML = catOptions.map(cat => {
+      const label = cat === "__all" ? "All" : cat;
+      const count = cat === "__all" ? filteredEligible.length : (countsByCat.get(cat) || 0);
+      const isActive = cat === activeCategory;
+      const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
+      const rowBg = gradientFromTheme(theme);
+      const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
+      return `
+        <button type="button" class="effect-menu__cat ${isActive ? "is-active" : ""}" data-cat="${cat}" style="background:${rowBg}; border-bottom-color:${borderColor};">
+          <span class="effect-menu__cat-label">${label}</span>
+          <span class="effect-menu__cat-count">${count}</span>
+        </button>
+      `;
+    }).join("");
+
+    catsEl.querySelectorAll(".effect-menu__cat").forEach(btn => {
+      const catValue = btn.getAttribute("data-cat") || "__all";
+      btn.addEventListener("mouseenter", () => setActiveCategory(catValue, false));
+      btn.addEventListener("click", () => setActiveCategory(catValue, true));
+      btn.addEventListener("focus", () => setActiveCategory(catValue, true));
+    });
+  };
+
+  const setActiveCategory = (catValue, commit = false) => {
+    activeCategory = catValue;
+    if (commit) {
+      curseCatBySlot[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
+    }
+
+    renderCategories();
+    renderEffectList();
+  };
+
+  const renderAll = () => {
+    filteredEligible = filterEligible();
+    countsByCat = computeCounts(filteredEligible);
+    if (activeCategory !== "__all" && activeCategory !== "Uncategorized" && !countsByCat.has(activeCategory)) {
+      activeCategory = "__all";
+    }
+    renderCategories();
+    renderEffectList();
+  };
+
+  const syncSearchInputs = (value, sourceEl = null) => {
+    searchInputs.forEach(inp => {
+      if (inp === sourceEl) return;
+      inp.value = value;
+    });
+  };
+
+  const handleSearchChange = (evt) => {
+    const value = evt.target.value || "";
+    searchTerm = value;
+    syncSearchInputs(value, evt.target);
+    renderAll();
+  };
+
+  searchInputs.forEach(inp => {
+    inp.addEventListener("input", handleSearchChange);
+  });
+
+  renderAll();
+
+  positionEffectMenu(curseMenu, anchorBtn.getBoundingClientRect());
+
+  requestAnimationFrame(() => {
+    const primarySearch = curseMenu.querySelector("[data-curse-search]");
+    if (primarySearch) {
+      primarySearch.focus();
+      primarySearch.select();
+    }
+  });
+
+  document.addEventListener("keydown", handleCurseMenuKeydown, true);
+  document.addEventListener("pointerdown", handleCurseMenuPointerDown, true);
+}
+
 function openCurseDialog(slotIdx) {
   ensureCurseDialog();
   if (!curseDialog) return;
@@ -481,7 +694,8 @@ function installCurseButtons() {
     btn.addEventListener("click", () => {
       const slotIdx = Number.parseInt(btn.getAttribute("data-curse-slot") || "-1", 10);
       if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
-      openCurseDialog(slotIdx);
+      if (btn.hasAttribute("disabled")) return;
+      openCurseMenu(slotIdx, btn);
     });
   });
 }
@@ -569,6 +783,7 @@ function handleEffectMenuPointerDown(evt) {
   if (!effectMenu) return;
   const target = evt.target;
   if (effectMenu.contains(target)) return;
+  if (effectMenuFlyout && effectMenuFlyout.contains(target)) return;
   if (effectMenuAnchorBtn && effectMenuAnchorBtn.contains(target)) return;
   closeEffectMenu();
 }
@@ -644,27 +859,8 @@ function positionEffectMenu(menuEl, anchorRect) {
   menuEl.style.top = `${top}px`;
 }
 
-function positionEffectFlyout(catRect, menuRect) {
-  if (!effectMenuFlyout) return;
-  const flyRect = effectMenuFlyout.getBoundingClientRect();
-  const { innerWidth, innerHeight } = window;
-
-  const flyW = flyRect.width || 360;
-  const flyH = flyRect.height || 320;
-
-  let left = menuRect.right + 6;
-  if (left + flyW > innerWidth - 8) left = menuRect.left - flyW - 6;
-  if (left < 8) left = 8;
-
-  // Align tops with the category menu for stability
-  let top = menuRect.top;
-  if (top + flyH > innerHeight - 8) top = innerHeight - flyH - 8;
-  if (top < 8) top = 8;
-
-  effectMenuFlyout.style.left = `${left}px`;
-  effectMenuFlyout.style.top = `${top}px`;
-  effectMenuFlyout.classList.remove("effect-menu__flyout--hidden");
-}
+// No-op placeholder retained for compatibility; flyout merged into single layout.
+function positionEffectFlyout() {}
 
 function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
   const data = computeEffectDialogData(slotIdx);
@@ -678,21 +874,14 @@ function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
   const eligible = data.eligible || [];
   const categories = data.categories || [];
 
-  const countsByCat = (() => {
-    const m = new Map();
-    for (const r of eligible) {
-      const c = effectCategoryForRow(r) || "Uncategorized";
-      m.set(c, (m.get(c) || 0) + 1);
-    }
-    return m;
-  })();
-
   const catOptions = ["__all", ...categories];
-  if (countsByCat.has("Uncategorized") && !catOptions.includes("Uncategorized")) {
+  const hasUncategorized = eligible.some(r => !effectCategoryForRow(r));
+  if (hasUncategorized && !catOptions.includes("Uncategorized")) {
     catOptions.push("Uncategorized");
   }
   const preferredCat = selectedCats[slotIdx] && categories.includes(selectedCats[slotIdx]) ? selectedCats[slotIdx] : "";
   let activeCategory = preferredCat || catOptions[0] || "__all";
+  let searchTerm = "";
 
   const categoryThemes = buildCategoryThemes(catOptions);
 
@@ -700,40 +889,57 @@ function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
   effectMenuAnchorBtn = anchorBtn;
 
   effectMenu = document.createElement("div");
-  effectMenu.className = "effect-menu effect-menu--compact";
+  effectMenu.className = "effect-menu effect-menu--wide";
   effectMenu.setAttribute("role", "dialog");
   effectMenu.innerHTML = `
-    <div class="effect-menu__body">
-      <div class="effect-menu__column effect-menu__column--cats" aria-label="Effect categories"></div>
+    <div class="effect-menu__search-bar effect-menu__search-bar--shared">
+      <input type="search" class="effect-menu__search-input" placeholder="Search effects..." aria-label="Search effects" data-effect-search="shared" />
     </div>
-    <div class="effect-menu__footer">
-      <button type="button" class="secondary effect-menu__clear">Clear Slot</button>
+    <div class="effect-menu__layout">
+      <div class="effect-menu__column effect-menu__column--cats" aria-label="Effect categories"></div>
+      <div class="effect-menu__column effect-menu__column--effects">
+        <div class="effect-menu__effects"></div>
+      </div>
     </div>
   `;
 
   document.body.appendChild(effectMenu);
 
   const catsEl = effectMenu.querySelector(".effect-menu__column--cats");
-  const clearBtn = effectMenu.querySelector(".effect-menu__clear");
+  const effectsListEl = effectMenu.querySelector(".effect-menu__effects");
 
-  if (!catsEl) {
+  const searchInputs = [...effectMenu.querySelectorAll("[data-effect-search]")];
+
+  if (!catsEl || !effectsListEl) {
     closeEffectMenu();
     return;
   }
 
-  effectMenuFlyout = document.createElement("div");
-  effectMenuFlyout.className = "effect-menu__flyout effect-menu__flyout--hidden";
-  effectMenuFlyout.setAttribute("role", "listbox");
-  document.body.appendChild(effectMenuFlyout);
-
-    const setActiveCategory = (catValue, commit = false, catBtnRect = null) => {
-    activeCategory = catValue;
-    if (commit) {
-      selectedCats[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
+  const computeCounts = (list) => {
+    const m = new Map();
+    for (const r of list) {
+      const c = effectCategoryForRow(r) || "Uncategorized";
+      m.set(c, (m.get(c) || 0) + 1);
     }
+    return m;
+  };
 
-    renderCategories();
-    renderEffectMenuEffects(effectMenuFlyout, eligible, activeCategory, data.currentId, (id) => {
+  let filteredEligible = eligible.slice();
+  let countsByCat = computeCounts(filteredEligible);
+
+  const filterEligible = () => {
+    const term = (searchTerm || "").trim().toLowerCase();
+    if (!term) return eligible;
+    return eligible.filter(r => {
+      const name = (r.EffectDescription || "").toString().toLowerCase();
+      const id = String(r.EffectID || "").toLowerCase();
+      const cat = effectCategoryForRow(r).toLowerCase();
+      return name.includes(term) || id.includes(term) || cat.includes(term);
+    });
+  };
+
+  const renderEffectList = (catBtnRect = null) => {
+    renderEffectMenuEffects(effectsListEl, filteredEligible, activeCategory, data.currentId, (id) => {
       setSelectedId(slotIdx, id);
       selectedCats[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
       curseBySlot[slotIdx] = null;
@@ -750,17 +956,17 @@ function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
 
     requestAnimationFrame(() => {
       const menuRect = effectMenu.getBoundingClientRect();
-        const anchorRect = catBtnRect || menuRect;
+      const activeCatBtn = effectMenu.querySelector(".effect-menu__cat.is-active");
+      const anchorRect = catBtnRect || activeCatBtn?.getBoundingClientRect() || menuRect;
       positionEffectFlyout(anchorRect, menuRect);
     });
   };
 
-  function renderCategories() {
-    if (!catsEl) return;
+  const renderCategories = () => {
     catsEl.innerHTML = catOptions.map(cat => {
       const label = cat === "__all" ? "All" : cat;
       const count = cat === "__all"
-        ? eligible.length
+        ? filteredEligible.length
         : (countsByCat.get(cat) || 0);
       const isActive = cat === activeCategory;
       const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
@@ -777,41 +983,65 @@ function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
     catsEl.querySelectorAll(".effect-menu__cat").forEach(btn => {
       const catValue = btn.getAttribute("data-cat") || "__all";
       btn.addEventListener("mouseenter", () => {
-          setActiveCategory(catValue, false, btn.getBoundingClientRect());
+        setActiveCategory(catValue, false, btn.getBoundingClientRect());
       });
-        btn.addEventListener("click", () => setActiveCategory(catValue, true, btn.getBoundingClientRect()));
+      btn.addEventListener("click", () => setActiveCategory(catValue, true, btn.getBoundingClientRect()));
       btn.addEventListener("focus", () => {
-          setActiveCategory(catValue, true, btn.getBoundingClientRect());
+        setActiveCategory(catValue, true, btn.getBoundingClientRect());
       });
     });
-  }
+  };
 
-  renderCategories();
-  renderEffectMenuEffects(effectMenuFlyout, eligible, activeCategory, data.currentId, (id) => {
-    setSelectedId(slotIdx, id);
-    selectedCats[slotIdx] = activeCategory === "__all" ? "" : activeCategory;
-    curseBySlot[slotIdx] = null;
-
-    if (slotIdx === 0) {
-      const chosen = getRow(id);
-      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-      if (nextType) dom.selType.value = nextType;
+  const setActiveCategory = (catValue, commit = false, catBtnRect = null) => {
+    activeCategory = catValue;
+    if (commit) {
+      selectedCats[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
     }
 
-    closeEffectMenu();
-    updateUI("effect-change");
-  }, categoryThemes);
+    renderCategories();
+    renderEffectList(catBtnRect);
+  };
 
-  if (clearBtn) clearBtn.addEventListener("click", () => {
-    setSelectedId(slotIdx, "");
-    curseBySlot[slotIdx] = null;
-    closeEffectMenu();
-    updateUI("effect-change");
+  const renderAll = (catBtnRect = null) => {
+    filteredEligible = filterEligible();
+    countsByCat = computeCounts(filteredEligible);
+    if (activeCategory !== "__all" && activeCategory !== "Uncategorized" && !countsByCat.has(activeCategory)) {
+      activeCategory = "__all";
+    }
+    renderCategories();
+    renderEffectList(catBtnRect);
+  };
+
+  const syncSearchInputs = (value, sourceEl = null) => {
+    searchInputs.forEach(inp => {
+      if (inp === sourceEl) return;
+      inp.value = value;
+    });
+  };
+
+  const handleSearchChange = (evt) => {
+    const value = evt.target.value || "";
+    searchTerm = value;
+    syncSearchInputs(value, evt.target);
+    renderAll();
+  };
+
+  searchInputs.forEach(inp => {
+    inp.addEventListener("input", handleSearchChange);
   });
+
+  renderAll();
 
   positionEffectMenu(effectMenu, anchorBtn.getBoundingClientRect());
 
-  // Show flyout aligned to the active (or first) category by default
+  requestAnimationFrame(() => {
+    const primarySearch = effectMenu.querySelector("[data-effect-search]");
+    if (primarySearch) {
+      primarySearch.focus();
+      primarySearch.select();
+    }
+  });
+
   const activeCatBtn = effectMenu.querySelector(`.effect-menu__cat.is-active`) || effectMenu.querySelector(`.effect-menu__cat`);
   if (activeCatBtn) {
     positionEffectFlyout(activeCatBtn.getBoundingClientRect(), effectMenu.getBoundingClientRect());
