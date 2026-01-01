@@ -6,7 +6,12 @@ import {
   applyCategory,
   eligibleList,
   baseFilteredByRelicType,
-  autoRelicTypeFromEffect1
+  autoRelicTypeFromEffect1,
+  categoryColorFor,
+  themeFromBase,
+  SEQ_CATEGORY_BASES,
+  ALL_THEME,
+  baseFromSequence
 } from "./reliquary.logic.js";
 import {
   renderChosenLine,
@@ -34,6 +39,45 @@ const curseBySlot = [null, null, null];
 const curseCatBySlot = ["", "", ""];
 
 let currentRandomColor = "Red";
+
+const defaultCategoryTheme = categoryColorFor("");
+
+function gradientFromTheme(theme) {
+  if (!theme) return "rgba(40, 40, 44, 0.85)";
+  const shades = theme.shades || [];
+  if (shades.length >= 3) {
+    return `linear-gradient(135deg, ${shades[0]} 0%, ${shades[1]} 50%, ${shades[2]} 100%)`;
+  }
+  return theme.base || "rgba(40, 40, 44, 0.85)";
+}
+
+function buildCategoryThemes(catList) {
+  const map = new Map();
+  const seq = SEQ_CATEGORY_BASES;
+  let seqIdx = 0;
+
+  const uncategorizedTheme = categoryColorFor("Uncategorized");
+
+  map.set("__default", defaultCategoryTheme);
+  map.set("__all", ALL_THEME);
+  map.set("Uncategorized", uncategorizedTheme);
+
+  (catList || []).forEach(cat => {
+    if (map.has(cat)) return;
+
+    const isCurse = /curse/i.test(cat);
+    if (isCurse) {
+      map.set(cat, categoryColorFor(cat));
+      return;
+    }
+
+    const base = baseFromSequence(seqIdx);
+    seqIdx += 1;
+    map.set(cat, themeFromBase(base));
+  });
+
+  return map;
+}
 
 function pickRandomColor() {
   currentRandomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
@@ -212,6 +256,10 @@ let curseDialog;
 let curseDialogTitle;
 let effectDialog;
 let effectDialogTitle;
+let effectMenu;
+let effectMenuSlot = null;
+let effectMenuAnchorBtn = null;
+let effectMenuFlyout = null;
 
 function ensureCurseDialog() {
   if (curseDialog) return;
@@ -443,6 +491,7 @@ function computeEffectDialogData(slotIdx, showIllegalOverride = null) {
   const type = dom.selType.value;
 
   const base = baseFilteredByRelicType(rows, type);
+
   const baseCats = categoriesFor(base);
 
   const a = getSelectedRow(0);
@@ -452,8 +501,12 @@ function computeEffectDialogData(slotIdx, showIllegalOverride = null) {
   if (slotIdx === 2 && (!a || !b)) return { disabled: true, reason: "Select previous effects first" };
 
   if (slotIdx === 0) {
-    const filtered = applyCategory(base, selectedCats[0]);
-    return { disabled: false, categories: baseCats, filtered, currentId: getSelectedId(0) };
+    return {
+      disabled: false,
+      categories: baseCats,
+      eligible: base,
+      currentId: getSelectedId(0)
+    };
   }
 
   if (slotIdx === 1) {
@@ -464,8 +517,12 @@ function computeEffectDialogData(slotIdx, showIllegalOverride = null) {
       if (cidA) blockedFor2.add(cidA);
     }
     const eligible2 = eligibleList(rows, type, blockedFor2, takenFor2, showIllegal);
-    const filtered = applyCategory(eligible2, selectedCats[1]);
-    return { disabled: false, categories: categoriesFor(eligible2.length ? eligible2 : base), filtered, currentId: getSelectedId(1) };
+    return {
+      disabled: false,
+      categories: categoriesFor(eligible2.length ? eligible2 : base),
+      eligible: eligible2,
+      currentId: getSelectedId(1)
+    };
   }
 
   if (slotIdx === 2) {
@@ -480,11 +537,287 @@ function computeEffectDialogData(slotIdx, showIllegalOverride = null) {
       if (cidB) blockedFor3.add(cidB);
     }
     const eligible3 = eligibleList(rows, type, blockedFor3, takenFor3, showIllegal);
-    const filtered = applyCategory(eligible3, selectedCats[2]);
-    return { disabled: false, categories: categoriesFor(eligible3.length ? eligible3 : base), filtered, currentId: getSelectedId(2) };
+    return {
+      disabled: false,
+      categories: categoriesFor(eligible3.length ? eligible3 : base),
+      eligible: eligible3,
+      currentId: getSelectedId(2)
+    };
   }
 
   return { disabled: true, reason: "Invalid slot" };
+}
+
+function closeEffectMenu() {
+  if (effectMenu) effectMenu.remove();
+  if (effectMenuFlyout) effectMenuFlyout.remove();
+
+  effectMenu = null;
+  effectMenuSlot = null;
+  effectMenuAnchorBtn = null;
+  effectMenuFlyout = null;
+
+  document.removeEventListener("keydown", handleEffectMenuKeydown, true);
+  document.removeEventListener("pointerdown", handleEffectMenuPointerDown, true);
+}
+
+function handleEffectMenuKeydown(evt) {
+  if (evt.key === "Escape") closeEffectMenu();
+}
+
+function handleEffectMenuPointerDown(evt) {
+  if (!effectMenu) return;
+  const target = evt.target;
+  if (effectMenu.contains(target)) return;
+  if (effectMenuAnchorBtn && effectMenuAnchorBtn.contains(target)) return;
+  closeEffectMenu();
+}
+
+function effectCategoryForRow(row) {
+  return (row?.EffectCategory ?? "").toString().trim();
+}
+
+function renderEffectMenuEffects(container, list, activeCategory, currentId, onPick, categoryThemes) {
+  const allList = (() => {
+    if (activeCategory === "__all") return list;
+    if (activeCategory === "Uncategorized") {
+      return list.filter(r => !effectCategoryForRow(r));
+    }
+    return list.filter(r => effectCategoryForRow(r) === activeCategory);
+  })();
+
+  if (!allList.length) {
+    container.innerHTML = `
+      <div class="effect-menu__empty">No effects available in this category.</div>
+    `;
+    return;
+  }
+
+  container.innerHTML = allList.map((r, idx) => {
+    const id = String(r.EffectID);
+    const title = r.EffectDescription ?? `(Effect ${id})`;
+    const cid = compatId(r) || "-";
+    const roll = r?.RollOrder != null && String(r.RollOrder).trim() !== "" ? String(r.RollOrder) : "-";
+    const requiresCurse = String(r?.CurseRequired ?? "0") === "1";
+    const isCurrent = currentId && currentId === id;
+    const catName = effectCategoryForRow(r) || "Uncategorized";
+    const theme = categoryThemes?.get(catName) || categoryThemes?.get("__default") || defaultCategoryTheme;
+    const shades = theme?.shades || [];
+    const rowBg = shades.length ? shades[idx % shades.length] : (theme?.base || "rgba(40, 40, 44, 0.85)");
+    const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
+
+    return `
+      <button type="button" class="effect-menu__effect ${isCurrent ? "is-current" : ""}" data-effect-id="${id}" style="background:${rowBg}; border-bottom-color:${borderColor};">
+        <span class="effect-menu__effect-title">${title}</span>
+        <span class="effect-menu__effect-meta">CID ${cid} | Roll ${roll}</span>
+        <span class="effect-menu__effect-tags">
+          ${requiresCurse ? `<span class="effect-menu__tag">Curse Required</span>` : ""}
+          ${isCurrent ? `<span class="effect-menu__tag effect-menu__tag--check">Selected</span>` : ""}
+        </span>
+      </button>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-effect-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-effect-id");
+      if (!id) return;
+      onPick(id);
+    });
+  });
+}
+
+function positionEffectMenu(menuEl, anchorRect) {
+  const { innerWidth, innerHeight } = window;
+  const rect = menuEl.getBoundingClientRect();
+
+  let left = anchorRect.left;
+  let top = anchorRect.bottom + 4;
+
+  if (left + rect.width > innerWidth - 8) left = innerWidth - rect.width - 8;
+  if (left < 8) left = 8;
+
+  if (top + rect.height > innerHeight - 8) top = anchorRect.top - rect.height - 4;
+  if (top < 8) top = 8;
+
+  menuEl.style.left = `${left}px`;
+  menuEl.style.top = `${top}px`;
+}
+
+function positionEffectFlyout(catRect, menuRect) {
+  if (!effectMenuFlyout) return;
+  const flyRect = effectMenuFlyout.getBoundingClientRect();
+  const { innerWidth, innerHeight } = window;
+
+  const flyW = flyRect.width || 360;
+  const flyH = flyRect.height || 320;
+
+  let left = menuRect.right + 6;
+  if (left + flyW > innerWidth - 8) left = menuRect.left - flyW - 6;
+  if (left < 8) left = 8;
+
+  // Align tops with the category menu for stability
+  let top = menuRect.top;
+  if (top + flyH > innerHeight - 8) top = innerHeight - flyH - 8;
+  if (top < 8) top = 8;
+
+  effectMenuFlyout.style.left = `${left}px`;
+  effectMenuFlyout.style.top = `${top}px`;
+  effectMenuFlyout.classList.remove("effect-menu__flyout--hidden");
+}
+
+function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
+  const data = computeEffectDialogData(slotIdx);
+  if (data.disabled) {
+    if (dom.statusText && data.reason) dom.statusText.textContent = data.reason;
+    return;
+  }
+
+  closeEffectMenu();
+
+  const eligible = data.eligible || [];
+  const categories = data.categories || [];
+
+  const countsByCat = (() => {
+    const m = new Map();
+    for (const r of eligible) {
+      const c = effectCategoryForRow(r) || "Uncategorized";
+      m.set(c, (m.get(c) || 0) + 1);
+    }
+    return m;
+  })();
+
+  const catOptions = ["__all", ...categories];
+  if (countsByCat.has("Uncategorized") && !catOptions.includes("Uncategorized")) {
+    catOptions.push("Uncategorized");
+  }
+  const preferredCat = selectedCats[slotIdx] && categories.includes(selectedCats[slotIdx]) ? selectedCats[slotIdx] : "";
+  let activeCategory = preferredCat || catOptions[0] || "__all";
+
+  const categoryThemes = buildCategoryThemes(catOptions);
+
+  effectMenuSlot = slotIdx;
+  effectMenuAnchorBtn = anchorBtn;
+
+  effectMenu = document.createElement("div");
+  effectMenu.className = "effect-menu effect-menu--compact";
+  effectMenu.setAttribute("role", "dialog");
+  effectMenu.innerHTML = `
+    <div class="effect-menu__body">
+      <div class="effect-menu__column effect-menu__column--cats" aria-label="Effect categories"></div>
+    </div>
+    <div class="effect-menu__footer">
+      <button type="button" class="secondary effect-menu__clear">Clear Slot</button>
+    </div>
+  `;
+
+  document.body.appendChild(effectMenu);
+
+  const catsEl = effectMenu.querySelector(".effect-menu__column--cats");
+  const clearBtn = effectMenu.querySelector(".effect-menu__clear");
+
+  if (!catsEl) {
+    closeEffectMenu();
+    return;
+  }
+
+  effectMenuFlyout = document.createElement("div");
+  effectMenuFlyout.className = "effect-menu__flyout effect-menu__flyout--hidden";
+  effectMenuFlyout.setAttribute("role", "listbox");
+  document.body.appendChild(effectMenuFlyout);
+
+    const setActiveCategory = (catValue, commit = false, catBtnRect = null) => {
+    activeCategory = catValue;
+    if (commit) {
+      selectedCats[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
+    }
+
+    renderCategories();
+    renderEffectMenuEffects(effectMenuFlyout, eligible, activeCategory, data.currentId, (id) => {
+      setSelectedId(slotIdx, id);
+      selectedCats[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
+      curseBySlot[slotIdx] = null;
+
+      if (slotIdx === 0) {
+        const chosen = getRow(id);
+        const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+        if (nextType) dom.selType.value = nextType;
+      }
+
+      closeEffectMenu();
+      updateUI("effect-change");
+    }, categoryThemes);
+
+    requestAnimationFrame(() => {
+      const menuRect = effectMenu.getBoundingClientRect();
+        const anchorRect = catBtnRect || menuRect;
+      positionEffectFlyout(anchorRect, menuRect);
+    });
+  };
+
+  function renderCategories() {
+    if (!catsEl) return;
+    catsEl.innerHTML = catOptions.map(cat => {
+      const label = cat === "__all" ? "All" : cat;
+      const count = cat === "__all"
+        ? eligible.length
+        : (countsByCat.get(cat) || 0);
+      const isActive = cat === activeCategory;
+      const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
+      const rowBg = gradientFromTheme(theme);
+      const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
+      return `
+        <button type="button" class="effect-menu__cat ${isActive ? "is-active" : ""}" data-cat="${cat}" style="background:${rowBg}; border-bottom-color:${borderColor};">
+          <span class="effect-menu__cat-label">${label}</span>
+          <span class="effect-menu__cat-count">${count}</span>
+        </button>
+      `;
+    }).join("");
+
+    catsEl.querySelectorAll(".effect-menu__cat").forEach(btn => {
+      const catValue = btn.getAttribute("data-cat") || "__all";
+      btn.addEventListener("mouseenter", () => {
+          setActiveCategory(catValue, false, btn.getBoundingClientRect());
+      });
+        btn.addEventListener("click", () => setActiveCategory(catValue, true, btn.getBoundingClientRect()));
+      btn.addEventListener("focus", () => {
+          setActiveCategory(catValue, true, btn.getBoundingClientRect());
+      });
+    });
+  }
+
+  renderCategories();
+  renderEffectMenuEffects(effectMenuFlyout, eligible, activeCategory, data.currentId, (id) => {
+    setSelectedId(slotIdx, id);
+    selectedCats[slotIdx] = activeCategory === "__all" ? "" : activeCategory;
+    curseBySlot[slotIdx] = null;
+
+    if (slotIdx === 0) {
+      const chosen = getRow(id);
+      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+      if (nextType) dom.selType.value = nextType;
+    }
+
+    closeEffectMenu();
+    updateUI("effect-change");
+  }, categoryThemes);
+
+  if (clearBtn) clearBtn.addEventListener("click", () => {
+    setSelectedId(slotIdx, "");
+    curseBySlot[slotIdx] = null;
+    closeEffectMenu();
+    updateUI("effect-change");
+  });
+
+  positionEffectMenu(effectMenu, anchorBtn.getBoundingClientRect());
+
+  // Show flyout aligned to the active (or first) category by default
+  const activeCatBtn = effectMenu.querySelector(`.effect-menu__cat.is-active`) || effectMenu.querySelector(`.effect-menu__cat`);
+  if (activeCatBtn) {
+    positionEffectFlyout(activeCatBtn.getBoundingClientRect(), effectMenu.getBoundingClientRect());
+  }
+  document.addEventListener("keydown", handleEffectMenuKeydown, true);
+  document.addEventListener("pointerdown", handleEffectMenuPointerDown, true);
 }
 
 function openEffectDialog(slotIdx) {
@@ -577,7 +910,7 @@ function installEffectButtons() {
       const slotIdx = Number.parseInt(btn.getAttribute("data-effect-slot") || "-1", 10);
       if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
       if (btn.hasAttribute("disabled")) return;
-      openEffectDialog(slotIdx);
+      openEffectMenu(slotIdx, btn, event);
     });
   });
 }
@@ -687,6 +1020,8 @@ function updateDetails(a, b, c) {
 }
 
 function updateUI(reason = "") {
+  closeEffectMenu();
+
   if (dom.selColor.value === "Random") {
     const modifierReasons = new Set([
       "type-change",
