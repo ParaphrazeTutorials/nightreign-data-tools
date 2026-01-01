@@ -9,63 +9,21 @@
   min-height: 0 !important;
 }
 
+/* Force curse-required label to match selected curse styling */
+#results .curse-line .curse-required {
+  color: #b58cff !important;
+  font-style: italic;
+  font-weight: 800;
+  margin-right: 0.6rem;
+}
+
+#results .curse-line .curse-sub {
+  margin-right: 0.6rem;
+}
+
 /* ------------------------------------------------------------
-   Relic Preview: square frame that tracks effects height,
-   but is capped so it can’t get absurdly large.
+   Relic Preview (use base layout styles; no overrides here)
    ------------------------------------------------------------ */
-
-#results .relic-preview {
-  display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr) !important;
-  grid-template-rows: repeat(3, auto) !important;
-  column-gap: 1rem !important;
-  row-gap: 0.5rem !important;
-  align-items: stretch !important;
-}
-
-/* Frame spans all 3 rows, stays square, but has a max size */
-#results .relic-frame {
-  grid-column: 1 !important;
-  grid-row: 1 / span 3 !important;
-
-  width: auto !important;
-  height: 100% !important;
-
-  aspect-ratio: 1 / 1 !important;
-
-  /* === THE FIX: stop it from getting huge === */
-  max-height: clamp(180px, 28vh, 320px) !important;
-  /* (optional) keeps it from getting too tiny */
-  min-height: 160px !important;
-
-  align-self: stretch !important;
-  justify-self: start !important;
-  overflow: hidden !important;
-}
-
-#results .relic-frame img {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-  object-fit: contain !important;
-}
-
-#results .relic-effects { display: contents !important; }
-#results .chosen-effects {
-  display: contents !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  list-style: none !important;
-}
-
-#results .chosen-effects > li { grid-column: 2 !important; }
-#results .chosen-effects > li:nth-child(1) { grid-row: 1 !important; }
-#results .chosen-effects > li:nth-child(2) { grid-row: 2 !important; }
-#results .chosen-effects > li:nth-child(3) { grid-row: 3 !important; }
-
-#results .chosen-effects > li:only-child {
-  grid-row: 1 / span 3 !important;
-}
 
 /* ------------------------------------------------------------
    Start Over button spacing + tan gradient (LEFT → RIGHT)
@@ -123,12 +81,12 @@ button#startOver:focus-visible {
   grid-template-columns: max-content max-content 1fr;
   grid-template-rows: auto auto auto;
   grid-template-areas:
-    "title btn ."
+    "title effectbtn ."
     "curse curse ."
-    "meta meta meta";
+    "meta  meta   meta";
   column-gap: 0.75rem;
   row-gap: 0.35rem;
-  align-items: start;
+  align-items: center;
 }
 
 /* Let the inner wrapper contribute its children to the grid */
@@ -137,20 +95,14 @@ button#startOver:focus-visible {
 }
 
 /* Place title + curse line */
-#results.is-raw .effect-main--row .effect-text .title {
-  grid-area: title;
-}
-
-#results.is-raw .effect-main--row .effect-text .curse-sub {
-  grid-area: curse;
-}
+#results.is-raw .effect-main--row .effect-text .title { grid-area: title; }
+#results.is-raw .effect-main--row .effect-text .curse-line { grid-area: curse; }
 
 /* Button sits immediately after title, not at far right */
-#results.is-raw .effect-main--row .curse-btn {
-  grid-area: btn;
+#results.is-raw .effect-main--row .effect-btn {
+  grid-area: effectbtn;
   justify-self: start;
-  align-self: start;
-  margin: 0;
+  align-self: center;
 }
 
 /* Raw meta always starts on its own row */

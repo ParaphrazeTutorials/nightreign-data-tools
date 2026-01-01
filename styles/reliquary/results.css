@@ -3,7 +3,7 @@
    ------------------------------------------------------------ */
 
 :root {
-  --results-img-col: 170px;
+  --results-img-col: 200px;
   --row-radius: 0.75rem;
   --row-pad-y: 0.7rem;
   --row-pad-x: 0.85rem;
@@ -12,7 +12,7 @@
 }
 
 #results {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(0, 0, 0, 0.22);
   border-radius: 0.75rem;
   padding: 0.9rem !important;
@@ -83,21 +83,104 @@
 
 .relic-preview {
   display: grid;
-  grid-template-columns: var(--results-img-col) minmax(0, 1fr);
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  grid-template-areas: "relic-img relic-effects";
   gap: 1rem;
   align-items: stretch;
+  /* row height follows effects; image stretches without contributing size */
+  grid-auto-rows: auto;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Raw + curse only: give the image column a sane size so it can't collapse to 2px */
+#results.raw-has-curse .relic-preview {
+  grid-template-columns: clamp(240px, 26vw, 340px) minmax(460px, 1fr) !important;
+}
+
+/* Raw mode baseline: keep the effects column wide enough that text/meta can wrap without vertical stacking */
+#results.is-raw .relic-preview {
+  grid-template-columns: clamp(240px, 26vw, 340px) minmax(560px, 1fr);
+}
+
+#results.is-raw .relic-effects {
+  min-width: 560px;
+}
+
+/* Raw + curse: enforce list items grid so rows don't collapse */
+#results.raw-has-curse .relic-preview .chosen-effects > li {
+  display: grid;
+  grid-template-columns: var(--icon-size) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  min-width: 0;
+}
+
+/* Raw + curse: keep the row layout from collapsing into a narrow column */
+#results.raw-has-curse .relic-preview .effect-row {
+  display: grid;
+  grid-template-columns: var(--icon-size) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Raw + curse selected: bound the image column so curse meta can't balloon the row */
+#results.is-raw .relic-preview {
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
 }
 
 .relic-frame {
-  width: var(--results-img-col);
+  grid-area: relic-img;
+  grid-row: 1;
+  width: auto;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1 / 1; /* square; height follows row, width follows height */
+  contain: size; /* prevent frame from setting the track/row size */
+  min-height: 0;
   border-radius: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.28);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: stretch;
+  justify-self: start;
+  grid-column: 1;
+  position: relative;
+  z-index: 2;
+}
+
+/* Raw + curse: frame fills its bounded column and can contribute size */
+#results.raw-has-curse .relic-preview .relic-frame {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  align-self: start;
+  justify-self: start;
+  contain: none;
+}
+
+/* Raw + curse: keep effects from collapsing */
+#results.raw-has-curse .relic-preview .relic-effects {
+  min-width: 460px;
+}
+
+/* Raw + curse: keep frame within the bounded column */
+#results.raw-has-curse .relic-frame {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  align-self: start;
+  justify-self: start;
 }
 
 .relic-frame img {
@@ -111,12 +194,104 @@
    Effects list
    ------------------------------------------------------------ */
 
+.relic-effects {
+  grid-area: relic-effects;
+  grid-row: 1;
+  height: auto;
+  min-height: var(--results-img-col);
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  grid-column: 2;
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Raw mode: keep natural width; rely on wrapping to avoid bleed */
+#results.is-raw .relic-effects {
+  overflow: hidden;
+}
+
+/* Keep preview columns isolated so raw data rows never bleed over the image column */
+.relic-preview > * {
+  min-width: 0;
+}
+
+.relic-frame {
+  position: relative;
+  z-index: 2;
+}
+
+#results.is-raw .relic-effects,
+#results.is-raw .relic-effects .chosen-effects,
+#results.is-raw .relic-effects .chosen-effects li,
+#results.is-raw .relic-effects .chosen-effects li .effect-line,
+#results.is-raw .relic-effects .chosen-effects li .effect-main,
+#results.is-raw .relic-effects .chosen-effects li .meta {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#results.is-raw .relic-effects .chosen-effects li .meta {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#results.is-raw .relic-effects .chosen-effects li {
+  overflow: hidden;
+}
+
+#results.is-raw .effect-main,
+#results.is-raw .effect-main.effect-main--row {
+  width: 100%;
+  min-width: 0;
+}
+
+/* (reverted raw text wrapping experiment) */
+
+#results.is-raw .effect-main.effect-main--row .effect-text,
+#results.is-raw .effect-main.effect-main--row .title,
+#results.is-raw .effect-main.effect-main--row .title .title-text,
+#results.is-raw .effect-main.effect-main--row .meta,
+#results.is-raw .effect-main.effect-main--row .meta code {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#results.is-raw .chosen-effects li .effect-main.effect-main--row,
+#results.is-raw .chosen-effects li .effect-main.effect-main--row .effect-text,
+#results.is-raw .chosen-effects li .effect-main.effect-main--row .meta,
+#results.is-raw .chosen-effects li .effect-main.effect-main--row .title,
+#results.is-raw .chosen-effects li .effect-main.effect-main--row .title .title-text {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#results.is-raw .chosen-effects li .effect-main.effect-main--row .title .title-text {
+  overflow-wrap: anywhere;
+}
+
 .chosen-effects {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
+  grid-template-rows: repeat(3, auto);
+  grid-auto-rows: auto;
   gap: var(--row-gap);
+  width: 100%;
+}
+
+.slot-counts {
+  display: none;
+}
+
+.slot-counts .subtext {
+  margin: 0;
 }
 
 .chosen-effects li {
@@ -129,6 +304,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   align-items: start;
+  height: auto;
+  align-self: stretch;
 }
 
 /* ------------------------------------------------------------
@@ -137,17 +314,6 @@
 
 .chosen-effects li:has(.move-indicator.move-up),
 .chosen-effects li:has(.move-indicator.move-down) {
-  background: linear-gradient(
-    90deg,
-    rgba(92, 22, 22, 0.58) 0%,
-    rgba(0, 0, 0, 0.22) 62%,
-    rgba(0, 0, 0, 0.55) 100%
-  );
-  border-color: rgba(92, 22, 22, 0.38);
-  box-shadow: inset 0 0 0 1px rgba(92, 22, 22, 0.18);
-}
-
-.chosen-effects li:has(.validity-badge--row.is-invalid) {
   background: linear-gradient(
     90deg,
     rgba(92, 22, 22, 0.58) 0%,
@@ -210,20 +376,62 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.55rem;
   min-width: 0;
-  align-items: start;
+  align-items: center;
 }
 
-.chosen-effects li .effect-main {
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: 0.35rem;
+#results.is-raw .chosen-effects li .effect-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  width: 100%;
   min-width: 0;
 }
 
-.chosen-effects li .effect-main .title {
+/* Raw mode: let the main content own the space; indicators stay absolute via existing rules */
+#results.is-raw .effect-line .effect-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Raw: use the base grid layout; wrapping handled by min-width:0 rules below */
+#results.is-raw .effect-main.effect-main--row {
+  display: grid !important;
+}
+
+/* Raw mode: force a simple flex row so the text column can use full width */
+#results.is-raw .effect-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+#results.is-raw .effect-line {
+  width: 100%;
+  min-width: 0;
+}
+
+#results:not(.is-raw) .chosen-effects li .effect-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+#results:not(.is-raw) .chosen-effects li .effect-main:has(.curse-line) {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+  align-items: start;
+}
+
+#results:not(.is-raw) .chosen-effects li .effect-main .title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   font-weight: 850;
   line-height: 1.15;
   margin: 0;
+  min-width: 0;
 }
 
 .chosen-effects li .effect-main .meta {
@@ -245,6 +453,21 @@
   border-radius: 0.45rem;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.10);
+}
+.chosen-effects li .curse-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.1rem;
+}
+
+.chosen-effects li .curse-required {
+  color: #b58cff !important;
+  font-style: italic;
+  font-weight: 700;
+  margin-right: 0.6rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 #results:not(.is-raw) .chosen-effects li .effect-main .meta { display: none; }
@@ -349,7 +572,7 @@
 
 #results .chosen-effects li .effect-line {
   /* reserve space so text/buttons never collide with the right rail */
-  padding-right: 8.75rem;
+  padding-right: 3.5rem;
 }
 
 #results .chosen-effects li .row-indicators {
@@ -371,17 +594,34 @@
   opacity: 1;
 }
 
+/* Raw: keep meta blocks flexible and let the curse row occupy full width without squeezing the title line */
+#results.is-raw .effect-main--row .meta {
+  width: 100%;
+  min-width: 0;
+}
+
+#results.is-raw .meta.meta--curse {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.25rem;
+}
+
+#results.is-raw .meta.meta--curse code {
+  white-space: nowrap;
+}
+
 
 
 /* ------------------------------------------------------------
-   Raw Data — keep Curse button position stable when a curse is selected
-   The raw layout uses a grid (components.css) with a 1fr first column which can
-   push the button as content grows (e.g., curse lines). When a curse meta row is
-   present, switch to auto/auto/1fr so the button stays adjacent to the title.
-   ------------------------------------------------------------ */
+  Raw Data — keep Curse button position stable when a curse is selected
+  The raw layout uses a 4-column grid (title | effectbtn | btn | indicators).
+  When a curse meta row is present, keep all four columns but bias the width
+  toward the text/meta column so the button stays locked to the title line.
+  ------------------------------------------------------------ */
 
 #results.is-raw .effect-main--row:has(.meta--curse) {
-  grid-template-columns: auto auto 1fr !important;
+  grid-template-columns: minmax(0, 1fr) auto auto auto !important;
 }
 
 #results.is-raw .effect-main--row:has(.meta--curse) .curse-btn {

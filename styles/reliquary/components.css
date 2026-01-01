@@ -4,6 +4,15 @@
   gap: 0.75rem;
 }
 
+/* Raw mode: force the original grid layout so content can't stretch into the image column */
+#results.is-raw .chosen-effects > li {
+  display: grid;
+  grid-template-columns: var(--icon-size) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  min-width: 0;
+}
+
 
 /* ============================================================
    Reliquary – Effect Line + Curse Button Alignment (FINAL)
@@ -37,12 +46,17 @@
 
 .title-text {
   display: inline-block;
+  font-weight: 700;
 }
 
 /* Curse subtitle */
 .curse-sub {
   color: #b58cff;
   font-style: italic;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
 
   /* Keep the curse text as close as possible to the effect title */
   margin-top: -0.32rem;
@@ -93,10 +107,10 @@
 /* Effect row: lock "title + curse button" to the same top row, with Raw Data on its own row */
 .effect-main--row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto auto;
   grid-template-areas:
-    "text btn indicators"
-    "meta meta indicators";
+    "text effectbtn btn indicators"
+    "meta  meta      meta indicators";
   column-gap: 0.75rem;
   row-gap: 0.35rem;
   align-items: center;
@@ -104,8 +118,48 @@
 
 .effect-main--row > .effect-text { grid-area: text; min-width: 0; }
 .effect-main--row > .meta { grid-area: meta; }
+.effect-main--row > .effect-btn { grid-area: effectbtn; align-self: center; justify-self: end; }
 .effect-main--row > .curse-btn { grid-area: btn; align-self: center; justify-self: end; }
 .effect-main--row > .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
+
+/* Effect selection button (mirrors curse button sizing but neutral style) */
+.effect-btn {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: linear-gradient(
+    90deg,
+    rgba(70, 120, 210, 0.90) 0%,
+    rgba(0, 0, 0, 0.18) 62%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+  color: rgba(255,255,255,0.94);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.effect-btn:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(90, 140, 230, 0.95) 0%,
+    rgba(0, 0, 0, 0.16) 62%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
+}
+
+.effect-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: grayscale(0.35);
+}
 
 /* Fallback: if a title is used directly (no .effect-text wrapper), treat it like the text area */
 .effect-main--row > .title {
@@ -135,11 +189,11 @@
 
 #results.is-raw .effect-main--row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto auto;
   grid-template-areas:
-    "title btn indicators"
-    "curse curse indicators"
-    "meta  meta  indicators";
+    "title effectbtn btn indicators"
+    "curse curse curse indicators"
+    "meta  meta  meta  indicators";
   /* Center items within each grid row so the button stays locked to the title line */
   align-items: center;
   column-gap: 0.75rem;
@@ -155,6 +209,7 @@
 #results.is-raw .effect-main--row .title     { grid-area: title; min-width: 0; align-self: center; }
 #results.is-raw .effect-main--row .curse-sub { grid-area: curse; align-self: start; }
 #results.is-raw .effect-main--row .meta      { grid-area: meta; align-self: start; }
+#results.is-raw .effect-main--row .effect-btn { grid-area: effectbtn; align-self: center; justify-self: end; }
 #results.is-raw .effect-main--row .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
 
 /* Button sits on the title row */

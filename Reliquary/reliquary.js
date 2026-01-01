@@ -9,8 +9,6 @@ import {
   autoRelicTypeFromEffect1
 } from "./reliquary.logic.js";
 import {
-  fillSelect,
-  fillCategorySelect,
   renderChosenLine,
   updateCounts,
   setRelicImageForStage,
@@ -20,17 +18,20 @@ import { getDom } from "./reliquary.dom.js";
 
 const dom = getDom();
 
-
 const resultsEl = document.getElementById("results");
 const resultsHeader = document.querySelector("#results .panel-header");
 const validityBadge = document.getElementById("relicValidity");
+
 let rows = [];
 let byId = new Map();
 let rowsAll = [];
 let byIdAll = new Map();
 let curses = [];
+
+const selectedEffects = ["", "", ""];
+const selectedCats = ["", "", ""];
 const curseBySlot = [null, null, null];
-const curseCatBySlot = ["", "", ""]; // remembered per slot ("" = All)
+const curseCatBySlot = ["", "", ""];
 
 let currentRandomColor = "Red";
 
@@ -46,6 +47,18 @@ function getRow(effectId) {
 function getAnyRow(effectId) {
   if (!effectId) return null;
   return byIdAll.get(String(effectId)) ?? null;
+}
+
+function getSelectedId(slotIdx) {
+  return selectedEffects[slotIdx] || "";
+}
+
+function setSelectedId(slotIdx, value) {
+  selectedEffects[slotIdx] = value ? String(value) : "";
+}
+
+function getSelectedRow(slotIdx) {
+  return getRow(getSelectedId(slotIdx));
 }
 
 function getRollValue(row) {
@@ -84,7 +97,6 @@ function computeRollOrderIssue(a, b, c) {
 
   const sortedPicked = picked.slice().sort((x, y) => getRollValue(x) - getRollValue(y));
 
-  // Is the current selected-only ordering already correct?
   let mismatch = false;
   let j = 0;
   for (let i = 0; i < original.length; i++) {
@@ -102,7 +114,6 @@ function computeRollOrderIssue(a, b, c) {
     };
   }
 
-  // Map slot -> packed index among selected items
   const slotToPickedIndex = [-1, -1, -1];
   let k = 0;
   for (let i = 0; i < original.length; i++) {
@@ -124,12 +135,11 @@ function computeRollOrderIssue(a, b, c) {
     const want = idToSortedIndex.get(String(row.EffectID));
     if (want == null || cur == null || cur < 0) continue;
 
-    const delta = want - cur; // negative => move up; positive => move down
+    const delta = want - cur;
     moveDeltaBySlot[i] = delta;
     movedSlots[i] = delta !== 0;
   }
 
-  // 3-slot sorted array for Details mini-preview (keeps empties in place)
   const sortedSlots = original.slice();
   j = 0;
   for (let i = 0; i < sortedSlots.length; i++) {
@@ -148,9 +158,7 @@ function computeRollOrderIssue(a, b, c) {
 
 function applyHeaderValidityClasses(state, anySelected) {
   if (!resultsHeader) return;
-
   resultsHeader.classList.remove("is-valid", "is-invalid");
-
   if (!anySelected) return;
   if (state === "Valid") resultsHeader.classList.add("is-valid");
   if (state === "Invalid") resultsHeader.classList.add("is-invalid");
@@ -168,10 +176,8 @@ function setValidityBadge(state, anySelected) {
 
   validityBadge.hidden = false;
   validityBadge.textContent = state;
-
   validityBadge.classList.toggle("is-valid", state === "Valid");
   validityBadge.classList.toggle("is-invalid", state === "Invalid");
-
   applyHeaderValidityClasses(state, true);
 }
 
@@ -182,16 +188,13 @@ function setDetailsEmpty() {
 
 function installDetailsToggles() {
   if (!dom.detailsBody) return;
-
   const buttons = dom.detailsBody.querySelectorAll("[data-popover-toggle]");
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-popover-toggle");
       if (!id) return;
-
       const pop = dom.detailsBody.querySelector(`#${CSS.escape(id)}`);
       if (!pop) return;
-
       pop.hidden = !pop.hidden;
     });
   });
@@ -201,14 +204,14 @@ function markLineReordered(html) {
   return html.replace("<li>", `<li class="reorder-changed">`);
 }
 
-
 function slotLabel(idx) {
   return idx === 0 ? "Effect 1" : idx === 1 ? "Effect 2" : "Effect 3";
 }
 
 let curseDialog;
-let curseDialogList;
 let curseDialogTitle;
+let effectDialog;
+let effectDialogTitle;
 
 function ensureCurseDialog() {
   if (curseDialog) return;
@@ -232,7 +235,7 @@ function ensureCurseDialog() {
           </label>
 
           <label class="curse-field">
-            <span class="curse-field__label">Curse Effect</span>
+            <span class="curse-field__label">Curse</span>
             <select id="curseEffectSelect">
               <option value="">Select a Curse…</option>
             </select>
@@ -241,8 +244,11 @@ function ensureCurseDialog() {
       </div>
 
       <footer class="curse-dialog__footer">
-        <button type="button" class="secondary" id="curseCancelBtn">Cancel</button>
-        <button type="submit" class="primary" id="curseSubmitBtn" disabled>Apply Curse</button>
+        <button type="button" class="secondary" id="curseClearBtn">Clear Curse</button>
+        <div class="curse-dialog__footer-right">
+          <button type="button" class="secondary" id="curseCancelBtn">Cancel</button>
+          <button type="submit" class="primary" id="curseSubmitBtn" disabled>Apply Curse</button>
+        </div>
       </footer>
     </form>
   `;
@@ -251,49 +257,82 @@ function ensureCurseDialog() {
   curseDialog = d;
   curseDialogTitle = d.querySelector("#curseDialogTitle");
 
-  d.querySelector(".curse-dialog__close").onclick =
-  d.querySelector("#curseCancelBtn").onclick = () => d.close("cancel");
+  const closeBtn = d.querySelector(".curse-dialog__close");
+  const cancelBtn = d.querySelector("#curseCancelBtn");
+  if (closeBtn) closeBtn.onclick = () => d.close("cancel");
+  if (cancelBtn) cancelBtn.onclick = () => d.close("cancel");
 }
 
+function ensureEffectDialog() {
+  if (effectDialog) return;
+
+  const d = document.createElement("dialog");
+  d.className = "effect-dialog";
+  d.innerHTML = `
+    <form method="dialog" class="effect-dialog__form">
+      <header class="effect-dialog__header">
+        <h4 class="effect-dialog__title" id="effectDialogTitle">Select an Effect</h4>
+        <button type="button" class="effect-dialog__close" aria-label="Close">✕</button>
+      </header>
+
+      <div class="effect-dialog__body">
+        <div class="effect-dialog__controls">
+          <label class="effect-field">
+            <span class="effect-field__label">Effect Category</span>
+            <select id="effectCategorySelect">
+              <option value="">All</option>
+            </select>
+          </label>
+
+          <label class="effect-field">
+            <span class="effect-field__label">Effect</span>
+            <select id="effectSelect">
+              <option value="">Select an Effect…</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <footer class="effect-dialog__footer">
+        <button type="button" class="secondary" id="effectClearBtn">Clear Slot</button>
+        <div class="effect-dialog__footer-right">
+          <button type="button" class="secondary" id="effectCancelBtn">Cancel</button>
+          <button type="submit" class="primary" id="effectSubmitBtn" disabled>Apply Effect</button>
+        </div>
+      </footer>
+    </form>
+  `;
+  document.body.appendChild(d);
+
+  effectDialog = d;
+  effectDialogTitle = d.querySelector("#effectDialogTitle");
+
+  const closeBtn = d.querySelector(".effect-dialog__close");
+  const cancelBtn = d.querySelector("#effectCancelBtn");
+  if (closeBtn) closeBtn.onclick = () => d.close("cancel");
+  if (cancelBtn) cancelBtn.onclick = () => d.close("cancel");
+}
 
 function computeBlockedCompatForCurse(slotIdx) {
   const blocked = new Set();
 
-  // Block compatibility groups already used by selected curses in OTHER slots.
-  for (let i = 0; i < curseBySlot.length; i++) {
-    if (i === slotIdx) continue;
-    const id = curseBySlot[i];
-    if (!id) continue;
-    const row = getAnyRow(id);
-    const cid = compatId(row);
-    if (cid) blocked.add(String(cid));
-  }
-
-  // Also block groups used by selected effects (keeps overall rules consistent).
-  const a = getRow(dom.sel1.value);
-  const b = getRow(dom.sel2.value);
-  const c = getRow(dom.sel3.value);
-
-  // Keep curse selections consistent with current effect picks.
-  const picked = [a, b, c];
-  for (let i = 0; i < picked.length; i++) {
-    const r = picked[i];
-    const req = r && String(r?.CurseRequired ?? "0") === "1";
-    if (!req) curseBySlot[i] = null;
-  }
-  for (const r of [a, b, c]) {
-    if (!r) continue;
+  const selections = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+  for (const r of selections) {
     const cid = compatId(r);
     if (cid) blocked.add(String(cid));
   }
 
-  // Allow this slot's current selection (so you can reopen and keep it).
-  const curId = curseBySlot[slotIdx];
-  if (curId) {
-    const curRow = getAnyRow(curId);
-    const cid = compatId(curRow);
-    if (cid) blocked.delete(String(cid));
+  for (let i = 0; i < curseBySlot.length; i++) {
+    if (i === slotIdx) continue;
+    const cRow = getAnyRow(curseBySlot[i]);
+    const cid = compatId(cRow);
+    if (cid) blocked.add(String(cid));
   }
+
+  // Allow keeping the currently selected curse even if it would otherwise be blocked
+  const current = getAnyRow(curseBySlot[slotIdx]);
+  const currentCid = compatId(current);
+  if (currentCid) blocked.delete(String(currentCid));
 
   return blocked;
 }
@@ -304,13 +343,14 @@ function openCurseDialog(slotIdx) {
 
   const catSel = curseDialog.querySelector("#curseCategorySelect");
   const effectSel = curseDialog.querySelector("#curseEffectSelect");
-  if (!catSel || !effectSel) return;
+  const submitBtn = curseDialog.querySelector("#curseSubmitBtn");
+  const clearBtn = curseDialog.querySelector("#curseClearBtn");
+
+  if (!catSel || !effectSel || !submitBtn || !clearBtn) return;
 
   if (curseDialogTitle) curseDialogTitle.textContent = `Select a Curse for ${slotLabel(slotIdx)}`;
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-
-  // Respect current relic-type filter and compatibility rules.
   const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
     .filter(r => {
       const cid = compatId(r);
@@ -321,16 +361,13 @@ function openCurseDialog(slotIdx) {
 
   const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
 
-  // If we already have a selected curse, default the category to that curse's category.
   if (!curseCatBySlot[slotIdx] && currentId) {
     const curRow = getAnyRow(currentId);
     const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
     curseCatBySlot[slotIdx] = curCat;
   }
 
-  // Build category list from eligible curses
   const cats = categoriesFor(eligibleCurses);
-
   catSel.innerHTML = `<option value="">All</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join("");
   catSel.value = curseCatBySlot[slotIdx] || "";
 
@@ -344,6 +381,7 @@ function openCurseDialog(slotIdx) {
       effectSel.innerHTML = `<option value="">No curses available</option>`;
       effectSel.value = "";
       effectSel.disabled = true;
+      submitBtn.disabled = true;
       return;
     }
 
@@ -356,27 +394,28 @@ function openCurseDialog(slotIdx) {
         return `<option value="${id}">${name}</option>`;
       }).join("");
 
-    // Keep current selection if it still exists under this filter
     if (currentId && [...effectSel.options].some(o => o.value === currentId)) {
       effectSel.value = currentId;
+      submitBtn.disabled = false;
     } else {
       effectSel.value = "";
+      submitBtn.disabled = true;
     }
   }
 
-  // initial render
   renderEffectOptions();
 
-  // events
   catSel.onchange = () => renderEffectOptions();
-
   effectSel.onchange = () => {
-    const v = String(effectSel.value || "");
-    const submit = curseDialog.querySelector("#curseSubmitBtn");
-    submit.disabled = !v;
+    submitBtn.disabled = !(effectSel.value && effectSel.value !== "");
   };
 
-  const submitBtn = curseDialog.querySelector("#curseSubmitBtn");
+  clearBtn.onclick = () => {
+    curseBySlot[slotIdx] = null;
+    curseDialog.close("clear");
+    updateUI("curse-change");
+  };
+
   submitBtn.onclick = () => {
     const v = String(effectSel.value || "");
     if (!v) return;
@@ -395,6 +434,150 @@ function installCurseButtons() {
       const slotIdx = Number.parseInt(btn.getAttribute("data-curse-slot") || "-1", 10);
       if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
       openCurseDialog(slotIdx);
+    });
+  });
+}
+
+function computeEffectDialogData(slotIdx, showIllegalOverride = null) {
+  const showIllegal = showIllegalOverride ?? !!dom.showIllegalEl.checked;
+  const type = dom.selType.value;
+
+  const base = baseFilteredByRelicType(rows, type);
+  const baseCats = categoriesFor(base);
+
+  const a = getSelectedRow(0);
+  const b = getSelectedRow(1);
+
+  if (slotIdx === 1 && !a) return { disabled: true, reason: "Select Effect 1 first" };
+  if (slotIdx === 2 && (!a || !b)) return { disabled: true, reason: "Select previous effects first" };
+
+  if (slotIdx === 0) {
+    const filtered = applyCategory(base, selectedCats[0]);
+    return { disabled: false, categories: baseCats, filtered, currentId: getSelectedId(0) };
+  }
+
+  if (slotIdx === 1) {
+    const takenFor2 = new Set([selectedEffects[0], selectedEffects[2]].filter(Boolean).map(String));
+    const blockedFor2 = new Set();
+    if (a) {
+      const cidA = compatId(a);
+      if (cidA) blockedFor2.add(cidA);
+    }
+    const eligible2 = eligibleList(rows, type, blockedFor2, takenFor2, showIllegal);
+    const filtered = applyCategory(eligible2, selectedCats[1]);
+    return { disabled: false, categories: categoriesFor(eligible2.length ? eligible2 : base), filtered, currentId: getSelectedId(1) };
+  }
+
+  if (slotIdx === 2) {
+    const takenFor3 = new Set([selectedEffects[0], selectedEffects[1]].filter(Boolean).map(String));
+    const blockedFor3 = new Set();
+    if (a) {
+      const cidA = compatId(a);
+      if (cidA) blockedFor3.add(cidA);
+    }
+    if (b) {
+      const cidB = compatId(b);
+      if (cidB) blockedFor3.add(cidB);
+    }
+    const eligible3 = eligibleList(rows, type, blockedFor3, takenFor3, showIllegal);
+    const filtered = applyCategory(eligible3, selectedCats[2]);
+    return { disabled: false, categories: categoriesFor(eligible3.length ? eligible3 : base), filtered, currentId: getSelectedId(2) };
+  }
+
+  return { disabled: true, reason: "Invalid slot" };
+}
+
+function openEffectDialog(slotIdx) {
+  ensureEffectDialog();
+  if (!effectDialog) return;
+
+  const catSel = effectDialog.querySelector("#effectCategorySelect");
+  const effectSel = effectDialog.querySelector("#effectSelect");
+  const submitBtn = effectDialog.querySelector("#effectSubmitBtn");
+  const clearBtn = effectDialog.querySelector("#effectClearBtn");
+
+  if (!catSel || !effectSel || !submitBtn || !clearBtn) return;
+
+  const data = computeEffectDialogData(slotIdx);
+  if (data.disabled) return;
+
+  if (effectDialogTitle) effectDialogTitle.textContent = `Select an Effect for ${slotLabel(slotIdx)}`;
+
+  catSel.innerHTML = `<option value="">All</option>` + (data.categories || []).map(c => `<option value="${c}">${c}</option>`).join("");
+  catSel.value = selectedCats[slotIdx] || "";
+
+  function renderEffectOptions() {
+    const catVal = catSel.value || "";
+    selectedCats[slotIdx] = catVal;
+
+    const filtered = applyCategory(data.filtered || [], catVal);
+
+    if (!filtered.length) {
+      effectSel.innerHTML = `<option value="">No effects available</option>`;
+      effectSel.value = "";
+      effectSel.disabled = true;
+      submitBtn.disabled = true;
+      return;
+    }
+
+    effectSel.disabled = false;
+    effectSel.innerHTML = `<option value="">Select an Effect…</option>` + filtered.map(r => {
+      const id = String(r.EffectID);
+      const name = r.EffectDescription ?? `(Effect ${id})`;
+      return `<option value="${id}">${name}</option>`;
+    }).join("");
+
+    const currentId = data.currentId || "";
+    if (currentId && [...effectSel.options].some(o => o.value === currentId)) {
+      effectSel.value = currentId;
+      submitBtn.disabled = false;
+    } else {
+      effectSel.value = "";
+      submitBtn.disabled = true;
+    }
+  }
+
+  renderEffectOptions();
+
+  catSel.onchange = () => renderEffectOptions();
+  effectSel.onchange = () => {
+    submitBtn.disabled = !(effectSel.value && effectSel.value !== "");
+  };
+
+  clearBtn.onclick = () => {
+    setSelectedId(slotIdx, "");
+    curseBySlot[slotIdx] = null;
+    effectDialog.close("clear");
+    updateUI("effect-change");
+  };
+
+  submitBtn.onclick = () => {
+    const v = String(effectSel.value || "");
+    if (!v) return;
+    setSelectedId(slotIdx, v);
+    curseBySlot[slotIdx] = null;
+
+    if (slotIdx === 0) {
+      const chosen = getRow(v);
+      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+      if (nextType) dom.selType.value = nextType;
+    }
+
+    effectDialog.close("apply");
+    updateUI("effect-change");
+  };
+
+  effectDialog.showModal();
+}
+
+function installEffectButtons() {
+  const btns = document.querySelectorAll("[data-effect-slot]");
+  btns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const slotIdx = Number.parseInt(btn.getAttribute("data-effect-slot") || "-1", 10);
+      if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
+      if (btn.hasAttribute("disabled")) return;
+      openEffectDialog(slotIdx);
     });
   });
 }
@@ -422,8 +605,7 @@ function updateDetails(a, b, c) {
     if (req && !curseBySlot[i]) missingCurseSlots.push(i);
   }
 
-  if (missingCurseSlots.length > 0)
-  {
+  if (missingCurseSlots.length > 0) {
     const labels = missingCurseSlots.map(i => slotLabel(i)).join(", ");
     blocks.push(`
       <div class="info-box is-alert" data-kind="curse-required">
@@ -435,7 +617,7 @@ function updateDetails(a, b, c) {
         <div id="cursePopover" class="popover" hidden>
           <h4 class="popover-title">Curse Required</h4>
           <div class="popover-body">
-            <p><em>On Depth of Night Relics only, there are certain effects that cannot be rolled without an accompanying Curse, which adds a detrimental effect to your roll.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
+            <p><em>On Depth of Night Relics only, certain effects cannot be rolled without an accompanying Curse.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
             <p>Missing for: <strong>${labels}</strong>.</p>
           </div>
         </div>
@@ -443,8 +625,7 @@ function updateDetails(a, b, c) {
     `);
   }
 
-if (hasDup) {
-
+  if (hasDup) {
     blocks.push(`
       <div class="info-box is-alert" data-kind="compat-dup">
         <div class="info-line">
@@ -457,8 +638,8 @@ if (hasDup) {
         <div class="popover" id="compatPopover" hidden>
           <div class="popover-title">Compatibility Group</div>
           <div class="popover-body popover-body--spaced">
-            <p>Behind the scenes, most effects share a Compatibility Group with one or more other effects. Relics cannot have more than one effect from any given Compatibility group.</p>
-            <p>For example, Fire Attack Power Up and Holy Attack Power Up share a Compatibility Group, and cannot be on the same Relic.</p>
+            <p>Relics cannot have more than one effect from the same Compatibility Group.</p>
+            <p>Some effects share a group even if their names differ.</p>
           </div>
         </div>
       </div>
@@ -479,7 +660,7 @@ if (hasDup) {
         <div class="popover" id="orderPopover" hidden>
           <div class="popover-title">Roll Order</div>
           <div class="popover-body popover-body--spaced">
-            <p>Behind the scenes, there is a value attached to each effect called "Roll Order", which determines the correct order each effect must be placed on the relic.</p>
+            <p>Each effect has a Roll Order value; the relic must list effects in ascending order.</p>
           </div>
         </div>
       </div>
@@ -489,27 +670,8 @@ if (hasDup) {
   dom.detailsBody.innerHTML = blocks.join("");
   installDetailsToggles();
 
-  // Details: raw intentionally disabled
-  if (hasDup) {
-    for (const g of dupGroups) {
-      const listEl = dom.detailsBody.querySelector(`#${CSS.escape(g.listId)}`);
-      if (!listEl) continue;
-
-      const lines = g.list
-        .slice(0, 3)
-        .map(row => renderChosenLine("", row, false))
-        .join("");
-
-      listEl.innerHTML = lines;
-    }
-  }
-
   if (roll.hasIssue && roll.sorted) {
-    const img = dom.detailsBody.querySelector("#sortedRelicImg");
     const list = dom.detailsBody.querySelector("#sortedChosenList");
-
-    if (img) img.src = dom.relicImg?.src || "";
-
     if (list) {
       let line1 = renderChosenLine("", roll.sorted[0], false);
       let line2 = renderChosenLine("", roll.sorted[1], false);
@@ -531,7 +693,6 @@ function updateUI(reason = "") {
       "illegal-change",
       "cat-change",
       "effect-change",
-      "reset",
       "init",
       "raw-change"
     ]);
@@ -541,24 +702,19 @@ function updateUI(reason = "") {
   const showIllegal = !!dom.showIllegalEl.checked;
   const showRaw = !!dom.showRawEl?.checked;
 
-  if (resultsEl) resultsEl.classList.toggle("is-raw", showRaw);
+  const hasCurseSelected = curseBySlot.some(Boolean);
 
-  const a = getRow(dom.sel1.value);
-  const b = getRow(dom.sel2.value);
-  const c = getRow(dom.sel3.value);
+  if (resultsEl) {
+    resultsEl.classList.toggle("is-raw", showRaw);
+    resultsEl.classList.toggle("raw-has-curse", showRaw && hasCurseSelected);
+  }
 
-  const stage = c ? 3 : b ? 2 : a ? 1 : 0;
+  const a = getSelectedRow(0);
+  const b = getSelectedRow(1);
+  const c = getSelectedRow(2);
 
-  setRelicImageForStage({
-    relicImg: dom.relicImg,
-    selectedType: dom.selType.value,
-    selectedColor: dom.selColor.value,
-    randomColor: currentRandomColor,
-    stage
-  });
-
-  const takenFor2 = new Set([dom.sel1.value, dom.sel3.value].filter(Boolean).map(String));
-  const takenFor3 = new Set([dom.sel1.value, dom.sel2.value].filter(Boolean).map(String));
+  const takenFor2 = new Set([selectedEffects[0], selectedEffects[2]].filter(Boolean).map(String));
+  const takenFor3 = new Set([selectedEffects[0], selectedEffects[1]].filter(Boolean).map(String));
 
   const blockedFor2 = new Set();
   if (a) {
@@ -576,67 +732,54 @@ function updateUI(reason = "") {
     if (cidB) blockedFor3.add(cidB);
   }
 
-  dom.sel1.disabled = false;
-  dom.cat1.disabled = false;
-
-  dom.sel2.disabled = !a;
-  dom.cat2.disabled = !a;
-
-  dom.sel3.disabled = !a || !b;
-  dom.cat3.disabled = !a || !b;
-
   const base1 = baseFilteredByRelicType(rows, dom.selType.value);
-  const filtered1 = applyCategory(base1, dom.cat1.value);
+  const filtered1 = applyCategory(base1, selectedCats[0]);
 
   const eligible2 = a ? eligibleList(rows, dom.selType.value, blockedFor2, takenFor2, showIllegal) : [];
-  const filtered2 = applyCategory(eligible2, dom.cat2.value);
+  const filtered2 = applyCategory(eligible2, selectedCats[1]);
 
   const eligible3 = (a && b) ? eligibleList(rows, dom.selType.value, blockedFor3, takenFor3, showIllegal) : [];
-  const filtered3 = applyCategory(eligible3, dom.cat3.value);
+  const filtered3 = applyCategory(eligible3, selectedCats[2]);
 
-  const prev1 = dom.sel1.value;
-  const prev2 = dom.sel2.value;
-  const prev3 = dom.sel3.value;
+  const eligible2Ids = new Set(filtered2.map(r => String(r.EffectID)));
+  const eligible3Ids = new Set(filtered3.map(r => String(r.EffectID)));
 
-  fillSelect(dom.sel1, filtered1, "— Effect 1 —");
-  if (![...dom.sel1.options].some(o => o.value === prev1)) {
-    dom.sel1.value = "";
-    dom.sel2.value = "";
-    dom.sel3.value = "";
-  } else {
-    dom.sel1.value = prev1;
+  let cleared = false;
+  if (selectedEffects[1] && !eligible2Ids.has(selectedEffects[1])) {
+    setSelectedId(1, "");
+    curseBySlot[1] = null;
+    cleared = true;
   }
 
-  const a2 = getRow(dom.sel1.value);
-
-  if (a2) {
-    fillSelect(dom.sel2, filtered2, "— Effect 2 —");
-    dom.sel2.value = [...dom.sel2.options].some(o => o.value === prev2) ? prev2 : "";
-  } else {
-    fillSelect(dom.sel2, [], "— Effect 2 —");
-    dom.sel2.value = "";
+  if (selectedEffects[2] && !eligible3Ids.has(selectedEffects[2])) {
+    setSelectedId(2, "");
+    curseBySlot[2] = null;
+    cleared = true;
   }
 
-  const b2 = getRow(dom.sel2.value);
-
-  if (a2 && b2) {
-    fillSelect(dom.sel3, filtered3, "— Effect 3 —");
-    dom.sel3.value = [...dom.sel3.options].some(o => o.value === prev3) ? prev3 : "";
-  } else {
-    fillSelect(dom.sel3, [], "— Effect 3 —");
-    dom.sel3.value = "";
+  if (cleared) {
+    updateUI(reason);
+    return;
   }
 
-  const c2 = getRow(dom.sel3.value);
+  const cSelections = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+  const stage = cSelections[2] ? 3 : cSelections[1] ? 2 : cSelections[0] ? 1 : 0;
 
-  const anySelected = !!a2 || !!b2 || !!c2;
-  const dupGroups = computeCompatDupGroups([a2, b2, c2].filter(Boolean));
+  setRelicImageForStage({
+    relicImg: dom.relicImg,
+    selectedType: dom.selType.value,
+    selectedColor: dom.selColor.value,
+    randomColor: currentRandomColor,
+    stage
+  });
+
+  const anySelected = cSelections.some(Boolean);
+  const dupGroups = computeCompatDupGroups(cSelections.filter(Boolean));
   const hasCompatIssue = dupGroups.length > 0;
 
-  // Row-level Compatibility Group conflicts (used for per-row indicators)
   const compatConflictIds = (() => {
     const m = new Map();
-    for (const r of [a2, b2, c2].filter(Boolean)) {
+    for (const r of cSelections.filter(Boolean)) {
       const cid = compatId(r);
       if (!cid) continue;
       if (!m.has(cid)) m.set(cid, []);
@@ -658,13 +801,12 @@ function updateUI(reason = "") {
     return !!(r && compatConflictIds.has(String(r.EffectID)));
   }
 
-  const roll = computeRollOrderIssue(a2, b2, c2);
+  const roll = computeRollOrderIssue(cSelections[0], cSelections[1], cSelections[2]);
   const hasOrderIssue = roll.hasIssue;
 
   const hasCurseMissing = (() => {
-    const orig = [a2, b2, c2];
-    for (let i = 0; i < orig.length; i++) {
-      const r = orig[i];
+    for (let i = 0; i < cSelections.length; i++) {
+      const r = cSelections[i];
       if (!r) continue;
       const req = String(r?.CurseRequired ?? "0") === "1";
       if (req && !curseBySlot[i]) return true;
@@ -675,70 +817,71 @@ function updateUI(reason = "") {
   const state = anySelected && (hasCompatIssue || hasOrderIssue || hasCurseMissing) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
-  // --- Validity + checkmark indicators ---
-  // When the relic is valid at 1 or 2 effects, show green check(s) and green row gradient.
   const okBySlot = [false, false, false];
 
   if (state === "Valid") {
-    // 1-effect relics should immediately show as valid
-    if (a2 && !b2 && !c2) okBySlot[0] = true;
-
-    // 2-effect relics: if there is no roll-order issue, both are correct
-    if (a2 && b2 && !c2 && !roll.hasIssue && !hasCompatIssue) {
+    if (cSelections[0] && !cSelections[1] && !cSelections[2]) okBySlot[0] = true;
+    if (cSelections[0] && cSelections[1] && !cSelections[2] && !roll.hasIssue && !hasCompatIssue) {
       okBySlot[0] = true;
       okBySlot[1] = true;
     }
-
-    // 3-effect relics: if fully valid, all three are correct
-    if (a2 && b2 && c2 && !roll.hasIssue && !hasCompatIssue) {
+    if (cSelections[0] && cSelections[1] && cSelections[2] && !roll.hasIssue && !hasCompatIssue) {
       okBySlot[0] = true;
       okBySlot[1] = true;
       okBySlot[2] = true;
     }
   }
 
-  // If the relic is invalid ONLY due to Compatibility conflicts (but roll order is correct),
-  // still show green checks on the non-incompatible row(s).
   if (hasCompatIssue && !roll.hasIssue) {
-    if (a2 && b2 && !c2) {
-      okBySlot[0] = !isIncompatRow(a2);
-      okBySlot[1] = !isIncompatRow(b2);
+    if (cSelections[0] && cSelections[1] && !cSelections[2]) {
+      okBySlot[0] = !isIncompatRow(cSelections[0]);
+      okBySlot[1] = !isIncompatRow(cSelections[1]);
     }
-    if (a2 && b2 && c2) {
-      okBySlot[0] = !isIncompatRow(a2);
-      okBySlot[1] = !isIncompatRow(b2);
-      okBySlot[2] = !isIncompatRow(c2);
+    if (cSelections[0] && cSelections[1] && cSelections[2]) {
+      okBySlot[0] = !isIncompatRow(cSelections[0]);
+      okBySlot[1] = !isIncompatRow(cSelections[1]);
+      okBySlot[2] = !isIncompatRow(cSelections[2]);
     }
   }
 
-  // Special checkmark condition (exactly 3 effects selected)
-  // If roll order is invalid and exactly one slot is already in the correct position,
-  // show a green checkbox on that slot.
-  const allThreeSelected = !!a2 && !!b2 && !!c2;
-
+  const allThreeSelected = !!cSelections[0] && !!cSelections[1] && !!cSelections[2];
   if (allThreeSelected && roll.hasIssue) {
     const deltas = roll.moveDeltaBySlot.slice(0, 3);
     const zeros = deltas
       .map((d, idx) => ({ d, idx }))
       .filter(x => x.d === 0);
 
-    // “only two need to move” => exactly one is correct
     if (zeros.length === 1) {
       const idx = zeros[0].idx;
-      const rowByIdx = idx === 0 ? a2 : idx === 1 ? b2 : c2;
+      const rowByIdx = cSelections[idx];
       if (!isIncompatRow(rowByIdx)) okBySlot[idx] = true;
     }
   }
 
-  // Preview rendering
-  if (!a2) {
+  const effectButtonDisabled = [false, !cSelections[0], !(cSelections[0] && cSelections[1])];
+
+  function renderSlot(idx, row, moveDelta, showOk, badge) {
+    const effectBtnLabel = row ? "Change Effect" : "Select Effect";
+    return renderChosenLine(slotLabel(idx), row, showRaw, moveDelta, showOk, badge, {
+      effectSlot: idx,
+      effectButtonLabel: effectBtnLabel,
+      effectButtonDisabled: effectButtonDisabled[idx],
+      curseRequired: String(row?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[idx]),
+      curseButtonLabel: curseBySlot[idx] ? "Change Curse" : "Select a Curse",
+      curseSlot: idx
+    });
+  }
+
+  if (!cSelections[0]) {
     setDetailsEmpty();
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", null, showRaw) +
-      renderChosenLine("", null, showRaw) +
-      renderChosenLine("", null, showRaw);
+      renderSlot(0, null, 0, okBySlot[0], null) +
+      renderSlot(1, null, 0, okBySlot[1], null) +
+      renderSlot(2, null, 0, okBySlot[2], null);
 
+    installEffectButtons();
     installCurseButtons();
 
     updateCounts(dom, 1, filtered1.length);
@@ -746,73 +889,45 @@ function updateUI(reason = "") {
     return;
   }
 
-  if (!b2) {
-    // With only Effect 1 selected, still show Details if a curse is required/missing.
-    updateDetails(a2, null, null);
+  if (!cSelections[1]) {
+    updateDetails(cSelections[0], null, null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2), {
-      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[0]),
-      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
-      curseSlot: 0
-    }) +
-      renderChosenLine("", null, showRaw) +
-      renderChosenLine("", null, showRaw);
+      renderSlot(0, cSelections[0], 0, okBySlot[0], badgeForRow(cSelections[0])) +
+      renderSlot(1, null, 0, okBySlot[1], null) +
+      renderSlot(2, null, 0, okBySlot[2], null);
 
+    installEffectButtons();
     installCurseButtons();
 
     updateCounts(dom, 2, filtered2.length);
     return;
   }
 
-  if (!c2) {
-    updateDetails(a2, b2, null);
+  if (!cSelections[2]) {
+    updateDetails(cSelections[0], cSelections[1], null);
 
     dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
-      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[0]),
-      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
-      curseSlot: 0
-    }) +
-      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
-      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[1]),
-      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
-      curseSlot: 1
-    }) +
-      renderChosenLine("", null, showRaw);
+      renderSlot(0, cSelections[0], roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(cSelections[0])) +
+      renderSlot(1, cSelections[1], roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(cSelections[1])) +
+      renderSlot(2, null, 0, okBySlot[2], null);
 
+    installEffectButtons();
     installCurseButtons();
 
     updateCounts(dom, 3, filtered3.length);
     return;
   }
 
-  updateDetails(a2, b2, c2);
+  updateDetails(cSelections[0], cSelections[1], cSelections[2]);
 
   dom.chosenList.innerHTML =
-    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
-      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[0]),
-      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
-      curseSlot: 0
-    }) +
-    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
-      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[1]),
-      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
-      curseSlot: 1
-    }) +
-    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(c2), {
-      curseRequired: String(c2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[2]),
-      curseButtonLabel: curseBySlot[2] ? "Change Curse" : "Select a Curse",
-      curseSlot: 2
-    });
+    renderSlot(0, cSelections[0], roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(cSelections[0])) +
+    renderSlot(1, cSelections[1], roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(cSelections[1])) +
+    renderSlot(2, cSelections[2], roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(cSelections[2]));
 
-    installCurseButtons();
+  installEffectButtons();
+  installCurseButtons();
 
   updateCounts(dom, 3, filtered3.length);
 }
@@ -821,21 +936,11 @@ function resetAllPreserveIllegal(desiredIllegal) {
   dom.selType.value = "All";
   dom.selColor.value = "Random";
 
-  // Preserve Show Illegal Combinations state (the user just toggled it)
   dom.showIllegalEl.checked = Boolean(desiredIllegal);
-
-  // Start Over behavior: Raw Data off, all selections cleared, default color repicked
   if (dom.showRawEl) dom.showRawEl.checked = false;
 
-  dom.cat1.value = "";
-  dom.cat2.value = "";
-  dom.cat3.value = "";
-
-  dom.sel1.value = "";
-  dom.sel2.value = "";
-  dom.sel3.value = "";
-
-  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
+  for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
   for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
 
   pickRandomColor();
@@ -849,15 +954,8 @@ function resetAll() {
   dom.showIllegalEl.checked = false;
   if (dom.showRawEl) dom.showRawEl.checked = false;
 
-  dom.cat1.value = "";
-  dom.cat2.value = "";
-  dom.cat3.value = "";
-
-  dom.sel1.value = "";
-  dom.sel2.value = "";
-  dom.sel3.value = "";
-
-  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
+  for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
   for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
 
   pickRandomColor();
@@ -871,21 +969,9 @@ async function load() {
   rowsAll = await res.json();
   byIdAll = new Map(rowsAll.map(r => [String(r.EffectID), r]));
   curses = rowsAll.filter(r => String(r?.Curse ?? "0") === "1");
-  // Filter out cursed effects (Curse = 1) from main dropdowns and categories.
-  // Data values are strings in JSON, so compare as strings.
   rows = rowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
   byId = new Map(rows.map(r => [String(r.EffectID), r]));
-pickRandomColor();
-
-  const base = baseFilteredByRelicType(rows, dom.selType.value);
-  const cats = categoriesFor(base);
-  fillCategorySelect(dom.cat1, cats);
-  fillCategorySelect(dom.cat2, cats);
-  fillCategorySelect(dom.cat3, cats);
-
-  fillSelect(dom.sel1, base, "— Effect 1 —");
-  fillSelect(dom.sel2, [], "— Effect 2 —");
-  fillSelect(dom.sel3, [], "— Effect 3 —");
+  pickRandomColor();
 
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
   installRelicImgFallback(dom.relicImg, () => dom.selType.value);
@@ -894,31 +980,6 @@ pickRandomColor();
   dom.selColor.addEventListener("change", () => updateUI("color-change"));
   dom.showIllegalEl.addEventListener("change", () => resetAllPreserveIllegal(dom.showIllegalEl.checked));
   if (dom.showRawEl) dom.showRawEl.addEventListener("change", () => updateUI("raw-change"));
-
-  dom.cat1.addEventListener("change", () => updateUI("cat-change"));
-  dom.cat2.addEventListener("change", () => updateUI("cat-change"));
-  dom.cat3.addEventListener("change", () => updateUI("cat-change"));
-
-  dom.sel1.addEventListener("change", () => {
-    // Any effect change forces curse re-pick for that slot
-    curseBySlot[0] = null;
-    const chosen = getRow(dom.sel1.value);
-    const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-    if (nextType) dom.selType.value = nextType;
-    updateUI("effect-change");
-  });
-
-  dom.sel2.addEventListener("change", () => {
-    // Any effect change forces curse re-pick for that slot
-    curseBySlot[1] = null;
-    updateUI("effect-change");
-  });
-  dom.sel3.addEventListener("change", () => {
-    // Any effect change forces curse re-pick for that slot
-    curseBySlot[2] = null;
-    updateUI("effect-change");
-  });
-
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", resetAll);
 
   updateUI("init");

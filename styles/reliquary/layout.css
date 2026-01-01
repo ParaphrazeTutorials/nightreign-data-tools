@@ -238,114 +238,17 @@
 }
 
 /* ------------------------------------------------------------
-   Main layout: 1/3 left, 2/3 right
+   Main layout: single column (preview + details)
    ------------------------------------------------------------ */
 
 .main-grid {
   display: grid;
-  grid-template-columns: clamp(320px, 30vw, 480px) 1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
-@media (max-width: 900px) {
-  .main-grid { grid-template-columns: 1fr; }
-}
-
-/* ------------------------------------------------------------
-   Main grid alignment fix
-   Ensure left Effect Selection panel and right Relic Preview panel
-   start at the same vertical baseline.
-   ------------------------------------------------------------ */
-
-.main-grid .left-column > *:first-child,
-.main-grid .right-column > *:first-child {
+.main-grid > *:first-child {
   margin-top: 0 !important;
-}
-
-/* ------------------------------------------------------------
-   LEFT COLUMN (COMPACT MODE)
-   ------------------------------------------------------------ */
-
-.left-column {
-  display: grid;
-  gap: 0.85rem;
-  align-content: start;
-}
-
-/* One sidebar container for all effects */
-.sidebar-panel {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.22);
-  border-radius: 0.75rem;
-  padding: 0.75rem;
-  margin-top: 0;
-}
-
-/* Tighten each effect section */
-.sidebar-panel .effect-card {
-  margin: 0;
-  padding: 0.5rem 0;
-  border-radius: 0;
-  background: transparent;
-  border: none;
-}
-
-.sidebar-panel .effect-card:first-child { padding-top: 0; }
-.sidebar-panel .effect-card:last-child { padding-bottom: 0; }
-
-.sidebar-panel .effect-card + .effect-card {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin-top: 0.5rem;
-  padding-top: 0.65rem;
-}
-
-/* Headings: smaller + no extra margin */
-.sidebar-panel .effect-card h3 {
-  margin: 0 0 0.45rem 0;
-  font-size: 0.98rem;
-  letter-spacing: 0.01em;
-}
-
-/* Subtext count: smaller + closer */
-.effect-card small.subtext {
-  display: block;
-  margin-top: 0.25rem;
-  opacity: 0.75;
-  font-size: 0.86rem;
-}
-
-/* ------------------------------------------------------------
-   EFFECT PICKERS: SIDE-BY-SIDE (SAFE + COMPACT)
-   ------------------------------------------------------------ */
-
-.sidebar-panel .effect-row {
-  display: grid;
-  grid-template-columns: minmax(120px, 0.85fr) minmax(200px, 1.55fr);
-  gap: 0.55rem;
-  align-items: end;
-}
-
-@media (max-width: 520px) {
-  .sidebar-panel .effect-row { grid-template-columns: 1fr; }
-}
-
-/* Kill Pico spacing and keep labels compact */
-.sidebar-panel .effect-row label {
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: 0.86rem;
-  opacity: 0.92;
-}
-
-.sidebar-panel .effect-row label > :is(select, input) {
-  margin-top: 0.25rem !important;
-}
-
-/* Slightly shorter selects */
-.sidebar-panel select {
-  padding-top: 0.45rem !important;
-  padding-bottom: 0.45rem !important;
-  min-height: 2.35rem;
 }
 
 /* ------------------------------------------------------------

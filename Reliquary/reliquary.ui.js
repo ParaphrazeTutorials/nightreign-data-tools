@@ -10,12 +10,6 @@ function optionHtml(row) {
   return `<option value="${row.EffectID}">${label}</option>`;
 }
 
-export function fillCategorySelect(catEl, categories) {
-  const first = `<option value="">All</option>`;
-  const opts = categories.map(c => `<option value="${c}">${c}</option>`).join("");
-  catEl.innerHTML = first + opts;
-}
-
 export function updateCounts(dom, activeIndex, availableCount) {
   dom.count1.textContent = "";
   dom.count2.textContent = "";
@@ -98,11 +92,17 @@ function moveIndicatorHtml(moveDelta, showOk = false) {
 export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk = false, rowBadge = null, opts = null) {
   const prefix = slotLabel ? `${slotLabel}: ` : "";
 
+  const effectSlot = opts && Number.isFinite(opts.effectSlot) ? opts.effectSlot : null;
+  const effectBtnLabel = (opts && opts.effectButtonLabel) ? String(opts.effectButtonLabel) : "Select Effect";
+  const effectBtnDisabled = !!(opts && opts.effectButtonDisabled);
+
+  const effectBtn = effectSlot != null
+    ? `<button type="button" class="effect-btn" data-effect-slot="${effectSlot}" ${effectBtnDisabled ? "disabled" : ""}>${effectBtnLabel}</button>`
+    : "";
+
   // Empty slot
   if (!row) {
-    const title = slotLabel
-      ? `${prefix}<span class="pill">Empty</span>`
-      : `<span class="pill">Empty</span>`;
+    const title = slotLabel ? slotLabel : "";
 
     if (!showRaw) {
       return `
@@ -112,6 +112,7 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
           <div class="effect-line">
             <div class="effect-main">
               <div class="title">${title}</div>
+              ${effectBtn}
             </div>
           </div>
         </li>
@@ -120,12 +121,16 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
 
     return `
       <li>
-          <div class="effect-row">
-        <div class="effect-icon" aria-hidden="true"></div>
-        <div class="effect-line">
-          <div class="effect-main">
-            <div class="title">${title}</div>
-            <div class="meta"></div>
+        <div class="effect-row">
+          <div class="effect-icon" aria-hidden="true"></div>
+          <div class="effect-line">
+            <div class="effect-main effect-main--row">
+              <div class="effect-text">
+                <div class="title">${title}</div>
+                <div class="meta"></div>
+              </div>
+              ${effectBtn}
+            </div>
           </div>
         </div>
       </li>
@@ -149,8 +154,11 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
     : "";
 
   const curseSub = curseRequired && curseName
-    ? `<div class="curse-sub">${curseName}</div>`
+    ? `<span class="curse-sub">${curseName}</span>`
     : "";
+
+  const needsCursePick = curseRequired && !curseName && curseBtn;
+  const hasCurse = curseRequired && !!curseName;
 
 
   const src = iconId ? iconPath(iconId) : "";
@@ -168,8 +176,9 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
         </div>
         <div class="effect-line">
           <div class="effect-main">
-            <div class="title"><span class="title-text">${prefix}${name}</span>${curseBtn}</div>
-            ${curseSub}
+            <div class="title"><span class="title-text">${prefix}${name}</span>${effectBtn}</div>
+            ${needsCursePick ? `<div class="curse-line"><span class="curse-required">Curse Required</span>${curseBtn}</div>` : ""}
+            ${hasCurse ? `<div class="curse-line">${curseSub}${curseBtn}</div>` : ""}
           </div>
           ${indicators}
         </div>
@@ -188,9 +197,10 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
         <div class="effect-main effect-main--row">
           <div class="effect-text">
             <div class="title"><span class="title-text">${prefix}${name}</span></div>
-            ${curseSub}
+            ${needsCursePick ? `<div class="curse-line"><span class="curse-required">Curse Required</span>${curseBtn}</div>` : ""}
+            ${hasCurse ? `<div class="curse-line">${curseSub}${curseBtn}</div>` : ""}
           </div>
-          ${curseBtn}
+          ${effectBtn}
           <div class="meta">
             EffectID <code>${row.EffectID}</code>
             • CompatibilityID <code>${cid}</code>
