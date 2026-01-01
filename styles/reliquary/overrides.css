@@ -21,6 +21,17 @@
   margin-right: 0.6rem;
 }
 
+/* Keep curse text centered with its button in all modes */
+#results .curse-line .curse-sub {
+  margin-top: 0;
+  align-self: center;
+  line-height: 1.1;
+}
+
+#results.is-raw .effect-main--row .curse-sub {
+  align-self: center !important;
+}
+
 /* ------------------------------------------------------------
    Relic Preview (use base layout styles; no overrides here)
    ------------------------------------------------------------ */
@@ -108,6 +119,35 @@ button#startOver:focus-visible {
 /* Raw meta always starts on its own row */
 #results.is-raw .effect-main--row .meta {
   grid-area: meta;
+
+  /* Let main tokens sit on line 1; allow a controlled wrap for curse tokens */
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  white-space: normal;
+  gap: 0.35rem 0.65rem;
+  align-items: center;
+}
+
+#results.is-raw .effect-main--row .meta code {
+  padding: 0.16rem 0.40rem;
+}
+
+/* Force a clean break before curse tokens without extra gap */
+#results.is-raw .effect-main--row .meta .meta-break {
+  flex-basis: 100%;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+}
+
+#results.is-raw .effect-main--row .meta .meta-curse {
+  color: #b58cff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 /* ------------------------------------------------------------
    Curse dialog sizing (compact centered modal)

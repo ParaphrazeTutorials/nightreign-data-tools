@@ -206,11 +206,8 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
             • CompatibilityID <code>${cid}</code>
             • RollOrder <code>${roll}</code>
             ${(showRaw && curseRow)
-    ? `<div class="meta meta--curse">
-         <span class="curse-label">CurseID</span> <code>${curseRow.EffectID}</code>
-         • <span class="curse-label">CurseCompatibilityID</span> <code>${curseRow.CompatibilityID}</code>
-       </div>`
-    : ``}
+              ? `<span class="meta-break"></span><span class="meta-curse">CurseID <code>${curseRow.EffectID}</code> • CurseCompatibilityID <code>${curseRow.CompatibilityID}</code></span>`
+              : ""}
 
           </div>
         </div>
