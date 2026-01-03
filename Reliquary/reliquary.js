@@ -115,6 +115,35 @@ function computeRollOrderIssue(a, b, c) {
   };
 }
 
+function computePositionIssue(a, b, c) {
+  const slots = [a, b, c];
+  const badSlots = [];
+  let sawEmpty = false;
+
+  for (let i = 0; i < slots.length; i++) {
+    const r = slots[i];
+    if (!r) {
+      sawEmpty = true;
+      continue;
+    }
+    if (sawEmpty) badSlots.push(i);
+  }
+
+  return { hasIssue: badSlots.length > 0, badSlots };
+}
+
+function selectionsCompatibleWithType(type) {
+  const others = [getSelectedRow(1), getSelectedRow(2)].filter(Boolean);
+  return others.every(r => baseFilteredByRelicType([r], type).length > 0);
+}
+
+function maybeAutoSetTypeFromEffect1(nextType) {
+  if (!nextType) return;
+  if (dom.selType.value !== "All") return;
+  if (!selectionsCompatibleWithType(nextType)) return;
+  dom.selType.value = nextType;
+}
+
 function applyAutoSort() {
   const current = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
   const roll = computeRollOrderIssue(current[0], current[1], current[2]);
@@ -1010,7 +1039,7 @@ function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
       if (slotIdx === 0) {
         const chosen = getRow(id);
         const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-        if (nextType) dom.selType.value = nextType;
+        maybeAutoSetTypeFromEffect1(nextType);
       }
 
       closeEffectMenu();
@@ -1193,7 +1222,7 @@ function openEffectDialog(slotIdx) {
     if (slotIdx === 0) {
       const chosen = getRow(v);
       const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-      if (nextType) dom.selType.value = nextType;
+      maybeAutoSetTypeFromEffect1(nextType);
     }
 
     effectDialog.close("apply");
@@ -1249,6 +1278,8 @@ function updateDetails(a, b, c) {
     if (req && !curseBySlot[i]) missingCurseSlots.push(i);
   }
 
+  const positionIssue = computePositionIssue(a, b, c);
+
   if (missingCurseSlots.length > 0) {
     const labels = missingCurseSlots.map(i => slotLabel(i)).join(", ");
     blocks.push(`
@@ -1263,6 +1294,26 @@ function updateDetails(a, b, c) {
           <div class="popover-body">
             <p><em>On Depth of Night Relics only, certain effects cannot be rolled without an accompanying Curse.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
             <p>Missing for: <strong>${labels}</strong>.</p>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  if (positionIssue.hasIssue) {
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="positioning">
+        <div class="info-line">
+          Improper effect
+          <button type="button" class="term-link" data-popover-toggle="positionPopover">
+            positioning
+          </button>.
+        </div>
+
+        <div class="popover" id="positionPopover" hidden>
+          <div class="popover-title">Improper Effect Positioning</div>
+          <div class="popover-body popover-body--spaced">
+            <p>Please add effects starting at slot 1 and fill each next slot in order.</p>
           </div>
         </div>
       </div>
@@ -1406,6 +1457,8 @@ function updateUI(reason = "") {
   const roll = computeRollOrderIssue(cSelections[0], cSelections[1], cSelections[2]);
   const hasOrderIssue = roll.hasIssue;
   const moveDeltaBySlot = roll.moveDeltaBySlot || [0, 0, 0];
+  const positionIssue = computePositionIssue(cSelections[0], cSelections[1], cSelections[2]);
+  const hasPositionIssue = positionIssue.hasIssue;
 
   if (autoSortBtn) {
     const showAutoSort = hasOrderIssue && selectedCount >= 2;
@@ -1423,7 +1476,7 @@ function updateUI(reason = "") {
     return false;
   })();
 
-  const state = anySelected && (hasCompatIssue || hasOrderIssue || hasCurseMissing) ? "Invalid" : "Valid";
+  const state = anySelected && (hasCompatIssue || hasOrderIssue || hasCurseMissing || hasPositionIssue) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
   const okBySlot = [false, false, false];
@@ -1436,8 +1489,9 @@ function updateUI(reason = "") {
     const orderBad = hasOrderIssue && moveDeltaBySlot[i] !== 0;
     const curseReq = String(row?.CurseRequired ?? "0") === "1";
     const curseMissing = curseReq && !curseBySlot[i];
+    const positionBad = hasPositionIssue && positionIssue.badSlots.includes(i);
 
-    if (!compatBad && !orderBad && !curseMissing) okBySlot[i] = true;
+    if (!compatBad && !orderBad && !curseMissing && !positionBad) okBySlot[i] = true;
   }
 
   const effectButtonDisabled = [false, false, false];

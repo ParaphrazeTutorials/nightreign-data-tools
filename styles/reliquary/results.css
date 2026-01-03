@@ -36,7 +36,7 @@
 
 #results .panel-header {
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
   padding: 0.55rem 0.7rem;
   border-radius: 0.65rem;
@@ -76,18 +76,33 @@
   justify-content: flex-end;
   gap: 0.35rem;
   flex-wrap: wrap;
+  white-space: nowrap;
 }
 
 .auto-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  min-height: 0;
+  height: 33.72px;
+  margin: 0;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(60, 80, 120, 0.28);
+  border: 1px solid rgba(200, 165, 255, 0.45);
+  background:
+    radial-gradient(120% 140% at 10% 15%, rgba(230, 200, 255, 0.25), rgba(0, 0, 0, 0) 62%),
+    linear-gradient(135deg,
+      rgba(120, 80, 200, 0.90) 0%,
+      rgba(170, 110, 255, 0.78) 55%,
+      rgba(30, 18, 48, 0.82) 100%
+    );
   color: #f4f7ff;
-  padding: 0.28rem 0.65rem;
-  font-weight: 700;
-  font-size: 0.72rem;
+  padding: 0 12px;
+  font-weight: 800;
+  font-size: 14.82px;
   letter-spacing: 0.01em;
-  line-height: 1.1;
+  line-height: 22.23px;
+  transform: none;
   transition: background 140ms ease, border-color 140ms ease, transform 120ms ease;
 }
 
