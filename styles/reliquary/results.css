@@ -3,12 +3,19 @@
    ------------------------------------------------------------ */
 
 :root {
-  --results-img-col: 200px;
-  --row-radius: 0.75rem;
-  --row-pad-y: 0.7rem;
-  --row-pad-x: 0.85rem;
-  --row-gap: 0.65rem;
-  --icon-size: 38px;
+  --results-img-col: 130px;
+  --row-radius: 0.56rem;
+  --row-pad-y: 0.38rem;
+  --row-pad-top: 0.38rem;
+  --row-pad-x: 0.52rem;
+  --row-gap: 0.4rem;
+  --icon-size: 24px;
+  --row-min-height-compact: 90px;
+  --row-min-height-raw: 140px;
+}
+
+#results {
+  font-size: 0.7rem;
 }
 
 #results {
@@ -29,7 +36,7 @@
 
 #results .panel-header {
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
   padding: 0.55rem 0.7rem;
   border-radius: 0.65rem;
@@ -83,15 +90,17 @@
 
 .relic-preview {
   display: grid;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  grid-template-columns: clamp(200px, 22vw, 300px) minmax(420px, 1fr);
   grid-template-areas: "relic-img relic-effects";
-  gap: 1rem;
+  gap: 0.55rem;
   align-items: stretch;
   /* row height follows effects; image stretches without contributing size */
   grid-auto-rows: auto;
   overflow: hidden;
   position: relative;
   isolation: isolate;
+  /* avoid scaling so the layout height matches the visible content */
+  width: 100%;
 }
 
 /* Raw + curse only: give the image column a sane size so it can't collapse to 2px */
@@ -99,13 +108,11 @@
   grid-template-columns: clamp(240px, 26vw, 340px) minmax(460px, 1fr) !important;
 }
 
-/* Raw mode baseline: keep the effects column wide enough that text/meta can wrap without vertical stacking */
-#results.is-raw .relic-preview {
-  grid-template-columns: clamp(240px, 26vw, 340px) minmax(560px, 1fr);
-}
+/* Raw inherits the same column sizing; raw-has-curse keeps its wider override above */
 
+/* Raw mode baseline: keep the effects column wide enough that text can wrap without vertical stacking */
 #results.is-raw .relic-effects {
-  min-width: 560px;
+  min-width: 420px;
 }
 
 /* Raw + curse: enforce list items grid so rows don't collapse */
@@ -127,20 +134,20 @@
   min-width: 0;
 }
 
-/* Raw + curse selected: bound the image column so curse meta can't balloon the row */
+/* Raw mode: match the standard clamp/min sizing so the image scales with effects */
 #results.is-raw .relic-preview {
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  grid-template-columns: clamp(200px, 22vw, 300px) minmax(420px, 1fr);
 }
 
 .relic-frame {
   grid-area: relic-img;
   grid-row: 1;
-  width: auto;
+  width: 100%;
   height: 100%;
   max-width: 100%;
   max-height: 100%;
   aspect-ratio: 1 / 1; /* square; height follows row, width follows height */
-  contain: size; /* prevent frame from setting the track/row size */
+  contain: none; /* allow frame to fill the column */
   min-height: 0;
   border-radius: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.32);
@@ -170,7 +177,7 @@
 
 /* Raw + curse: keep effects from collapsing */
 #results.raw-has-curse .relic-preview .relic-effects {
-  min-width: 460px;
+  min-width: 380px;
 }
 
 /* Raw + curse: keep frame within the bounded column */
@@ -198,7 +205,7 @@
   grid-area: relic-effects;
   grid-row: 1;
   height: auto;
-  min-height: var(--results-img-col);
+  min-height: auto;
   align-self: stretch;
   width: 100%;
   min-width: 0;
@@ -227,15 +234,9 @@
 #results.is-raw .relic-effects .chosen-effects,
 #results.is-raw .relic-effects .chosen-effects li,
 #results.is-raw .relic-effects .chosen-effects li .effect-line,
-#results.is-raw .relic-effects .chosen-effects li .effect-main,
-#results.is-raw .relic-effects .chosen-effects li .meta {
+#results.is-raw .relic-effects .chosen-effects li .effect-main {
   min-width: 0;
   max-width: 100%;
-}
-
-#results.is-raw .relic-effects .chosen-effects li .meta {
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 #results.is-raw .relic-effects .chosen-effects li {
@@ -252,9 +253,7 @@
 
 #results.is-raw .effect-main.effect-main--row .effect-text,
 #results.is-raw .effect-main.effect-main--row .title,
-#results.is-raw .effect-main.effect-main--row .title .title-text,
-#results.is-raw .effect-main.effect-main--row .meta,
-#results.is-raw .effect-main.effect-main--row .meta code {
+#results.is-raw .effect-main.effect-main--row .title .title-text {
   min-width: 0;
   max-width: 100%;
   white-space: normal;
@@ -264,7 +263,6 @@
 
 #results.is-raw .chosen-effects li .effect-main.effect-main--row,
 #results.is-raw .chosen-effects li .effect-main.effect-main--row .effect-text,
-#results.is-raw .chosen-effects li .effect-main.effect-main--row .meta,
 #results.is-raw .chosen-effects li .effect-main.effect-main--row .title,
 #results.is-raw .chosen-effects li .effect-main.effect-main--row .title .title-text {
   min-width: 0;
@@ -280,8 +278,8 @@
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-rows: repeat(3, auto);
-  grid-auto-rows: auto;
+  grid-template-rows: repeat(3, minmax(var(--row-min-height-compact), auto));
+  grid-auto-rows: minmax(var(--row-min-height-compact), auto);
   gap: var(--row-gap);
   width: 100%;
 }
@@ -298,14 +296,29 @@
   display: grid;
   grid-template-columns: var(--icon-size) minmax(0, 1fr);
   gap: 0.75rem;
-  padding: var(--row-pad-y) var(--row-pad-x);
+  padding: var(--row-pad-top) var(--row-pad-x) var(--row-pad-y) var(--row-pad-x);
   border-radius: var(--row-radius);
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.10));
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   align-items: start;
+  min-height: var(--row-min-height-compact);
   height: auto;
   align-self: stretch;
+}
+
+/* Raw mode: allow taller rows/panel to fit curse content */
+#results.is-raw .relic-effects {
+  min-height: calc(var(--row-min-height-raw) * 3 + var(--row-gap) * 2);
+}
+
+#results.is-raw .chosen-effects {
+  grid-template-rows: repeat(3, minmax(var(--row-min-height-raw), auto));
+  grid-auto-rows: minmax(var(--row-min-height-raw), auto);
+}
+
+#results.is-raw .chosen-effects li {
+  min-height: var(--row-min-height-raw);
 }
 
 /* ------------------------------------------------------------
@@ -374,17 +387,86 @@
 .chosen-effects li .effect-line {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.55rem;
+  column-gap: 0.55rem;
+  row-gap: 0.35rem;
   min-width: 0;
+  align-items: start;
+}
+
+.effect-main.effect-main--row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-auto-rows: auto;
+  align-items: start;
+  gap: 0.35rem 0.6rem;
+  width: 100%;
+  min-width: 0;
+}
+
+#results:not(.is-raw) .effect-main.effect-main--row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "text controls";
   align-items: center;
+  align-content: start;
+  column-gap: 0.55rem;
+  row-gap: 0.35rem;
+  width: 100%;
+}
+
+#results:not(.is-raw) .effect-main.effect-main--row .effect-text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+#results:not(.is-raw) .effect-main.effect-main--row .title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+#results:not(.is-raw) .effect-line .curse-line {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+#results:not(.is-raw) .effect-main.effect-main--row .effect-btn,
+#results:not(.is-raw) .effect-main.effect-main--row .control-cluster.effect-controls,
+#results:not(.is-raw) .effect-main.effect-main--row .curse-btn,
+#results:not(.is-raw) .effect-main.effect-main--row .control-cluster.curse-controls,
+#results:not(.is-raw) .effect-main.effect-main--row .row-indicators {
+  align-self: center;
+}
+
+#results:not(.is-raw) .effect-main.effect-main--row .control-cluster.effect-controls,
+#results:not(.is-raw) .effect-main.effect-main--row .effect-btn {
+  grid-area: controls;
+  justify-self: end;
+  align-self: start;
+  margin-top: -1px;
+}
+
+.effect-main.effect-main--row .effect-text {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
 }
 
 #results.is-raw .chosen-effects li .effect-line {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.55rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 0.55rem;
+  row-gap: 0.35rem;
   width: 100%;
   min-width: 0;
+  align-items: start;
 }
 
 /* Raw mode: let the main content own the space; indicators stay absolute via existing rules */
@@ -410,14 +492,14 @@
   min-width: 0;
 }
 
-#results:not(.is-raw) .chosen-effects li .effect-main {
+#results:not(.is-raw) .chosen-effects li .effect-main:not(.effect-main--row) {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   min-width: 0;
 }
 
-#results:not(.is-raw) .chosen-effects li .effect-main:has(.curse-line) {
+#results:not(.is-raw) .chosen-effects li .effect-main:not(.effect-main--row):has(.curse-line) {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.35rem;
@@ -434,31 +516,20 @@
   min-width: 0;
 }
 
-.chosen-effects li .effect-main .meta {
-  font-size: 0.88rem;
-  line-height: 1.25;
-  opacity: 0.78;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 0.55rem;
-  align-items: center;
-  margin: 0;
-  min-width: 0;
+.chosen-effects li .title-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
 }
 
-.chosen-effects li .effect-main .meta code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 0.85em;
-  padding: 0.18rem 0.42rem;
-  border-radius: 0.45rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-}
 .chosen-effects li .curse-line {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.45rem;
   margin-top: 0;
+  position: relative;
 }
 
 /* Keep curse text level with the button; remove the negative lift from the shared style */
@@ -466,6 +537,24 @@
   margin-top: 0;
   align-self: center;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.curse-line .curse-required,
+.curse-line .curse-btn,
+.curse-line .curse-sub {
+  align-self: center;
+}
+
+.curse-line .curse-btn {
+  margin-top: 0;
+}
+
+.curse-line .curse-btn {
+  align-items: center;
+  line-height: 1.25;
 }
 
 .chosen-effects li .curse-required {
@@ -477,7 +566,6 @@
   align-items: center;
 }
 
-#results:not(.is-raw) .chosen-effects li .effect-main .meta { display: none; }
 #results:not(.is-raw) .chosen-effects li,
 #results:not(.is-raw) .chosen-effects li .effect-line { align-items: center; }
 
@@ -490,7 +578,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.9rem;
+  gap: 0.55rem;
   background: none;
   border: none;
   padding: 0;
@@ -591,52 +679,6 @@
   align-items: center;
   gap: 0.6rem;
 }
-
-/* ------------------------------------------------------------
-   Raw Data — Curse meta labels (labels only; values unchanged)
-   ------------------------------------------------------------ */
-
-#results.is-raw .meta.meta--curse .curse-label {
-  color: rgba(181, 140, 255, 1);
-  opacity: 1;
-}
-
-/* Raw: keep meta blocks flexible and let the curse row occupy full width without squeezing the title line */
-#results.is-raw .effect-main--row .meta {
-  width: 100%;
-  min-width: 0;
-}
-
-#results.is-raw .meta.meta--curse {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  margin-top: 0.25rem;
-}
-
-#results.is-raw .meta.meta--curse code {
-  white-space: nowrap;
-}
-
-
-
-/* ------------------------------------------------------------
-  Raw Data — keep Curse button position stable when a curse is selected
-  The raw layout uses a 4-column grid (title | effectbtn | btn | indicators).
-  When a curse meta row is present, keep all four columns but bias the width
-  toward the text/meta column so the button stays locked to the title line.
-  ------------------------------------------------------------ */
-
-#results.is-raw .effect-main--row:has(.meta--curse) {
-  grid-template-columns: minmax(0, 1fr) auto auto auto !important;
-}
-
-#results.is-raw .effect-main--row:has(.meta--curse) .curse-btn {
-  align-self: center !important;
-  justify-self: start !important;
-}
-
-
 
 /* ------------------------------------------------------------
    Curse Button — Purple gradient when a curse is selected

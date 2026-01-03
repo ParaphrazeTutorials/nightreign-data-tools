@@ -90,7 +90,8 @@ function moveIndicatorHtml(moveDelta, showOk = false) {
 }
 
 export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk = false, rowBadge = null, opts = null) {
-  const prefix = slotLabel ? `${slotLabel}: ` : "";
+  // Only prepend the slot label when the slot is empty; selected rows should just show the effect name
+  const prefix = (!row && slotLabel) ? `${slotLabel}: ` : "";
 
   const effectSlot = opts && Number.isFinite(opts.effectSlot) ? opts.effectSlot : null;
   const effectBtnLabel = (opts && opts.effectButtonLabel) ? String(opts.effectButtonLabel) : "Select Effect";
@@ -99,6 +100,31 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
   const effectBtn = effectSlot != null
     ? `<button type="button" class="effect-btn" data-effect-slot="${effectSlot}" ${effectBtnDisabled ? "disabled" : ""}>${effectBtnLabel}</button>`
     : "";
+
+  // Precompute effect meta fields (used in tooltip and meta block)
+  const name = row?.EffectDescription ?? (row ? `(Effect ${row.EffectID})` : "");
+  const cid = row?.CompatibilityID == null ? "∅" : String(row.CompatibilityID);
+  const iconId = row?.StatusIconID ? row.StatusIconID.toString().trim() : "";
+  const roll = (row?.RollOrder == null || String(row.RollOrder).trim() === "") ? "∅" : String(row.RollOrder);
+
+  const effectInfoParts = row
+    ? [
+        `EffectID ${row.EffectID}`,
+        `Compatibility ${cid}`,
+        `RollOrder ${roll}`,
+        ...(opts && opts.curseRow ? [`CurseID ${opts.curseRow.EffectID}`, `CurseCompatibility ${opts.curseRow.CompatibilityID ?? "∅"}`] : [])
+      ]
+    : [];
+  const effectInfoTitle = effectInfoParts.join(" • ");
+  const curseInfoTitle = cr => cr ? `CurseID ${cr.EffectID} • CurseCompatibility ${cr.CompatibilityID ?? "∅"}` : "";
+
+  const effectControls = (effectSlot != null && row)
+    ? `<div class="control-cluster effect-controls" data-effect-controls="${effectSlot}">
+        <button type="button" class="icon-btn swap-btn" data-effect-slot="${effectSlot}" aria-label="Change Effect" title="Change Effect">⇄</button>
+        <button type="button" class="icon-btn info-btn" aria-label="Show Effect Info" title="${effectInfoTitle}">i</button>
+        <button type="button" class="icon-btn clear-btn" data-effect-clear-slot="${effectSlot}" aria-label="Clear Effect" title="Clear Effect">×</button>
+      </div>`
+    : effectBtn;
 
   // Empty slot
   if (!row) {
@@ -127,7 +153,6 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
             <div class="effect-main effect-main--row">
               <div class="effect-text">
                 <div class="title">${title}</div>
-                <div class="meta"></div>
               </div>
               ${effectBtn}
             </div>
@@ -136,12 +161,6 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
       </li>
     `;
   }
-
-  const name = row.EffectDescription ?? `(Effect ${row.EffectID})`;
-  const cid = (row?.CompatibilityID == null) ? "∅" : String(row.CompatibilityID);
-  const iconId = (row?.StatusIconID ?? "").toString().trim();
-  const roll = (row?.RollOrder == null || String(row.RollOrder).trim() === "") ? "∅" : String(row.RollOrder);
-
 
   const curseRequired = !!(opts && opts.curseRequired);
   const curseRow = opts && opts.curseRow ? opts.curseRow : null;
@@ -160,6 +179,18 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
   const needsCursePick = curseRequired && !curseName && curseBtn;
   const hasCurse = curseRequired && !!curseName;
 
+  const curseLine = needsCursePick
+    ? `<div class="curse-line"><span class="curse-required">Curse Required</span>${curseBtn}</div>`
+    : hasCurse
+      ? `<div class="curse-line">${curseSub}
+          <div class="control-cluster curse-controls" data-curse-controls="${curseSlot != null ? curseSlot : ""}">
+            <button type="button" class="icon-btn swap-btn" data-curse-slot="${curseSlot}" aria-label="Change Curse" title="Change Curse">⇄</button>
+            <button type="button" class="icon-btn info-btn" aria-label="Show Curse Info" title="${curseInfoTitle(curseRow)}">i</button>
+            <button type="button" class="icon-btn clear-btn" data-curse-clear-slot="${curseSlot}" aria-label="Clear Curse" title="Clear Curse">×</button>
+          </div>
+        </div>`
+      : "";
+
 
   const src = iconId ? iconPath(iconId) : "";
   const mover = moveIndicatorHtml(moveDelta, showOk);
@@ -167,51 +198,22 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
   const indicators = (badge || mover) ? `<div class="row-indicators">${badge}${mover}</div>` : "";
 
   // Compact
-  if (!showRaw) {
-    return `
-      <li>
-          <div class="effect-row">
+  return `
+    <li>
+      <div class="effect-row">
         <div class="effect-icon" aria-hidden="true">
           ${src ? `<img src="${src}" alt="" onerror="this.remove()" />` : ""}
         </div>
         <div class="effect-line">
-          <div class="effect-main">
-            <div class="title"><span class="title-text">${prefix}${name}</span>${effectBtn}</div>
-            ${needsCursePick ? `<div class="curse-line"><span class="curse-required">Curse Required</span>${curseBtn}</div>` : ""}
-            ${hasCurse ? `<div class="curse-line">${curseSub}${curseBtn}</div>` : ""}
+          <div class="effect-main effect-main--row">
+            <div class="effect-text">
+              <div class="title"><span class="title-text">${prefix}${name}</span></div>
+            </div>
+            ${effectControls}
           </div>
+          ${curseLine}
           ${indicators}
         </div>
-      </li>
-    `;
-  }
-
-  // Raw
-  return `
-    <li>
-          <div class="effect-row">
-      <div class="effect-icon" aria-hidden="true">
-        ${src ? `<img src="${src}" alt="" onerror="this.remove()" />` : ""}
-      </div>
-      <div class="effect-line">
-        <div class="effect-main effect-main--row">
-          <div class="effect-text">
-            <div class="title"><span class="title-text">${prefix}${name}</span></div>
-            ${needsCursePick ? `<div class="curse-line"><span class="curse-required">Curse Required</span>${curseBtn}</div>` : ""}
-            ${hasCurse ? `<div class="curse-line">${curseSub}${curseBtn}</div>` : ""}
-          </div>
-          ${effectBtn}
-          <div class="meta">
-            EffectID <code>${row.EffectID}</code>
-            • CompatibilityID <code>${cid}</code>
-            • RollOrder <code>${roll}</code>
-            ${(showRaw && curseRow)
-              ? `<span class="meta-break"></span><span class="meta-curse">CurseID <code>${curseRow.EffectID}</code> • CurseCompatibilityID <code>${curseRow.CompatibilityID}</code></span>`
-              : ""}
-
-          </div>
-        </div>
-        ${indicators}
       </div>
     </li>
   `;

@@ -21,6 +21,14 @@
 .effect-line {
   display: flex;
   align-items: center;
+
+.effect-menu__effect-leading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
   gap: 0.75rem;
 }
 
@@ -60,6 +68,7 @@
 
   /* Keep the curse text as close as possible to the effect title */
   margin-top: -0.32rem;
+  line-height: 1.25;
   line-height: 1.05;
 }
 
@@ -70,12 +79,13 @@
   margin: 0;
   display: inline-flex;
   align-items: center;
+  align-self: center;
 
-  padding: 0.25rem 0.55rem;
+  padding: 0.18rem 0.39rem;
   border-radius: 999px;
 
   font-weight: 800;
-  font-size: 0.78rem;
+  font-size: 0.6rem;
   letter-spacing: 0.02em;
 
   border: 1px solid rgba(255,255,255,0.12);
@@ -118,7 +128,8 @@
 
 .effect-main--row > .effect-text { grid-area: text; min-width: 0; }
 .effect-main--row > .meta { grid-area: meta; }
-.effect-main--row > .effect-btn { grid-area: effectbtn; align-self: center; justify-self: end; }
+.effect-main--row > .effect-btn,
+.effect-main--row > .control-cluster.effect-controls { grid-area: effectbtn; align-self: center; justify-self: end; }
 .effect-main--row > .curse-btn { grid-area: btn; align-self: center; justify-self: end; }
 .effect-main--row > .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
 
@@ -127,10 +138,11 @@
   margin: 0;
   display: inline-flex;
   align-items: center;
-  padding: 0.3rem 0.65rem;
+  align-self: center;
+  padding: 0.21rem 0.46rem;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   letter-spacing: 0.02em;
   border: 1px solid rgba(255,255,255,0.14);
   background: linear-gradient(
@@ -154,6 +166,40 @@
     rgba(0, 0, 0, 0.42) 100%
   );
 }
+
+/* Icon clusters for selected effect/curse actions */
+.control-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.icon-btn {
+  margin: 0;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(25, 32, 52, 0.9);
+  color: rgba(255, 255, 255, 0.92);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.86rem;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.icon-btn:hover { background: rgba(35, 44, 70, 0.95); border-color: rgba(255, 255, 255, 0.28); }
+.icon-btn:active { background: rgba(18, 24, 40, 0.95); }
+.icon-btn.clear-btn { color: rgba(255, 138, 138, 0.95); border-color: rgba(255, 138, 138, 0.35); }
+.icon-btn.clear-btn:hover { color: rgba(255, 160, 160, 1); border-color: rgba(255, 160, 160, 0.55); }
+.icon-btn.swap-btn { color: rgba(140, 190, 255, 0.95); }
+.icon-btn.info-btn { color: rgba(181, 140, 255, 0.95); }
 
 .effect-btn:disabled {
   cursor: not-allowed;
@@ -269,7 +315,7 @@
 
 .effect-menu--wide .effect-menu__layout {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(420px, 2fr);
+  grid-template-columns: minmax(240px, 1.15fr) minmax(420px, 2fr);
   gap: 0.1rem;
   flex: 1 1 auto;
   min-height: 0;
@@ -365,56 +411,63 @@
   height: 100%;
 }
 
+.effect-menu__column--cats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-content: stretch;
+  align-items: stretch;
+  padding: 0.6rem 0.65rem 0.55rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
 .effect-menu__cat {
   appearance: none;
   -webkit-appearance: none;
-  display: flex;
+  flex: 0 0 auto;
+  display: inline-flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   margin: 0;
-  gap: 0.5rem;
-  padding: 12px 0.6rem;
-  border-radius: 0;
-  border: none;
-  border-bottom: 1px solid rgba(120, 30, 30, 0.8);
+  gap: 0.45rem;
+  padding: 0.42rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 30, 30, 0.8);
   background: rgba(80, 24, 30, 0.9);
   color: rgba(245, 247, 251, 0.95);
-  font-weight: 660;
+  font-weight: 720;
   font-size: 0.9em;
+  line-height: 1.25;
   letter-spacing: 0.01em;
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, filter 120ms ease;
   text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
 }
 
 .effect-menu__cat:hover,
 .effect-menu__cat:focus-visible {
   outline: none;
-  background: rgba(110, 36, 44, 0.9);
-  border-bottom-color: rgba(160, 50, 60, 0.9);
+  border-color: rgba(190, 70, 80, 0.9);
+  filter: brightness(1.06);
+  transform: translateY(-1px);
 }
 
 .effect-menu__cat.is-active {
-  border-bottom-color: rgba(190, 70, 80, 0.9);
-  background: rgba(120, 40, 48, 0.95);
-  box-shadow: none;
-}
-
-/* Tri-color striping for category rows */
-.effect-menu__column .effect-menu__cat:nth-child(3n + 1) {
-  background: rgba(80, 24, 30, 0.9);
-}
-
-.effect-menu__column .effect-menu__cat:nth-child(3n + 2) {
-  background: rgba(62, 18, 26, 0.84);
-}
-
-.effect-menu__column .effect-menu__cat:nth-child(3n) {
-  background: rgba(48, 12, 18, 0.78);
+  border-color: rgba(220, 200, 255, 0.6);
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.3),
+    0 0 0 2px rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  transform: translateY(-2px);
 }
 
 .effect-menu__cat-label {
@@ -422,56 +475,139 @@
   gap: 0.35rem;
   align-items: center;
   min-width: 0;
+  flex: 1 1 auto;
+  word-break: break-word;
+  font-weight: 760;
 }
 
 .effect-menu__cat-count {
-  font-size: 0.72rem;
-  opacity: 0.75;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 0.74rem;
+  opacity: 0.86;
   flex-shrink: 0;
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
 }
 
 .effect-menu__effect {
   width: 100%;
   text-align: left;
   margin: 0;
-  border-radius: 0;
-  border: none;
-  border-bottom: 1px solid rgba(120, 30, 30, 0.8);
-  padding: 10px 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 30, 30, 0.8);
+  padding: 10px 0.85rem;
   background: transparent;
   color: rgba(244, 246, 250, 0.94);
-  box-shadow: none;
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: border-color 120ms ease, transform 120ms ease;
-  font-size: 0.76em;
-  line-height: 1.2;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  justify-content: flex-start;
+  gap: 0.65rem;
+  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  font-size: 0.82em;
+  line-height: 1.25;
+  overflow: visible;
+  white-space: normal;
+  text-overflow: unset;
 }
 
 /* Tri-color striping for effect rows */
 /* Per-category gradients are applied inline; striping removed */
 
+.effect-menu__effect-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.effect-menu__effect-trailing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
 .effect-menu__effect:hover,
 .effect-menu__effect:focus-visible {
   outline: none;
-  border-color: rgba(110, 150, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.26);
+  filter: brightness(1.04);
   transform: translateY(-1px);
 }
 
 .effect-menu__effect.is-current {
-  border-color: rgba(120, 235, 170, 0.9);
+  border-color: rgba(120, 235, 170, 0.85);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 0 0 1px rgba(120, 235, 170, 0.3);
+    0 12px 24px rgba(0, 0, 0, 0.22),
+    0 0 0 2px rgba(120, 235, 170, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .effect-menu__effect-title {
-  font-weight: 540;
-  letter-spacing: 0.001em;
+  font-weight: 640;
+  letter-spacing: 0.003em;
+  flex: 1 1 auto;
+  word-break: break-word;
+}
+
+.curse-indicator {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  display: inline-block;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+  opacity: 0.98;
+  min-width: 26px;
+  min-height: 26px;
+  max-width: 26px;
+  max-height: 26px;
+  line-height: 0;
+}
+
+.curse-indicator-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.curse-indicator-wrap::after {
+  content: "Curse Required";
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  padding: 0.24rem 0.5rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(133, 76, 255, 0.35);
+  background: rgba(28, 16, 48, 0.95);
+  color: #caa5ff;
+  font-size: 0.72rem;
+  font-style: italic;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 3;
+}
+
+.curse-indicator-wrap:hover::after,
+.curse-indicator-wrap:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .effect-menu__effect-meta {

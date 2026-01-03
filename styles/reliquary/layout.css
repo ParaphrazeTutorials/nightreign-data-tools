@@ -257,6 +257,30 @@
 
 .right-column {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
   gap: 0.85rem;
+  flex-wrap: nowrap;
+}
+
+#results {
+  flex: 0 1 70%;
+  min-width: 360px;
+}
+
+#details {
+  flex: 0 1 30%;
+  min-width: 260px;
+}
+
+@media (max-width: 1100px) {
+  .right-column {
+    flex-direction: column;
+  }
+
+  #results,
+  #details {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
 }

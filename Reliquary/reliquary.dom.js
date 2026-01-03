@@ -5,7 +5,6 @@ export function getDom() {
     selColor: document.getElementById("relicColor"),
 
     showIllegalEl: document.getElementById("showIllegal"),
-    showRawEl: document.getElementById("showRaw"),
     startOverBtn: document.getElementById("startOver"),
 
     // Counts

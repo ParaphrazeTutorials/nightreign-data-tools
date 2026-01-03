@@ -3,20 +3,20 @@
 export const COLORS = ["Red", "Blue", "Yellow", "Green"];
 
 // Category color configuration (non-purple palette by default; purple reserved for curses)
-// Sequential palette bases (walked in order across categories; purple reserved for curses)
+// Wide-gamut palette to keep adjacent categories visually distinct
 export const SEQ_CATEGORY_BASES = [
-  "#702020", // dark red (All)
-  "#8a232a", // deep red
-  "#b43a22", // ember
-  "#c66a1c", // orange
-  "#d48b1c", // amber
-  "#c9a42d", // warm yellow
-  "#b6b02d", // yellow-green
-  "#5d8ac7", // mid blue
-  "#3f7fb8", // steel blue
-  "#2f9d9f", // teal
-  "#3f9d58", // green
-  "#5ca34d"  // soft green
+  "#e23e57", // crimson
+  "#12c1d9", // electric cyan
+  "#8bc926", // chartreuse
+  "#ff6f3c", // coral
+  "#1f7ad8", // cobalt
+  "#5cd1a3", // mint
+  "#ff9f1a", // amber
+  "#1fb5b5", // teal
+  "#f45ba3", // hot pink
+  "#ffd93b", // bright yellow
+  "#4fb548", // leaf green
+  "#3c5cff"  // royal blue
 ];
 
 const CURSE_COLOR_BASE = "#7a4bc6"; // reserved purple for curse-related categories
@@ -83,19 +83,43 @@ export function adjustLightness(hex, delta) {
   return hslToHex(h, s, nextL);
 }
 
+function relativeLuminance(hex) {
+  const sanitized = hex.replace("#", "");
+  const bigint = parseInt(sanitized, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  const toLinear = (v) => {
+    const n = v / 255;
+    return n <= 0.03928 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4);
+  };
+
+  const rl = toLinear(r);
+  const gl = toLinear(g);
+  const bl = toLinear(b);
+  return 0.2126 * rl + 0.7152 * gl + 0.0722 * bl;
+}
+
+export function textColorFor(base) {
+  const lum = relativeLuminance(base);
+  const threshold = 0.58; // lean darker so white text is chosen only when safe
+  return lum > threshold ? "#0c0c0f" : "#f7f9ff";
+}
+
 export function themeFromBase(base) {
   const shades = [adjustLightness(base, -0.2), base, adjustLightness(base, 0.16)];
-  return { base, shades, border: adjustLightness(base, -0.22) };
+  return { base, shades, border: adjustLightness(base, -0.22), text: textColorFor(base) };
 }
 
 export function baseFromSequence(idx) {
   const seq = SEQ_CATEGORY_BASES;
   if (idx < seq.length) return seq[idx];
 
-  // When we exhaust the fixed list, continue rotating hue forward without wrapping to prior reds
+  // When we exhaust the fixed list, continue hopping hue far enough to avoid "rainbow crawl"
   const last = seq[seq.length - 1];
   const { h, s, l } = hexToHsl(last);
-  const step = 18 / 360; // 18° hue step per extra category
+  const step = 0.29; // ~104° hue jump per extra category keeps contrast high
   const n = idx - seq.length + 1;
   const nextH = (h + step * n) % 1;
   return hslToHex(nextH, s, l);
@@ -143,6 +167,19 @@ export function normalize(v) {
 
 export function compatId(row) {
   return row?.CompatibilityID == null ? "" : String(row.CompatibilityID);
+}
+
+// Group rows that share the same non-empty CompatibilityID; only return groups with conflicts (length > 1)
+export function computeCompatDupGroups(rows) {
+  const map = new Map();
+  for (const r of rows || []) {
+    if (!r) continue;
+    const cid = compatId(r);
+    if (!cid) continue;
+    if (!map.has(cid)) map.set(cid, []);
+    map.get(cid).push(r);
+  }
+  return [...map.values()].filter(group => group.length > 1);
 }
 
 export function relicTypeForRow(row) {

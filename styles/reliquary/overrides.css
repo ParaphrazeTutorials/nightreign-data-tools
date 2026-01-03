@@ -82,44 +82,32 @@ button#startOver:focus-visible {
   outline-offset: 2px;
 }
 /* ------------------------------------------------------------
-   Raw-mode Curse button placement
-   Keep the Curse button directly after the Effect title (like non-raw)
+   Raw-mode layout: keep effect row simple; curse row stacks below via effect-line grid
    ------------------------------------------------------------ */
 
-/* Only affects the Results list when Raw Data is ON */
+/* Keep the effect title/controls on one row; curse-line now lives outside effect-main */
 #results.is-raw .effect-main--row {
   display: grid;
-  grid-template-columns: max-content max-content 1fr;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "title effectbtn ."
-    "curse curse ."
-    "meta  meta   meta";
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "text controls";
   column-gap: 0.75rem;
   row-gap: 0.35rem;
   align-items: center;
 }
 
-/* Let the inner wrapper contribute its children to the grid */
 #results.is-raw .effect-main--row .effect-text {
-  display: contents;
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-/* Place title + curse line */
-#results.is-raw .effect-main--row .effect-text .title { grid-area: title; }
-#results.is-raw .effect-main--row .effect-text .curse-line { grid-area: curse; }
-
-/* Button sits immediately after title, not at far right */
-#results.is-raw .effect-main--row .effect-btn {
-  grid-area: effectbtn;
-  justify-self: start;
+#results.is-raw .effect-main--row .effect-btn,
+#results.is-raw .effect-main--row .control-cluster.effect-controls {
+  grid-area: controls;
+  justify-self: end;
   align-self: center;
 }
-
-/* Raw meta always starts on its own row */
-#results.is-raw .effect-main--row .meta {
-  grid-area: meta;
-
   /* Let main tokens sit on line 1; allow a controlled wrap for curse tokens */
   display: flex;
   width: 100%;
