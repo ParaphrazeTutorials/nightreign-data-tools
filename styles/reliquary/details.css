@@ -1,6 +1,23 @@
 /* ------------------------------------------------------------
-   Mini preview relic scaling (legacy; overridden below by hiding frame)
-   ------------------------------------------------------------ */
+  DETAILS — frame + sizing (match Relic Preview)
+  ------------------------------------------------------------ */
+
+#details {
+  font-size: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.75rem;
+  padding: 0.9rem !important;
+}
+
+#details,
+#details * {
+  box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------
+  Mini preview relic scaling (legacy; overridden below by hiding frame)
+  ------------------------------------------------------------ */
 
 #details .sorted-preview .relic-frame {
   width: var(--mini-preview-size);
@@ -57,6 +74,21 @@
   flex-wrap: wrap;
 }
 
+#details .info-box.is-alert .info-line{
+  font-size: 0.94em;
+  line-height: 1.35;
+}
+
+#details .info-box .popover-title{
+  font-size: 0.94em;
+}
+
+#details .info-box .popover-body,
+#details .info-box .popover-body p{
+  font-size: 0.80em;
+  line-height: 1.45;
+}
+
 /* inline clickable term (underline + caret, aligned) */
 #details .term-link{
   appearance: none;
@@ -85,13 +117,7 @@
   text-decoration-color: rgba(255,255,255,0.45);
 }
 
-#details .term-link::after{
-  content: "▾";
-  display: inline-block;
-  font-weight: 700;
-  opacity: 0.75;
-  transform: translateY(-0.02em);
-}
+#details .term-link::after{ content: none; }
 
 #details .term-link:hover{
   text-decoration-color: rgba(232,194,0,0.95);
@@ -232,4 +258,110 @@
   box-shadow:
     inset 0 0 0 1px rgba(232,194,0,0.22),
     inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ------------------------------------------------------------
+   DETAILS — modal overlay (Lexicon-style)
+   ------------------------------------------------------------ */
+
+.details-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.details-modal.is-open { display: flex; }
+
+.details-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.details-modal__card {
+  position: relative;
+  width: min(90vw, 640px);
+  max-height: min(88vh, 840px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.85rem;
+  background: rgba(12, 14, 18, 0.92);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+}
+
+.details-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid rgba(220, 70, 70, 0.55);
+  background: linear-gradient(
+    90deg,
+    rgba(92, 22, 22, 0.78) 0%,
+    rgba(92, 22, 22, 0.62) 48%,
+    rgba(0, 0, 0, 0.40) 100%
+  );
+}
+
+.details-modal__title {
+  margin: 0;
+  font-size: 1em;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.details-modal__close {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.24);
+  border-radius: 0.6rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  font-size: 1.05rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #f5f7fb;
+  margin: 0;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, transform 120ms ease;
+}
+
+.details-modal__close:hover {
+  border-color: rgba(181, 140, 255, 0.38);
+  background: rgba(181, 140, 255, 0.16);
+}
+
+.details-modal__close:active {
+  transform: translateY(1px);
+}
+
+.details-modal__close:focus-visible {
+  outline: 2px solid rgba(181, 140, 255, 0.60);
+  outline-offset: 2px;
+}
+
+.details-modal__body {
+  padding: 0.95rem 1rem 1.15rem;
+  overflow: auto;
+  display: grid;
+  gap: 0.65rem;
+  font-size: 0.80em;
+  line-height: 1.45;
+  text-align: left;
+  max-height: calc(88vh - 120px);
+}
+
+.details-modal__body p {
+  margin: 0;
+  opacity: 0.9;
 }

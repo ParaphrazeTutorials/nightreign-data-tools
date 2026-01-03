@@ -298,6 +298,73 @@ function setDetailsEmpty() {
   dom.detailsBody.innerHTML = "";
 }
 
+let detailsPopoverRoot;
+let detailsPopoverTitle;
+let detailsPopoverBody;
+
+function ensureDetailsPopoverDialog() {
+  if (detailsPopoverRoot) return;
+
+  const root = document.createElement("div");
+  root.className = "details-modal";
+  root.id = "detailsModal";
+  root.setAttribute("aria-hidden", "true");
+  root.setAttribute("role", "dialog");
+  root.setAttribute("aria-modal", "true");
+
+  root.innerHTML = `
+    <div class="details-modal__backdrop" data-close="backdrop"></div>
+    <div class="details-modal__card" role="document">
+      <header class="details-modal__header">
+        <h4 class="details-modal__title" id="detailsPopTitle">Details</h4>
+        <button class="details-modal__close" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="details-modal__body" id="detailsPopBody"></div>
+    </div>
+  `;
+
+  const closeBtn = root.querySelector(".details-modal__close");
+  const backdrop = root.querySelector(".details-modal__backdrop");
+
+  const close = () => closeDetailsPopover();
+  if (closeBtn) closeBtn.addEventListener("click", close);
+  if (backdrop) backdrop.addEventListener("click", close);
+
+  document.addEventListener("keydown", evt => {
+    if (evt.key === "Escape" && root.classList.contains("is-open")) {
+      closeDetailsPopover();
+    }
+  });
+
+  document.body.appendChild(root);
+
+  detailsPopoverRoot = root;
+  detailsPopoverTitle = root.querySelector("#detailsPopTitle");
+  detailsPopoverBody = root.querySelector("#detailsPopBody");
+}
+
+function openDetailsPopover(pop) {
+  ensureDetailsPopoverDialog();
+  if (!detailsPopoverRoot) return;
+
+  const titleEl = pop.querySelector(".popover-title");
+  const bodyEl = pop.querySelector(".popover-body");
+
+  if (detailsPopoverTitle) detailsPopoverTitle.textContent = titleEl ? titleEl.textContent : "Details";
+  if (detailsPopoverBody) detailsPopoverBody.innerHTML = bodyEl ? bodyEl.innerHTML : pop.innerHTML;
+
+  detailsPopoverRoot.classList.add("is-open");
+  detailsPopoverRoot.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeDetailsPopover() {
+  if (!detailsPopoverRoot) return;
+  detailsPopoverRoot.classList.remove("is-open");
+  detailsPopoverRoot.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
 function installDetailsToggles() {
   if (!dom.detailsBody) return;
   const buttons = dom.detailsBody.querySelectorAll("[data-popover-toggle]");
@@ -307,7 +374,7 @@ function installDetailsToggles() {
       if (!id) return;
       const pop = dom.detailsBody.querySelector(`#${CSS.escape(id)}`);
       if (!pop) return;
-      pop.hidden = !pop.hidden;
+      openDetailsPopover(pop);
     });
   });
 }
@@ -1286,7 +1353,7 @@ function updateDetails(a, b, c) {
       <div class="info-box is-alert" data-kind="curse-required">
         <div class="info-line">
           <span>One or more of your effects requires a </span>
-          <button type="button" class="term-link" data-popover-toggle="cursePopover">Curse</button><span>.</span>
+          <button type="button" class="term-link" data-popover-toggle="cursePopover">Curse</button>.
         </div>
 
         <div id="cursePopover" class="popover" hidden>
@@ -1305,9 +1372,7 @@ function updateDetails(a, b, c) {
       <div class="info-box is-alert" data-kind="positioning">
         <div class="info-line">
           Improper effect
-          <button type="button" class="term-link" data-popover-toggle="positionPopover">
-            positioning
-          </button>.
+          <button type="button" class="term-link" data-popover-toggle="positionPopover">Positioning</button>.
         </div>
 
         <div class="popover" id="positionPopover" hidden>
@@ -1347,9 +1412,7 @@ function updateDetails(a, b, c) {
       <div class="info-box is-alert" data-kind="rollorder">
         <div class="info-line">
           Your effects aren't in the correct 
-          <button type="button" class="term-link" data-popover-toggle="orderPopover">
-            roll order
-          </button>.
+          <button type="button" class="term-link" data-popover-toggle="orderPopover">Roll Order</button>.
         </div>
 
         <div class="popover" id="orderPopover" hidden>
