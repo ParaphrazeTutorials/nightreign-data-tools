@@ -70,6 +70,41 @@
 
 #results .panel-header h3 { margin: 0; }
 
+.panel-header__right {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.auto-sort-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(60, 80, 120, 0.28);
+  color: #f4f7ff;
+  padding: 0.28rem 0.65rem;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  transition: background 140ms ease, border-color 140ms ease, transform 120ms ease;
+}
+
+.auto-sort-btn:hover:not(:disabled) {
+  background: rgba(80, 110, 150, 0.38);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.auto-sort-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.auto-sort-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .validity-badge {
   display: inline-flex;
   align-items: center;

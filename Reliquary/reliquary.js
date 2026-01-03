@@ -27,6 +27,7 @@ const dom = getDom();
 const resultsEl = document.getElementById("results");
 const resultsHeader = document.querySelector("#results .panel-header");
 const validityBadge = document.getElementById("relicValidity");
+const autoSortBtn = document.getElementById("autoSortBtn");
 
 let rows = [];
 let byId = new Map();
@@ -112,6 +113,61 @@ function computeRollOrderIssue(a, b, c) {
     movedSlots,
     moveDeltaBySlot
   };
+}
+
+function applyAutoSort() {
+  const current = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+  const roll = computeRollOrderIssue(current[0], current[1], current[2]);
+
+  if (!roll.hasIssue || !roll.sorted) return;
+
+  const entries = [0, 1, 2]
+    .map(slotIdx => ({
+      slotIdx,
+      row: current[slotIdx],
+      cat: selectedCats[slotIdx] || "",
+      curse: curseBySlot[slotIdx],
+      curseCat: curseCatBySlot[slotIdx] || ""
+    }))
+    .filter(e => !!e.row);
+
+  const used = new Set();
+
+  const nextEffects = ["", "", ""];
+  const nextCats = ["", "", ""];
+  const nextCurses = [null, null, null];
+  const nextCurseCats = ["", "", ""];
+
+  for (let i = 0; i < roll.sorted.length; i++) {
+    const row = roll.sorted[i];
+    if (!row) continue;
+
+    const matchIdx = entries.findIndex((entry, idx) => {
+      if (used.has(idx)) return false;
+      return String(entry.row.EffectID) === String(row.EffectID);
+    });
+
+    const entry = matchIdx >= 0 ? entries[matchIdx] : null;
+    if (matchIdx >= 0) used.add(matchIdx);
+
+    nextEffects[i] = String(row.EffectID);
+    nextCats[i] = entry ? entry.cat : "";
+    nextCurses[i] = entry ? entry.curse : null;
+    nextCurseCats[i] = entry ? entry.curseCat : "";
+  }
+
+  for (let i = 0; i < selectedEffects.length; i++) {
+    selectedEffects[i] = nextEffects[i] || "";
+    selectedCats[i] = nextCats[i] || "";
+    curseBySlot[i] = nextCurses[i] || null;
+    curseCatBySlot[i] = nextCurseCats[i] || "";
+  }
+
+  updateUI("auto-sort");
+}
+
+if (autoSortBtn) {
+  autoSortBtn.addEventListener("click", applyAutoSort);
 }
 
 function gradientFromTheme(theme) {
@@ -1350,6 +1406,12 @@ function updateUI(reason = "") {
   const roll = computeRollOrderIssue(cSelections[0], cSelections[1], cSelections[2]);
   const hasOrderIssue = roll.hasIssue;
   const moveDeltaBySlot = roll.moveDeltaBySlot || [0, 0, 0];
+
+  if (autoSortBtn) {
+    const showAutoSort = hasOrderIssue && selectedCount >= 2;
+    autoSortBtn.hidden = !showAutoSort;
+    autoSortBtn.disabled = !showAutoSort;
+  }
 
   const hasCurseMissing = (() => {
     for (let i = 0; i < cSelections.length; i++) {
