@@ -41,13 +41,14 @@ const curseBySlot = [null, null, null];
 const curseCatBySlot = ["", "", ""];
 
 let currentRandomColor = "Red";
+let selectedColor = "Random";
 const COLOR_CHOICES = ["Random", ...COLORS];
 
 const COLOR_SWATCH = {
-  Red: "#e25b5b",
-  Blue: "#5ba6f5",
-  Yellow: "#f5c74c",
-  Green: "#48b36a"
+  Red: "linear-gradient(135deg, #642121, #b84242)",
+  Blue: "linear-gradient(135deg, #1e4275, #3f7ad0)",
+  Yellow: "linear-gradient(135deg, #645019, #b28d2c)",
+  Green: "linear-gradient(135deg, #10482a, #2f8a52)"
 };
 const RANDOM_SWATCH = "linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44a)";
 
@@ -61,7 +62,7 @@ function colorChipLabel(value) {
 
 function updateColorChipLabel() {
   if (!dom.relicColorChip) return;
-  const selected = dom.selColor ? (dom.selColor.value || "Random") : "Random";
+  const selected = selectedColor || "Random";
   const resolved = selected === "Random" ? currentRandomColor : selected;
   const label = colorChipLabel(selected);
 
@@ -121,7 +122,7 @@ function colorOptionHtml(color) {
 }
 
 function installColorChipMenu() {
-  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip || !dom.selColor) return;
+  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip) return;
 
   dom.relicColorMenu.innerHTML = COLOR_CHOICES.map(colorOptionHtml).join("");
   dom.relicColorControl.hidden = false;
@@ -137,7 +138,7 @@ function installColorChipMenu() {
     if (!btn) return;
     const next = btn.getAttribute("data-color-option");
     if (!next) return;
-    dom.selColor.value = next;
+    selectedColor = next;
     updateUI("color-change");
     closeColorMenu();
   });
@@ -1550,7 +1551,7 @@ function updateUI(reason = "") {
   closeEffectMenu();
   closeColorMenu();
 
-  if (dom.selColor.value === "Random") {
+  if (selectedColor === "Random") {
     const modifierReasons = new Set([
       "type-change",
       "illegal-change",
@@ -1591,7 +1592,7 @@ function updateUI(reason = "") {
   setRelicImageForStage({
     relicImg: dom.relicImg,
     selectedType: dom.selType.value,
-    selectedColor: dom.selColor.value,
+    selectedColor,
     randomColor: currentRandomColor,
     stage
   });
@@ -1704,7 +1705,7 @@ function updateUI(reason = "") {
 
 function resetAllPreserveIllegal(desiredIllegal) {
   dom.selType.value = "All";
-  dom.selColor.value = "Random";
+  selectedColor = "Random";
 
   dom.showIllegalEl.checked = Boolean(desiredIllegal);
 
@@ -1718,7 +1719,7 @@ function resetAllPreserveIllegal(desiredIllegal) {
 
 function resetAll() {
   dom.selType.value = "All";
-  dom.selColor.value = "Random";
+  selectedColor = "Random";
 
   dom.showIllegalEl.checked = false;
 
@@ -1747,7 +1748,6 @@ async function load() {
   installColorChipMenu();
 
   dom.selType.addEventListener("change", () => updateUI("type-change"));
-  dom.selColor.addEventListener("change", () => updateUI("color-change"));
   dom.showIllegalEl.addEventListener("change", () => resetAllPreserveIllegal(dom.showIllegalEl.checked));
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", resetAll);
 

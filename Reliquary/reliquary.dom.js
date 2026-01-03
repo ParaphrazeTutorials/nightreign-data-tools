@@ -2,7 +2,6 @@ export function getDom() {
   return {
     // Top controls
     selType: document.getElementById("relicType"),
-    selColor: document.getElementById("relicColor"),
 
     showIllegalEl: document.getElementById("showIllegal"),
     startOverBtn: document.getElementById("startOver"),

@@ -228,8 +228,8 @@
 
 .relic-color-control {
   position: absolute;
-  right: 0.1rem;
-  bottom: -0.1rem;
+  right: 0.6rem;
+  bottom: 0.6rem;
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
@@ -241,8 +241,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: linear-gradient(145deg, rgba(38, 46, 68, 0.95), rgba(22, 24, 32, 0.95));
@@ -272,11 +276,11 @@
   right: calc(100% + 0.4rem);
   top: 50%;
   transform: translateY(-50%);
-  padding: 0.35rem 0.35rem;
+  padding: 0.08rem 0.22rem;
   display: none;
   flex-direction: row-reverse;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.24rem;
   border-radius: 999px;
   background: linear-gradient(160deg, rgba(12, 14, 22, 0.96), rgba(22, 28, 38, 0.96));
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -296,6 +300,8 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  margin: 0;
+  line-height: 1;
   border-radius: 50%;
   background: transparent;
   border: 1px solid transparent;
@@ -329,10 +335,10 @@
   background: linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44a);
 }
 
-.relic-color-option[data-color-option="Red"] .color-dot { background: linear-gradient(135deg, #e05757, #7a1f1f); }
-.relic-color-option[data-color-option="Blue"] .color-dot { background: linear-gradient(135deg, #4f7dfc, #1f3d9a); }
-.relic-color-option[data-color-option="Yellow"] .color-dot { background: linear-gradient(135deg, #f2c94c, #b88a0e); }
-.relic-color-option[data-color-option="Green"] .color-dot { background: linear-gradient(135deg, #48b36a, #1e6636); }
+.relic-color-option[data-color-option="Red"] .color-dot { background: linear-gradient(135deg, #642121, #b84242); }
+.relic-color-option[data-color-option="Blue"] .color-dot { background: linear-gradient(135deg, #1e4275, #3f7ad0); }
+.relic-color-option[data-color-option="Yellow"] .color-dot { background: linear-gradient(135deg, #645019, #b28d2c); }
+.relic-color-option[data-color-option="Green"] .color-dot { background: linear-gradient(135deg, #10482a, #2f8a52); }
 
 /* Raw + curse: frame fills its bounded column and can contribute size */
 #results.raw-has-curse .relic-preview .relic-frame {
