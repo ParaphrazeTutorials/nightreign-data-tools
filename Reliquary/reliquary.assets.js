@@ -29,7 +29,8 @@ export function relicPath(relicType, color, size) {
   return new URL(`../Assets/relics/${type}/${s}/${c}.png`, window.location.href).toString();
 }
 
-// When type is "All", visuals should behave like Standard
+// When type is unset/All, visuals should behave like Standard
 export function visualRelicType(selectedType) {
-  return selectedType === "All" ? "Standard" : selectedType;
+  if (!selectedType || selectedType === "All") return "Standard";
+  return selectedType;
 }

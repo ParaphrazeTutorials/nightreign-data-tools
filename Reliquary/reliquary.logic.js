@@ -202,13 +202,16 @@ export function applyCategory(list, catValue) {
 }
 
 export function baseFilteredByRelicType(rows, selectedType) {
+  const type = normalize(selectedType);
+
   return rows.filter(r => {
     const t = relicTypeForRow(r);
 
-    if (selectedType === "All") return true;
-    if (selectedType === "Both") return t === "Both";
-    if (selectedType === "Standard") return (t === "Standard" || t === "Both");
-    if (selectedType === "Depth Of Night") return (t === "Depth Of Night" || t === "Both");
+    // Empty/placeholder or "All" means no filtering
+    if (!type || type === "All") return true;
+
+    if (type === "Standard") return t === "Standard" || t === "Both";
+    if (type === "Depth Of Night") return t === "Depth Of Night" || t === "Both";
 
     return true;
   });
@@ -231,10 +234,13 @@ export function eligibleList(rows, selectedType, blockedCompatIds, takenIds, sho
 // If user is on Relic Type = All and picks Effect 1, return the type to auto-set (or null)
 export function autoRelicTypeFromEffect1(currentType, effect1Row) {
   if (!effect1Row) return null;
-  if (currentType !== "All") return null;
+
+  // Only auto-set when dropdown is unset/placeholder or explicitly All
+  if (currentType && currentType !== "All") return null;
 
   const t = relicTypeForRow(effect1Row);
-  if (t === "Standard" || t === "Depth Of Night" || t === "Both") return t;
+  if (t === "Standard" || t === "Depth Of Night") return t;
 
+  // If effect is "Both", do not force a type
   return null;
 }

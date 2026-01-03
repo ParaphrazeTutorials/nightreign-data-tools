@@ -34,65 +34,73 @@
 
       <section class="tool-shell">
 
-        <!-- TOP (Filters + Instructions) -->
-        <section class="top-grid">
-          <div class="top-grid__left">
-            <!-- OPTIONS -->
-            <section class="options-panel">
-              <div class="options-row">
-                <label>
-                  Relic Type
+        <!-- UTILITY BAR (Filters + Actions) -->
+        <section class="utility-bar" aria-label="Reliquary controls">
+          <div class="utility-bar__col utility-bar__col--left">
+            <div class="utility-stack">
+              <div class="utility-inline utility-inline--row utility-inline--fill">
+                <label class="utility-field">
                   <select id="relicType">
-                    <option value="All" selected>All</option>
+                    <option value="" selected>-- Relic Type --</option>
                     <option value="Standard">Standard</option>
-                    <option value="Both">Both</option>
                     <option value="Depth Of Night">Depth Of Night</option>
                   </select>
-                  <small class="field-subtext">Filters effects below</small>
                 </label>
 
-                <div class="options-controls">
-                  <div class="options-controls__left">
-                    <label class="inline-check">
-                      <input type="checkbox" id="showIllegal" />
-                      Show Illegal Combinations
-                    </label>
-                  </div>
+                <button id="showIllegalBtn" class="utility-toggle" type="button" aria-pressed="false" title="Show Illegal Effect Combinations">
+                  <span class="utility-toggle__icon" aria-hidden="true">
+                    <svg class="utility-toggle__svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M5.75 5.75L18.25 18.25M12 21C7.029 21 3 16.971 3 12S7.029 3 12 3s9 4.029 9 9-4.029 9-9 9Z" />
+                    </svg>
+                  </span>
+                  <span class="sr-only">Show Illegal Effect Combinations</span>
+                </button>
 
-                  <div class="options-controls__right">
-                    <button id="startOver" class="secondary" type="button">Start Over</button>
-                  </div>
+                <div id="illegalPill" class="illegal-pill" role="status" aria-live="polite" hidden>
+                  Illegal Effect Combinations Enabled
                 </div>
+
+                <button id="startOver" class="secondary utility-inline__push" type="button">Start Over</button>
               </div>
-            </section>
+            </div>
           </div>
 
-          <div class="top-grid__right">
-            <!-- INSTRUCTIONS -->
-            <section class="instructions-panel">
-
-              <h3>Instructions</h3>
-              <p>
-                Select the effects you want on your relic, and the reliquary will tell you how to make it a legal combination&mdash;if it's possible.
-              </p>
-
-              <h4>Disclaimer</h4>
-              <p>
-                This tool is an <strong>unofficial</strong> community helper for planning effect combinations. It does <strong>not</strong> modify your game, connect to your account,
-                or guarantee anything about online safety. You are responsible for how you use the information provided here and for any changes you make to your save/data.
-              </p>
-              <p>
-                Compatibility rules and outcomes can change with patches, anticheat updates, and server-side checks.
-                If you're not sure whether a change is safe, assume it isn't and keep your relics unedited for online play.
-              </p>
-              <p class="disclaimer-warning">
-                <span style="color: rgba(255, 115, 115, 0.95); font-weight: 800; text-decoration: underline;">
-                  Please do not play online with illegal relics.
-                </span>
-              </p>
-            </section>
+          <div class="utility-bar__col utility-bar__col--right">
+            <div class="utility-inline utility-inline--right">
+              <button id="instructionsBtn" class="utility-ghost" type="button">Instructions</button>
+              <button id="disclaimerBtn" class="utility-ghost" type="button">Disclaimer</button>
+            </div>
           </div>
         </section>
+
+        <!-- Hidden popover sources for Instructions / Disclaimer -->
+        <div class="utility-popover-source" id="instructionsPopover" hidden>
+          <div class="popover-title">Instructions</div>
+          <div class="popover-body">
+            <p>
+              Select the effects you want on your relic, and the reliquary will tell you how to make it a legal combination&mdash;if it's possible.
+            </p>
+          </div>
+        </div>
+
+        <div class="utility-popover-source" id="disclaimerPopover" hidden>
+          <div class="popover-title">Disclaimer</div>
+          <div class="popover-body">
+            <p>
+              This tool is an <strong>unofficial</strong> community helper for planning effect combinations. It does <strong>not</strong> modify your game, connect to your account,
+              or guarantee anything about online safety. You are responsible for how you use the information provided here and for any changes you make to your save/data.
+            </p>
+            <p>
+              Compatibility rules and outcomes can change with patches, anticheat updates, and server-side checks.
+              If you're not sure whether a change is safe, assume it isn't and keep your relics unedited for online play.
+            </p>
+            <p class="disclaimer-warning">
+              <span style="color: rgba(255, 115, 115, 0.95); font-weight: 800; text-decoration: underline;">
+                Please do not play online with illegal relics.
+              </span>
+            </p>
+          </div>
+        </div>
 
         <!-- MAIN GRID -->
         <section class="main-grid">

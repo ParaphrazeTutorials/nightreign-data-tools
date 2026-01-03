@@ -43,6 +43,44 @@
    (Overrides layout.css which uses !important)
    ------------------------------------------------------------ */
 
+/* Keep the utility-bar row vertically centered */
+.utility-bar button#startOver {
+  margin: 0 0.4rem 0 auto !important;
+  align-self: center;
+}
+
+/* Tuck the left utility group in slightly so Start Over aligns with the effect row instead of the preview width */
+.utility-bar__col--left {
+  padding-right: 0.9rem;
+}
+
+/* Offset right column to line up Instructions with the Details panel content */
+.utility-bar__col--right {
+  padding-left: 0.85rem;
+}
+
+/* Purple gradients for Instructions / Disclaimer */
+button#instructionsBtn,
+button#disclaimerBtn {
+  background: linear-gradient(135deg, #5b3c9f 0%, #8f6bd8 55%, #2b1a4f 100%) !important;
+  color: #f5f0ff !important;
+  border: 1px solid rgba(180, 150, 255, 0.55) !important;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+button#instructionsBtn:hover,
+button#disclaimerBtn:hover {
+  filter: brightness(1.06);
+  border-color: rgba(200, 175, 255, 0.8) !important;
+}
+
+button#instructionsBtn:active,
+button#disclaimerBtn:active {
+  filter: brightness(0.98);
+}
+
 button#startOver {
   margin-top: 0.85rem !important;
   margin-bottom: 0.35rem !important;
@@ -82,6 +120,25 @@ button#startOver:active {
 button#startOver:focus-visible {
   outline: 2px solid rgba(214, 194, 154, 0.9) !important;
   outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   Illegal toggle (highest priority): active = white bg + red icon/border
+   ------------------------------------------------------------ */
+
+button#showIllegalBtn.is-active,
+button#showIllegalBtn[aria-pressed="true"] {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 2px solid #b10000 !important;
+  color: #b10000 !important;
+  box-shadow: 0 0 0 1px rgba(177, 0, 0, 0.35) !important;
+}
+
+button#showIllegalBtn.is-active .utility-toggle__svg,
+button#showIllegalBtn[aria-pressed="true"] .utility-toggle__svg {
+  stroke: #b10000 !important;
+  stroke-width: 2.4px !important;
 }
 /* ------------------------------------------------------------
    Raw-mode layout: keep effect row simple; curse row stacks below via effect-line grid

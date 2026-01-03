@@ -44,6 +44,21 @@ let currentRandomColor = "Red";
 let selectedColor = "Random";
 const COLOR_CHOICES = ["Random", ...COLORS];
 
+function isShowIllegalActive() {
+  return !!(dom.showIllegalBtn && dom.showIllegalBtn.classList.contains("is-active"));
+}
+
+function setShowIllegalActive(active) {
+  if (!dom.showIllegalBtn) return;
+  dom.showIllegalBtn.classList.toggle("is-active", !!active);
+  dom.showIllegalBtn.setAttribute("aria-pressed", String(!!active));
+
+  if (dom.illegalPill) {
+    dom.illegalPill.hidden = !active;
+    dom.illegalPill.classList.toggle("is-active", !!active);
+  }
+}
+
 const COLOR_SWATCH = {
   Red: "linear-gradient(135deg, #642121, #b84242)",
   Blue: "linear-gradient(135deg, #1e4275, #3f7ad0)",
@@ -236,13 +251,15 @@ function computePositionIssue(a, b, c) {
 }
 
 function selectionsCompatibleWithType(type) {
-  const others = [getSelectedRow(1), getSelectedRow(2)].filter(Boolean);
-  return others.every(r => baseFilteredByRelicType([r], type).length > 0);
+  const picked = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)].filter(Boolean);
+  if (!type) return true;
+  return picked.every(r => baseFilteredByRelicType([r], type).length > 0);
 }
 
 function maybeAutoSetTypeFromEffect1(nextType) {
   if (!nextType) return;
-  if (dom.selType.value !== "All") return;
+  const current = dom.selType.value;
+  if (current && current !== "All") return;
   if (!selectionsCompatibleWithType(nextType)) return;
   dom.selType.value = nextType;
 }
@@ -466,6 +483,18 @@ function closeDetailsPopover() {
   detailsPopoverRoot.classList.remove("is-open");
   detailsPopoverRoot.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
+}
+
+function installUtilityPopoverButtons() {
+  const pairs = [
+    [dom.instructionsBtn, dom.instructionsPopover],
+    [dom.disclaimerBtn, dom.disclaimerPopover]
+  ];
+
+  pairs.forEach(([btn, pop]) => {
+    if (!btn || !pop) return;
+    btn.addEventListener("click", () => openDetailsPopover(pop));
+  });
 }
 
 function installDetailsToggles() {
@@ -956,7 +985,7 @@ function installCurseButtons() {
 }
 
 function computeEligibilityForSlot(slotIdx, showIllegalOverride = null) {
-  const showIllegal = showIllegalOverride ?? !!dom.showIllegalEl.checked;
+  const showIllegal = showIllegalOverride ?? isShowIllegalActive();
 
   if (!Number.isInteger(slotIdx) || slotIdx < 0 || slotIdx > 2) {
     return { eligible: [], filtered: [], categories: [], currentId: "" };
@@ -1206,11 +1235,9 @@ function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
       selectedCats[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
       curseBySlot[slotIdx] = null;
 
-      if (slotIdx === 0) {
-        const chosen = getRow(id);
-        const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-        maybeAutoSetTypeFromEffect1(nextType);
-      }
+      const chosen = getRow(id);
+      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+      maybeAutoSetTypeFromEffect1(nextType);
 
       closeEffectMenu();
       updateUI("effect-change");
@@ -1389,11 +1416,9 @@ function openEffectDialog(slotIdx) {
     setSelectedId(slotIdx, v);
     curseBySlot[slotIdx] = null;
 
-    if (slotIdx === 0) {
-      const chosen = getRow(v);
-      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-      maybeAutoSetTypeFromEffect1(nextType);
-    }
+    const chosen = getRow(v);
+    const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+    maybeAutoSetTypeFromEffect1(nextType);
 
     effectDialog.close("apply");
     updateUI("effect-change");
@@ -1562,7 +1587,7 @@ function updateUI(reason = "") {
     if (modifierReasons.has(reason)) pickRandomColor();
   }
 
-  const showIllegal = !!dom.showIllegalEl.checked;
+  const showIllegal = isShowIllegalActive();
 
   let cleared = false;
   for (let i = selectedEffects.length - 1; i >= 0; i--) {
@@ -1704,10 +1729,10 @@ function updateUI(reason = "") {
 // Meta visibility toggle removed; info is now provided via hover tooltips on the info icon.
 
 function resetAllPreserveIllegal(desiredIllegal) {
-  dom.selType.value = "All";
+  dom.selType.value = "";
   selectedColor = "Random";
 
-  dom.showIllegalEl.checked = Boolean(desiredIllegal);
+  setShowIllegalActive(Boolean(desiredIllegal));
 
   for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
   for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
@@ -1718,10 +1743,10 @@ function resetAllPreserveIllegal(desiredIllegal) {
 }
 
 function resetAll() {
-  dom.selType.value = "All";
+  dom.selType.value = "";
   selectedColor = "Random";
 
-  dom.showIllegalEl.checked = false;
+  setShowIllegalActive(false);
 
   for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
   for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
@@ -1746,9 +1771,19 @@ async function load() {
   installRelicImgFallback(dom.relicImg, () => dom.selType.value);
 
   installColorChipMenu();
+  installUtilityPopoverButtons();
+
+  // Default illegal toggle is off
+  setShowIllegalActive(false);
 
   dom.selType.addEventListener("change", () => updateUI("type-change"));
-  dom.showIllegalEl.addEventListener("change", () => resetAllPreserveIllegal(dom.showIllegalEl.checked));
+  if (dom.showIllegalBtn) {
+    dom.showIllegalBtn.addEventListener("click", () => {
+      const next = !isShowIllegalActive();
+      setShowIllegalActive(next);
+      resetAllPreserveIllegal(next);
+    });
+  }
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", resetAll);
 
   updateUI("init");

@@ -29,6 +29,210 @@
 }
 
 /* ------------------------------------------------------------
+   Utility bar (single-row controls)
+   ------------------------------------------------------------ */
+
+.utility-bar {
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.65rem;
+}
+.utility-bar button {
+  margin: 0 !important;
+}
+
+.utility-bar__col {
+  min-width: 0;
+  display: flex;
+  line-height: 1;
+  align-items: center;
+}
+
+.utility-bar__col--left {
+  justify-content: flex-start;
+}
+
+.utility-bar__col--right {
+  justify-content: flex-end;
+}
+
+.utility-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.utility-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.utility-inline.utility-inline--row {
+  gap: 0.6rem;
+  flex-wrap: nowrap;
+}
+
+.utility-inline.utility-inline--spread {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.utility-inline.utility-inline--fill {
+  width: 100%;
+}
+
+.utility-inline__push {
+  margin-left: auto !important;
+}
+
+.utility-inline--right {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.utility-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 12rem;
+  margin: 0 !important;
+}
+
+.utility-field select {
+  min-width: 10rem;
+  height: 32px;
+  padding: 0 0.55rem;
+  line-height: 1.08;
+  font-size: 0.9rem;
+  margin: 0 !important;
+  vertical-align: middle;
+  align-self: center;
+}
+
+.utility-label {
+  font-weight: 760;
+  letter-spacing: 0.01em;
+}
+
+.utility-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+
+.utility-toggle {
+  --toggle-color: rgba(200, 204, 212, 0.8);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1 / 1;
+  padding: 0.25rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background-color: rgba(255, 255, 255, 0.06);
+  background-image: none;
+  color: rgba(235, 237, 242, 0.92);
+  font-weight: 760;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  margin: 0 !important;
+  align-self: center;
+  transform: translateY(0);
+}
+
+.utility-toggle__icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.utility-toggle__svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--toggle-color);
+  stroke-width: 2px;
+  fill: none;
+}
+
+.utility-toggle.is-active,
+.utility-toggle.is-active:hover,
+.utility-toggle.is-active:focus-visible,
+.utility-toggle[aria-pressed="true"],
+.utility-toggle[aria-pressed="true"]:hover,
+.utility-toggle[aria-pressed="true"]:focus-visible {
+  --toggle-color: #b10000;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #b10000 !important;
+  color: #b10000 !important;
+  box-shadow: 0 0 0 1px rgba(177, 0, 0, 0.4);
+}
+
+.utility-toggle.is-active .utility-toggle__svg,
+.utility-toggle[aria-pressed="true"] .utility-toggle__svg {
+  stroke: #b10000 !important;
+}
+
+.utility-toggle:not(.is-active):hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.utility-toggle:active {
+  transform: translateY(0);
+}
+
+.utility-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 32px;
+  padding: 0 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 760;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  white-space: nowrap;
+  line-height: 1;
+  margin: 0 !important;
+  align-self: center;
+}
+
+.utility-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.utility-ghost:active {
+  transform: translateY(0);
+}
+
+.utility-popover-source {
+  display: none;
+}
+
+/* ------------------------------------------------------------
    Options panel (SLICER SECTION)
    ------------------------------------------------------------ */
 
@@ -110,10 +314,12 @@
 }
 
 #startOver {
-  display: block;
-  width: 100%;
-  min-height: 34px;
-  padding: 0.35rem 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 9.5rem;
+  height: 32px;
+  padding: 0 1.1rem;
   font-weight: 750;
   letter-spacing: 0.01em;
   border-radius: 0.65rem;
@@ -133,6 +339,34 @@
     0 10px 26px rgba(0, 0, 0, 0.35),
     0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+}
+
+.illegal-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 9.5rem;
+  height: 32px;
+  padding: 0 1.1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 120, 120, 0.55);
+  background:
+    radial-gradient(120% 140% at 10% 10%, rgba(255, 120, 120, 0.35), rgba(0,0,0,0) 62%),
+    linear-gradient(135deg, rgba(177, 0, 0, 0.92), rgba(240, 72, 72, 0.85), rgba(120, 0, 0, 0.88));
+  color: rgba(255, 244, 244, 0.98);
+  font-weight: 760;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+}
+
+.illegal-pill.is-active {
+  filter: brightness(1.02);
+  transform: translateY(-1px);
 }
 
 #startOver:hover {
@@ -234,6 +468,18 @@
   .options-controls__left{
     grid-template-columns: 1fr;
     gap: 0.8rem;
+  }
+
+  .utility-bar{
+    grid-template-columns: 1fr;
+  }
+
+  .utility-inline--right{
+    justify-content: flex-start;
+  }
+
+  .utility-inline.utility-inline--row{
+    flex-wrap: wrap;
   }
 }
 

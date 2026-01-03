@@ -3,8 +3,13 @@ export function getDom() {
     // Top controls
     selType: document.getElementById("relicType"),
 
-    showIllegalEl: document.getElementById("showIllegal"),
+    showIllegalBtn: document.getElementById("showIllegalBtn"),
+    illegalPill: document.getElementById("illegalPill"),
     startOverBtn: document.getElementById("startOver"),
+    instructionsBtn: document.getElementById("instructionsBtn") || null,
+    disclaimerBtn: document.getElementById("disclaimerBtn") || null,
+    instructionsPopover: document.getElementById("instructionsPopover") || null,
+    disclaimerPopover: document.getElementById("disclaimerPopover") || null,
 
     // Counts
     count1: document.getElementById("count1"),
