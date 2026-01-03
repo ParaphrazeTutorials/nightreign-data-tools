@@ -41,8 +41,110 @@ const curseBySlot = [null, null, null];
 const curseCatBySlot = ["", "", ""];
 
 let currentRandomColor = "Red";
+const COLOR_CHOICES = ["Random", ...COLORS];
+
+const COLOR_SWATCH = {
+  Red: "#e25b5b",
+  Blue: "#5ba6f5",
+  Yellow: "#f5c74c",
+  Green: "#48b36a"
+};
+const RANDOM_SWATCH = "linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44a)";
 
 const defaultCategoryTheme = categoryColorFor("");
+
+function colorChipLabel(value) {
+  const v = value || "Random";
+  if (v === "Random") return `Color: Random (${currentRandomColor})`;
+  return `Color: ${v}`;
+}
+
+function updateColorChipLabel() {
+  if (!dom.relicColorChip) return;
+  const selected = dom.selColor ? (dom.selColor.value || "Random") : "Random";
+  const resolved = selected === "Random" ? currentRandomColor : selected;
+  const label = colorChipLabel(selected);
+
+  dom.relicColorChip.setAttribute("data-color", selected);
+  dom.relicColorChip.setAttribute("aria-label", label);
+  dom.relicColorChip.setAttribute("title", label);
+  const swatch = selected === "Random" ? RANDOM_SWATCH : (COLOR_SWATCH[resolved] || "#b9c2d0");
+  dom.relicColorChip.style.setProperty("--chip-swatch", swatch);
+  dom.relicColorChip.setAttribute("data-swatch", swatch);
+
+  if (!dom.relicColorMenu) return;
+  const buttons = dom.relicColorMenu.querySelectorAll("[data-color-option]");
+  buttons.forEach(btn => {
+    const isActive = btn.getAttribute("data-color-option") === selected;
+    btn.classList.toggle("is-active", isActive);
+    btn.setAttribute("aria-selected", String(isActive));
+  });
+}
+
+function openColorMenu() {
+  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip) return;
+  dom.relicColorControl.classList.add("is-open");
+  dom.relicColorMenu.hidden = false;
+  dom.relicColorChip.setAttribute("aria-expanded", "true");
+}
+
+function closeColorMenu() {
+  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip) return;
+  dom.relicColorControl.classList.remove("is-open");
+  dom.relicColorMenu.hidden = true;
+  dom.relicColorChip.setAttribute("aria-expanded", "false");
+}
+
+function toggleColorMenu() {
+  if (!dom.relicColorControl) return;
+  const isOpen = dom.relicColorControl.classList.contains("is-open");
+  if (isOpen) {
+    closeColorMenu();
+  } else {
+    openColorMenu();
+  }
+}
+
+function handleColorMenuOutsideClick(evt) {
+  if (!dom.relicColorControl) return;
+  if (dom.relicColorControl.contains(evt.target)) return;
+  closeColorMenu();
+}
+
+function colorOptionHtml(color) {
+  return `
+    <button type="button" class="relic-color-option" role="option" data-color-option="${color}" aria-selected="false" title="${color}">
+      <span class="color-dot" aria-hidden="true"></span>
+      <span class="sr-only">${color}</span>
+    </button>
+  `;
+}
+
+function installColorChipMenu() {
+  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip || !dom.selColor) return;
+
+  dom.relicColorMenu.innerHTML = COLOR_CHOICES.map(colorOptionHtml).join("");
+  dom.relicColorControl.hidden = false;
+  dom.relicColorMenu.hidden = true;
+
+  dom.relicColorChip.addEventListener("click", evt => {
+    evt.stopPropagation();
+    toggleColorMenu();
+  });
+
+  dom.relicColorMenu.addEventListener("click", evt => {
+    const btn = evt.target.closest("[data-color-option]");
+    if (!btn) return;
+    const next = btn.getAttribute("data-color-option");
+    if (!next) return;
+    dom.selColor.value = next;
+    updateUI("color-change");
+    closeColorMenu();
+  });
+
+  document.addEventListener("click", handleColorMenuOutsideClick);
+  updateColorChipLabel();
+}
 
 function computeCompatDupGroups(rows) {
   const map = new Map();
@@ -1446,6 +1548,7 @@ function updateDetails(a, b, c) {
 
 function updateUI(reason = "") {
   closeEffectMenu();
+  closeColorMenu();
 
   if (dom.selColor.value === "Random") {
     const modifierReasons = new Set([
@@ -1492,6 +1595,8 @@ function updateUI(reason = "") {
     randomColor: currentRandomColor,
     stage
   });
+
+  updateColorChipLabel();
 
   const anySelected = cSelections.some(Boolean);
   const dupGroups = computeCompatDupGroups(cSelections.filter(Boolean));
@@ -1638,6 +1743,8 @@ async function load() {
 
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
   installRelicImgFallback(dom.relicImg, () => dom.selType.value);
+
+  installColorChipMenu();
 
   dom.selType.addEventListener("change", () => updateUI("type-change"));
   dom.selColor.addEventListener("change", () => updateUI("color-change"));

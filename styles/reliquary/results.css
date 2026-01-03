@@ -214,6 +214,126 @@
   z-index: 2;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.relic-color-control {
+  position: absolute;
+  right: 0.1rem;
+  bottom: -0.1rem;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 0.3rem;
+  z-index: 5;
+}
+
+.relic-color-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(145deg, rgba(38, 46, 68, 0.95), rgba(22, 24, 32, 0.95));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+
+.relic-color-chip:hover { border-color: rgba(255, 255, 255, 0.3); transform: translateY(-1px); }
+.relic-color-chip:active { transform: translateY(0); }
+
+.relic-color-control.is-open .relic-color-chip {
+  border-color: rgba(200, 210, 255, 0.6);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.relic-color-chip[data-swatch] {
+  background: var(--chip-swatch, linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44a));
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+    0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+.relic-color-menu {
+  position: absolute;
+  right: calc(100% + 0.4rem);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.35rem 0.35rem;
+  display: none;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(160deg, rgba(12, 14, 22, 0.96), rgba(22, 28, 38, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+}
+
+.relic-color-control.is-open .relic-color-menu { display: flex; }
+.relic-color-control.is-open .relic-color-menu .relic-color-option { opacity: 1; }
+.relic-color-menu .relic-color-option { opacity: 0.94; }
+
+.relic-color-option {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(235, 238, 255, 0.95);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.relic-color-option .color-dot {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+  display: block;
+}
+
+.relic-color-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.relic-color-option.is-active {
+  background: linear-gradient(135deg, rgba(78, 108, 176, 0.55), rgba(24, 28, 38, 0.85));
+  border-color: rgba(200, 210, 255, 0.5);
+}
+
+.relic-color-option[data-color-option="Random"] .color-dot {
+  background: linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44a);
+}
+
+.relic-color-option[data-color-option="Red"] .color-dot { background: linear-gradient(135deg, #e05757, #7a1f1f); }
+.relic-color-option[data-color-option="Blue"] .color-dot { background: linear-gradient(135deg, #4f7dfc, #1f3d9a); }
+.relic-color-option[data-color-option="Yellow"] .color-dot { background: linear-gradient(135deg, #f2c94c, #b88a0e); }
+.relic-color-option[data-color-option="Green"] .color-dot { background: linear-gradient(135deg, #48b36a, #1e6636); }
+
 /* Raw + curse: frame fills its bounded column and can contribute size */
 #results.raw-has-curse .relic-preview .relic-frame {
   width: 100%;
