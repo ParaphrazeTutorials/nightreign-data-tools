@@ -13,7 +13,37 @@
 // ------------------------------------------------------------
 // Global build status (single source of truth)
 // ------------------------------------------------------------
-const GLOBAL_BUILD_STATUS = "BETA";     // "BETA" | "LIVE"  (sourced from Reliquary baseline)
+function detectBuildStatus() {
+  // Allow a query override (e.g., ?build=beta) for quick sanity checks.
+  const query = (() => {
+    try {
+      return new URLSearchParams(window.location.search || "");
+    } catch (_) {
+      return new URLSearchParams();
+    }
+  })();
+
+  const forced = String(query.get("build") || "").trim().toUpperCase();
+  if (forced === "BETA" || forced === "LIVE") return forced;
+
+  const host = String(window.location?.hostname || "").toLowerCase();
+  const path = String(window.location?.pathname || "").toLowerCase();
+
+  // Treat dev/pre-prod hosts and the dev pages repo path as BETA.
+  const betaMarkers = [
+    "localhost",
+    "127.0.0.1",
+    "nightreign-data-tools-dev",
+    "-dev" // catch custom dev hosts
+  ];
+
+  const isBetaHost = betaMarkers.some((m) => host.includes(m));
+  const isBetaPath = path.includes("nightreign-data-tools-dev") || path.includes("/dev/");
+
+  return (isBetaHost || isBetaPath) ? "BETA" : "LIVE";
+}
+
+const GLOBAL_BUILD_STATUS = detectBuildStatus(); // "BETA" | "LIVE" (auto from host)
 const GLOBAL_BUILD_VERSION = "v0.0.0";  // app version (update as needed)
 const GLOBAL_GAME_VERSION = "1.03.1.0025"; // game version (sourced from Reliquary baseline)
 
