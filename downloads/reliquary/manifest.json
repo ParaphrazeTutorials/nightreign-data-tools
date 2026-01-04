@@ -8,7 +8,7 @@
       "filename": "reliquary.json",
       "description": "The complete Reliquary dataset as a JSON file.",
       "format": "json",
-      "href": "/Data/reliquary.json"
+      "href": "../Data/reliquary.json"
     }
   ],
   "rawGameFiles": [
@@ -18,7 +18,7 @@
       "filename": "AttachEffectName.csv",
       "description": "This is a file directly exported from SmithBox, and contains the names of each effect.",
       "format": "csv",
-      "href": "/downloads/reliquary/gamefiles/AttachEffectName.csv"
+      "href": "../downloads/reliquary/gamefiles/AttachEffectName.csv"
     },
     {
       "id": "attach-effect-param",
@@ -26,7 +26,7 @@
       "filename": "AttachEffectParam.csv",
       "description": "This is a file directly exported from SmithBox, and contains the definitions of each effect's paremeters",
       "format": "csv",
-      "href": "/downloads/reliquary/gamefiles/AttachEffectParam.csv"
+      "href": "../downloads/reliquary/gamefiles/AttachEffectParam.csv"
     },
     {
       "id": "attach-effect-table-param",
@@ -34,7 +34,7 @@
       "filename": "AttachEffectTableParam.csv",
       "description": "This is a file directly exported from SmithBox, and contains the pairings of effects and their chanceweights.",
       "format": "csv",
-      "href": "/downloads/reliquary/gamefiles/AttachEffectTableParam.csv"
+      "href": "../downloads/reliquary/gamefiles/AttachEffectTableParam.csv"
     }
   ],
   "supplementalFiles": [
@@ -44,7 +44,7 @@
       "filename": "compatibility.csv",
       "description": "A manually created file that assigned in-game Effect Categories to the Effect Category IDs used in the Attach Effect data.",
       "format": "csv",
-      "href": "/downloads/reliquary/supplemental/compatibility.csv"
+      "href": "../downloads/reliquary/supplemental/compatibility.csv"
     },
     {
       "id": "reliquary-query",
@@ -52,7 +52,7 @@
       "filename": "reliquary.sql",
       "description": "The complete SQL query that shows how I've taken the Raw and Supplemental files, and turned them into the data you see in the application",
       "format": "sql",
-      "href": "/downloads/reliquary/queries/reliquary.sql"
+      "href": "../downloads/reliquary/queries/reliquary.sql"
     }
   ]
 }
