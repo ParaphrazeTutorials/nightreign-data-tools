@@ -1696,6 +1696,39 @@ function installInfoButtons() {
   });
 }
 
+function installRowCopyButtons() {
+  const copyBtns = document.querySelectorAll("[data-copy-effect-id], [data-copy-curse-id]");
+
+  copyBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.getAttribute("data-copy-effect-id") || btn.getAttribute("data-copy-curse-id") || "";
+      if (!val) return;
+
+      const label = btn.hasAttribute("data-copy-curse-id") ? "CurseID" : "EffectID";
+      const success = () => showCopyStatus(btn, `${label} copied`, false);
+      const fail = () => showCopyStatus(btn, "Copy failed", true);
+
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(val).then(success).catch(() => {
+          try {
+            fallbackCopy(val);
+            success();
+          } catch (err) {
+            fail();
+          }
+        });
+      } else {
+        try {
+          fallbackCopy(val);
+          success();
+        } catch (err) {
+          fail();
+        }
+      }
+    });
+  });
+}
+
 function updateDetails(a, b, c) {
   if (!dom.detailsBody) return;
 
@@ -1963,6 +1996,7 @@ function updateUI(reason = "") {
   installEffectButtons();
   installCurseButtons();
   installInfoButtons();
+  installRowCopyButtons();
 
   const firstEmptyIdx = cSelections.findIndex(r => !r);
   const activeIndex = firstEmptyIdx === -1 ? 0 : firstEmptyIdx + 1;

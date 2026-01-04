@@ -172,6 +172,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  position: relative;
 }
 
 .icon-btn {
@@ -200,6 +201,29 @@
 .icon-btn.clear-btn:hover { color: rgba(255, 160, 160, 1); border-color: rgba(255, 160, 160, 0.55); }
 .icon-btn.swap-btn { color: rgba(140, 190, 255, 0.95); }
 .icon-btn.info-btn { color: rgba(181, 140, 255, 0.95); }
+.icon-btn.copy-id-btn {
+  border-color: rgba(90, 210, 140, 0.7);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, rgba(24,38,32,0.9) 55%, rgba(16,26,22,0.9) 100%);
+}
+.icon-btn.copy-id-btn:hover {
+  border-color: rgba(110, 240, 165, 0.85);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.38) 0%, rgba(32,52,42,0.95) 55%, rgba(20,32,26,0.95) 100%);
+}
+.icon-btn.copy-id-btn .effect-copy-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2336d27a'%3E%3Cpath d='M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1Z'/%3E%3Cpath d='M18 5H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H10V7h8v14Z'/%3E%3C/svg%3E");
+}
+
+.control-cluster .effect-copy-status {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  margin-left: 0.35rem;
+  z-index: 2;
+  white-space: nowrap;
+}
 
 .effect-btn:disabled {
   cursor: not-allowed;

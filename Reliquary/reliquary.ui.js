@@ -130,6 +130,15 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
           data-info-raw="${effectInfoTitle}"
         >i</button>
         <button type="button" class="icon-btn clear-btn" data-effect-clear-slot="${effectSlot}" aria-label="Clear Effect" title="Clear Effect">×</button>
+        <button
+          type="button"
+          class="icon-btn copy-id-btn"
+          aria-label="Copy EffectID ${row.EffectID}"
+          title="EffectID ${row.EffectID}"
+          data-copy-effect-id="${row.EffectID}"
+        >
+          <span class="effect-copy-icon" aria-hidden="true"></span>
+        </button>
       </div>`
     : effectBtn;
 
@@ -201,6 +210,15 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
               data-info-raw="${curseInfoTitle(curseRow)}"
             >i</button>
             <button type="button" class="icon-btn clear-btn" data-curse-clear-slot="${curseSlot}" aria-label="Clear Curse" title="Clear Curse">×</button>
+            <button
+              type="button"
+              class="icon-btn copy-id-btn"
+              aria-label="Copy CurseID ${curseRow.EffectID}"
+              title="CurseID ${curseRow.EffectID}"
+              data-copy-curse-id="${curseRow.EffectID}"
+            >
+              <span class="effect-copy-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>`
       : "";
