@@ -12,7 +12,8 @@ import {
   SEQ_CATEGORY_BASES,
   ALL_THEME,
   baseFromSequence,
-  textColorFor
+  textColorFor,
+  relicTypeForRow
 } from "./reliquary.logic.js";
 import {
   renderChosenLine,
@@ -393,6 +394,28 @@ function setSelectedId(slotIdx, value) {
 
 function getSelectedRow(slotIdx) {
   return getRow(getSelectedId(slotIdx));
+}
+
+function exclusiveRelicTypeFromSelections() {
+  const picked = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+
+  let hasStandard = false;
+  let hasDepth = false;
+
+  for (const row of picked) {
+    const t = relicTypeForRow(row);
+    if (t === "Standard") hasStandard = true;
+    if (t === "Depth Of Night") hasDepth = true;
+  }
+
+  if (hasStandard && !hasDepth) return "Standard";
+  if (hasDepth && !hasStandard) return "Depth Of Night";
+
+  return null;
+}
+
+function effectiveRelicType() {
+  return exclusiveRelicTypeFromSelections() || dom.selType.value;
 }
 
 function getRollValue(row) {
@@ -921,7 +944,7 @@ function openCurseMenu(slotIdx, anchorBtn) {
   closeEffectMenu();
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-  const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
+  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType())
     .filter(r => {
       const cid = compatId(r);
       if (!cid) return true;
@@ -1125,7 +1148,7 @@ function openCurseDialog(slotIdx) {
   if (curseDialogTitle) curseDialogTitle.textContent = `Select a Curse for ${slotLabel(slotIdx)}`;
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-  const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
+  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType())
     .filter(r => {
       const cid = compatId(r);
       if (!cid) return true;
@@ -1230,7 +1253,7 @@ function computeEligibilityForSlot(slotIdx, showIllegalOverride = null) {
     return { eligible: [], filtered: [], categories: [], currentId: "" };
   }
 
-  const type = dom.selType.value;
+  const type = effectiveRelicType();
   const base = baseFilteredByRelicType(rows, type);
   const selectedRows = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
 
@@ -1895,7 +1918,7 @@ function updateUI(reason = "") {
 
   setRelicImageForStage({
     relicImg: dom.relicImg,
-    selectedType: dom.selType.value,
+    selectedType: effectiveRelicType(),
     selectedColor,
     randomColor: currentRandomColor,
     stage
@@ -2049,7 +2072,7 @@ async function load() {
   pickRandomColor();
 
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
-  installRelicImgFallback(dom.relicImg, () => dom.selType.value);
+  installRelicImgFallback(dom.relicImg, () => effectiveRelicType());
 
   installColorChipMenu();
   installUtilityPopoverButtons();
