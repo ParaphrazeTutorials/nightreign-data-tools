@@ -1,0 +1,60 @@
+name: "Feature Request"
+description: "Propose a feature"
+labels: ["feature"]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: "Summary"
+      placeholder: "Short title of the feature"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem"
+      description: "What user/job-to-be-done or pain point does this solve?"
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Proposed solution"
+      description: "Describe the approach, UX, or behavior"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "Acceptance criteria"
+      description: "Bullet list of conditions to consider this done"
+      placeholder: "- ..."
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: "Scope / Out of scope"
+      description: "Call out what is included vs not"
+      placeholder: "In: ...\nOut: ..."
+    validations:
+      required: false
+  - type: dropdown
+    id: priority_hint
+    attributes:
+      label: "Priority suggestion"
+      options:
+        - P0 (critical)
+        - P1 (high)
+        - P2 (medium)
+        - P3 (low)
+      default: 2
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: "Notes / links"
+      description: "Designs, mockups, references"
+    validations:
+      required: false

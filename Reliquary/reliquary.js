@@ -1,4 +1,4 @@
-import { DATA_URL, relicDefaultPath, visualRelicType, RELEASE_CHANNEL, GAME_VERSION } from "./reliquary.assets.js";
+import { DATA_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
 import {
   COLORS,
   compatId,
@@ -6,11 +6,16 @@ import {
   applyCategory,
   eligibleList,
   baseFilteredByRelicType,
-  autoRelicTypeFromEffect1
+  autoRelicTypeFromEffect1,
+  categoryColorFor,
+  themeFromBase,
+  SEQ_CATEGORY_BASES,
+  ALL_THEME,
+  baseFromSequence,
+  textColorFor,
+  relicTypeForRow
 } from "./reliquary.logic.js";
 import {
-  fillSelect,
-  fillCategorySelect,
   renderChosenLine,
   updateCounts,
   setRelicImageForStage,
@@ -20,126 +25,184 @@ import { getDom } from "./reliquary.dom.js";
 
 const dom = getDom();
 
-function initHeaderBuildTag() {
-  const el = document.getElementById("heroBuild");
-  if (!el) return;
-
-  // Environment detection (deployment-based):
-  // - Local dev (localhost / 127.0.0.1 / ::1) => BETA
-  // - Dev GitHub Pages repo (nightreign-data-tools-dev) => BETA
-  // - Prod GitHub Pages repo (nightreign-data-tools) => LIVE
-  // - Otherwise => fall back to configured RELEASE_CHANNEL
-  const host = String(window.location.hostname || "").toLowerCase();
-  const path = String(window.location.pathname || "").toLowerCase();
-  const isLocal = host === "localhost" || host === "127.0.0.1" || host === "::1";
-  const isDevDeploy = path.startsWith("/nightreign-data-tools-dev/");
-  const isProdDeploy = path.startsWith("/nightreign-data-tools/");
-
-  const channel = (isLocal || isDevDeploy)
-    ? "BETA"
-    : (isProdDeploy
-        ? "LIVE"
-        : String(RELEASE_CHANNEL || "").trim().toUpperCase());
-const version = String(GAME_VERSION || "").trim();
-
-  el.classList.toggle("is-beta", channel === "BETA");
-  el.classList.toggle("is-live", channel === "LIVE");
-
-  const statusText = channel || "BETA";
-  const versionText = version ? `Game Version ${version}` : "Game Version";
-
-  el.innerHTML = `
-    <span class="hero-build__status">${statusText}</span>
-    <span class="hero-build__sep">|</span>
-    <span class="hero-build__version">${versionText}</span>
-  `;
-}
-
 const resultsEl = document.getElementById("results");
 const resultsHeader = document.querySelector("#results .panel-header");
 const validityBadge = document.getElementById("relicValidity");
-
-initHeaderBuildTag();
+const autoSortBtn = document.getElementById("autoSortBtn");
 
 let rows = [];
 let byId = new Map();
 let rowsAll = [];
 let byIdAll = new Map();
 let curses = [];
+
+const selectedEffects = ["", "", ""];
+const selectedCats = ["", "", ""];
 const curseBySlot = [null, null, null];
-const curseCatBySlot = ["", "", ""]; // remembered per slot ("" = All)
+const curseCatBySlot = ["", "", ""];
 
 let currentRandomColor = "Red";
+let selectedColor = "Random";
+const COLOR_CHOICES = ["Random", ...COLORS];
 
-function pickRandomColor() {
-  currentRandomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+function isShowIllegalActive() {
+  return !!(dom.showIllegalBtn && dom.showIllegalBtn.classList.contains("is-active"));
 }
 
-function getRow(effectId) {
-  if (!effectId) return null;
-  return byId.get(String(effectId)) ?? null;
-}
+function setShowIllegalActive(active) {
+  if (!dom.showIllegalBtn) return;
+  dom.showIllegalBtn.classList.toggle("is-active", !!active);
+  dom.showIllegalBtn.setAttribute("aria-pressed", String(!!active));
 
-function getAnyRow(effectId) {
-  if (!effectId) return null;
-  return byIdAll.get(String(effectId)) ?? null;
-}
-
-function getRollValue(row) {
-  const n = Number.parseInt(row?.RollOrder, 10);
-  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
-}
-
-function computeCompatDupGroups(selectedRows) {
-  const byCompat = new Map();
-
-  for (const r of selectedRows) {
-    if (!r) continue;
-    const id = compatId(r);
-    if (!id) continue;
-    if (!byCompat.has(id)) byCompat.set(id, []);
-    byCompat.get(id).push(r);
+  if (dom.illegalPill) {
+    dom.illegalPill.hidden = !active;
+    dom.illegalPill.classList.toggle("is-active", !!active);
   }
+}
 
-  return [...byCompat.entries()]
-    .filter(([, list]) => list.length > 1)
-    .map(([cid, list], idx) => ({ cid, list, listId: `compatDupList_${idx}` }));
+const COLOR_SWATCH = {
+  Red: "linear-gradient(135deg, #642121, #b84242)",
+  Blue: "linear-gradient(135deg, #1e4275, #3f7ad0)",
+  Yellow: "linear-gradient(135deg, #645019, #b28d2c)",
+  Green: "linear-gradient(135deg, #10482a, #2f8a52)"
+};
+const RANDOM_SWATCH = "linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44a)";
+
+const defaultCategoryTheme = categoryColorFor("");
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => {
+    const map = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    };
+    return map[ch] || ch;
+  });
+}
+
+function colorChipLabel(value) {
+  const v = value || "Random";
+  if (v === "Random") return `Color: Random (${currentRandomColor})`;
+  return `Color: ${v}`;
+}
+
+function updateColorChipLabel() {
+  if (!dom.relicColorChip) return;
+  const selected = selectedColor || "Random";
+  const resolved = selected === "Random" ? currentRandomColor : selected;
+  const label = colorChipLabel(selected);
+
+  dom.relicColorChip.setAttribute("data-color", selected);
+  dom.relicColorChip.setAttribute("aria-label", label);
+  dom.relicColorChip.setAttribute("title", label);
+  const swatch = selected === "Random" ? RANDOM_SWATCH : (COLOR_SWATCH[resolved] || "#b9c2d0");
+  dom.relicColorChip.style.setProperty("--chip-swatch", swatch);
+  dom.relicColorChip.setAttribute("data-swatch", swatch);
+
+  if (!dom.relicColorMenu) return;
+  const buttons = dom.relicColorMenu.querySelectorAll("[data-color-option]");
+  buttons.forEach(btn => {
+    const isActive = btn.getAttribute("data-color-option") === selected;
+    btn.classList.toggle("is-active", isActive);
+    btn.setAttribute("aria-selected", String(isActive));
+  });
+}
+
+function openColorMenu() {
+  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip) return;
+  dom.relicColorControl.classList.add("is-open");
+  dom.relicColorMenu.hidden = false;
+  dom.relicColorChip.setAttribute("aria-expanded", "true");
+}
+
+function closeColorMenu() {
+  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip) return;
+  dom.relicColorControl.classList.remove("is-open");
+  dom.relicColorMenu.hidden = true;
+  dom.relicColorChip.setAttribute("aria-expanded", "false");
+}
+
+function toggleColorMenu() {
+  if (!dom.relicColorControl) return;
+  const isOpen = dom.relicColorControl.classList.contains("is-open");
+  if (isOpen) {
+    closeColorMenu();
+  } else {
+    openColorMenu();
+  }
+}
+
+function handleColorMenuOutsideClick(evt) {
+  if (!dom.relicColorControl) return;
+  if (dom.relicColorControl.contains(evt.target)) return;
+  closeColorMenu();
+}
+
+function colorOptionHtml(color) {
+  return `
+    <button type="button" class="relic-color-option" role="option" data-color-option="${color}" aria-selected="false" title="${color}">
+      <span class="color-dot" aria-hidden="true"></span>
+      <span class="sr-only">${color}</span>
+    </button>
+  `;
+}
+
+function installColorChipMenu() {
+  if (!dom.relicColorControl || !dom.relicColorMenu || !dom.relicColorChip) return;
+
+  dom.relicColorMenu.innerHTML = COLOR_CHOICES.map(colorOptionHtml).join("");
+  dom.relicColorControl.hidden = false;
+  dom.relicColorMenu.hidden = true;
+
+  dom.relicColorChip.addEventListener("click", evt => {
+    evt.stopPropagation();
+    toggleColorMenu();
+  });
+
+  dom.relicColorMenu.addEventListener("click", evt => {
+    const btn = evt.target.closest("[data-color-option]");
+    if (!btn) return;
+    const next = btn.getAttribute("data-color-option");
+    if (!next) return;
+    selectedColor = next;
+    updateUI("color-change");
+    closeColorMenu();
+  });
+
+  document.addEventListener("click", handleColorMenuOutsideClick);
+  updateColorChipLabel();
+}
+
+function computeCompatDupGroups(rows) {
+  const map = new Map();
+  for (const r of rows || []) {
+    if (!r) continue;
+    const cid = compatId(r);
+    if (!cid) continue;
+    if (!map.has(cid)) map.set(cid, []);
+    map.get(cid).push(r);
+  }
+  return [...map.values()].filter(group => group.length > 1);
 }
 
 function computeRollOrderIssue(a, b, c) {
   const original = [a, b, c];
   const picked = original.filter(Boolean);
 
-  if (picked.length < 2) {
+  if (picked.length <= 1) {
     return {
       hasIssue: false,
-      sorted: null,
+      sorted: original,
       movedSlots: [false, false, false],
       moveDeltaBySlot: [0, 0, 0]
     };
   }
 
-  const sortedPicked = picked.slice().sort((x, y) => getRollValue(x) - getRollValue(y));
+  const sortedPicked = [...picked].sort((x, y) => getRollValue(x) - getRollValue(y));
 
-  // Is the current selected-only ordering already correct?
-  let mismatch = false;
-  let j = 0;
-  for (let i = 0; i < original.length; i++) {
-    if (!original[i]) continue;
-    if (String(original[i].EffectID) !== String(sortedPicked[j].EffectID)) mismatch = true;
-    j++;
-  }
-
-  if (!mismatch) {
-    return {
-      hasIssue: false,
-      sorted: null,
-      movedSlots: [false, false, false],
-      moveDeltaBySlot: [0, 0, 0]
-    };
-  }
-
-  // Map slot -> packed index among selected items
   const slotToPickedIndex = [-1, -1, -1];
   let k = 0;
   for (let i = 0; i < original.length; i++) {
@@ -161,33 +224,253 @@ function computeRollOrderIssue(a, b, c) {
     const want = idToSortedIndex.get(String(row.EffectID));
     if (want == null || cur == null || cur < 0) continue;
 
-    const delta = want - cur; // negative => move up; positive => move down
+    const delta = want - cur;
     moveDeltaBySlot[i] = delta;
     movedSlots[i] = delta !== 0;
   }
 
-  // 3-slot sorted array for Details mini-preview (keeps empties in place)
   const sortedSlots = original.slice();
-  j = 0;
+  let j = 0;
   for (let i = 0; i < sortedSlots.length; i++) {
     if (!sortedSlots[i]) continue;
     sortedSlots[i] = sortedPicked[j];
     j++;
   }
 
+  const hasIssue = movedSlots.some(Boolean);
+
   return {
-    hasIssue: true,
+    hasIssue,
     sorted: sortedSlots,
     movedSlots,
     moveDeltaBySlot
   };
 }
 
+function computePositionIssue(a, b, c) {
+  const slots = [a, b, c];
+  const badSlots = [];
+  let sawEmpty = false;
+
+  for (let i = 0; i < slots.length; i++) {
+    const r = slots[i];
+    if (!r) {
+      sawEmpty = true;
+      continue;
+    }
+    if (sawEmpty) badSlots.push(i);
+  }
+
+  return { hasIssue: badSlots.length > 0, badSlots };
+}
+
+function selectionsCompatibleWithType(type) {
+  const picked = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)].filter(Boolean);
+  if (!type) return true;
+  return picked.every(r => baseFilteredByRelicType([r], type).length > 0);
+}
+
+function maybeAutoSetTypeFromEffect1(nextType) {
+  if (!nextType) return;
+  const current = dom.selType.value;
+  if (current && current !== "All") return;
+  if (!selectionsCompatibleWithType(nextType)) return;
+  dom.selType.value = nextType;
+}
+
+function applyAutoSort() {
+  const current = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+  const roll = computeRollOrderIssue(current[0], current[1], current[2]);
+
+  if (!roll.hasIssue || !roll.sorted) return;
+
+  const entries = [0, 1, 2]
+    .map(slotIdx => ({
+      slotIdx,
+      row: current[slotIdx],
+      cat: selectedCats[slotIdx] || "",
+      curse: curseBySlot[slotIdx],
+      curseCat: curseCatBySlot[slotIdx] || ""
+    }))
+    .filter(e => !!e.row);
+
+  const used = new Set();
+
+  const nextEffects = ["", "", ""];
+  const nextCats = ["", "", ""];
+  const nextCurses = [null, null, null];
+  const nextCurseCats = ["", "", ""];
+
+  for (let i = 0; i < roll.sorted.length; i++) {
+    const row = roll.sorted[i];
+    if (!row) continue;
+
+    const matchIdx = entries.findIndex((entry, idx) => {
+      if (used.has(idx)) return false;
+      return String(entry.row.EffectID) === String(row.EffectID);
+    });
+
+    const entry = matchIdx >= 0 ? entries[matchIdx] : null;
+    if (matchIdx >= 0) used.add(matchIdx);
+
+    nextEffects[i] = String(row.EffectID);
+    nextCats[i] = entry ? entry.cat : "";
+    nextCurses[i] = entry ? entry.curse : null;
+    nextCurseCats[i] = entry ? entry.curseCat : "";
+  }
+
+  for (let i = 0; i < selectedEffects.length; i++) {
+    selectedEffects[i] = nextEffects[i] || "";
+    selectedCats[i] = nextCats[i] || "";
+    curseBySlot[i] = nextCurses[i] || null;
+    curseCatBySlot[i] = nextCurseCats[i] || "";
+  }
+
+  updateUI("auto-sort");
+}
+
+if (autoSortBtn) {
+  autoSortBtn.addEventListener("click", applyAutoSort);
+}
+
+function gradientFromTheme(theme) {
+  if (!theme) return "rgba(40, 40, 44, 0.85)";
+  const shades = theme.shades || [];
+  if (shades.length >= 3) {
+    return `linear-gradient(135deg, ${shades[0]} 0%, ${shades[1]} 50%, ${shades[2]} 100%)`;
+  }
+  return theme.base || "rgba(40, 40, 44, 0.85)";
+}
+
+function buildCategoryThemes(catList) {
+  const map = new Map();
+  const seq = SEQ_CATEGORY_BASES;
+  let seqIdx = 0;
+
+  const uncategorizedTheme = categoryColorFor("Uncategorized");
+
+  map.set("__default", defaultCategoryTheme);
+  map.set("__all", ALL_THEME);
+  map.set("Uncategorized", uncategorizedTheme);
+
+  (catList || []).forEach(cat => {
+    if (map.has(cat)) return;
+
+    const isCurse = /curse/i.test(cat);
+    if (isCurse) {
+      map.set(cat, categoryColorFor(cat));
+      return;
+    }
+
+    const base = baseFromSequence(seqIdx);
+    seqIdx += 1;
+    map.set(cat, themeFromBase(base));
+  });
+
+  return map;
+}
+
+function pickRandomColor() {
+  currentRandomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+}
+
+function getRow(effectId) {
+  if (!effectId) return null;
+  return byId.get(String(effectId)) ?? null;
+}
+
+function getAnyRow(effectId) {
+  if (!effectId) return null;
+  return byIdAll.get(String(effectId)) ?? null;
+}
+
+function getSelectedId(slotIdx) {
+  return selectedEffects[slotIdx] || "";
+}
+
+function setSelectedId(slotIdx, value) {
+  selectedEffects[slotIdx] = value ? String(value) : "";
+}
+
+function getSelectedRow(slotIdx) {
+  return getRow(getSelectedId(slotIdx));
+}
+
+function exclusiveRelicTypeFromSelections() {
+  const picked = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+
+  let hasStandard = false;
+  let hasDepth = false;
+
+  for (const row of picked) {
+    const t = relicTypeForRow(row);
+    if (t === "Standard") hasStandard = true;
+    if (t === "Depth Of Night") hasDepth = true;
+  }
+
+  if (hasStandard && !hasDepth) return "Standard";
+  if (hasDepth && !hasStandard) return "Depth Of Night";
+
+  return null;
+}
+
+function effectiveRelicType(forFiltering = false) {
+  // When showing illegal combinations, filtering should ignore relic type entirely
+  if (forFiltering && isShowIllegalActive()) return "";
+  return exclusiveRelicTypeFromSelections() || dom.selType.value;
+}
+
+function relicTypeMismatchInfo(rows) {
+  // Only relevant when illegal combinations are visible
+  if (!isShowIllegalActive()) return { hasIssue: false, ids: new Set() };
+
+  const selectedType = dom.selType.value;
+
+  let hasStandard = false;
+  let hasDepth = false;
+  const idsStandard = new Set();
+  const idsDepth = new Set();
+
+  for (const row of rows.filter(Boolean)) {
+    const t = relicTypeForRow(row);
+    if (t === "Standard") {
+      hasStandard = true;
+      idsStandard.add(String(row.EffectID));
+    }
+    if (t === "Depth Of Night") {
+      hasDepth = true;
+      idsDepth.add(String(row.EffectID));
+    }
+  }
+
+  const noIssue = { hasIssue: false, ids: new Set() };
+
+  // Mixed exclusive effects are always a mismatch
+  if (hasStandard && hasDepth) {
+    return { hasIssue: true, ids: new Set([...idsStandard, ...idsDepth]) };
+  }
+
+  // Single-type selections conflicting with an explicit relic type
+  if (selectedType === "Standard" && hasDepth) {
+    return { hasIssue: true, ids: idsDepth };
+  }
+
+  if (selectedType === "Depth Of Night" && hasStandard) {
+    return { hasIssue: true, ids: idsStandard };
+  }
+
+  return noIssue;
+}
+
+function getRollValue(row) {
+  const val = Number(row?.RollOrder);
+  if (!Number.isFinite(val)) return Number.POSITIVE_INFINITY;
+  return val;
+}
+
 function applyHeaderValidityClasses(state, anySelected) {
   if (!resultsHeader) return;
-
   resultsHeader.classList.remove("is-valid", "is-invalid");
-
   if (!anySelected) return;
   if (state === "Valid") resultsHeader.classList.add("is-valid");
   if (state === "Invalid") resultsHeader.classList.add("is-invalid");
@@ -205,10 +488,8 @@ function setValidityBadge(state, anySelected) {
 
   validityBadge.hidden = false;
   validityBadge.textContent = state;
-
   validityBadge.classList.toggle("is-valid", state === "Valid");
   validityBadge.classList.toggle("is-invalid", state === "Invalid");
-
   applyHeaderValidityClasses(state, true);
 }
 
@@ -217,19 +498,321 @@ function setDetailsEmpty() {
   dom.detailsBody.innerHTML = "";
 }
 
+let detailsPopoverRoot;
+let detailsPopoverTitle;
+let detailsPopoverBody;
+
+function ensureDetailsPopoverDialog() {
+  if (detailsPopoverRoot) return;
+
+  const root = document.createElement("div");
+  root.className = "details-modal";
+  root.id = "detailsModal";
+  root.setAttribute("aria-hidden", "true");
+  root.setAttribute("role", "dialog");
+  root.setAttribute("aria-modal", "true");
+
+  root.innerHTML = `
+    <div class="details-modal__backdrop" data-close="backdrop"></div>
+    <div class="details-modal__card" role="document">
+      <header class="details-modal__header">
+        <h4 class="details-modal__title" id="detailsPopTitle">Details</h4>
+        <button class="details-modal__close" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="details-modal__body" id="detailsPopBody"></div>
+    </div>
+  `;
+
+  const closeBtn = root.querySelector(".details-modal__close");
+  const backdrop = root.querySelector(".details-modal__backdrop");
+
+  const close = () => closeDetailsPopover();
+  if (closeBtn) closeBtn.addEventListener("click", close);
+  if (backdrop) backdrop.addEventListener("click", close);
+
+  document.addEventListener("keydown", evt => {
+    if (evt.key === "Escape" && root.classList.contains("is-open")) {
+      closeDetailsPopover();
+    }
+  });
+
+  document.body.appendChild(root);
+
+  detailsPopoverRoot = root;
+  detailsPopoverTitle = root.querySelector("#detailsPopTitle");
+  detailsPopoverBody = root.querySelector("#detailsPopBody");
+}
+
+function openDetailsPopover(pop, kind = "") {
+  ensureDetailsPopoverDialog();
+  if (!detailsPopoverRoot) return;
+
+  const titleEl = pop.querySelector(".popover-title");
+  const bodyEl = pop.querySelector(".popover-body");
+
+  detailsPopoverRoot.classList.remove("is-effect", "is-curse");
+  const k = kind || pop.getAttribute("data-pop-kind") || "";
+  if (k === "effect" || k === "curse") {
+    detailsPopoverRoot.classList.add(`is-${k}`);
+  }
+
+  if (detailsPopoverTitle) detailsPopoverTitle.textContent = titleEl ? titleEl.textContent : "Details";
+  if (detailsPopoverBody) detailsPopoverBody.innerHTML = bodyEl ? bodyEl.innerHTML : pop.innerHTML;
+
+  // Attach copy handlers for any raw-data copy buttons in the injected content
+  if (detailsPopoverBody) {
+    const copyBtns = detailsPopoverBody.querySelectorAll(".effect-copy-btn[data-copy-raw]");
+    copyBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const val = btn.getAttribute("data-copy-raw") || "";
+        if (!val) return;
+        const success = () => showCopyStatus(btn, "Copied to Clipboard", false);
+        const fail = () => showCopyStatus(btn, "Copy failed", true);
+
+        if (navigator?.clipboard?.writeText) {
+          navigator.clipboard.writeText(val).then(success).catch(() => {
+            fallbackCopy(val);
+            success();
+          });
+        } else {
+          fallbackCopy(val);
+          success();
+        }
+      });
+    });
+  }
+
+  detailsPopoverRoot.classList.add("is-open");
+  detailsPopoverRoot.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeDetailsPopover() {
+  if (!detailsPopoverRoot) return;
+  detailsPopoverRoot.classList.remove("is-open");
+  detailsPopoverRoot.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "absolute";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); } catch (err) {
+    console.warn("Copy failed", err);
+  }
+  document.body.removeChild(ta);
+}
+
+function showCopyStatus(btn, message, isError = false) {
+  if (!btn || !btn.parentElement) return;
+  let badge = btn.parentElement.querySelector(".effect-copy-status");
+  if (!badge) {
+    badge = document.createElement("span");
+    badge.className = "effect-copy-status";
+    btn.parentElement.appendChild(badge);
+  }
+  badge.textContent = message || "Copied";
+  badge.classList.toggle("is-error", !!isError);
+  badge.hidden = false;
+
+  const key = "copyStatusTimeout";
+  if (badge[key]) clearTimeout(badge[key]);
+  badge[key] = setTimeout(() => {
+    badge.hidden = true;
+    badge[key] = null;
+  }, 1500);
+}
+
+function formatRelicTypeLabel(value) {
+  const v = String(value || "").trim().toLowerCase();
+  if (!v) return { label: "Unknown", modifier: "placeholder" };
+  if (v.includes("both")) return { label: "Both", modifier: "both" };
+  if (v.includes("depth")) return { label: "Depth of Night", modifier: "depth" };
+  if (v.includes("standard")) return { label: "Standard", modifier: "standard" };
+  return { label: value, modifier: "placeholder" };
+}
+
+function chipsForRelicType(value) {
+  const v = String(value || "").trim().toLowerCase();
+  if (v.includes("both")) {
+    return [
+      { label: "Standard", modifier: "standard" },
+      { label: "Depth of Night", modifier: "depth" }
+    ];
+  }
+  const single = formatRelicTypeLabel(value);
+  return [single];
+}
+
+function buildEffectInfoPopover(row, rawText, kind = "effect") {
+  const pop = document.createElement("div");
+  pop.setAttribute("data-pop-kind", kind === "curse" ? "curse" : "effect");
+
+  const title = document.createElement("div");
+  title.className = "popover-title";
+  title.textContent = "Effect Information";
+
+  const body = document.createElement("div");
+  body.className = "popover-body";
+
+  if (!row) {
+    body.innerHTML = `<p>Unable to load details for this entry.</p>`;
+    pop.append(title, body);
+    return pop;
+  }
+
+  const name = row.EffectDescription ?? `(Effect ${row.EffectID ?? "?"})`;
+  const relicChips = chipsForRelicType(row.RelicType);
+  const entryKind = kind === "curse" ? "Curse" : "Effect";
+  const rawValueFull = rawText && String(rawText).trim()
+    ? String(rawText).trim()
+    : `EffectID ${row.EffectID ?? "?"}`;
+
+  // For effect popups, omit any curse-specific fragments from the raw data string
+  const rawValue = (() => {
+    if (kind === "curse") return rawValueFull;
+    const parts = rawValueFull.split("•").map(s => s.trim()).filter(Boolean);
+    const filtered = parts.filter(p => !/^curse/i.test(p));
+    return filtered.join(" • ") || rawValueFull;
+  })();
+
+  const curseRequired = String(row?.CurseRequired ?? "0") === "1";
+  const compatibility = row?.CompatibilityID ?? "";
+  const rollOrder = row?.RollOrder ?? "";
+  const relicTypeText = relicChips.map(chip => chip.label).join(" / ") || "Unknown";
+
+  // TSV-style payload so Excel pastes into rows (Label | Value)
+  const copyRows = [
+    ["Entry Type", entryKind],
+    ["Effect Name", name],
+    ["EffectID", row?.EffectID ?? ""],
+    ["Relic Type", relicTypeText],
+    ["Curse Required", curseRequired ? "Yes" : "No"],
+    ["Compatibility", compatibility === "" ? "∅" : compatibility],
+    ["Roll Order", rollOrder === "" ? "∅" : rollOrder],
+    ["Raw", rawValue]
+  ];
+
+  const copyPayload = copyRows
+    .filter(([_, v]) => v != null && String(v).trim() !== "")
+    .map(([k, v]) => `${k}\t${v}`)
+    .join("\n");
+
+  body.innerHTML = `
+    <div class="effect-info-grid">
+      <div class="effect-info-section">
+        <div class="effect-info-label">Effect Name</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-info-name">${escapeHtml(name)}</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Relic Type</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          ${relicChips.map(chip => `
+            <span class="effect-chip effect-chip--relic effect-chip--${chip.modifier || "placeholder"}">${escapeHtml(chip.label)}</span>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Curse Required</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--curse-${curseRequired ? "yes" : "no"}">${curseRequired ? "Yes" : "No"}</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Eligible Classes</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Self-Stacking</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Similar-Stacking</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label effect-info-label--with-action">
+          <span>Raw Data</span>
+          <button
+            type="button"
+            class="effect-copy-btn"
+            aria-label="Copy raw data"
+            title="Copy raw data"
+            data-copy-raw="${escapeHtml(copyPayload)}"
+          >
+            <span class="effect-copy-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <code class="effect-raw">${escapeHtml(rawValue)}</code>
+        </div>
+      </div>
+    </div>
+  `;
+
+  pop.append(title, body);
+  return pop;
+}
+
+function openInfoPopoverForButton(btn) {
+  if (!btn) return;
+  const effectId = btn.getAttribute("data-effect-id");
+  if (!effectId) return;
+  const kind = btn.getAttribute("data-info-kind") || "effect";
+  const raw = btn.getAttribute("data-info-raw") || "";
+  const row = getAnyRow(effectId);
+  const pop = buildEffectInfoPopover(row, raw, kind);
+  openDetailsPopover(pop, kind);
+}
+
+function installUtilityPopoverButtons() {
+  const pairs = [
+    [dom.instructionsBtn, dom.instructionsPopover],
+    [dom.disclaimerBtn, dom.disclaimerPopover]
+  ];
+
+  pairs.forEach(([btn, pop]) => {
+    if (!btn || !pop) return;
+    btn.addEventListener("click", () => openDetailsPopover(pop));
+  });
+}
+
 function installDetailsToggles() {
   if (!dom.detailsBody) return;
-
   const buttons = dom.detailsBody.querySelectorAll("[data-popover-toggle]");
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-popover-toggle");
       if (!id) return;
-
       const pop = dom.detailsBody.querySelector(`#${CSS.escape(id)}`);
       if (!pop) return;
-
-      pop.hidden = !pop.hidden;
+      openDetailsPopover(pop);
     });
   });
 }
@@ -238,14 +821,21 @@ function markLineReordered(html) {
   return html.replace("<li>", `<li class="reorder-changed">`);
 }
 
-
 function slotLabel(idx) {
   return idx === 0 ? "Effect 1" : idx === 1 ? "Effect 2" : "Effect 3";
 }
 
 let curseDialog;
-let curseDialogList;
 let curseDialogTitle;
+let effectDialog;
+let effectDialogTitle;
+let effectMenu;
+let effectMenuSlot = null;
+let effectMenuAnchorBtn = null;
+let effectMenuFlyout = null;
+let curseMenu;
+let curseMenuSlot = null;
+let curseMenuAnchorBtn = null;
 
 function ensureCurseDialog() {
   if (curseDialog) return;
@@ -269,7 +859,7 @@ function ensureCurseDialog() {
           </label>
 
           <label class="curse-field">
-            <span class="curse-field__label">Curse Effect</span>
+            <span class="curse-field__label">Curse</span>
             <select id="curseEffectSelect">
               <option value="">Select a Curse…</option>
             </select>
@@ -278,8 +868,11 @@ function ensureCurseDialog() {
       </div>
 
       <footer class="curse-dialog__footer">
-        <button type="button" class="secondary" id="curseCancelBtn">Cancel</button>
-        <button type="submit" class="primary" id="curseSubmitBtn" disabled>Apply Curse</button>
+        <button type="button" class="secondary" id="curseClearBtn">Clear Curse</button>
+        <div class="curse-dialog__footer-right">
+          <button type="button" class="secondary" id="curseCancelBtn">Cancel</button>
+          <button type="submit" class="primary" id="curseSubmitBtn" disabled>Apply Curse</button>
+        </div>
       </footer>
     </form>
   `;
@@ -288,51 +881,301 @@ function ensureCurseDialog() {
   curseDialog = d;
   curseDialogTitle = d.querySelector("#curseDialogTitle");
 
-  d.querySelector(".curse-dialog__close").onclick =
-  d.querySelector("#curseCancelBtn").onclick = () => d.close("cancel");
+  const closeBtn = d.querySelector(".curse-dialog__close");
+  const cancelBtn = d.querySelector("#curseCancelBtn");
+  if (closeBtn) closeBtn.onclick = () => d.close("cancel");
+  if (cancelBtn) cancelBtn.onclick = () => d.close("cancel");
 }
 
+function ensureEffectDialog() {
+  if (effectDialog) return;
+
+  const d = document.createElement("dialog");
+  d.className = "effect-dialog";
+  d.innerHTML = `
+    <form method="dialog" class="effect-dialog__form">
+      <header class="effect-dialog__header">
+        <h4 class="effect-dialog__title" id="effectDialogTitle">Select an Effect</h4>
+        <button type="button" class="effect-dialog__close" aria-label="Close">✕</button>
+      </header>
+
+      <div class="effect-dialog__body">
+        <div class="effect-dialog__controls">
+          <label class="effect-field">
+            <span class="effect-field__label">Effect Category</span>
+            <select id="effectCategorySelect">
+              <option value="">All</option>
+            </select>
+          </label>
+
+          <label class="effect-field">
+            <span class="effect-field__label">Effect</span>
+            <select id="effectSelect">
+              <option value="">Select an Effect…</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <footer class="effect-dialog__footer">
+        <button type="button" class="secondary" id="effectClearBtn">Clear Slot</button>
+        <div class="effect-dialog__footer-right">
+          <button type="button" class="secondary" id="effectCancelBtn">Cancel</button>
+          <button type="submit" class="primary" id="effectSubmitBtn" disabled>Apply Effect</button>
+        </div>
+      </footer>
+    </form>
+  `;
+  document.body.appendChild(d);
+
+  effectDialog = d;
+  effectDialogTitle = d.querySelector("#effectDialogTitle");
+
+  const closeBtn = d.querySelector(".effect-dialog__close");
+  const cancelBtn = d.querySelector("#effectCancelBtn");
+  if (closeBtn) closeBtn.onclick = () => d.close("cancel");
+  if (cancelBtn) cancelBtn.onclick = () => d.close("cancel");
+}
 
 function computeBlockedCompatForCurse(slotIdx) {
   const blocked = new Set();
 
-  // Block compatibility groups already used by selected curses in OTHER slots.
-  for (let i = 0; i < curseBySlot.length; i++) {
-    if (i === slotIdx) continue;
-    const id = curseBySlot[i];
-    if (!id) continue;
-    const row = getAnyRow(id);
-    const cid = compatId(row);
-    if (cid) blocked.add(String(cid));
-  }
-
-  // Also block groups used by selected effects (keeps overall rules consistent).
-  const a = getRow(dom.sel1.value);
-  const b = getRow(dom.sel2.value);
-  const c = getRow(dom.sel3.value);
-
-  // Keep curse selections consistent with current effect picks.
-  const picked = [a, b, c];
-  for (let i = 0; i < picked.length; i++) {
-    const r = picked[i];
-    const req = r && String(r?.CurseRequired ?? "0") === "1";
-    if (!req) curseBySlot[i] = null;
-  }
-  for (const r of [a, b, c]) {
-    if (!r) continue;
+  const selections = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+  for (const r of selections) {
     const cid = compatId(r);
     if (cid) blocked.add(String(cid));
   }
 
-  // Allow this slot's current selection (so you can reopen and keep it).
-  const curId = curseBySlot[slotIdx];
-  if (curId) {
-    const curRow = getAnyRow(curId);
-    const cid = compatId(curRow);
-    if (cid) blocked.delete(String(cid));
+  for (let i = 0; i < curseBySlot.length; i++) {
+    if (i === slotIdx) continue;
+    const cRow = getAnyRow(curseBySlot[i]);
+    const cid = compatId(cRow);
+    if (cid) blocked.add(String(cid));
   }
 
+  // Allow keeping the currently selected curse even if it would otherwise be blocked
+  const current = getAnyRow(curseBySlot[slotIdx]);
+  const currentCid = compatId(current);
+  if (currentCid) blocked.delete(String(currentCid));
+
   return blocked;
+}
+
+function closeCurseMenu() {
+  if (curseMenu) curseMenu.remove();
+  curseMenu = null;
+  curseMenuSlot = null;
+  curseMenuAnchorBtn = null;
+
+  document.removeEventListener("keydown", handleCurseMenuKeydown, true);
+  document.removeEventListener("pointerdown", handleCurseMenuPointerDown, true);
+}
+
+function handleCurseMenuKeydown(evt) {
+  if (evt.key === "Escape") closeCurseMenu();
+}
+
+function handleCurseMenuPointerDown(evt) {
+  if (!curseMenu) return;
+  const target = evt.target;
+  if (curseMenu.contains(target)) return;
+  if (curseMenuAnchorBtn && curseMenuAnchorBtn.contains(target)) return;
+  closeCurseMenu();
+}
+
+function openCurseMenu(slotIdx, anchorBtn) {
+  closeCurseMenu();
+  closeEffectMenu();
+
+  const blockedCompat = computeBlockedCompatForCurse(slotIdx);
+  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType(true))
+    .filter(r => {
+      const cid = compatId(r);
+      if (!cid) return true;
+      return !blockedCompat.has(String(cid));
+    })
+    .sort((x, y) => getRollValue(x) - getRollValue(y));
+
+  if (!eligibleCurses.length) return;
+
+  const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
+  if (!curseCatBySlot[slotIdx] && currentId) {
+    const curRow = getAnyRow(currentId);
+    const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
+    curseCatBySlot[slotIdx] = curCat;
+  }
+
+  const categories = categoriesFor(eligibleCurses);
+  const catOptions = ["__all", ...categories];
+  const hasUncategorized = eligibleCurses.some(r => !effectCategoryForRow(r));
+  if (hasUncategorized && !catOptions.includes("Uncategorized")) catOptions.push("Uncategorized");
+
+  let activeCategory = (curseCatBySlot[slotIdx] && catOptions.includes(curseCatBySlot[slotIdx]))
+    ? curseCatBySlot[slotIdx]
+    : (catOptions[0] || "__all");
+  let searchTerm = "";
+
+  const cursePalette = ["#4b2f70", "#6a3fa3", "#8d5fd3"]; // three distinct purples
+  const categoryThemes = (() => {
+    const map = new Map();
+    const baseTheme = themeFromBase("#7a4bc6");
+    map.set("__default", baseTheme);
+    map.set("__all", baseTheme);
+    map.set("Uncategorized", baseTheme);
+
+    catOptions.forEach((cat, idx) => {
+      if (map.has(cat)) return;
+      const base = cursePalette[idx % cursePalette.length];
+      map.set(cat, themeFromBase(base));
+    });
+
+    return map;
+  })();
+
+  curseMenuSlot = slotIdx;
+  curseMenuAnchorBtn = anchorBtn;
+
+  curseMenu = document.createElement("div");
+  curseMenu.className = "effect-menu effect-menu--wide";
+  curseMenu.setAttribute("role", "dialog");
+  curseMenu.innerHTML = `
+    <div class="effect-menu__search-bar effect-menu__search-bar--shared">
+      <input type="search" class="effect-menu__search-input" placeholder="Search curses..." aria-label="Search curses" data-curse-search="shared" />
+    </div>
+    <div class="effect-menu__layout">
+      <div class="effect-menu__column effect-menu__column--cats" aria-label="Curse categories"></div>
+      <div class="effect-menu__column effect-menu__column--effects">
+        <div class="effect-menu__effects"></div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(curseMenu);
+
+  const catsEl = curseMenu.querySelector(".effect-menu__column--cats");
+  const effectsListEl = curseMenu.querySelector(".effect-menu__effects");
+  const searchInputs = [...curseMenu.querySelectorAll("[data-curse-search]")];
+
+  if (!catsEl || !effectsListEl) {
+    closeCurseMenu();
+    return;
+  }
+
+  const computeCounts = (list) => {
+    const m = new Map();
+    for (const r of list) {
+      const c = effectCategoryForRow(r) || "Uncategorized";
+      m.set(c, (m.get(c) || 0) + 1);
+    }
+    return m;
+  };
+
+  let filteredEligible = eligibleCurses.slice();
+  let countsByCat = computeCounts(filteredEligible);
+
+  const filterEligible = () => {
+    const term = (searchTerm || "").trim().toLowerCase();
+    if (!term) return eligibleCurses;
+    return eligibleCurses.filter(r => {
+      const name = (r.EffectDescription || "").toString().toLowerCase();
+      const id = String(r.EffectID || "").toLowerCase();
+      const cat = effectCategoryForRow(r).toLowerCase();
+      return name.includes(term) || id.includes(term) || cat.includes(term);
+    });
+  };
+
+  const renderEffectList = () => {
+    renderEffectMenuEffects(effectsListEl, filteredEligible, activeCategory, currentId, (id) => {
+      curseBySlot[slotIdx] = id;
+      curseCatBySlot[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
+      closeCurseMenu();
+      updateUI("curse-change");
+    }, categoryThemes);
+  };
+
+  const renderCategories = () => {
+    const visibleCats = catOptions.filter(cat => {
+      if (cat === "__all") return true;
+      return (countsByCat.get(cat) || 0) > 0;
+    });
+
+    if (!visibleCats.includes(activeCategory)) {
+      activeCategory = visibleCats[0] || "__all";
+    }
+
+    catsEl.innerHTML = visibleCats.map(cat => {
+      const label = cat === "__all" ? "All" : cat;
+      const count = cat === "__all" ? filteredEligible.length : (countsByCat.get(cat) || 0);
+      const isActive = cat === activeCategory;
+      const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
+      const rowBg = gradientFromTheme(theme);
+      const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
+      const textColor = textColorFor(theme?.base || rowBg || "#2b2f38");
+      return `
+        <button type="button" class="effect-menu__cat ${isActive ? "is-active" : ""}" data-cat="${cat}" style="background:${rowBg}; border-color:${borderColor}; color:${textColor};">
+          <span class="effect-menu__cat-label">${label}</span>
+          <span class="effect-menu__cat-count">${count}</span>
+        </button>
+      `;
+    }).join("");
+
+    catsEl.querySelectorAll(".effect-menu__cat").forEach(btn => {
+      const catValue = btn.getAttribute("data-cat") || "__all";
+      btn.addEventListener("mouseenter", () => setActiveCategory(catValue, false));
+      btn.addEventListener("click", () => setActiveCategory(catValue, true));
+      btn.addEventListener("focus", () => setActiveCategory(catValue, true));
+    });
+  };
+
+  const setActiveCategory = (catValue, commit = false) => {
+    activeCategory = catValue;
+    if (commit) {
+      curseCatBySlot[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
+    }
+
+    renderCategories();
+    renderEffectList();
+  };
+
+  const renderAll = () => {
+    filteredEligible = filterEligible();
+    countsByCat = computeCounts(filteredEligible);
+    renderCategories();
+    renderEffectList();
+  };
+
+  const syncSearchInputs = (value, sourceEl = null) => {
+    searchInputs.forEach(inp => {
+      if (inp === sourceEl) return;
+      inp.value = value;
+    });
+  };
+
+  const handleSearchChange = (evt) => {
+    const value = evt.target.value || "";
+    searchTerm = value;
+    syncSearchInputs(value, evt.target);
+    renderAll();
+  };
+
+  searchInputs.forEach(inp => {
+    inp.addEventListener("input", handleSearchChange);
+  });
+
+  renderAll();
+
+  positionEffectMenu(curseMenu, anchorBtn.getBoundingClientRect());
+
+  requestAnimationFrame(() => {
+    const primarySearch = curseMenu.querySelector("[data-curse-search]");
+    if (primarySearch) {
+      primarySearch.focus();
+      primarySearch.select();
+    }
+  });
+
+  document.addEventListener("keydown", handleCurseMenuKeydown, true);
+  document.addEventListener("pointerdown", handleCurseMenuPointerDown, true);
 }
 
 function openCurseDialog(slotIdx) {
@@ -341,14 +1184,15 @@ function openCurseDialog(slotIdx) {
 
   const catSel = curseDialog.querySelector("#curseCategorySelect");
   const effectSel = curseDialog.querySelector("#curseEffectSelect");
-  if (!catSel || !effectSel) return;
+  const submitBtn = curseDialog.querySelector("#curseSubmitBtn");
+  const clearBtn = curseDialog.querySelector("#curseClearBtn");
+
+  if (!catSel || !effectSel || !submitBtn || !clearBtn) return;
 
   if (curseDialogTitle) curseDialogTitle.textContent = `Select a Curse for ${slotLabel(slotIdx)}`;
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-
-  // Respect current relic-type filter and compatibility rules.
-  const eligibleCurses = baseFilteredByRelicType(curses, dom.selType.value)
+  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType(true))
     .filter(r => {
       const cid = compatId(r);
       if (!cid) return true;
@@ -358,16 +1202,13 @@ function openCurseDialog(slotIdx) {
 
   const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
 
-  // If we already have a selected curse, default the category to that curse's category.
   if (!curseCatBySlot[slotIdx] && currentId) {
     const curRow = getAnyRow(currentId);
     const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
     curseCatBySlot[slotIdx] = curCat;
   }
 
-  // Build category list from eligible curses
   const cats = categoriesFor(eligibleCurses);
-
   catSel.innerHTML = `<option value="">All</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join("");
   catSel.value = curseCatBySlot[slotIdx] || "";
 
@@ -381,6 +1222,7 @@ function openCurseDialog(slotIdx) {
       effectSel.innerHTML = `<option value="">No curses available</option>`;
       effectSel.value = "";
       effectSel.disabled = true;
+      submitBtn.disabled = true;
       return;
     }
 
@@ -393,27 +1235,28 @@ function openCurseDialog(slotIdx) {
         return `<option value="${id}">${name}</option>`;
       }).join("");
 
-    // Keep current selection if it still exists under this filter
     if (currentId && [...effectSel.options].some(o => o.value === currentId)) {
       effectSel.value = currentId;
+      submitBtn.disabled = false;
     } else {
       effectSel.value = "";
+      submitBtn.disabled = true;
     }
   }
 
-  // initial render
   renderEffectOptions();
 
-  // events
   catSel.onchange = () => renderEffectOptions();
-
   effectSel.onchange = () => {
-    const v = String(effectSel.value || "");
-    const submit = curseDialog.querySelector("#curseSubmitBtn");
-    submit.disabled = !v;
+    submitBtn.disabled = !(effectSel.value && effectSel.value !== "");
   };
 
-  const submitBtn = curseDialog.querySelector("#curseSubmitBtn");
+  clearBtn.onclick = () => {
+    curseBySlot[slotIdx] = null;
+    curseDialog.close("clear");
+    updateUI("curse-change");
+  };
+
   submitBtn.onclick = () => {
     const v = String(effectSel.value || "");
     if (!v) return;
@@ -431,7 +1274,524 @@ function installCurseButtons() {
     btn.addEventListener("click", () => {
       const slotIdx = Number.parseInt(btn.getAttribute("data-curse-slot") || "-1", 10);
       if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
-      openCurseDialog(slotIdx);
+      if (btn.hasAttribute("disabled")) return;
+      openCurseMenu(slotIdx, btn);
+    });
+  });
+
+  const clearBtns = document.querySelectorAll("[data-curse-clear-slot]");
+  clearBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const slotIdx = Number.parseInt(btn.getAttribute("data-curse-clear-slot") || "-1", 10);
+      if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
+      curseBySlot[slotIdx] = null;
+      updateUI("curse-change");
+    });
+  });
+}
+
+function computeEligibilityForSlot(slotIdx, showIllegalOverride = null) {
+  const showIllegal = showIllegalOverride ?? isShowIllegalActive();
+
+  if (!Number.isInteger(slotIdx) || slotIdx < 0 || slotIdx > 2) {
+    return { eligible: [], filtered: [], categories: [], currentId: "" };
+  }
+
+  const type = effectiveRelicType(true);
+  const base = baseFilteredByRelicType(rows, type);
+  const selectedRows = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+
+  const taken = new Set();
+  const blocked = new Set();
+
+  for (let i = 0; i < selectedEffects.length; i++) {
+    if (i === slotIdx) continue;
+
+    const id = selectedEffects[i];
+    if (id) taken.add(String(id));
+
+    const cid = compatId(selectedRows[i]);
+    if (cid) blocked.add(cid);
+  }
+
+  const eligible = eligibleList(rows, type, blocked, taken, showIllegal);
+  const categorySource = eligible.length ? eligible : base;
+
+  return {
+    eligible,
+    filtered: categorySource,
+    pool: categorySource,
+    categories: categoriesFor(categorySource),
+    currentId: getSelectedId(slotIdx)
+  };
+}
+
+function computeEffectDialogData(slotIdx, showIllegalOverride = null) {
+  if (!Number.isInteger(slotIdx) || slotIdx < 0 || slotIdx > 2) {
+    return { disabled: true, reason: "Invalid slot" };
+  }
+
+  const data = computeEligibilityForSlot(slotIdx, showIllegalOverride);
+
+  return {
+    disabled: false,
+    categories: data.categories,
+    eligible: data.eligible,
+    filtered: data.filtered,
+    currentId: data.currentId
+  };
+}
+
+function closeEffectMenu() {
+  if (effectMenu) effectMenu.remove();
+  if (effectMenuFlyout) effectMenuFlyout.remove();
+
+  effectMenu = null;
+  effectMenuSlot = null;
+  effectMenuAnchorBtn = null;
+  effectMenuFlyout = null;
+
+  document.removeEventListener("keydown", handleEffectMenuKeydown, true);
+  document.removeEventListener("pointerdown", handleEffectMenuPointerDown, true);
+}
+
+function handleEffectMenuKeydown(evt) {
+  if (evt.key === "Escape") closeEffectMenu();
+}
+
+function handleEffectMenuPointerDown(evt) {
+  if (!effectMenu) return;
+  const target = evt.target;
+  if (effectMenu.contains(target)) return;
+  if (effectMenuFlyout && effectMenuFlyout.contains(target)) return;
+  if (effectMenuAnchorBtn && effectMenuAnchorBtn.contains(target)) return;
+  closeEffectMenu();
+}
+
+function effectCategoryForRow(row) {
+  return (row?.EffectCategory ?? "").toString().trim();
+}
+
+function renderEffectMenuEffects(container, list, activeCategory, currentId, onPick, categoryThemes) {
+  const allList = (() => {
+    if (activeCategory === "__all") return list;
+    if (activeCategory === "Uncategorized") {
+      return list.filter(r => !effectCategoryForRow(r));
+    }
+    return list.filter(r => effectCategoryForRow(r) === activeCategory);
+  })();
+
+  if (!allList.length) {
+    container.innerHTML = `
+      <div class="effect-menu__empty">No effects available in this category.</div>
+    `;
+    return;
+  }
+
+  container.innerHTML = allList.map((r, idx) => {
+    const id = String(r.EffectID);
+    const title = r.EffectDescription ?? `(Effect ${id})`;
+    const cid = compatId(r) || "-";
+    const roll = r?.RollOrder != null && String(r.RollOrder).trim() !== "" ? String(r.RollOrder) : "-";
+    const requiresCurse = String(r?.CurseRequired ?? "0") === "1";
+    const isCurrent = currentId && currentId === id;
+    const catName = effectCategoryForRow(r) || "Uncategorized";
+    const theme = categoryThemes?.get(catName) || categoryThemes?.get("__default") || defaultCategoryTheme;
+    const rowBg = theme?.base || "rgba(40, 40, 44, 0.85)";
+    const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
+    const textColor = textColorFor(rowBg);
+
+    const curseIcon = requiresCurse ? `
+      <svg class="curse-indicator" viewBox="0 0 20 20" width="28" height="28" aria-label="Curse required" role="img">
+        <defs>
+          <radialGradient id="curseBadge" cx="50%" cy="45%" r="60%">
+            <stop offset="0%" stop-color="#e9ddff" stop-opacity="0.98"/>
+            <stop offset="70%" stop-color="#b271ff" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#7a3fe6" stop-opacity="0.95"/>
+          </radialGradient>
+        </defs>
+        <circle cx="10" cy="10" r="9" fill="url(#curseBadge)" stroke="#5219b3" stroke-width="0.9"/>
+        <text x="10" y="13" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="800" fill="#ffffff">C</text>
+      </svg>
+    ` : "";
+
+    return `
+      <button type="button" class="effect-menu__effect ${isCurrent ? "is-current" : ""}" data-effect-id="${id}" style="background:${rowBg}; border-color:${borderColor}; color:${textColor};">
+        <span class="effect-menu__effect-main">
+          <span class="effect-menu__effect-title">${title}</span>
+          <span class="effect-menu__effect-meta">CID ${cid} | Roll ${roll}</span>
+          <span class="effect-menu__effect-tags">
+            ${requiresCurse ? `<span class="effect-menu__tag">Curse Required</span>` : ""}
+            ${isCurrent ? `<span class="effect-menu__tag effect-menu__tag--check">Selected</span>` : ""}
+          </span>
+        </span>
+        ${requiresCurse ? `<span class="effect-menu__effect-trailing"><span class="curse-indicator-wrap">${curseIcon}</span></span>` : ""}
+      </button>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-effect-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-effect-id");
+      if (!id) return;
+      onPick(id);
+    });
+  });
+}
+
+function positionEffectMenu(menuEl, anchorRect) {
+  const { innerWidth, innerHeight } = window;
+  const rect = menuEl.getBoundingClientRect();
+
+  let left = anchorRect.left;
+  let top = anchorRect.bottom + 4;
+
+  if (left + rect.width > innerWidth - 8) left = innerWidth - rect.width - 8;
+  if (left < 8) left = 8;
+
+  if (top + rect.height > innerHeight - 8) top = anchorRect.top - rect.height - 4;
+  if (top < 8) top = 8;
+
+  menuEl.style.left = `${left}px`;
+  menuEl.style.top = `${top}px`;
+}
+
+// No-op placeholder retained for compatibility; flyout merged into single layout.
+function positionEffectFlyout() {}
+
+function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
+  const data = computeEffectDialogData(slotIdx);
+  if (data.disabled) {
+    if (dom.statusText && data.reason) dom.statusText.textContent = data.reason;
+    return;
+  }
+
+  closeEffectMenu();
+
+  const eligible = data.eligible || [];
+  const categories = data.categories || [];
+
+  const catOptions = ["__all", ...categories];
+  const hasUncategorized = eligible.some(r => !effectCategoryForRow(r));
+  if (hasUncategorized && !catOptions.includes("Uncategorized")) {
+    catOptions.push("Uncategorized");
+  }
+  const preferredCat = selectedCats[slotIdx] && categories.includes(selectedCats[slotIdx]) ? selectedCats[slotIdx] : "";
+  let activeCategory = preferredCat || catOptions[0] || "__all";
+  let searchTerm = "";
+
+  const categoryThemes = buildCategoryThemes(catOptions);
+
+  effectMenuSlot = slotIdx;
+  effectMenuAnchorBtn = anchorBtn;
+
+  effectMenu = document.createElement("div");
+  effectMenu.className = "effect-menu effect-menu--wide";
+  effectMenu.setAttribute("role", "dialog");
+  effectMenu.innerHTML = `
+    <div class="effect-menu__search-bar effect-menu__search-bar--shared">
+      <input type="search" class="effect-menu__search-input" placeholder="Search effects..." aria-label="Search effects" data-effect-search="shared" />
+    </div>
+    <div class="effect-menu__layout">
+      <div class="effect-menu__column effect-menu__column--cats" aria-label="Effect categories"></div>
+      <div class="effect-menu__column effect-menu__column--effects">
+        <div class="effect-menu__effects"></div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(effectMenu);
+
+  const catsEl = effectMenu.querySelector(".effect-menu__column--cats");
+  const effectsListEl = effectMenu.querySelector(".effect-menu__effects");
+
+  const searchInputs = [...effectMenu.querySelectorAll("[data-effect-search]")];
+
+  if (!catsEl || !effectsListEl) {
+    closeEffectMenu();
+    return;
+  }
+
+  const computeCounts = (list) => {
+    const m = new Map();
+    for (const r of list) {
+      const c = effectCategoryForRow(r) || "Uncategorized";
+      m.set(c, (m.get(c) || 0) + 1);
+    }
+    return m;
+  };
+
+  let filteredEligible = eligible.slice();
+  let countsByCat = computeCounts(filteredEligible);
+
+  const filterEligible = () => {
+    const term = (searchTerm || "").trim().toLowerCase();
+    if (!term) return eligible;
+    return eligible.filter(r => {
+      const name = (r.EffectDescription || "").toString().toLowerCase();
+      const id = String(r.EffectID || "").toLowerCase();
+      const cat = effectCategoryForRow(r).toLowerCase();
+      return name.includes(term) || id.includes(term) || cat.includes(term);
+    });
+  };
+
+  const renderEffectList = (catBtnRect = null) => {
+    renderEffectMenuEffects(effectsListEl, filteredEligible, activeCategory, data.currentId, (id) => {
+      setSelectedId(slotIdx, id);
+      selectedCats[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
+      curseBySlot[slotIdx] = null;
+
+      const chosen = getRow(id);
+      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+      maybeAutoSetTypeFromEffect1(nextType);
+
+      closeEffectMenu();
+      updateUI("effect-change");
+    }, categoryThemes);
+
+    requestAnimationFrame(() => {
+      const menuRect = effectMenu.getBoundingClientRect();
+      const activeCatBtn = effectMenu.querySelector(".effect-menu__cat.is-active");
+      const anchorRect = catBtnRect || activeCatBtn?.getBoundingClientRect() || menuRect;
+      positionEffectFlyout(anchorRect, menuRect);
+    });
+  };
+
+  const renderCategories = () => {
+    const visibleCats = catOptions.filter(cat => {
+      if (cat === "__all") return true;
+      return (countsByCat.get(cat) || 0) > 0;
+    });
+
+    if (!visibleCats.includes(activeCategory)) {
+      activeCategory = visibleCats[0] || "__all";
+    }
+
+    catsEl.innerHTML = visibleCats.map(cat => {
+      const label = cat === "__all" ? "All" : cat;
+      const count = cat === "__all"
+        ? filteredEligible.length
+        : (countsByCat.get(cat) || 0);
+      const isActive = cat === activeCategory;
+      const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
+      const rowBg = gradientFromTheme(theme);
+      const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
+      const textColor = textColorFor(theme?.base || rowBg || "#2b2f38");
+      return `
+        <button type="button" class="effect-menu__cat ${isActive ? "is-active" : ""}" data-cat="${cat}" style="background:${rowBg}; border-color:${borderColor}; color:${textColor};">
+          <span class="effect-menu__cat-label">${label}</span>
+          <span class="effect-menu__cat-count">${count}</span>
+        </button>
+      `;
+    }).join("");
+
+    catsEl.querySelectorAll(".effect-menu__cat").forEach(btn => {
+      const catValue = btn.getAttribute("data-cat") || "__all";
+      btn.addEventListener("mouseenter", () => {
+        setActiveCategory(catValue, false, btn.getBoundingClientRect());
+      });
+      btn.addEventListener("click", () => setActiveCategory(catValue, true, btn.getBoundingClientRect()));
+      btn.addEventListener("focus", () => {
+        setActiveCategory(catValue, true, btn.getBoundingClientRect());
+      });
+    });
+  };
+
+  const setActiveCategory = (catValue, commit = false, catBtnRect = null) => {
+    activeCategory = catValue;
+    if (commit) {
+      selectedCats[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
+    }
+
+    renderCategories();
+    renderEffectList(catBtnRect);
+  };
+
+  const renderAll = (catBtnRect = null) => {
+    filteredEligible = filterEligible();
+    countsByCat = computeCounts(filteredEligible);
+    renderCategories();
+    renderEffectList(catBtnRect);
+  };
+
+  const syncSearchInputs = (value, sourceEl = null) => {
+    searchInputs.forEach(inp => {
+      if (inp === sourceEl) return;
+      inp.value = value;
+    });
+  };
+
+  const handleSearchChange = (evt) => {
+    const value = evt.target.value || "";
+    searchTerm = value;
+    syncSearchInputs(value, evt.target);
+    renderAll();
+  };
+
+  searchInputs.forEach(inp => {
+    inp.addEventListener("input", handleSearchChange);
+  });
+
+  renderAll();
+
+  positionEffectMenu(effectMenu, anchorBtn.getBoundingClientRect());
+
+  requestAnimationFrame(() => {
+    const primarySearch = effectMenu.querySelector("[data-effect-search]");
+    if (primarySearch) {
+      primarySearch.focus();
+      primarySearch.select();
+    }
+  });
+
+  const activeCatBtn = effectMenu.querySelector(`.effect-menu__cat.is-active`) || effectMenu.querySelector(`.effect-menu__cat`);
+  if (activeCatBtn) {
+    positionEffectFlyout(activeCatBtn.getBoundingClientRect(), effectMenu.getBoundingClientRect());
+  }
+  document.addEventListener("keydown", handleEffectMenuKeydown, true);
+  document.addEventListener("pointerdown", handleEffectMenuPointerDown, true);
+}
+
+function openEffectDialog(slotIdx) {
+  ensureEffectDialog();
+  if (!effectDialog) return;
+
+  const catSel = effectDialog.querySelector("#effectCategorySelect");
+  const effectSel = effectDialog.querySelector("#effectSelect");
+  const submitBtn = effectDialog.querySelector("#effectSubmitBtn");
+  const clearBtn = effectDialog.querySelector("#effectClearBtn");
+
+  if (!catSel || !effectSel || !submitBtn || !clearBtn) return;
+
+  const data = computeEffectDialogData(slotIdx);
+  if (data.disabled) return;
+
+  if (effectDialogTitle) effectDialogTitle.textContent = `Select an Effect for ${slotLabel(slotIdx)}`;
+
+  catSel.innerHTML = `<option value="">All</option>` + (data.categories || []).map(c => `<option value="${c}">${c}</option>`).join("");
+  catSel.value = selectedCats[slotIdx] || "";
+
+  function renderEffectOptions() {
+    const catVal = catSel.value || "";
+    selectedCats[slotIdx] = catVal;
+
+    const filtered = applyCategory(data.filtered || [], catVal);
+
+    if (!filtered.length) {
+      effectSel.innerHTML = `<option value="">No effects available</option>`;
+      effectSel.value = "";
+      effectSel.disabled = true;
+      submitBtn.disabled = true;
+      return;
+    }
+
+    effectSel.disabled = false;
+    effectSel.innerHTML = `<option value="">Select an Effect…</option>` + filtered.map(r => {
+      const id = String(r.EffectID);
+      const name = r.EffectDescription ?? `(Effect ${id})`;
+      return `<option value="${id}">${name}</option>`;
+    }).join("");
+
+    const currentId = data.currentId || "";
+    if (currentId && [...effectSel.options].some(o => o.value === currentId)) {
+      effectSel.value = currentId;
+      submitBtn.disabled = false;
+    } else {
+      effectSel.value = "";
+      submitBtn.disabled = true;
+    }
+  }
+
+  renderEffectOptions();
+
+  catSel.onchange = () => renderEffectOptions();
+  effectSel.onchange = () => {
+    submitBtn.disabled = !(effectSel.value && effectSel.value !== "");
+  };
+
+  clearBtn.onclick = () => {
+    setSelectedId(slotIdx, "");
+    curseBySlot[slotIdx] = null;
+    effectDialog.close("clear");
+    updateUI("effect-change");
+  };
+
+  submitBtn.onclick = () => {
+    const v = String(effectSel.value || "");
+    if (!v) return;
+    setSelectedId(slotIdx, v);
+    curseBySlot[slotIdx] = null;
+
+    const chosen = getRow(v);
+    const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+    maybeAutoSetTypeFromEffect1(nextType);
+
+    effectDialog.close("apply");
+    updateUI("effect-change");
+  };
+
+  effectDialog.showModal();
+}
+
+function installEffectButtons() {
+  const btns = document.querySelectorAll("[data-effect-slot]");
+  btns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const slotIdx = Number.parseInt(btn.getAttribute("data-effect-slot") || "-1", 10);
+      if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
+      if (btn.hasAttribute("disabled")) return;
+      openEffectMenu(slotIdx, btn, event);
+    });
+  });
+
+  const clearBtns = document.querySelectorAll("[data-effect-clear-slot]");
+  clearBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const slotIdx = Number.parseInt(btn.getAttribute("data-effect-clear-slot") || "-1", 10);
+      if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
+      setSelectedId(slotIdx, "");
+      curseBySlot[slotIdx] = null;
+      updateUI("effect-change");
+    });
+  });
+}
+
+function installInfoButtons() {
+  const infoBtns = document.querySelectorAll(".info-btn[data-effect-id]");
+  infoBtns.forEach(btn => {
+    btn.addEventListener("click", () => openInfoPopoverForButton(btn));
+  });
+}
+
+function installRowCopyButtons() {
+  const copyBtns = document.querySelectorAll("[data-copy-effect-id], [data-copy-curse-id]");
+
+  copyBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.getAttribute("data-copy-effect-id") || btn.getAttribute("data-copy-curse-id") || "";
+      if (!val) return;
+
+      const label = btn.hasAttribute("data-copy-curse-id") ? "CurseID" : "EffectID";
+      const success = () => showCopyStatus(btn, `${label} copied`, false);
+      const fail = () => showCopyStatus(btn, "Copy failed", true);
+
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(val).then(success).catch(() => {
+          try {
+            fallbackCopy(val);
+            success();
+          } catch (err) {
+            fail();
+          }
+        });
+      } else {
+        try {
+          fallbackCopy(val);
+          success();
+        } catch (err) {
+          fail();
+        }
+      }
     });
   });
 }
@@ -447,6 +1807,8 @@ function updateDetails(a, b, c) {
 
   const blocks = [];
 
+  const relicTypeIssue = relicTypeMismatchInfo([a, b, c]);
+
   const dupGroups = (selected.length >= 2) ? computeCompatDupGroups(selected) : [];
   const hasDup = dupGroups.length > 0;
 
@@ -459,20 +1821,21 @@ function updateDetails(a, b, c) {
     if (req && !curseBySlot[i]) missingCurseSlots.push(i);
   }
 
-  if (missingCurseSlots.length > 0)
-  {
+  const positionIssue = computePositionIssue(a, b, c);
+
+  if (missingCurseSlots.length > 0) {
     const labels = missingCurseSlots.map(i => slotLabel(i)).join(", ");
     blocks.push(`
       <div class="info-box is-alert" data-kind="curse-required">
         <div class="info-line">
           <span>One or more of your effects requires a </span>
-          <button type="button" class="term-link" data-popover-toggle="cursePopover">Curse</button><span>.</span>
+          <button type="button" class="term-link" data-popover-toggle="cursePopover">Curse</button>.
         </div>
 
         <div id="cursePopover" class="popover" hidden>
           <h4 class="popover-title">Curse Required</h4>
           <div class="popover-body">
-            <p><em>On Depth of Night Relics only, there are certain effects that cannot be rolled without an accompanying Curse, which adds a detrimental effect to your roll.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
+            <p><em>On Depth of Night Relics only, certain effects cannot be rolled without an accompanying Curse.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
             <p>Missing for: <strong>${labels}</strong>.</p>
           </div>
         </div>
@@ -480,8 +1843,44 @@ function updateDetails(a, b, c) {
     `);
   }
 
-if (hasDup) {
+  if (relicTypeIssue.hasIssue) {
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="relic-type">
+        <div class="info-line">
+          Mismatched
+          <button type="button" class="term-link" data-popover-toggle="relicTypePopover">Relic Types</button>.
+        </div>
 
+        <div class="popover" id="relicTypePopover" hidden>
+          <div class="popover-title">Mismatched Relic Types</div>
+          <div class="popover-body popover-body--spaced">
+            <p>Certain effects can only appear on certain Relic Types.</p>
+            <p>You cannot have a Standard relic effect on a Depth of Night relic, and vice versa.</p>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  if (positionIssue.hasIssue) {
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="positioning">
+        <div class="info-line">
+          Improper effect
+          <button type="button" class="term-link" data-popover-toggle="positionPopover">Positioning</button>.
+        </div>
+
+        <div class="popover" id="positionPopover" hidden>
+          <div class="popover-title">Improper Effect Positioning</div>
+          <div class="popover-body popover-body--spaced">
+            <p>Please add effects starting at slot 1 and fill each next slot in order.</p>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  if (hasDup) {
     blocks.push(`
       <div class="info-box is-alert" data-kind="compat-dup">
         <div class="info-line">
@@ -494,8 +1893,8 @@ if (hasDup) {
         <div class="popover" id="compatPopover" hidden>
           <div class="popover-title">Compatibility Group</div>
           <div class="popover-body popover-body--spaced">
-            <p>Behind the scenes, most effects share a Compatibility Group with one or more other effects. Relics cannot have more than one effect from any given Compatibility group.</p>
-            <p>For example, Fire Attack Power Up and Holy Attack Power Up share a Compatibility Group, and cannot be on the same Relic.</p>
+            <p>Relics cannot have more than one effect from the same Compatibility Group.</p>
+            <p>Some effects share a group even if their names differ.</p>
           </div>
         </div>
       </div>
@@ -508,15 +1907,13 @@ if (hasDup) {
       <div class="info-box is-alert" data-kind="rollorder">
         <div class="info-line">
           Your effects aren't in the correct 
-          <button type="button" class="term-link" data-popover-toggle="orderPopover">
-            roll order
-          </button>.
+          <button type="button" class="term-link" data-popover-toggle="orderPopover">Roll Order</button>.
         </div>
 
         <div class="popover" id="orderPopover" hidden>
           <div class="popover-title">Roll Order</div>
           <div class="popover-body popover-body--spaced">
-            <p>Behind the scenes, there is a value attached to each effect called "Roll Order", which determines the correct order each effect must be placed on the relic.</p>
+            <p>Each effect has a Roll Order value; the relic must list effects in ascending order.</p>
           </div>
         </div>
       </div>
@@ -526,27 +1923,8 @@ if (hasDup) {
   dom.detailsBody.innerHTML = blocks.join("");
   installDetailsToggles();
 
-  // Details: raw intentionally disabled
-  if (hasDup) {
-    for (const g of dupGroups) {
-      const listEl = dom.detailsBody.querySelector(`#${CSS.escape(g.listId)}`);
-      if (!listEl) continue;
-
-      const lines = g.list
-        .slice(0, 3)
-        .map(row => renderChosenLine("", row, false))
-        .join("");
-
-      listEl.innerHTML = lines;
-    }
-  }
-
   if (roll.hasIssue && roll.sorted) {
-    const img = dom.detailsBody.querySelector("#sortedRelicImg");
     const list = dom.detailsBody.querySelector("#sortedChosenList");
-
-    if (img) img.src = dom.relicImg?.src || "";
-
     if (list) {
       let line1 = renderChosenLine("", roll.sorted[0], false);
       let line2 = renderChosenLine("", roll.sorted[1], false);
@@ -562,118 +1940,67 @@ if (hasDup) {
 }
 
 function updateUI(reason = "") {
-  if (dom.selColor.value === "Random") {
+  closeEffectMenu();
+  closeColorMenu();
+
+  if (selectedColor === "Random") {
     const modifierReasons = new Set([
       "type-change",
       "illegal-change",
       "cat-change",
       "effect-change",
-      "reset",
-      "init",
-      "raw-change"
+      "init"
     ]);
     if (modifierReasons.has(reason)) pickRandomColor();
   }
 
-  const showIllegal = !!dom.showIllegalEl.checked;
-  const showRaw = !!dom.showRawEl?.checked;
+  const showIllegal = isShowIllegalActive();
 
-  if (resultsEl) resultsEl.classList.toggle("is-raw", showRaw);
+  let cleared = false;
+  for (let i = selectedEffects.length - 1; i >= 0; i--) {
+    const eligibility = computeEligibilityForSlot(i, showIllegal);
+    const eligibleIds = new Set((eligibility.eligible || []).map(r => String(r.EffectID)));
 
-  const a = getRow(dom.sel1.value);
-  const b = getRow(dom.sel2.value);
-  const c = getRow(dom.sel3.value);
+    const id = selectedEffects[i];
+    if (!id) continue;
+    if (!eligibleIds.has(id)) {
+      setSelectedId(i, "");
+      curseBySlot[i] = null;
+      cleared = true;
+    }
+  }
 
-  const stage = c ? 3 : b ? 2 : a ? 1 : 0;
+  if (cleared) {
+    updateUI(reason);
+    return;
+  }
+
+  const slotData = [0, 1, 2].map(idx => computeEligibilityForSlot(idx, showIllegal));
+
+  const cSelections = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
+  const selectedCount = cSelections.filter(Boolean).length;
+  const stage = Math.min(selectedCount, 3);
 
   setRelicImageForStage({
     relicImg: dom.relicImg,
-    selectedType: dom.selType.value,
-    selectedColor: dom.selColor.value,
+    selectedType: effectiveRelicType(),
+    selectedColor,
     randomColor: currentRandomColor,
     stage
   });
 
-  const takenFor2 = new Set([dom.sel1.value, dom.sel3.value].filter(Boolean).map(String));
-  const takenFor3 = new Set([dom.sel1.value, dom.sel2.value].filter(Boolean).map(String));
+  updateColorChipLabel();
 
-  const blockedFor2 = new Set();
-  if (a) {
-    const cidA = compatId(a);
-    if (cidA) blockedFor2.add(cidA);
-  }
-
-  const blockedFor3 = new Set();
-  if (a) {
-    const cidA = compatId(a);
-    if (cidA) blockedFor3.add(cidA);
-  }
-  if (b) {
-    const cidB = compatId(b);
-    if (cidB) blockedFor3.add(cidB);
-  }
-
-  dom.sel1.disabled = false;
-  dom.cat1.disabled = false;
-
-  dom.sel2.disabled = !a;
-  dom.cat2.disabled = !a;
-
-  dom.sel3.disabled = !a || !b;
-  dom.cat3.disabled = !a || !b;
-
-  const base1 = baseFilteredByRelicType(rows, dom.selType.value);
-  const filtered1 = applyCategory(base1, dom.cat1.value);
-
-  const eligible2 = a ? eligibleList(rows, dom.selType.value, blockedFor2, takenFor2, showIllegal) : [];
-  const filtered2 = applyCategory(eligible2, dom.cat2.value);
-
-  const eligible3 = (a && b) ? eligibleList(rows, dom.selType.value, blockedFor3, takenFor3, showIllegal) : [];
-  const filtered3 = applyCategory(eligible3, dom.cat3.value);
-
-  const prev1 = dom.sel1.value;
-  const prev2 = dom.sel2.value;
-  const prev3 = dom.sel3.value;
-
-  fillSelect(dom.sel1, filtered1, "— Effect 1 —");
-  if (![...dom.sel1.options].some(o => o.value === prev1)) {
-    dom.sel1.value = "";
-    dom.sel2.value = "";
-    dom.sel3.value = "";
-  } else {
-    dom.sel1.value = prev1;
-  }
-
-  const a2 = getRow(dom.sel1.value);
-
-  if (a2) {
-    fillSelect(dom.sel2, filtered2, "— Effect 2 —");
-    dom.sel2.value = [...dom.sel2.options].some(o => o.value === prev2) ? prev2 : "";
-  } else {
-    fillSelect(dom.sel2, [], "— Effect 2 —");
-    dom.sel2.value = "";
-  }
-
-  const b2 = getRow(dom.sel2.value);
-
-  if (a2 && b2) {
-    fillSelect(dom.sel3, filtered3, "— Effect 3 —");
-    dom.sel3.value = [...dom.sel3.options].some(o => o.value === prev3) ? prev3 : "";
-  } else {
-    fillSelect(dom.sel3, [], "— Effect 3 —");
-    dom.sel3.value = "";
-  }
-
-  const c2 = getRow(dom.sel3.value);
-
-  const anySelected = !!a2 || !!b2 || !!c2;
-  const dupGroups = computeCompatDupGroups([a2, b2, c2].filter(Boolean));
+  const anySelected = cSelections.some(Boolean);
+  const dupGroups = computeCompatDupGroups(cSelections.filter(Boolean));
   const hasCompatIssue = dupGroups.length > 0;
 
-  // Row-level Compatibility Group conflicts (used for per-row indicators)
+  const relicTypeIssue = relicTypeMismatchInfo(cSelections);
+  const hasRelicTypeIssue = relicTypeIssue.hasIssue;
+
   const compatConflictIds = (() => {
     const m = new Map();
-    for (const r of [a2, b2, c2].filter(Boolean)) {
+    for (const r of cSelections.filter(Boolean)) {
       const cid = compatId(r);
       if (!cid) continue;
       if (!m.has(cid)) m.set(cid, []);
@@ -688,20 +2015,25 @@ function updateUI(reason = "") {
 
   function badgeForRow(r) {
     if (!r) return null;
+    if (hasRelicTypeIssue && relicTypeIssue.ids.has(String(r.EffectID))) return "Relic Type";
     return compatConflictIds.has(String(r.EffectID)) ? "Incompatible" : null;
   }
 
-  function isIncompatRow(r) {
-    return !!(r && compatConflictIds.has(String(r.EffectID)));
+  const roll = computeRollOrderIssue(cSelections[0], cSelections[1], cSelections[2]);
+  const hasOrderIssue = roll.hasIssue;
+  const moveDeltaBySlot = roll.moveDeltaBySlot || [0, 0, 0];
+  const positionIssue = computePositionIssue(cSelections[0], cSelections[1], cSelections[2]);
+  const hasPositionIssue = positionIssue.hasIssue;
+
+  if (autoSortBtn) {
+    const showAutoSort = hasOrderIssue && selectedCount >= 2;
+    autoSortBtn.hidden = !showAutoSort;
+    autoSortBtn.disabled = !showAutoSort;
   }
 
-  const roll = computeRollOrderIssue(a2, b2, c2);
-  const hasOrderIssue = roll.hasIssue;
-
   const hasCurseMissing = (() => {
-    const orig = [a2, b2, c2];
-    for (let i = 0; i < orig.length; i++) {
-      const r = orig[i];
+    for (let i = 0; i < cSelections.length; i++) {
+      const r = cSelections[i];
       if (!r) continue;
       const req = String(r?.CurseRequired ?? "0") === "1";
       if (req && !curseBySlot[i]) return true;
@@ -709,170 +2041,75 @@ function updateUI(reason = "") {
     return false;
   })();
 
-  const state = anySelected && (hasCompatIssue || hasOrderIssue || hasCurseMissing) ? "Invalid" : "Valid";
+  const state = anySelected && (hasCompatIssue || hasRelicTypeIssue || hasOrderIssue || hasCurseMissing || hasPositionIssue) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
-  // --- Validity + checkmark indicators ---
-  // When the relic is valid at 1 or 2 effects, show green check(s) and green row gradient.
   const okBySlot = [false, false, false];
 
-  if (state === "Valid") {
-    // 1-effect relics should immediately show as valid
-    if (a2 && !b2 && !c2) okBySlot[0] = true;
+  for (let i = 0; i < cSelections.length; i++) {
+    const row = cSelections[i];
+    if (!row) continue;
 
-    // 2-effect relics: if there is no roll-order issue, both are correct
-    if (a2 && b2 && !c2 && !roll.hasIssue && !hasCompatIssue) {
-      okBySlot[0] = true;
-      okBySlot[1] = true;
-    }
+    const compatBad = compatConflictIds.has(String(row.EffectID));
+    const relicTypeBad = hasRelicTypeIssue && relicTypeIssue.ids.has(String(row.EffectID));
+    const orderBad = hasOrderIssue && moveDeltaBySlot[i] !== 0;
+    const curseReq = String(row?.CurseRequired ?? "0") === "1";
+    const curseMissing = curseReq && !curseBySlot[i];
+    const positionBad = hasPositionIssue && positionIssue.badSlots.includes(i);
 
-    // 3-effect relics: if fully valid, all three are correct
-    if (a2 && b2 && c2 && !roll.hasIssue && !hasCompatIssue) {
-      okBySlot[0] = true;
-      okBySlot[1] = true;
-      okBySlot[2] = true;
-    }
+    if (!compatBad && !relicTypeBad && !orderBad && !curseMissing && !positionBad) okBySlot[i] = true;
   }
 
-  // If the relic is invalid ONLY due to Compatibility conflicts (but roll order is correct),
-  // still show green checks on the non-incompatible row(s).
-  if (hasCompatIssue && !roll.hasIssue) {
-    if (a2 && b2 && !c2) {
-      okBySlot[0] = !isIncompatRow(a2);
-      okBySlot[1] = !isIncompatRow(b2);
-    }
-    if (a2 && b2 && c2) {
-      okBySlot[0] = !isIncompatRow(a2);
-      okBySlot[1] = !isIncompatRow(b2);
-      okBySlot[2] = !isIncompatRow(c2);
-    }
+  const effectButtonDisabled = [false, false, false];
+
+  function renderSlot(idx, row, moveDelta, showOk, badge) {
+    const effectBtnLabel = row ? "Change Effect" : "Select Effect";
+    return renderChosenLine(slotLabel(idx), row, false, moveDelta, showOk, badge, {
+      effectSlot: idx,
+      effectButtonLabel: effectBtnLabel,
+      effectButtonDisabled: effectButtonDisabled[idx],
+      curseRequired: String(row?.CurseRequired ?? "0") === "1",
+      curseRow: getAnyRow(curseBySlot[idx]),
+      curseButtonLabel: curseBySlot[idx] ? "Change Curse" : "Select a Curse",
+      curseSlot: idx
+    });
   }
 
-  // Special checkmark condition (exactly 3 effects selected)
-  // If roll order is invalid and exactly one slot is already in the correct position,
-  // show a green checkbox on that slot.
-  const allThreeSelected = !!a2 && !!b2 && !!c2;
-
-  if (allThreeSelected && roll.hasIssue) {
-    const deltas = roll.moveDeltaBySlot.slice(0, 3);
-    const zeros = deltas
-      .map((d, idx) => ({ d, idx }))
-      .filter(x => x.d === 0);
-
-    // “only two need to move” => exactly one is correct
-    if (zeros.length === 1) {
-      const idx = zeros[0].idx;
-      const rowByIdx = idx === 0 ? a2 : idx === 1 ? b2 : c2;
-      if (!isIncompatRow(rowByIdx)) okBySlot[idx] = true;
-    }
-  }
-
-  // Preview rendering
-  if (!a2) {
+  if (anySelected) {
+    updateDetails(cSelections[0], cSelections[1], cSelections[2]);
+  } else {
     setDetailsEmpty();
-
-    dom.chosenList.innerHTML =
-      renderChosenLine("", null, showRaw) +
-      renderChosenLine("", null, showRaw) +
-      renderChosenLine("", null, showRaw);
-
-    installCurseButtons();
-
-    updateCounts(dom, 1, filtered1.length);
-    setValidityBadge("Valid", false);
-    return;
   }
-
-  if (!b2) {
-    // With only Effect 1 selected, still show Details if a curse is required/missing.
-    updateDetails(a2, null, null);
-
-    dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, 0, okBySlot[0], badgeForRow(a2), {
-      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[0]),
-      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
-      curseSlot: 0
-    }) +
-      renderChosenLine("", null, showRaw) +
-      renderChosenLine("", null, showRaw);
-
-    installCurseButtons();
-
-    updateCounts(dom, 2, filtered2.length);
-    return;
-  }
-
-  if (!c2) {
-    updateDetails(a2, b2, null);
-
-    dom.chosenList.innerHTML =
-      renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
-      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[0]),
-      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
-      curseSlot: 0
-    }) +
-      renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
-      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[1]),
-      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
-      curseSlot: 1
-    }) +
-      renderChosenLine("", null, showRaw);
-
-    installCurseButtons();
-
-    updateCounts(dom, 3, filtered3.length);
-    return;
-  }
-
-  updateDetails(a2, b2, c2);
 
   dom.chosenList.innerHTML =
-    renderChosenLine("", a2, showRaw, roll.moveDeltaBySlot[0], okBySlot[0], badgeForRow(a2), {
-      curseRequired: String(a2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[0]),
-      curseButtonLabel: curseBySlot[0] ? "Change Curse" : "Select a Curse",
-      curseSlot: 0
-    }) +
-    renderChosenLine("", b2, showRaw, roll.moveDeltaBySlot[1], okBySlot[1], badgeForRow(b2), {
-      curseRequired: String(b2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[1]),
-      curseButtonLabel: curseBySlot[1] ? "Change Curse" : "Select a Curse",
-      curseSlot: 1
-    }) +
-    renderChosenLine("", c2, showRaw, roll.moveDeltaBySlot[2], okBySlot[2], badgeForRow(c2), {
-      curseRequired: String(c2?.CurseRequired ?? "0") === "1",
-      curseRow: getAnyRow(curseBySlot[2]),
-      curseButtonLabel: curseBySlot[2] ? "Change Curse" : "Select a Curse",
-      curseSlot: 2
-    });
+    renderSlot(0, cSelections[0], moveDeltaBySlot[0], okBySlot[0], badgeForRow(cSelections[0])) +
+    renderSlot(1, cSelections[1], moveDeltaBySlot[1], okBySlot[1], badgeForRow(cSelections[1])) +
+    renderSlot(2, cSelections[2], moveDeltaBySlot[2], okBySlot[2], badgeForRow(cSelections[2]));
 
-    installCurseButtons();
+  installEffectButtons();
+  installCurseButtons();
+  installInfoButtons();
+  installRowCopyButtons();
 
-  updateCounts(dom, 3, filtered3.length);
+  const firstEmptyIdx = cSelections.findIndex(r => !r);
+  const activeIndex = firstEmptyIdx === -1 ? 0 : firstEmptyIdx + 1;
+  const filteredForActiveSlot = firstEmptyIdx === -1
+    ? []
+    : applyCategory(slotData[firstEmptyIdx]?.filtered || [], selectedCats[firstEmptyIdx]);
+  const availableCount = firstEmptyIdx === -1 ? 0 : filteredForActiveSlot.length;
+  updateCounts(dom, activeIndex, availableCount);
 }
 
+// Meta visibility toggle removed; info is now provided via hover tooltips on the info icon.
+
 function resetAllPreserveIllegal(desiredIllegal) {
-  dom.selType.value = "All";
-  dom.selColor.value = "Random";
+  dom.selType.value = "";
+  selectedColor = "Random";
 
-  // Preserve Show Illegal Combinations state (the user just toggled it)
-  dom.showIllegalEl.checked = Boolean(desiredIllegal);
+  setShowIllegalActive(Boolean(desiredIllegal));
 
-  // Start Over behavior: Raw Data off, all selections cleared, default color repicked
-  if (dom.showRawEl) dom.showRawEl.checked = false;
-
-  dom.cat1.value = "";
-  dom.cat2.value = "";
-  dom.cat3.value = "";
-
-  dom.sel1.value = "";
-  dom.sel2.value = "";
-  dom.sel3.value = "";
-
-  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
+  for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
   for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
 
   pickRandomColor();
@@ -880,21 +2117,13 @@ function resetAllPreserveIllegal(desiredIllegal) {
 }
 
 function resetAll() {
-  dom.selType.value = "All";
-  dom.selColor.value = "Random";
+  dom.selType.value = "";
+  selectedColor = "Random";
 
-  dom.showIllegalEl.checked = false;
-  if (dom.showRawEl) dom.showRawEl.checked = false;
+  setShowIllegalActive(false);
 
-  dom.cat1.value = "";
-  dom.cat2.value = "";
-  dom.cat3.value = "";
-
-  dom.sel1.value = "";
-  dom.sel2.value = "";
-  dom.sel3.value = "";
-
-  // Clear any selected curses (forces re-pick after effect changes/reset)
+  for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
+  for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
   for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
 
   pickRandomColor();
@@ -908,54 +2137,27 @@ async function load() {
   rowsAll = await res.json();
   byIdAll = new Map(rowsAll.map(r => [String(r.EffectID), r]));
   curses = rowsAll.filter(r => String(r?.Curse ?? "0") === "1");
-  // Filter out cursed effects (Curse = 1) from main dropdowns and categories.
-  // Data values are strings in JSON, so compare as strings.
   rows = rowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
   byId = new Map(rows.map(r => [String(r.EffectID), r]));
-pickRandomColor();
-
-  const base = baseFilteredByRelicType(rows, dom.selType.value);
-  const cats = categoriesFor(base);
-  fillCategorySelect(dom.cat1, cats);
-  fillCategorySelect(dom.cat2, cats);
-  fillCategorySelect(dom.cat3, cats);
-
-  fillSelect(dom.sel1, base, "— Effect 1 —");
-  fillSelect(dom.sel2, [], "— Effect 2 —");
-  fillSelect(dom.sel3, [], "— Effect 3 —");
+  pickRandomColor();
 
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
-  installRelicImgFallback(dom.relicImg, () => dom.selType.value);
+  installRelicImgFallback(dom.relicImg, () => effectiveRelicType());
+
+  installColorChipMenu();
+  installUtilityPopoverButtons();
+
+  // Default illegal toggle is off
+  setShowIllegalActive(false);
 
   dom.selType.addEventListener("change", () => updateUI("type-change"));
-  dom.selColor.addEventListener("change", () => updateUI("color-change"));
-  dom.showIllegalEl.addEventListener("change", () => resetAllPreserveIllegal(dom.showIllegalEl.checked));
-  if (dom.showRawEl) dom.showRawEl.addEventListener("change", () => updateUI("raw-change"));
-
-  dom.cat1.addEventListener("change", () => updateUI("cat-change"));
-  dom.cat2.addEventListener("change", () => updateUI("cat-change"));
-  dom.cat3.addEventListener("change", () => updateUI("cat-change"));
-
-  dom.sel1.addEventListener("change", () => {
-    // Any effect change forces curse re-pick for that slot
-    curseBySlot[0] = null;
-    const chosen = getRow(dom.sel1.value);
-    const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-    if (nextType) dom.selType.value = nextType;
-    updateUI("effect-change");
-  });
-
-  dom.sel2.addEventListener("change", () => {
-    // Any effect change forces curse re-pick for that slot
-    curseBySlot[1] = null;
-    updateUI("effect-change");
-  });
-  dom.sel3.addEventListener("change", () => {
-    // Any effect change forces curse re-pick for that slot
-    curseBySlot[2] = null;
-    updateUI("effect-change");
-  });
-
+  if (dom.showIllegalBtn) {
+    dom.showIllegalBtn.addEventListener("click", () => {
+      const next = !isShowIllegalActive();
+      setShowIllegalActive(next);
+      resetAllPreserveIllegal(next);
+    });
+  }
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", resetAll);
 
   updateUI("init");

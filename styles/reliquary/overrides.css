@@ -3,74 +3,83 @@
    Purpose: safety rails only.
    ------------------------------------------------------------ */
 
+
 #results,
 #results.is-raw {
   height: auto !important;
   min-height: 0 !important;
 }
 
+/* Force curse-required label to match selected curse styling */
+#results .curse-line .curse-required {
+  color: #b58cff !important;
+  font-style: italic;
+  font-weight: 800;
+  margin-right: 0.6rem;
+  font-size: 0.75em;
+}
+
+#results .curse-line .curse-sub {
+  margin-right: 0.6rem;
+}
+
+/* Keep curse text centered with its button in all modes */
+#results .curse-line .curse-sub {
+  margin-top: 0;
+  align-self: center;
+  line-height: 1.1;
+}
+
+#results.is-raw .effect-main--row .curse-sub {
+  align-self: center !important;
+}
+
 /* ------------------------------------------------------------
-   Relic Preview: square frame that tracks effects height,
-   but is capped so it can’t get absurdly large.
+   Relic Preview (use base layout styles; no overrides here)
    ------------------------------------------------------------ */
-
-#results .relic-preview {
-  display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr) !important;
-  grid-template-rows: repeat(3, auto) !important;
-  column-gap: 1rem !important;
-  row-gap: 0.5rem !important;
-  align-items: stretch !important;
-}
-
-/* Frame spans all 3 rows, stays square, but has a max size */
-#results .relic-frame {
-  grid-column: 1 !important;
-  grid-row: 1 / span 3 !important;
-
-  width: auto !important;
-  height: 100% !important;
-
-  aspect-ratio: 1 / 1 !important;
-
-  /* === THE FIX: stop it from getting huge === */
-  max-height: clamp(180px, 28vh, 320px) !important;
-  /* (optional) keeps it from getting too tiny */
-  min-height: 160px !important;
-
-  align-self: stretch !important;
-  justify-self: start !important;
-  overflow: hidden !important;
-}
-
-#results .relic-frame img {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-  object-fit: contain !important;
-}
-
-#results .relic-effects { display: contents !important; }
-#results .chosen-effects {
-  display: contents !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  list-style: none !important;
-}
-
-#results .chosen-effects > li { grid-column: 2 !important; }
-#results .chosen-effects > li:nth-child(1) { grid-row: 1 !important; }
-#results .chosen-effects > li:nth-child(2) { grid-row: 2 !important; }
-#results .chosen-effects > li:nth-child(3) { grid-row: 3 !important; }
-
-#results .chosen-effects > li:only-child {
-  grid-row: 1 / span 3 !important;
-}
 
 /* ------------------------------------------------------------
    Start Over button spacing + tan gradient (LEFT → RIGHT)
    (Overrides layout.css which uses !important)
    ------------------------------------------------------------ */
+
+/* Keep the utility-bar row vertically centered */
+.utility-bar button#startOver {
+  margin: 0 0.4rem 0 auto !important;
+  align-self: center;
+}
+
+/* Tuck the left utility group in slightly so Start Over aligns with the effect row instead of the preview width */
+.utility-bar__col--left {
+  padding-right: 0.9rem;
+}
+
+/* Offset right column to line up Instructions with the Details panel content */
+.utility-bar__col--right {
+  padding-left: 0.85rem;
+}
+
+/* Purple gradients for Instructions / Disclaimer */
+button#instructionsBtn,
+button#disclaimerBtn {
+  background: linear-gradient(135deg, #5b3c9f 0%, #8f6bd8 55%, #2b1a4f 100%) !important;
+  color: #f5f0ff !important;
+  border: 1px solid rgba(180, 150, 255, 0.55) !important;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+button#instructionsBtn:hover,
+button#disclaimerBtn:hover {
+  filter: brightness(1.06);
+  border-color: rgba(200, 175, 255, 0.8) !important;
+}
+
+button#instructionsBtn:active,
+button#disclaimerBtn:active {
+  filter: brightness(0.98);
+}
 
 button#startOver {
   margin-top: 0.85rem !important;
@@ -112,50 +121,80 @@ button#startOver:focus-visible {
   outline: 2px solid rgba(214, 194, 154, 0.9) !important;
   outline-offset: 2px;
 }
+
 /* ------------------------------------------------------------
-   Raw-mode Curse button placement
-   Keep the Curse button directly after the Effect title (like non-raw)
+   Illegal toggle (highest priority): active = white bg + red icon/border
    ------------------------------------------------------------ */
 
-/* Only affects the Results list when Raw Data is ON */
+button#showIllegalBtn.is-active,
+button#showIllegalBtn[aria-pressed="true"] {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 2px solid #b10000 !important;
+  color: #b10000 !important;
+  box-shadow: 0 0 0 1px rgba(177, 0, 0, 0.35) !important;
+}
+
+button#showIllegalBtn.is-active .utility-toggle__svg,
+button#showIllegalBtn[aria-pressed="true"] .utility-toggle__svg {
+  stroke: #b10000 !important;
+  stroke-width: 2.4px !important;
+}
+/* ------------------------------------------------------------
+   Raw-mode layout: keep effect row simple; curse row stacks below via effect-line grid
+   ------------------------------------------------------------ */
+
+/* Keep the effect title/controls on one row; curse-line now lives outside effect-main */
 #results.is-raw .effect-main--row {
   display: grid;
-  grid-template-columns: max-content max-content 1fr;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "title btn ."
-    "curse curse ."
-    "meta meta meta";
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "text controls";
   column-gap: 0.75rem;
   row-gap: 0.35rem;
-  align-items: start;
+  align-items: center;
 }
 
-/* Let the inner wrapper contribute its children to the grid */
 #results.is-raw .effect-main--row .effect-text {
-  display: contents;
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-/* Place title + curse line */
-#results.is-raw .effect-main--row .effect-text .title {
-  grid-area: title;
+#results.is-raw .effect-main--row .effect-btn,
+#results.is-raw .effect-main--row .control-cluster.effect-controls {
+  grid-area: controls;
+  justify-self: end;
+  align-self: center;
+}
+  /* Let main tokens sit on line 1; allow a controlled wrap for curse tokens */
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  white-space: normal;
+  gap: 0.35rem 0.65rem;
+  align-items: center;
 }
 
-#results.is-raw .effect-main--row .effect-text .curse-sub {
-  grid-area: curse;
+#results.is-raw .effect-main--row .meta code {
+  padding: 0.16rem 0.40rem;
 }
 
-/* Button sits immediately after title, not at far right */
-#results.is-raw .effect-main--row .curse-btn {
-  grid-area: btn;
-  justify-self: start;
-  align-self: start;
+/* Force a clean break before curse tokens without extra gap */
+#results.is-raw .effect-main--row .meta .meta-break {
+  flex-basis: 100%;
+  height: 0;
+  padding: 0;
   margin: 0;
+  line-height: 0;
 }
 
-/* Raw meta always starts on its own row */
-#results.is-raw .effect-main--row .meta {
-  grid-area: meta;
+#results.is-raw .effect-main--row .meta .meta-curse {
+  color: #b58cff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 /* ------------------------------------------------------------
    Curse dialog sizing (compact centered modal)

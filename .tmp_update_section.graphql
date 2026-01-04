@@ -1,0 +1,26 @@
+mutation {
+  updateProjectV2Field(
+    input: {
+      fieldId: "PVTSSF_lAHODudxFM4BL0-Lzg7SQLU"
+      singleSelectOptions: [
+        { name: "Home/Global", color: GRAY, description: "Global/home features" }
+        { name: "Menagerie", color: GREEN, description: "Monsters & stats" }
+        { name: "Grimoire", color: PURPLE, description: "Skills, sorceries, incantations" }
+        { name: "Lexicon", color: BLUE, description: "Information hub" }
+        { name: "Reliquary", color: ORANGE, description: "Relic validation/features" }
+        { name: "Armory", color: RED, description: "Weapons & equipment" }
+      ]
+    }
+  ) {
+    projectV2Field {
+      ... on ProjectV2SingleSelectField {
+        options {
+          id
+          name
+          color
+          description
+        }
+      }
+    }
+  }
+}

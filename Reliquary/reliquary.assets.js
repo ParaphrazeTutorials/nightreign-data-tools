@@ -2,9 +2,6 @@
 
 export const DATA_URL = new URL("../Data/reliquary.json", window.location.href).toString();
 
-// Page header build info (manually maintained)
-export const RELEASE_CHANNEL = "LIVE"; // "BETA" | "LIVE"
-export const GAME_VERSION = "1.03.1.0025";
 
 // Icon folder:
 // Assets/icons/reliquary/{StatusIconID}.png
@@ -32,7 +29,8 @@ export function relicPath(relicType, color, size) {
   return new URL(`../Assets/relics/${type}/${s}/${c}.png`, window.location.href).toString();
 }
 
-// When type is "All", visuals should behave like Standard
+// When type is unset/All, visuals should behave like Standard
 export function visualRelicType(selectedType) {
-  return selectedType === "All" ? "Standard" : selectedType;
+  if (!selectedType || selectedType === "All") return "Standard";
+  return selectedType;
 }

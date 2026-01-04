@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>The Lexicon — The Round Table Codex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="../styles/site.css">
+    <link rel="stylesheet" href="../styles/lexicon.css">
+    <!-- Reuse Home card visuals for the left app tiles -->
+    <link rel="stylesheet" href="../styles/home.css">
+  </head>
+
+  <body>
+    <main class="app-shell app-grid">
+
+      <!-- HERO (global renderer) -->
+      <header
+        id="globalHero"
+        class="hero"
+        data-hero-image="../Assets/home/Lexicon.png"
+        data-hero-h1="The Round Table Codex"
+        data-hero-h2="The Lexicon"
+        data-hero-build="true"
+      ></header>
+
+      <!-- NAV (global) -->
+      <nav id="globalNav" class="tool-nav" aria-label="Primary navigation"></nav>
+
+      <!-- LEXICON SHELL -->
+      <section class="tool-shell lexicon-shell">
+
+        <!-- LEFT: APP TILES (no header; cards speak for themselves) -->
+        <aside class="lexicon-sidebar" aria-label="Apps">
+          <div class="lexicon-apps" role="list">
+
+            <button
+              class="app-tile app-tile--reliquary lexicon-module-card is-active"
+              data-module="reliquary"
+              role="listitem"
+              type="button"
+              style="--card-art-src: url('../Assets/home/Reliquary.png')"
+            >
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Reliquary</div>
+                  <div>Effects dataset</div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              class="app-tile app-tile--menagerie lexicon-module-card is-disabled"
+              data-module="menagerie"
+              role="listitem"
+              type="button"
+              tabindex="-1"
+              aria-disabled="true"
+              style="--card-art-src: url('../Assets/home/Menagerie.png')"
+            >
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Menagerie</div>
+                  <div>Coming soon</div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              class="app-tile app-tile--armory lexicon-module-card is-disabled"
+              data-module="armory"
+              role="listitem"
+              type="button"
+              tabindex="-1"
+              aria-disabled="true"
+              style="--card-art-src: url('../Assets/home/Armory.png')"
+            >
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Armory</div>
+                  <div>Coming soon</div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              class="app-tile app-tile--grimoire lexicon-module-card is-disabled"
+              data-module="grimoire"
+              role="listitem"
+              type="button"
+              tabindex="-1"
+              aria-disabled="true"
+              style="--card-art-src: url('../Assets/home/Grimoire.png')"
+            >
+              <div class="app-tile__meta">
+                <div class="app-tile__text">
+                  <div class="app-tile__title">Grimoire</div>
+                  <div>Coming soon</div>
+                </div>
+              </div>
+            </button>
+
+          </div>
+        </aside>
+
+        <!-- RIGHT: Single dominant Data Table -->
+        <section class="lexicon-main" aria-label="Lexicon data">
+          <article class="lex-tile lex-tile--full" data-tile="table">
+            <header class="lex-tile__header">
+              <div class="lex-tile__header-main">
+                <div class="lex-table-title">
+                  <h3>Data Table</h3>
+                  <input id="lexiconSearch" class="lexicon-search" type="search" placeholder="Search all columns" aria-label="Search all columns" />
+                </div>
+                <div class="lex-tile__actions">
+                  <button id="lexExportButton" class="lexicon-export-btn secondary" type="button">Export Table</button>
+                  <button id="lexDownloadsButton" class="lexicon-export-btn secondary" type="button">Download Files</button>
+                  <div aria-label="Text size" class="lexicon-zoom-buttons" role="group">
+                    <button aria-pressed="true" class="lexicon-zoom-btn is-active" data-zoom="small" title="Small" type="button">S</button>
+                    <button aria-pressed="false" class="lexicon-zoom-btn" data-zoom="medium" title="Medium" type="button">M</button>
+                    <button aria-pressed="false" class="lexicon-zoom-btn" data-zoom="large" title="Large" type="button">L</button>
+                  </div>
+                </div>
+              </div>
+              <div class="lex-tile__header-sub">
+                <div class="lex-tile__subtext">Explore columns and values, then export what you need.</div>
+                <div id="lexiconMeta" class="lexicon-meta"></div>
+              </div>
+            </header>
+
+            <div class="lex-tile__body">
+              <section class="lexicon-wrap zoom-small">
+                <div class="lexicon-table-wrap">
+                  <table class="lexicon-table">
+                    <thead id="lexiconHead"></thead>
+                    <tbody id="lexiconBody"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+
+            
+          </article>
+        </section>
+      </section>
+
+      <!-- FOOTER (global) -->
+      <footer id="globalFooter" class="site-footer"></footer>
+
+    </main>
+
+    <!-- Downloads modal -->
+    <div id="lexModal" class="lex-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="lex-modal__backdrop" data-close="backdrop"></div>
+      <div class="lex-modal__card" role="document">
+        <header class="lex-modal__header">
+          <h3 class="lex-modal__title">Downloads</h3>
+          <button class="lex-modal__close" type="button" aria-label="Close">×</button>
+        </header>
+        <div class="lex-modal__body" id="lexModalBody">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Column info modal -->
+    <div id="lexInfoModal" class="lex-modal lex-modal--info" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="lex-modal__backdrop" data-close="backdrop"></div>
+      <div class="lex-modal__card" role="document">
+        <header class="lex-modal__header">
+          <h3 class="lex-modal__title" id="lexInfoTitle">Column info</h3>
+          <button class="lex-modal__close" type="button" aria-label="Close">×</button>
+        </header>
+        <div class="lex-modal__body" id="lexInfoModalBody">No column selected.</div>
+      </div>
+    </div>
+
+    <script type="module" src="../scripts/hero.js"></script>
+    <script type="module" src="../scripts/chrome.js"></script>
+    <script type="module" src="./lexicon.js"></script>
+  </body>
+</html>

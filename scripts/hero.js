@@ -10,6 +10,15 @@
 //
 // Styling is defined in /styles/site.css.
 
+// ------------------------------------------------------------
+// Global build status (single source of truth)
+// ------------------------------------------------------------
+const GLOBAL_BUILD_STATUS = "BETA";     // "BETA" | "LIVE"  (sourced from Reliquary baseline)
+const GLOBAL_BUILD_VERSION = "v0.0.0";  // app version (update as needed)
+const GLOBAL_GAME_VERSION = "1.03.1.0025"; // game version (sourced from Reliquary baseline)
+
+
+
 function toBool(v) {
   const s = String(v ?? "").trim().toLowerCase();
   return s === "true" || s === "1" || s === "yes";
@@ -42,7 +51,20 @@ function renderHero() {
       ${h2 ? `<h2>${h2}</h2>` : ""}
     </div>
 
-    ${showBuild ? `<div id="heroBuild" class="hero-build" aria-label="Release channel and game version"></div>` : ""}
+    ${showBuild ? (() => {
+      const status = String(GLOBAL_BUILD_STATUS || "BETA").trim().toUpperCase();
+      const version = String(GLOBAL_BUILD_VERSION || "").trim();
+      const game = String(GLOBAL_GAME_VERSION || "").trim();
+      const cls = status === "LIVE" ? "is-live" : "is-beta";
+      return `
+        <div id="heroBuild" class="hero-build ${cls}" aria-label="Release channel and game version">
+                    <span class="hero-build__status">${status}</span>
+          <span class="hero-build__sep"> | </span>
+          <span class="hero-build__version">Game Version ${game}</span>
+
+        </div>
+      `;
+    })() : ""}
   `;
 }
 

@@ -2,20 +2,14 @@ export function getDom() {
   return {
     // Top controls
     selType: document.getElementById("relicType"),
-    selColor: document.getElementById("relicColor"),
 
-    showIllegalEl: document.getElementById("showIllegal"),
-    showRawEl: document.getElementById("showRaw"),
+    showIllegalBtn: document.getElementById("showIllegalBtn"),
+    illegalPill: document.getElementById("illegalPill"),
     startOverBtn: document.getElementById("startOver"),
-
-    // Categories + Effects
-    cat1: document.getElementById("cat1"),
-    cat2: document.getElementById("cat2"),
-    cat3: document.getElementById("cat3"),
-
-    sel1: document.getElementById("effect1"),
-    sel2: document.getElementById("effect2"),
-    sel3: document.getElementById("effect3"),
+    instructionsBtn: document.getElementById("instructionsBtn") || null,
+    disclaimerBtn: document.getElementById("disclaimerBtn") || null,
+    instructionsPopover: document.getElementById("instructionsPopover") || null,
+    disclaimerPopover: document.getElementById("disclaimerPopover") || null,
 
     // Counts
     count1: document.getElementById("count1"),
@@ -24,6 +18,9 @@ export function getDom() {
 
     // Preview / Details
     relicImg: document.getElementById("relicImg"),
+    relicColorControl: document.getElementById("relicColorControl"),
+    relicColorChip: document.getElementById("relicColorChip"),
+    relicColorMenu: document.getElementById("relicColorMenu"),
     chosenList: document.getElementById("chosenList"),
     detailsBody: document.getElementById("detailsBody"),
 

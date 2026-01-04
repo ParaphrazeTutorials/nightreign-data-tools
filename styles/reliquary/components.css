@@ -4,6 +4,15 @@
   gap: 0.75rem;
 }
 
+/* Raw mode: force the original grid layout so content can't stretch into the image column */
+#results.is-raw .chosen-effects > li {
+  display: grid;
+  grid-template-columns: var(--icon-size) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  min-width: 0;
+}
+
 
 /* ============================================================
    Reliquary – Effect Line + Curse Button Alignment (FINAL)
@@ -12,6 +21,14 @@
 .effect-line {
   display: flex;
   align-items: center;
+
+.effect-menu__effect-leading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
   gap: 0.75rem;
 }
 
@@ -37,6 +54,7 @@
 
 .title-text {
   display: inline-block;
+  font-weight: 700;
 }
 
 /* Curse subtitle */
@@ -44,8 +62,13 @@
   color: #b58cff;
   font-style: italic;
 
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
   /* Keep the curse text as close as possible to the effect title */
   margin-top: -0.32rem;
+  line-height: 1.25;
   line-height: 1.05;
 }
 
@@ -56,12 +79,13 @@
   margin: 0;
   display: inline-flex;
   align-items: center;
+  align-self: center;
 
-  padding: 0.25rem 0.55rem;
+  padding: 0.18rem 0.39rem;
   border-radius: 999px;
 
   font-weight: 800;
-  font-size: 0.78rem;
+  font-size: 0.6rem;
   letter-spacing: 0.02em;
 
   border: 1px solid rgba(255,255,255,0.12);
@@ -93,10 +117,10 @@
 /* Effect row: lock "title + curse button" to the same top row, with Raw Data on its own row */
 .effect-main--row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto auto;
   grid-template-areas:
-    "text btn indicators"
-    "meta meta indicators";
+    "text effectbtn btn indicators"
+    "meta  meta      meta indicators";
   column-gap: 0.75rem;
   row-gap: 0.35rem;
   align-items: center;
@@ -104,8 +128,108 @@
 
 .effect-main--row > .effect-text { grid-area: text; min-width: 0; }
 .effect-main--row > .meta { grid-area: meta; }
+.effect-main--row > .effect-btn,
+.effect-main--row > .control-cluster.effect-controls { grid-area: effectbtn; align-self: center; justify-self: end; }
 .effect-main--row > .curse-btn { grid-area: btn; align-self: center; justify-self: end; }
 .effect-main--row > .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
+
+/* Effect selection button (mirrors curse button sizing but neutral style) */
+.effect-btn {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  padding: 0.21rem 0.46rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: linear-gradient(
+    90deg,
+    rgba(70, 120, 210, 0.90) 0%,
+    rgba(0, 0, 0, 0.18) 62%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+  color: rgba(255,255,255,0.94);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.effect-btn:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(90, 140, 230, 0.95) 0%,
+    rgba(0, 0, 0, 0.16) 62%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
+}
+
+/* Icon clusters for selected effect/curse actions */
+.control-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.icon-btn {
+  margin: 0;
+  width: 1.24rem;
+  height: 1.24rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(25, 32, 52, 0.9);
+  color: rgba(255, 255, 255, 0.92);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.icon-btn:hover { background: rgba(35, 44, 70, 0.95); border-color: rgba(255, 255, 255, 0.28); }
+.icon-btn:active { background: rgba(18, 24, 40, 0.95); }
+.icon-btn.clear-btn { color: rgba(255, 138, 138, 0.95); border-color: rgba(255, 138, 138, 0.35); }
+.icon-btn.clear-btn:hover { color: rgba(255, 160, 160, 1); border-color: rgba(255, 160, 160, 0.55); }
+.icon-btn.swap-btn { color: rgba(140, 190, 255, 0.95); }
+.icon-btn.info-btn { color: rgba(181, 140, 255, 0.95); }
+.icon-btn.copy-id-btn {
+  border-color: rgba(90, 210, 140, 0.7);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, rgba(24,38,32,0.9) 55%, rgba(16,26,22,0.9) 100%);
+}
+.icon-btn.copy-id-btn:hover {
+  border-color: rgba(110, 240, 165, 0.85);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.38) 0%, rgba(32,52,42,0.95) 55%, rgba(20,32,26,0.95) 100%);
+}
+.icon-btn.copy-id-btn .effect-copy-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2336d27a'%3E%3Cpath d='M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1Z'/%3E%3Cpath d='M18 5H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H10V7h8v14Z'/%3E%3C/svg%3E");
+}
+
+.control-cluster .effect-copy-status {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  margin-left: 0.35rem;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.effect-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: grayscale(0.35);
+}
 
 /* Fallback: if a title is used directly (no .effect-text wrapper), treat it like the text area */
 .effect-main--row > .title {
@@ -135,11 +259,11 @@
 
 #results.is-raw .effect-main--row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto auto;
   grid-template-areas:
-    "title btn indicators"
-    "curse curse indicators"
-    "meta  meta  indicators";
+    "title effectbtn btn indicators"
+    "curse curse curse indicators"
+    "meta  meta  meta  indicators";
   /* Center items within each grid row so the button stays locked to the title line */
   align-items: center;
   column-gap: 0.75rem;
@@ -155,6 +279,7 @@
 #results.is-raw .effect-main--row .title     { grid-area: title; min-width: 0; align-self: center; }
 #results.is-raw .effect-main--row .curse-sub { grid-area: curse; align-self: start; }
 #results.is-raw .effect-main--row .meta      { grid-area: meta; align-self: start; }
+#results.is-raw .effect-main--row .effect-btn { grid-area: effectbtn; align-self: center; justify-self: end; }
 #results.is-raw .effect-main--row .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
 
 /* Button sits on the title row */
@@ -178,4 +303,436 @@
 #results.is-raw .chosen-effects > li .effect-icon {
   margin-top: 0.15rem; /* optical nudge to match title cap-height */
   flex: 0 0 auto;
+}
+
+/* ------------------------------------------------------------
+   Effect Picker (dual-column popover)
+   ------------------------------------------------------------ */
+
+.effect-menu {
+  position: fixed;
+  z-index: 1200;
+  width: min(900px, 90vw);
+  min-width: 300px;
+  max-height: 360px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  padding: 0.18rem;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, rgba(18, 24, 34, 0.96), rgba(12, 16, 24, 0.94));
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+
+  overflow: hidden;
+
+  font-size: 0.7rem;
+}
+
+.effect-menu--compact .effect-menu__body {
+  display: block;
+}
+
+.effect-menu--wide .effect-menu__layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.15fr) minmax(420px, 2fr);
+  gap: 0.1rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 320px;
+  align-items: stretch;
+}
+
+.effect-menu__search-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 0.08rem;
+  padding: 0.1rem 0.16rem;
+  height: auto;
+  min-height: 18px;
+  max-height: none;
+  background: rgba(22, 26, 34, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.effect-menu__search-bar--shared {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  gap: 0.2rem;
+}
+
+.effect-menu__search-bar--flyout {
+  background: rgba(20, 24, 32, 0.96);
+}
+
+.effect-menu__search-input {
+  width: 100%;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 2px 5px 2px 2.35rem !important;
+  flex: 1 1 auto;
+  display: block;
+  align-self: stretch;
+  margin: 0 !important;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(245, 247, 251, 0.95);
+  font-size: 0.55rem !important;
+  line-height: 12px !important;
+  outline: none;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background-repeat: no-repeat;
+  background-position: 0.9rem 50%;
+  background-size: 14px;
+  text-indent: 0; /* ensure text starts after padding */
+  box-sizing: border-box;
+}
+
+.effect-menu__search-input::placeholder {
+  color: rgba(220, 225, 235, 0.8);
+  font-size: 0.55rem;
+}
+
+.effect-menu__search-input::-webkit-search-decoration,
+.effect-menu__search-input::-webkit-search-cancel-button,
+.effect-menu__search-input::-webkit-search-results-button,
+.effect-menu__search-input::-webkit-search-results-decoration {
+  display: none;
+}
+
+.effect-menu__column {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 10, 12, 0.35);
+  border-radius: 0;
+  padding: 0;
+  overflow: auto;
+  max-height: none;
+  height: 100%;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow-x: hidden;
+}
+
+.effect-menu__column--effects {
+  max-height: 100%;
+  height: 100%;
+}
+
+.effect-menu__column--cats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  align-content: stretch;
+  align-items: stretch;
+  padding: 0.5rem 0.55rem 0.46rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.effect-menu__cat {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  gap: 0.36rem;
+  padding: 0.34rem 0.76rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 30, 30, 0.8);
+  background: rgba(80, 24, 30, 0.9);
+  color: rgba(245, 247, 251, 0.95);
+  font-weight: 720;
+  font-size: 0.82em;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, filter 120ms ease;
+  text-align: left;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.effect-menu__cat:hover,
+.effect-menu__cat:focus-visible {
+  outline: none;
+  border-color: rgba(190, 70, 80, 0.9);
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.effect-menu__cat.is-active {
+  border-color: rgba(220, 200, 255, 0.6);
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.3),
+    0 0 0 2px rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  transform: translateY(-2px);
+}
+
+.effect-menu__cat-label {
+  display: inline-flex;
+  gap: 0.28rem;
+  align-items: center;
+  min-width: 0;
+  flex: 1 1 auto;
+  word-break: break-word;
+  font-weight: 760;
+}
+
+.effect-menu__cat-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.065rem 0.36rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 0.6rem;
+  opacity: 0.86;
+  flex-shrink: 0;
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.effect-menu__effect {
+  width: 100%;
+  text-align: left;
+  margin: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 30, 30, 0.8);
+  padding: 8px 0.7rem;
+  background: transparent;
+  color: rgba(244, 246, 250, 0.94);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.52rem;
+  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  font-size: 0.78em;
+  line-height: 1.25;
+  overflow: visible;
+  white-space: normal;
+  text-overflow: unset;
+}
+
+/* Tri-color striping for effect rows */
+/* Per-category gradients are applied inline; striping removed */
+
+.effect-menu__effect-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.effect-menu__effect-trailing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.effect-menu__effect:hover,
+.effect-menu__effect:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.26);
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.effect-menu__effect.is-current {
+  border-color: rgba(120, 235, 170, 0.85);
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.22),
+    0 0 0 2px rgba(120, 235, 170, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.effect-menu__effect-title {
+  font-weight: 640;
+  letter-spacing: 0.003em;
+  flex: 1 1 auto;
+  word-break: break-word;
+}
+
+.curse-indicator {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  display: inline-block;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+  opacity: 0.98;
+  min-width: 21px;
+  min-height: 21px;
+  max-width: 21px;
+  max-height: 21px;
+  line-height: 0;
+}
+
+.curse-indicator-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.curse-indicator-wrap::after {
+  content: "Curse Required";
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  padding: 0.24rem 0.5rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(133, 76, 255, 0.35);
+  background: rgba(28, 16, 48, 0.95);
+  color: #caa5ff;
+  font-size: 0.58rem;
+  font-style: italic;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 3;
+}
+
+.curse-indicator-wrap:hover::after,
+.curse-indicator-wrap:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.effect-menu__effect-meta {
+  display: none;
+}
+
+.effect-menu__effect-tags {
+  display: none;
+}
+
+.effect-menu__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.44rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: rgba(255, 160, 110, 0.18);
+  color: rgba(255, 222, 200, 0.95);
+}
+
+.effect-menu__tag--check {
+  background: rgba(110, 210, 150, 0.16);
+  color: rgba(200, 255, 225, 0.95);
+  border-color: rgba(120, 235, 170, 0.45);
+}
+
+.effect-menu__empty {
+  padding: 1rem 0.5rem;
+  text-align: center;
+  color: rgba(235, 238, 245, 0.78);
+  border-radius: 0.7rem;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.82em;
+  overflow: hidden;
+}
+
+/* footer removed for now */
+.effect-menu__footer { display: none; }
+
+.effect-menu__footer-meta {
+  display: grid;
+  gap: 0.1rem;
+  text-align: right;
+  justify-items: end;
+}
+
+.effect-menu__hint {
+  font-size: 0.68rem;
+  color: rgba(220, 225, 235, 0.8);
+}
+
+.effect-menu__count {
+  font-size: 0.62rem;
+  color: rgba(180, 190, 205, 0.85);
+}
+
+.effect-menu__effects {
+  padding: 0.08rem;
+  overflow: auto;
+  max-height: 100%;
+  height: 100%;
+}
+
+.effect-menu__flyout {
+  position: fixed;
+  z-index: 1201;
+  min-width: 520px;
+  max-width: min(700px, calc(100vw - 1.5rem));
+  max-height: 360px;
+  padding: 0.08rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, rgba(18, 24, 34, 0.98), rgba(12, 16, 24, 0.95));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  overflow: hidden;
+  font-size: 0.72rem;
+}
+
+.effect-menu__flyout--hidden {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .effect-menu {
+    width: min(740px, calc(100vw - 1.25rem));
+  }
+
+  .effect-menu__body {
+    grid-template-columns: 1fr;
+  }
+
+  .effect-menu__column--cats {
+    max-height: 180px;
+  }
 }

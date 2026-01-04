@@ -18,9 +18,9 @@
      Global Hero Art Controls (CANONICAL)
      ------------------------------------------------------------ */
   /* Canonical global hero art controls */
-  --hero-art-zoom: 0.5;
+  --hero-art-zoom: 0.4;
   --hero-art-x: 65%;
-  --hero-art-y: 90%;
+  --hero-art-y: 100%;
 }
 
 
@@ -46,12 +46,16 @@
    Hero
    ------------------------------------------------------------ */
 
+/* ------------------------------------------------------------
+   Hero
+   ------------------------------------------------------------ */
+
 .hero {
-  position: relative;
+  position: relative; /* anchor for pill */
   overflow: hidden;
 
-  min-height: 200px;
-  padding: 1.4rem 1.25rem;
+  /* reduced vertical real estate */
+  padding: 1.05rem 1.25rem 0.85rem;
 
   border-radius: 0.5rem;
   color: white;
@@ -62,11 +66,9 @@
     rgba(0, 0, 0, 0.40) 45%,
     rgba(0, 0, 0, 0.10) 100%
   );
-
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
 }
+
+
 
 
 /* ------------------------------------------------------------
@@ -129,40 +131,59 @@
 
 .tool-nav {
   background-color: var(--color-accent-primary);
-  padding: 0.2rem 1rem;
-  border-radius: 0.45rem;
+  padding: 0.28rem 1rem; /* small, but less cramped */
+  border-radius: 0.5rem;
 }
 
 .tool-nav ul {
   display: flex;
-  gap: 1rem;
+  column-gap: 0.95rem;
+  row-gap: 0.35rem;
+
   margin: 0;
   padding: 0;
+
   list-style: none;
   align-items: center;
-
-  line-height: 1;
-  min-height: unset;
+  flex-wrap: wrap;
 }
 
+
+
 .tool-nav a {
-  color: white;
+  color: rgba(255,255,255,0.92);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.85rem;
+  line-height: 1.1;
 
-  padding: 0.15rem 0.4rem;
+  /* Small, but not squished */
+  padding: 0.22rem 0.52rem;
 
-  border-radius: 0.35rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+
+  /* No pill/border treatment */
+  background: transparent;
+  border: 0;
+
+  transition: color 120ms ease, text-decoration-color 120ms ease, opacity 120ms ease;
 }
 
 .tool-nav a:not([aria-disabled="true"]):hover {
-  background: var(--color-accent-hover);
+  color: rgba(255,255,255,0.98);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: rgba(255,255,255,0.35);
 }
 
 .tool-nav a.active {
-  background: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,1);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: rgba(255,255,255,0.55);
 }
 
 .tool-nav a[aria-disabled="true"] {
@@ -185,22 +206,22 @@ footer {
    Hero build tag (page status + DB/Game version)
    ------------------------------------------------------------ */
 
-.hero-build{
+/* ------------------------------------------------------------
+   Hero build pill
+   ------------------------------------------------------------ */
+
+.hero-build {
   position: absolute;
-  left: 1.05rem;
-  bottom: 0.9rem;
-  z-index: 2;
+  top: 0.75rem;
+  right: 1.05rem;
+  z-index: 5;
 
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.55rem;
-
-  font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
-
-  text-shadow: 0 6px 18px rgba(0,0,0,0.55);
+  /* scale entire pill */
+  transform: scale(0.5);
+  transform-origin: top right;
 }
+
+
 
 .hero-build__status{
   text-transform: uppercase;
@@ -286,4 +307,39 @@ footer {
 
 .site-footer .footer-credits {
   opacity: 0.78;
+}
+
+
+/* ------------------------------------------------------------
+   Hero build pill — normalize font weight everywhere
+   (Lexicon override fix)
+   ------------------------------------------------------------ */
+.hero .hero-build,
+.hero .hero-build *,
+header.hero .hero-build,
+header.hero .hero-build * {
+  font-weight: 400 !important;
+}
+
+.tool-nav li {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+  display: flex; /* prevents inherited block padding weirdness */
+  align-items: center;
+}
+
+.tool-nav ul li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+
+/* Lexicon footer alignment fix */
+.site-footer .footer-inner {
+  max-width: none;
+  margin: 0 auto;
+  padding-inline: clamp(0.75rem, 2.2vw, 2.75rem);
 }
