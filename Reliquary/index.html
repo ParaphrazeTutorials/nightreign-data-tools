@@ -14,6 +14,17 @@
     <link rel="stylesheet" href="../styles/reliquary/overrides.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT87FT9EYB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      const isProd = location.hostname === 'paraphrazetutorials.github.io' && location.pathname.startsWith('/nightreign-data-tools');
+      if (isProd) {
+        gtag('config', 'G-WT87FT9EYB');
+      }
+    </script>
   </head>
 
   <body>

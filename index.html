@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="./styles/site.css">
     <link rel="stylesheet" href="./styles/home.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT87FT9EYB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      const isProd = location.hostname === 'paraphrazetutorials.github.io' && location.pathname.startsWith('/nightreign-data-tools');
+      if (isProd) {
+        gtag('config', 'G-WT87FT9EYB');
+      }
+    </script>
   </head>
 
   <body>
