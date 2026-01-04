@@ -1,3 +1,11 @@
+import {
+  categoriesFor as reliquaryCategoriesFor,
+  categoryColorFor,
+  baseFromSequence,
+  themeFromBase,
+  textColorFor
+} from "../Reliquary/reliquary.logic.js";
+
 // The Lexicon — table + tile theater mode + module picker
 // Session-only: sort + text zoom. No persistence across refresh.
 
@@ -103,6 +111,9 @@ const state = {
   zoom: "small", // "small" | "medium" | "large"
   filters: new Map(),
   searchTerm: "",
+
+  // styling helpers
+  categoryThemes: new Map(),
 
   // downloads
   downloadsManifest: null,
@@ -254,6 +265,64 @@ function escapeHtml(str) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+// Mirror the Reliquary effect menu gradients so category pills stay consistent
+function gradientFromTheme(theme) {
+  if (!theme) return "rgba(40, 40, 44, 0.85)";
+  const shades = theme.shades || [];
+  if (shades.length >= 3) {
+    return `linear-gradient(135deg, ${shades[0]} 0%, ${shades[1]} 50%, ${shades[2]} 100%)`;
+  }
+  return theme.base || "rgba(40, 40, 44, 0.85)";
+}
+
+function buildCategoryThemeMap(rows) {
+  if (!Array.isArray(rows) || !rows.length) return new Map();
+
+  const map = new Map();
+  const uncategorizedTheme = categoryColorFor("Uncategorized");
+
+  map.set("__default", categoryColorFor(""));
+  map.set("Uncategorized", uncategorizedTheme);
+
+  const cats = reliquaryCategoriesFor(rows);
+  let seqIdx = 0;
+
+  cats.forEach(cat => {
+    if (map.has(cat)) return;
+
+    const isCurse = /curse/i.test(cat);
+    if (isCurse) {
+      map.set(cat, categoryColorFor(cat));
+      return;
+    }
+
+    const base = baseFromSequence(seqIdx);
+    seqIdx += 1;
+    map.set(cat, themeFromBase(base));
+  });
+
+  return map;
+}
+
+function categoryThemeFor(value) {
+  if (state.module !== "reliquary") return null;
+  const key = (value ?? "").toString().trim() || "Uncategorized";
+  return state.categoryThemes.get(key) || state.categoryThemes.get("__default") || null;
+}
+
+function categoryCellHtml(rawValue, isSorted = false) {
+  const label = (rawValue == null || String(rawValue).trim() === "") ? "Uncategorized" : String(rawValue);
+  const theme = categoryThemeFor(label);
+  const bg = gradientFromTheme(theme);
+  const base = theme?.base || "#2b2f38";
+  const borderColor = theme?.border || "rgba(255, 255, 255, 0.14)";
+  const textColor = textColorFor(base);
+
+  const cls = isSorted ? "lex-cat-cell lexicon-td--sorted" : "lex-cat-cell";
+
+  return `<td class="${cls}"><span class="lex-cat-pill" style="--lex-cat-base:${base}; background:${bg}; border-color:${borderColor}; color:${textColor};"><span class="lex-cat-pill__label">${escapeHtml(label)}</span></span></td>`;
 }
 
 function inferColumns(rows) {
@@ -617,13 +686,20 @@ function thHtml(key) {
 
 function tdHtml(key, value) {
   const v = value == null ? "" : String(value);
+  const isEffectCategory = state.module === "reliquary" && key === "EffectCategory";
+
+  if (isEffectCategory) {
+    const isSortedCol = state.sortKey === key && state.sortDir !== 0;
+    return categoryCellHtml(v, isSortedCol);
+  }
+
   const isLongText = key.toLowerCase().includes("description");
   const isIdish = key.toLowerCase().endsWith("id") || /^[0-9]+$/.test(v);
   const isNumeric = state.typeByCol.get(key) === "number";
   const isSortedCol = state.sortKey === key && state.sortDir !== 0;
 
   const cls = [
-    isLongText ? "lexicon-cell--text" : "",
+    isLongText ? "lexicon-cell--text lexicon-cell--description" : "",
     isIdish ? "lexicon-cell--mono" : "",
     isNumeric ? "lexicon-cell--number" : "",
     isSortedCol ? "lexicon-td--sorted" : ""
@@ -925,6 +1001,11 @@ async function loadData() {
   state.searchTerm = "";
   if (dom.searchInput) dom.searchInput.value = "";
   computeTypeMap(state.rawRows, state.columns);
+
+  // Precompute category colors so EffectCategory cells mirror Reliquary dropdowns
+  state.categoryThemes = state.module === "reliquary"
+    ? buildCategoryThemeMap(state.rawRows)
+    : new Map();
 
   render();
   loadDownloadsManifest(state.module).catch(console.error);
