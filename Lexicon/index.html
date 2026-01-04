@@ -10,6 +10,17 @@
     <link rel="stylesheet" href="../styles/lexicon.css">
     <!-- Reuse Home card visuals for the left app tiles -->
     <link rel="stylesheet" href="../styles/home.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT87FT9EYB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      const isProd = location.hostname === 'paraphrazetutorials.github.io' && location.pathname.startsWith('/nightreign-data-tools');
+      if (isProd) {
+        gtag('config', 'G-WT87FT9EYB');
+      }
+    </script>
   </head>
 
   <body>
