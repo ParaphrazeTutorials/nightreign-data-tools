@@ -5,18 +5,18 @@ export const COLORS = ["Red", "Blue", "Yellow", "Green"];
 // Category color configuration (non-purple palette by default; purple reserved for curses)
 // Wide-gamut palette to keep adjacent categories visually distinct
 export const SEQ_CATEGORY_BASES = [
-  "#e23e57", // crimson
-  "#12c1d9", // electric cyan
-  "#8bc926", // chartreuse
-  "#ff6f3c", // coral
-  "#1f7ad8", // cobalt
-  "#5cd1a3", // mint
-  "#ff9f1a", // amber
-  "#1fb5b5", // teal
-  "#f45ba3", // hot pink
-  "#ffd93b", // bright yellow
-  "#4fb548", // leaf green
-  "#3c5cff"  // royal blue
+  "#b12f45", // deep crimson
+  "#0f8da4", // storm cyan
+  "#5f8d1a", // moss green
+  "#c74d2e", // ember coral
+  "#1a5ba5", // dusk cobalt
+  "#3e9c7c", // pine mint
+  "#c67914", // burnt amber
+  "#177f7f", // shadow teal
+  "#b13c79", // wine rose
+  "#c49a18", // dark goldenrod
+  "#3a8a32", // forest leaf
+  "#2d46b0"  // indigo royal
 ];
 
 const CURSE_COLOR_BASE = "#7a4bc6"; // reserved purple for curse-related categories
@@ -108,8 +108,8 @@ export function textColorFor(base) {
 }
 
 export function themeFromBase(base) {
-  const shades = [adjustLightness(base, -0.2), base, adjustLightness(base, 0.16)];
-  return { base, shades, border: adjustLightness(base, -0.22), text: textColorFor(base) };
+  const shades = [adjustLightness(base, -0.26), base, adjustLightness(base, 0.08)];
+  return { base, shades, border: adjustLightness(base, -0.3), text: textColorFor(base) };
 }
 
 export function baseFromSequence(idx) {
