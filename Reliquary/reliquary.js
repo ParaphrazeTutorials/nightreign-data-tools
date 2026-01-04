@@ -414,8 +414,52 @@ function exclusiveRelicTypeFromSelections() {
   return null;
 }
 
-function effectiveRelicType() {
+function effectiveRelicType(forFiltering = false) {
+  // When showing illegal combinations, filtering should ignore relic type entirely
+  if (forFiltering && isShowIllegalActive()) return "";
   return exclusiveRelicTypeFromSelections() || dom.selType.value;
+}
+
+function relicTypeMismatchInfo(rows) {
+  // Only relevant when illegal combinations are visible
+  if (!isShowIllegalActive()) return { hasIssue: false, ids: new Set() };
+
+  const selectedType = dom.selType.value;
+
+  let hasStandard = false;
+  let hasDepth = false;
+  const idsStandard = new Set();
+  const idsDepth = new Set();
+
+  for (const row of rows.filter(Boolean)) {
+    const t = relicTypeForRow(row);
+    if (t === "Standard") {
+      hasStandard = true;
+      idsStandard.add(String(row.EffectID));
+    }
+    if (t === "Depth Of Night") {
+      hasDepth = true;
+      idsDepth.add(String(row.EffectID));
+    }
+  }
+
+  const noIssue = { hasIssue: false, ids: new Set() };
+
+  // Mixed exclusive effects are always a mismatch
+  if (hasStandard && hasDepth) {
+    return { hasIssue: true, ids: new Set([...idsStandard, ...idsDepth]) };
+  }
+
+  // Single-type selections conflicting with an explicit relic type
+  if (selectedType === "Standard" && hasDepth) {
+    return { hasIssue: true, ids: idsDepth };
+  }
+
+  if (selectedType === "Depth Of Night" && hasStandard) {
+    return { hasIssue: true, ids: idsStandard };
+  }
+
+  return noIssue;
 }
 
 function getRollValue(row) {
@@ -944,7 +988,7 @@ function openCurseMenu(slotIdx, anchorBtn) {
   closeEffectMenu();
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType())
+  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType(true))
     .filter(r => {
       const cid = compatId(r);
       if (!cid) return true;
@@ -1148,7 +1192,7 @@ function openCurseDialog(slotIdx) {
   if (curseDialogTitle) curseDialogTitle.textContent = `Select a Curse for ${slotLabel(slotIdx)}`;
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType())
+  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType(true))
     .filter(r => {
       const cid = compatId(r);
       if (!cid) return true;
@@ -1253,7 +1297,7 @@ function computeEligibilityForSlot(slotIdx, showIllegalOverride = null) {
     return { eligible: [], filtered: [], categories: [], currentId: "" };
   }
 
-  const type = effectiveRelicType();
+  const type = effectiveRelicType(true);
   const base = baseFilteredByRelicType(rows, type);
   const selectedRows = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
 
@@ -1763,6 +1807,8 @@ function updateDetails(a, b, c) {
 
   const blocks = [];
 
+  const relicTypeIssue = relicTypeMismatchInfo([a, b, c]);
+
   const dupGroups = (selected.length >= 2) ? computeCompatDupGroups(selected) : [];
   const hasDup = dupGroups.length > 0;
 
@@ -1791,6 +1837,25 @@ function updateDetails(a, b, c) {
           <div class="popover-body">
             <p><em>On Depth of Night Relics only, certain effects cannot be rolled without an accompanying Curse.</em> Select a Curse for each effect that requires one before your relic can be finalized.</p>
             <p>Missing for: <strong>${labels}</strong>.</p>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  if (relicTypeIssue.hasIssue) {
+    blocks.push(`
+      <div class="info-box is-alert" data-kind="relic-type">
+        <div class="info-line">
+          Mismatched
+          <button type="button" class="term-link" data-popover-toggle="relicTypePopover">Relic Types</button>.
+        </div>
+
+        <div class="popover" id="relicTypePopover" hidden>
+          <div class="popover-title">Mismatched Relic Types</div>
+          <div class="popover-body popover-body--spaced">
+            <p>Certain effects can only appear on certain Relic Types.</p>
+            <p>You cannot have a Standard relic effect on a Depth of Night relic, and vice versa.</p>
           </div>
         </div>
       </div>
@@ -1930,6 +1995,9 @@ function updateUI(reason = "") {
   const dupGroups = computeCompatDupGroups(cSelections.filter(Boolean));
   const hasCompatIssue = dupGroups.length > 0;
 
+  const relicTypeIssue = relicTypeMismatchInfo(cSelections);
+  const hasRelicTypeIssue = relicTypeIssue.hasIssue;
+
   const compatConflictIds = (() => {
     const m = new Map();
     for (const r of cSelections.filter(Boolean)) {
@@ -1947,6 +2015,7 @@ function updateUI(reason = "") {
 
   function badgeForRow(r) {
     if (!r) return null;
+    if (hasRelicTypeIssue && relicTypeIssue.ids.has(String(r.EffectID))) return "Relic Type";
     return compatConflictIds.has(String(r.EffectID)) ? "Incompatible" : null;
   }
 
@@ -1972,7 +2041,7 @@ function updateUI(reason = "") {
     return false;
   })();
 
-  const state = anySelected && (hasCompatIssue || hasOrderIssue || hasCurseMissing || hasPositionIssue) ? "Invalid" : "Valid";
+  const state = anySelected && (hasCompatIssue || hasRelicTypeIssue || hasOrderIssue || hasCurseMissing || hasPositionIssue) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
   const okBySlot = [false, false, false];
@@ -1982,12 +2051,13 @@ function updateUI(reason = "") {
     if (!row) continue;
 
     const compatBad = compatConflictIds.has(String(row.EffectID));
+    const relicTypeBad = hasRelicTypeIssue && relicTypeIssue.ids.has(String(row.EffectID));
     const orderBad = hasOrderIssue && moveDeltaBySlot[i] !== 0;
     const curseReq = String(row?.CurseRequired ?? "0") === "1";
     const curseMissing = curseReq && !curseBySlot[i];
     const positionBad = hasPositionIssue && positionIssue.badSlots.includes(i);
 
-    if (!compatBad && !orderBad && !curseMissing && !positionBad) okBySlot[i] = true;
+    if (!compatBad && !relicTypeBad && !orderBad && !curseMissing && !positionBad) okBySlot[i] = true;
   }
 
   const effectButtonDisabled = [false, false, false];
