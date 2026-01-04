@@ -384,7 +384,7 @@
   height: 100% !important;
   min-height: 0 !important;
   max-height: none !important;
-  padding: 2px 5px !important;
+  padding: 2px 5px 2px 2.35rem !important;
   flex: 1 1 auto;
   display: block;
   align-self: stretch;
@@ -400,9 +400,9 @@
   appearance: none;
   -webkit-appearance: none;
   background-repeat: no-repeat;
-  background-position: 0.35rem 50%;
-  background-size: 10px;
-  padding-left: 1.2rem;
+  background-position: 0.9rem 50%;
+  background-size: 14px;
+  text-indent: 0; /* ensure text starts after padding */
   box-sizing: border-box;
 }
 
