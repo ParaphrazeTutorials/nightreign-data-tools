@@ -68,6 +68,7 @@ const dom = {
   searchInput: document.getElementById("lexiconSearch"),
 
   // downloads button + modal
+  exportButton: document.getElementById("lexExportButton"),
   downloadsButton: document.getElementById("lexDownloadsButton"),
   modalRoot: document.getElementById("lexModal"),
   modalBody: document.getElementById("lexModalBody"),
@@ -226,6 +227,24 @@ function downloadText(filename, text, mime = "text/plain;charset=utf-8") {
   a.remove();
 
   URL.revokeObjectURL(url);
+}
+
+function exportCurrentTable() {
+  const columns = state.columns;
+  if (!columns.length) return;
+
+  const rows = getCurrentViewRows();
+  const header = columns.map(col => getDisplayLabel(col));
+
+  const lines = [];
+  lines.push(header.map(csvEscape).join(","));
+  for (const r of rows) lines.push(columns.map(c => csvEscape(r?.[c])).join(","));
+
+  const date = new Date().toISOString().split("T")[0];
+  const moduleKey = state.module || "export";
+  const filename = `lexicon-${moduleKey}-${date}.csv`;
+
+  downloadText(filename, lines.join("\n"), "text/csv;charset=utf-8");
 }
 
 function escapeHtml(str) {
@@ -564,6 +583,11 @@ function bindDownloadsModal() {
       closeDownloadsModal();
     }
   });
+}
+
+function bindExportButton() {
+  if (!dom.exportButton) return;
+  dom.exportButton.addEventListener("click", exportCurrentTable);
 }
 
 function thHtml(key) {
@@ -910,6 +934,7 @@ async function init() {
   bindZoomButtons();
   bindSearch();
   bindModulePicker();
+  bindExportButton();
   bindDownloadsModal();
   bindInfoModal();
 

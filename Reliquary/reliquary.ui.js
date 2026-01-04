@@ -121,7 +121,14 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
   const effectControls = (effectSlot != null && row)
     ? `<div class="control-cluster effect-controls" data-effect-controls="${effectSlot}">
         <button type="button" class="icon-btn swap-btn" data-effect-slot="${effectSlot}" aria-label="Change Effect" title="Change Effect">⇄</button>
-        <button type="button" class="icon-btn info-btn" aria-label="Show Effect Info" title="${effectInfoTitle}">i</button>
+        <button
+          type="button"
+          class="icon-btn info-btn"
+          aria-label="Show Effect Info"
+          data-effect-id="${row.EffectID}"
+          data-info-kind="effect"
+          data-info-raw="${effectInfoTitle}"
+        >i</button>
         <button type="button" class="icon-btn clear-btn" data-effect-clear-slot="${effectSlot}" aria-label="Clear Effect" title="Clear Effect">×</button>
       </div>`
     : effectBtn;
@@ -185,7 +192,14 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
       ? `<div class="curse-line">${curseSub}
           <div class="control-cluster curse-controls" data-curse-controls="${curseSlot != null ? curseSlot : ""}">
             <button type="button" class="icon-btn swap-btn" data-curse-slot="${curseSlot}" aria-label="Change Curse" title="Change Curse">⇄</button>
-            <button type="button" class="icon-btn info-btn" aria-label="Show Curse Info" title="${curseInfoTitle(curseRow)}">i</button>
+            <button
+              type="button"
+              class="icon-btn info-btn"
+              aria-label="Show Curse Info"
+              data-effect-id="${curseRow.EffectID}"
+              data-info-kind="curse"
+              data-info-raw="${curseInfoTitle(curseRow)}"
+            >i</button>
             <button type="button" class="icon-btn clear-btn" data-curse-clear-slot="${curseSlot}" aria-label="Clear Curse" title="Clear Curse">×</button>
           </div>
         </div>`

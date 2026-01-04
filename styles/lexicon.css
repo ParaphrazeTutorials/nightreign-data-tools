@@ -1032,7 +1032,25 @@ table.lexicon-table td.lexicon-td--sorted:nth-child(2) {
 }
 
 .lexicon-export-btn.secondary {
-  background: rgba(0,0,0,0.18);
+  background: linear-gradient(135deg, #5b3c9f 0%, #8f6bd8 55%, #2b1a4f 100%);
+  color: #f5f0ff;
+  border-color: rgba(180, 150, 255, 0.55);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.lexicon-export-btn.secondary:hover {
+  filter: brightness(1.05);
+  border-color: rgba(200, 175, 255, 0.80);
+}
+
+.lexicon-export-btn.secondary:active {
+  filter: brightness(0.97);
+}
+
+.lexicon-export-btn.secondary:focus-visible {
+  outline-color: rgba(200, 175, 255, 0.90);
 }
 
 .lex-tile__help {

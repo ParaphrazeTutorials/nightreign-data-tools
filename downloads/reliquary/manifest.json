@@ -24,7 +24,7 @@
       "id": "attach-effect-param",
       "title": "Attach effect parameters",
       "filename": "AttachEffectParam.csv",
-      "description": "Raw game file: attach effect parameters.",
+      "description": "This is a file directly exported from SmithBox, and contains the definitions of each effect's paremeters",
       "format": "csv",
       "href": "/downloads/reliquary/gamefiles/AttachEffectParam.csv"
     },
@@ -32,7 +32,7 @@
       "id": "attach-effect-table-param",
       "title": "Attach effect table parameters",
       "filename": "AttachEffectTableParam.csv",
-      "description": "Raw game file: attach effect table parameters.",
+      "description": "This is a file directly exported from SmithBox, and contains the pairings of effects and their chanceweights.",
       "format": "csv",
       "href": "/downloads/reliquary/gamefiles/AttachEffectTableParam.csv"
     }
@@ -42,7 +42,7 @@
       "id": "compatibility",
       "title": "Compatibility mappings",
       "filename": "compatibility.csv",
-      "description": "Supplemental compatibility mappings.",
+      "description": "A manually created file that assigned in-game Effect Categories to the Effect Category IDs used in the Attach Effect data.",
       "format": "csv",
       "href": "/downloads/reliquary/supplemental/compatibility.csv"
     },
@@ -50,7 +50,7 @@
       "id": "reliquary-query",
       "title": "Reliquary SQL export",
       "filename": "reliquary.sql",
-      "description": "SQL query for Reliquary dataset extraction.",
+      "description": "The complete SQL query that shows how I've taken the Raw and Supplemental files, and turned them into the data you see in the application",
       "format": "sql",
       "href": "/downloads/reliquary/queries/reliquary.sql"
     }

@@ -69,6 +69,19 @@ const RANDOM_SWATCH = "linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44
 
 const defaultCategoryTheme = categoryColorFor("");
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => {
+    const map = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    };
+    return map[ch] || ch;
+  });
+}
+
 function colorChipLabel(value) {
   const v = value || "Random";
   if (v === "Random") return `Color: Random (${currentRandomColor})`;
@@ -463,15 +476,44 @@ function ensureDetailsPopoverDialog() {
   detailsPopoverBody = root.querySelector("#detailsPopBody");
 }
 
-function openDetailsPopover(pop) {
+function openDetailsPopover(pop, kind = "") {
   ensureDetailsPopoverDialog();
   if (!detailsPopoverRoot) return;
 
   const titleEl = pop.querySelector(".popover-title");
   const bodyEl = pop.querySelector(".popover-body");
 
+  detailsPopoverRoot.classList.remove("is-effect", "is-curse");
+  const k = kind || pop.getAttribute("data-pop-kind") || "";
+  if (k === "effect" || k === "curse") {
+    detailsPopoverRoot.classList.add(`is-${k}`);
+  }
+
   if (detailsPopoverTitle) detailsPopoverTitle.textContent = titleEl ? titleEl.textContent : "Details";
   if (detailsPopoverBody) detailsPopoverBody.innerHTML = bodyEl ? bodyEl.innerHTML : pop.innerHTML;
+
+  // Attach copy handlers for any raw-data copy buttons in the injected content
+  if (detailsPopoverBody) {
+    const copyBtns = detailsPopoverBody.querySelectorAll(".effect-copy-btn[data-copy-raw]");
+    copyBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const val = btn.getAttribute("data-copy-raw") || "";
+        if (!val) return;
+        const success = () => showCopyStatus(btn, "Copied to Clipboard", false);
+        const fail = () => showCopyStatus(btn, "Copy failed", true);
+
+        if (navigator?.clipboard?.writeText) {
+          navigator.clipboard.writeText(val).then(success).catch(() => {
+            fallbackCopy(val);
+            success();
+          });
+        } else {
+          fallbackCopy(val);
+          success();
+        }
+      });
+    });
+  }
 
   detailsPopoverRoot.classList.add("is-open");
   detailsPopoverRoot.setAttribute("aria-hidden", "false");
@@ -483,6 +525,203 @@ function closeDetailsPopover() {
   detailsPopoverRoot.classList.remove("is-open");
   detailsPopoverRoot.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "absolute";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); } catch (err) {
+    console.warn("Copy failed", err);
+  }
+  document.body.removeChild(ta);
+}
+
+function showCopyStatus(btn, message, isError = false) {
+  if (!btn || !btn.parentElement) return;
+  let badge = btn.parentElement.querySelector(".effect-copy-status");
+  if (!badge) {
+    badge = document.createElement("span");
+    badge.className = "effect-copy-status";
+    btn.parentElement.appendChild(badge);
+  }
+  badge.textContent = message || "Copied";
+  badge.classList.toggle("is-error", !!isError);
+  badge.hidden = false;
+
+  const key = "copyStatusTimeout";
+  if (badge[key]) clearTimeout(badge[key]);
+  badge[key] = setTimeout(() => {
+    badge.hidden = true;
+    badge[key] = null;
+  }, 1500);
+}
+
+function formatRelicTypeLabel(value) {
+  const v = String(value || "").trim().toLowerCase();
+  if (!v) return { label: "Unknown", modifier: "placeholder" };
+  if (v.includes("both")) return { label: "Both", modifier: "both" };
+  if (v.includes("depth")) return { label: "Depth of Night", modifier: "depth" };
+  if (v.includes("standard")) return { label: "Standard", modifier: "standard" };
+  return { label: value, modifier: "placeholder" };
+}
+
+function chipsForRelicType(value) {
+  const v = String(value || "").trim().toLowerCase();
+  if (v.includes("both")) {
+    return [
+      { label: "Standard", modifier: "standard" },
+      { label: "Depth of Night", modifier: "depth" }
+    ];
+  }
+  const single = formatRelicTypeLabel(value);
+  return [single];
+}
+
+function buildEffectInfoPopover(row, rawText, kind = "effect") {
+  const pop = document.createElement("div");
+  pop.setAttribute("data-pop-kind", kind === "curse" ? "curse" : "effect");
+
+  const title = document.createElement("div");
+  title.className = "popover-title";
+  title.textContent = "Effect Information";
+
+  const body = document.createElement("div");
+  body.className = "popover-body";
+
+  if (!row) {
+    body.innerHTML = `<p>Unable to load details for this entry.</p>`;
+    pop.append(title, body);
+    return pop;
+  }
+
+  const name = row.EffectDescription ?? `(Effect ${row.EffectID ?? "?"})`;
+  const relicChips = chipsForRelicType(row.RelicType);
+  const entryKind = kind === "curse" ? "Curse" : "Effect";
+  const rawValueFull = rawText && String(rawText).trim()
+    ? String(rawText).trim()
+    : `EffectID ${row.EffectID ?? "?"}`;
+
+  // For effect popups, omit any curse-specific fragments from the raw data string
+  const rawValue = (() => {
+    if (kind === "curse") return rawValueFull;
+    const parts = rawValueFull.split("•").map(s => s.trim()).filter(Boolean);
+    const filtered = parts.filter(p => !/^curse/i.test(p));
+    return filtered.join(" • ") || rawValueFull;
+  })();
+
+  const curseRequired = String(row?.CurseRequired ?? "0") === "1";
+  const compatibility = row?.CompatibilityID ?? "";
+  const rollOrder = row?.RollOrder ?? "";
+  const relicTypeText = relicChips.map(chip => chip.label).join(" / ") || "Unknown";
+
+  // TSV-style payload so Excel pastes into rows (Label | Value)
+  const copyRows = [
+    ["Entry Type", entryKind],
+    ["Effect Name", name],
+    ["EffectID", row?.EffectID ?? ""],
+    ["Relic Type", relicTypeText],
+    ["Curse Required", curseRequired ? "Yes" : "No"],
+    ["Compatibility", compatibility === "" ? "∅" : compatibility],
+    ["Roll Order", rollOrder === "" ? "∅" : rollOrder],
+    ["Raw", rawValue]
+  ];
+
+  const copyPayload = copyRows
+    .filter(([_, v]) => v != null && String(v).trim() !== "")
+    .map(([k, v]) => `${k}\t${v}`)
+    .join("\n");
+
+  body.innerHTML = `
+    <div class="effect-info-grid">
+      <div class="effect-info-section">
+        <div class="effect-info-label">Effect Name</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-info-name">${escapeHtml(name)}</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Relic Type</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          ${relicChips.map(chip => `
+            <span class="effect-chip effect-chip--relic effect-chip--${chip.modifier || "placeholder"}">${escapeHtml(chip.label)}</span>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Curse Required</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--curse-${curseRequired ? "yes" : "no"}">${curseRequired ? "Yes" : "No"}</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Eligible Classes</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Self-Stacking</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Similar-Stacking</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label effect-info-label--with-action">
+          <span>Raw Data</span>
+          <button
+            type="button"
+            class="effect-copy-btn"
+            aria-label="Copy raw data"
+            title="Copy raw data"
+            data-copy-raw="${escapeHtml(copyPayload)}"
+          >
+            <span class="effect-copy-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <code class="effect-raw">${escapeHtml(rawValue)}</code>
+        </div>
+      </div>
+    </div>
+  `;
+
+  pop.append(title, body);
+  return pop;
+}
+
+function openInfoPopoverForButton(btn) {
+  if (!btn) return;
+  const effectId = btn.getAttribute("data-effect-id");
+  if (!effectId) return;
+  const kind = btn.getAttribute("data-info-kind") || "effect";
+  const raw = btn.getAttribute("data-info-raw") || "";
+  const row = getAnyRow(effectId);
+  const pop = buildEffectInfoPopover(row, raw, kind);
+  openDetailsPopover(pop, kind);
 }
 
 function installUtilityPopoverButtons() {
@@ -1450,6 +1689,13 @@ function installEffectButtons() {
   });
 }
 
+function installInfoButtons() {
+  const infoBtns = document.querySelectorAll(".info-btn[data-effect-id]");
+  infoBtns.forEach(btn => {
+    btn.addEventListener("click", () => openInfoPopoverForButton(btn));
+  });
+}
+
 function updateDetails(a, b, c) {
   if (!dom.detailsBody) return;
 
@@ -1716,6 +1962,7 @@ function updateUI(reason = "") {
 
   installEffectButtons();
   installCurseButtons();
+  installInfoButtons();
 
   const firstEmptyIdx = cSelections.findIndex(r => !r);
   const activeIndex = firstEmptyIdx === -1 ? 0 : firstEmptyIdx + 1;
