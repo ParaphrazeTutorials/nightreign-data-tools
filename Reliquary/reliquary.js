@@ -9,11 +9,10 @@ import {
   autoRelicTypeFromEffect1,
   categoryColorFor,
   themeFromBase,
-  SEQ_CATEGORY_BASES,
   ALL_THEME,
-  baseFromSequence,
   textColorFor,
-  relicTypeForRow
+  relicTypeForRow,
+  computeCompatDupGroups
 } from "./reliquary.logic.js";
 import {
   renderChosenLine,
@@ -22,6 +21,8 @@ import {
   installRelicImgFallback
 } from "./reliquary.ui.js";
 import { getDom } from "./reliquary.dom.js";
+import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
+import { openEffectMenu, closeEffectMenu, openCurseMenu, closeCurseMenu } from "./reliquary.menus.js";
 
 const dom = getDom();
 
@@ -176,18 +177,6 @@ function installColorChipMenu() {
   updateColorChipLabel();
 }
 
-function computeCompatDupGroups(rows) {
-  const map = new Map();
-  for (const r of rows || []) {
-    if (!r) continue;
-    const cid = compatId(r);
-    if (!cid) continue;
-    if (!map.has(cid)) map.set(cid, []);
-    map.get(cid).push(r);
-  }
-  return [...map.values()].filter(group => group.length > 1);
-}
-
 function computeRollOrderIssue(a, b, c) {
   const original = [a, b, c];
   const picked = original.filter(Boolean);
@@ -331,43 +320,6 @@ function applyAutoSort() {
 
 if (autoSortBtn) {
   autoSortBtn.addEventListener("click", applyAutoSort);
-}
-
-function gradientFromTheme(theme) {
-  if (!theme) return "rgba(40, 40, 44, 0.85)";
-  const shades = theme.shades || [];
-  if (shades.length >= 3) {
-    return `linear-gradient(135deg, ${shades[0]} 0%, ${shades[1]} 50%, ${shades[2]} 100%)`;
-  }
-  return theme.base || "rgba(40, 40, 44, 0.85)";
-}
-
-function buildCategoryThemes(catList) {
-  const map = new Map();
-  const seq = SEQ_CATEGORY_BASES;
-  let seqIdx = 0;
-
-  const uncategorizedTheme = categoryColorFor("Uncategorized");
-
-  map.set("__default", defaultCategoryTheme);
-  map.set("__all", ALL_THEME);
-  map.set("Uncategorized", uncategorizedTheme);
-
-  (catList || []).forEach(cat => {
-    if (map.has(cat)) return;
-
-    const isCurse = /curse/i.test(cat);
-    if (isCurse) {
-      map.set(cat, categoryColorFor(cat));
-      return;
-    }
-
-    const base = baseFromSequence(seqIdx);
-    seqIdx += 1;
-    map.set(cat, themeFromBase(base));
-  });
-
-  return map;
 }
 
 function pickRandomColor() {
@@ -829,13 +781,6 @@ let curseDialog;
 let curseDialogTitle;
 let effectDialog;
 let effectDialogTitle;
-let effectMenu;
-let effectMenuSlot = null;
-let effectMenuAnchorBtn = null;
-let effectMenuFlyout = null;
-let curseMenu;
-let curseMenuSlot = null;
-let curseMenuAnchorBtn = null;
 
 function ensureCurseDialog() {
   if (curseDialog) return;
@@ -961,223 +906,6 @@ function computeBlockedCompatForCurse(slotIdx) {
   return blocked;
 }
 
-function closeCurseMenu() {
-  if (curseMenu) curseMenu.remove();
-  curseMenu = null;
-  curseMenuSlot = null;
-  curseMenuAnchorBtn = null;
-
-  document.removeEventListener("keydown", handleCurseMenuKeydown, true);
-  document.removeEventListener("pointerdown", handleCurseMenuPointerDown, true);
-}
-
-function handleCurseMenuKeydown(evt) {
-  if (evt.key === "Escape") closeCurseMenu();
-}
-
-function handleCurseMenuPointerDown(evt) {
-  if (!curseMenu) return;
-  const target = evt.target;
-  if (curseMenu.contains(target)) return;
-  if (curseMenuAnchorBtn && curseMenuAnchorBtn.contains(target)) return;
-  closeCurseMenu();
-}
-
-function openCurseMenu(slotIdx, anchorBtn) {
-  closeCurseMenu();
-  closeEffectMenu();
-
-  const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType(true))
-    .filter(r => {
-      const cid = compatId(r);
-      if (!cid) return true;
-      return !blockedCompat.has(String(cid));
-    })
-    .sort((x, y) => getRollValue(x) - getRollValue(y));
-
-  if (!eligibleCurses.length) return;
-
-  const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
-  if (!curseCatBySlot[slotIdx] && currentId) {
-    const curRow = getAnyRow(currentId);
-    const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
-    curseCatBySlot[slotIdx] = curCat;
-  }
-
-  const categories = categoriesFor(eligibleCurses);
-  const catOptions = ["__all", ...categories];
-  const hasUncategorized = eligibleCurses.some(r => !effectCategoryForRow(r));
-  if (hasUncategorized && !catOptions.includes("Uncategorized")) catOptions.push("Uncategorized");
-
-  let activeCategory = (curseCatBySlot[slotIdx] && catOptions.includes(curseCatBySlot[slotIdx]))
-    ? curseCatBySlot[slotIdx]
-    : (catOptions[0] || "__all");
-  let searchTerm = "";
-
-  const cursePalette = ["#4b2f70", "#6a3fa3", "#8d5fd3"]; // three distinct purples
-  const categoryThemes = (() => {
-    const map = new Map();
-    const baseTheme = themeFromBase("#7a4bc6");
-    map.set("__default", baseTheme);
-    map.set("__all", baseTheme);
-    map.set("Uncategorized", baseTheme);
-
-    catOptions.forEach((cat, idx) => {
-      if (map.has(cat)) return;
-      const base = cursePalette[idx % cursePalette.length];
-      map.set(cat, themeFromBase(base));
-    });
-
-    return map;
-  })();
-
-  curseMenuSlot = slotIdx;
-  curseMenuAnchorBtn = anchorBtn;
-
-  curseMenu = document.createElement("div");
-  curseMenu.className = "effect-menu effect-menu--wide";
-  curseMenu.setAttribute("role", "dialog");
-  curseMenu.innerHTML = `
-    <div class="effect-menu__search-bar effect-menu__search-bar--shared">
-      <input type="search" class="effect-menu__search-input" placeholder="Search curses..." aria-label="Search curses" data-curse-search="shared" />
-    </div>
-    <div class="effect-menu__layout">
-      <div class="effect-menu__column effect-menu__column--cats" aria-label="Curse categories"></div>
-      <div class="effect-menu__column effect-menu__column--effects">
-        <div class="effect-menu__effects"></div>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(curseMenu);
-
-  const catsEl = curseMenu.querySelector(".effect-menu__column--cats");
-  const effectsListEl = curseMenu.querySelector(".effect-menu__effects");
-  const searchInputs = [...curseMenu.querySelectorAll("[data-curse-search]")];
-
-  if (!catsEl || !effectsListEl) {
-    closeCurseMenu();
-    return;
-  }
-
-  const computeCounts = (list) => {
-    const m = new Map();
-    for (const r of list) {
-      const c = effectCategoryForRow(r) || "Uncategorized";
-      m.set(c, (m.get(c) || 0) + 1);
-    }
-    return m;
-  };
-
-  let filteredEligible = eligibleCurses.slice();
-  let countsByCat = computeCounts(filteredEligible);
-
-  const filterEligible = () => {
-    const term = (searchTerm || "").trim().toLowerCase();
-    if (!term) return eligibleCurses;
-    return eligibleCurses.filter(r => {
-      const name = (r.EffectDescription || "").toString().toLowerCase();
-      const id = String(r.EffectID || "").toLowerCase();
-      const cat = effectCategoryForRow(r).toLowerCase();
-      return name.includes(term) || id.includes(term) || cat.includes(term);
-    });
-  };
-
-  const renderEffectList = () => {
-    renderEffectMenuEffects(effectsListEl, filteredEligible, activeCategory, currentId, (id) => {
-      curseBySlot[slotIdx] = id;
-      curseCatBySlot[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
-      closeCurseMenu();
-      updateUI("curse-change");
-    }, categoryThemes);
-  };
-
-  const renderCategories = () => {
-    const visibleCats = catOptions.filter(cat => {
-      if (cat === "__all") return true;
-      return (countsByCat.get(cat) || 0) > 0;
-    });
-
-    if (!visibleCats.includes(activeCategory)) {
-      activeCategory = visibleCats[0] || "__all";
-    }
-
-    catsEl.innerHTML = visibleCats.map(cat => {
-      const label = cat === "__all" ? "All" : cat;
-      const count = cat === "__all" ? filteredEligible.length : (countsByCat.get(cat) || 0);
-      const isActive = cat === activeCategory;
-      const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
-      const rowBg = gradientFromTheme(theme);
-      const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
-      const textColor = textColorFor(theme?.base || rowBg || "#2b2f38");
-      return `
-        <button type="button" class="effect-menu__cat ${isActive ? "is-active" : ""}" data-cat="${cat}" style="background:${rowBg}; border-color:${borderColor}; color:${textColor};">
-          <span class="effect-menu__cat-label">${label}</span>
-          <span class="effect-menu__cat-count">${count}</span>
-        </button>
-      `;
-    }).join("");
-
-    catsEl.querySelectorAll(".effect-menu__cat").forEach(btn => {
-      const catValue = btn.getAttribute("data-cat") || "__all";
-      btn.addEventListener("mouseenter", () => setActiveCategory(catValue, false));
-      btn.addEventListener("click", () => setActiveCategory(catValue, true));
-      btn.addEventListener("focus", () => setActiveCategory(catValue, true));
-    });
-  };
-
-  const setActiveCategory = (catValue, commit = false) => {
-    activeCategory = catValue;
-    if (commit) {
-      curseCatBySlot[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
-    }
-
-    renderCategories();
-    renderEffectList();
-  };
-
-  const renderAll = () => {
-    filteredEligible = filterEligible();
-    countsByCat = computeCounts(filteredEligible);
-    renderCategories();
-    renderEffectList();
-  };
-
-  const syncSearchInputs = (value, sourceEl = null) => {
-    searchInputs.forEach(inp => {
-      if (inp === sourceEl) return;
-      inp.value = value;
-    });
-  };
-
-  const handleSearchChange = (evt) => {
-    const value = evt.target.value || "";
-    searchTerm = value;
-    syncSearchInputs(value, evt.target);
-    renderAll();
-  };
-
-  searchInputs.forEach(inp => {
-    inp.addEventListener("input", handleSearchChange);
-  });
-
-  renderAll();
-
-  positionEffectMenu(curseMenu, anchorBtn.getBoundingClientRect());
-
-  requestAnimationFrame(() => {
-    const primarySearch = curseMenu.querySelector("[data-curse-search]");
-    if (primarySearch) {
-      primarySearch.focus();
-      primarySearch.select();
-    }
-  });
-
-  document.addEventListener("keydown", handleCurseMenuKeydown, true);
-  document.addEventListener("pointerdown", handleCurseMenuPointerDown, true);
-}
-
 function openCurseDialog(slotIdx) {
   ensureCurseDialog();
   if (!curseDialog) return;
@@ -1275,7 +1003,7 @@ function installCurseButtons() {
       const slotIdx = Number.parseInt(btn.getAttribute("data-curse-slot") || "-1", 10);
       if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
       if (btn.hasAttribute("disabled")) return;
-      openCurseMenu(slotIdx, btn);
+      openCurseMenuForSlot(slotIdx, btn);
     });
   });
 
@@ -1342,315 +1070,7 @@ function computeEffectDialogData(slotIdx, showIllegalOverride = null) {
   };
 }
 
-function closeEffectMenu() {
-  if (effectMenu) effectMenu.remove();
-  if (effectMenuFlyout) effectMenuFlyout.remove();
-
-  effectMenu = null;
-  effectMenuSlot = null;
-  effectMenuAnchorBtn = null;
-  effectMenuFlyout = null;
-
-  document.removeEventListener("keydown", handleEffectMenuKeydown, true);
-  document.removeEventListener("pointerdown", handleEffectMenuPointerDown, true);
-}
-
-function handleEffectMenuKeydown(evt) {
-  if (evt.key === "Escape") closeEffectMenu();
-}
-
-function handleEffectMenuPointerDown(evt) {
-  if (!effectMenu) return;
-  const target = evt.target;
-  if (effectMenu.contains(target)) return;
-  if (effectMenuFlyout && effectMenuFlyout.contains(target)) return;
-  if (effectMenuAnchorBtn && effectMenuAnchorBtn.contains(target)) return;
-  closeEffectMenu();
-}
-
-function effectCategoryForRow(row) {
-  return (row?.EffectCategory ?? "").toString().trim();
-}
-
-function renderEffectMenuEffects(container, list, activeCategory, currentId, onPick, categoryThemes) {
-  const allList = (() => {
-    if (activeCategory === "__all") return list;
-    if (activeCategory === "Uncategorized") {
-      return list.filter(r => !effectCategoryForRow(r));
-    }
-    return list.filter(r => effectCategoryForRow(r) === activeCategory);
-  })();
-
-  if (!allList.length) {
-    container.innerHTML = `
-      <div class="effect-menu__empty">No effects available in this category.</div>
-    `;
-    return;
-  }
-
-  container.innerHTML = allList.map((r, idx) => {
-    const id = String(r.EffectID);
-    const title = r.EffectDescription ?? `(Effect ${id})`;
-    const cid = compatId(r) || "-";
-    const roll = r?.RollOrder != null && String(r.RollOrder).trim() !== "" ? String(r.RollOrder) : "-";
-    const requiresCurse = String(r?.CurseRequired ?? "0") === "1";
-    const isCurrent = currentId && currentId === id;
-    const catName = effectCategoryForRow(r) || "Uncategorized";
-    const theme = categoryThemes?.get(catName) || categoryThemes?.get("__default") || defaultCategoryTheme;
-    const rowBg = theme?.base || "rgba(40, 40, 44, 0.85)";
-    const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
-    const textColor = textColorFor(rowBg);
-
-    const curseIcon = requiresCurse ? `
-      <svg class="curse-indicator" viewBox="0 0 20 20" width="28" height="28" aria-label="Curse required" role="img">
-        <defs>
-          <radialGradient id="curseBadge" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stop-color="#e9ddff" stop-opacity="0.98"/>
-            <stop offset="70%" stop-color="#b271ff" stop-opacity="0.95"/>
-            <stop offset="100%" stop-color="#7a3fe6" stop-opacity="0.95"/>
-          </radialGradient>
-        </defs>
-        <circle cx="10" cy="10" r="9" fill="url(#curseBadge)" stroke="#5219b3" stroke-width="0.9"/>
-        <text x="10" y="13" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="800" fill="#ffffff">C</text>
-      </svg>
-    ` : "";
-
-    return `
-      <button type="button" class="effect-menu__effect ${isCurrent ? "is-current" : ""}" data-effect-id="${id}" style="background:${rowBg}; border-color:${borderColor}; color:${textColor};">
-        <span class="effect-menu__effect-main">
-          <span class="effect-menu__effect-title">${title}</span>
-          <span class="effect-menu__effect-meta">CID ${cid} | Roll ${roll}</span>
-          <span class="effect-menu__effect-tags">
-            ${requiresCurse ? `<span class="effect-menu__tag">Curse Required</span>` : ""}
-            ${isCurrent ? `<span class="effect-menu__tag effect-menu__tag--check">Selected</span>` : ""}
-          </span>
-        </span>
-        ${requiresCurse ? `<span class="effect-menu__effect-trailing"><span class="curse-indicator-wrap">${curseIcon}</span></span>` : ""}
-      </button>
-    `;
-  }).join("");
-
-  container.querySelectorAll("[data-effect-id]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-effect-id");
-      if (!id) return;
-      onPick(id);
-    });
-  });
-}
-
-function positionEffectMenu(menuEl, anchorRect) {
-  const { innerWidth, innerHeight } = window;
-  const rect = menuEl.getBoundingClientRect();
-
-  let left = anchorRect.left;
-  let top = anchorRect.bottom + 4;
-
-  if (left + rect.width > innerWidth - 8) left = innerWidth - rect.width - 8;
-  if (left < 8) left = 8;
-
-  if (top + rect.height > innerHeight - 8) top = anchorRect.top - rect.height - 4;
-  if (top < 8) top = 8;
-
-  menuEl.style.left = `${left}px`;
-  menuEl.style.top = `${top}px`;
-}
-
-// No-op placeholder retained for compatibility; flyout merged into single layout.
-function positionEffectFlyout() {}
-
-function openEffectMenu(slotIdx, anchorBtn, clickEvent = null) {
-  const data = computeEffectDialogData(slotIdx);
-  if (data.disabled) {
-    if (dom.statusText && data.reason) dom.statusText.textContent = data.reason;
-    return;
-  }
-
-  closeEffectMenu();
-
-  const eligible = data.eligible || [];
-  const categories = data.categories || [];
-
-  const catOptions = ["__all", ...categories];
-  const hasUncategorized = eligible.some(r => !effectCategoryForRow(r));
-  if (hasUncategorized && !catOptions.includes("Uncategorized")) {
-    catOptions.push("Uncategorized");
-  }
-  const preferredCat = selectedCats[slotIdx] && categories.includes(selectedCats[slotIdx]) ? selectedCats[slotIdx] : "";
-  let activeCategory = preferredCat || catOptions[0] || "__all";
-  let searchTerm = "";
-
-  const categoryThemes = buildCategoryThemes(catOptions);
-
-  effectMenuSlot = slotIdx;
-  effectMenuAnchorBtn = anchorBtn;
-
-  effectMenu = document.createElement("div");
-  effectMenu.className = "effect-menu effect-menu--wide";
-  effectMenu.setAttribute("role", "dialog");
-  effectMenu.innerHTML = `
-    <div class="effect-menu__search-bar effect-menu__search-bar--shared">
-      <input type="search" class="effect-menu__search-input" placeholder="Search effects..." aria-label="Search effects" data-effect-search="shared" />
-    </div>
-    <div class="effect-menu__layout">
-      <div class="effect-menu__column effect-menu__column--cats" aria-label="Effect categories"></div>
-      <div class="effect-menu__column effect-menu__column--effects">
-        <div class="effect-menu__effects"></div>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(effectMenu);
-
-  const catsEl = effectMenu.querySelector(".effect-menu__column--cats");
-  const effectsListEl = effectMenu.querySelector(".effect-menu__effects");
-
-  const searchInputs = [...effectMenu.querySelectorAll("[data-effect-search]")];
-
-  if (!catsEl || !effectsListEl) {
-    closeEffectMenu();
-    return;
-  }
-
-  const computeCounts = (list) => {
-    const m = new Map();
-    for (const r of list) {
-      const c = effectCategoryForRow(r) || "Uncategorized";
-      m.set(c, (m.get(c) || 0) + 1);
-    }
-    return m;
-  };
-
-  let filteredEligible = eligible.slice();
-  let countsByCat = computeCounts(filteredEligible);
-
-  const filterEligible = () => {
-    const term = (searchTerm || "").trim().toLowerCase();
-    if (!term) return eligible;
-    return eligible.filter(r => {
-      const name = (r.EffectDescription || "").toString().toLowerCase();
-      const id = String(r.EffectID || "").toLowerCase();
-      const cat = effectCategoryForRow(r).toLowerCase();
-      return name.includes(term) || id.includes(term) || cat.includes(term);
-    });
-  };
-
-  const renderEffectList = (catBtnRect = null) => {
-    renderEffectMenuEffects(effectsListEl, filteredEligible, activeCategory, data.currentId, (id) => {
-      setSelectedId(slotIdx, id);
-      selectedCats[slotIdx] = (activeCategory === "__all" || activeCategory === "Uncategorized") ? "" : activeCategory;
-      curseBySlot[slotIdx] = null;
-
-      const chosen = getRow(id);
-      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
-      maybeAutoSetTypeFromEffect1(nextType);
-
-      closeEffectMenu();
-      updateUI("effect-change");
-    }, categoryThemes);
-
-    requestAnimationFrame(() => {
-      const menuRect = effectMenu.getBoundingClientRect();
-      const activeCatBtn = effectMenu.querySelector(".effect-menu__cat.is-active");
-      const anchorRect = catBtnRect || activeCatBtn?.getBoundingClientRect() || menuRect;
-      positionEffectFlyout(anchorRect, menuRect);
-    });
-  };
-
-  const renderCategories = () => {
-    const visibleCats = catOptions.filter(cat => {
-      if (cat === "__all") return true;
-      return (countsByCat.get(cat) || 0) > 0;
-    });
-
-    if (!visibleCats.includes(activeCategory)) {
-      activeCategory = visibleCats[0] || "__all";
-    }
-
-    catsEl.innerHTML = visibleCats.map(cat => {
-      const label = cat === "__all" ? "All" : cat;
-      const count = cat === "__all"
-        ? filteredEligible.length
-        : (countsByCat.get(cat) || 0);
-      const isActive = cat === activeCategory;
-      const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
-      const rowBg = gradientFromTheme(theme);
-      const borderColor = theme?.border || "rgba(120, 30, 30, 0.8)";
-      const textColor = textColorFor(theme?.base || rowBg || "#2b2f38");
-      return `
-        <button type="button" class="effect-menu__cat ${isActive ? "is-active" : ""}" data-cat="${cat}" style="background:${rowBg}; border-color:${borderColor}; color:${textColor};">
-          <span class="effect-menu__cat-label">${label}</span>
-          <span class="effect-menu__cat-count">${count}</span>
-        </button>
-      `;
-    }).join("");
-
-    catsEl.querySelectorAll(".effect-menu__cat").forEach(btn => {
-      const catValue = btn.getAttribute("data-cat") || "__all";
-      btn.addEventListener("mouseenter", () => {
-        setActiveCategory(catValue, false, btn.getBoundingClientRect());
-      });
-      btn.addEventListener("click", () => setActiveCategory(catValue, true, btn.getBoundingClientRect()));
-      btn.addEventListener("focus", () => {
-        setActiveCategory(catValue, true, btn.getBoundingClientRect());
-      });
-    });
-  };
-
-  const setActiveCategory = (catValue, commit = false, catBtnRect = null) => {
-    activeCategory = catValue;
-    if (commit) {
-      selectedCats[slotIdx] = (catValue === "__all" || catValue === "Uncategorized") ? "" : catValue;
-    }
-
-    renderCategories();
-    renderEffectList(catBtnRect);
-  };
-
-  const renderAll = (catBtnRect = null) => {
-    filteredEligible = filterEligible();
-    countsByCat = computeCounts(filteredEligible);
-    renderCategories();
-    renderEffectList(catBtnRect);
-  };
-
-  const syncSearchInputs = (value, sourceEl = null) => {
-    searchInputs.forEach(inp => {
-      if (inp === sourceEl) return;
-      inp.value = value;
-    });
-  };
-
-  const handleSearchChange = (evt) => {
-    const value = evt.target.value || "";
-    searchTerm = value;
-    syncSearchInputs(value, evt.target);
-    renderAll();
-  };
-
-  searchInputs.forEach(inp => {
-    inp.addEventListener("input", handleSearchChange);
-  });
-
-  renderAll();
-
-  positionEffectMenu(effectMenu, anchorBtn.getBoundingClientRect());
-
-  requestAnimationFrame(() => {
-    const primarySearch = effectMenu.querySelector("[data-effect-search]");
-    if (primarySearch) {
-      primarySearch.focus();
-      primarySearch.select();
-    }
-  });
-
-  const activeCatBtn = effectMenu.querySelector(`.effect-menu__cat.is-active`) || effectMenu.querySelector(`.effect-menu__cat`);
-  if (activeCatBtn) {
-    positionEffectFlyout(activeCatBtn.getBoundingClientRect(), effectMenu.getBoundingClientRect());
-  }
-  document.addEventListener("keydown", handleEffectMenuKeydown, true);
-  document.addEventListener("pointerdown", handleEffectMenuPointerDown, true);
-}
+// Menu logic migrated to reliquary.menus.js
 
 function openEffectDialog(slotIdx) {
   ensureEffectDialog();
@@ -1736,11 +1156,11 @@ function openEffectDialog(slotIdx) {
 function installEffectButtons() {
   const btns = document.querySelectorAll("[data-effect-slot]");
   btns.forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", evt => {
       const slotIdx = Number.parseInt(btn.getAttribute("data-effect-slot") || "-1", 10);
       if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) return;
       if (btn.hasAttribute("disabled")) return;
-      openEffectMenu(slotIdx, btn, event);
+      openEffectMenuForSlot(slotIdx, btn, evt);
     });
   });
 
@@ -1939,8 +1359,79 @@ function updateDetails(a, b, c) {
   }
 }
 
+function openEffectMenuForSlot(slotIdx, anchorBtn) {
+  const data = computeEffectDialogData(slotIdx);
+  if (data.disabled) {
+    if (dom.statusText && data.reason) dom.statusText.textContent = data.reason;
+    return;
+  }
+
+  const preferredCat = selectedCats[slotIdx] && data.categories.includes(selectedCats[slotIdx])
+    ? selectedCats[slotIdx]
+    : "";
+
+  openEffectMenu({
+    slotIdx,
+    anchorBtn,
+    eligible: data.eligible || [],
+    categories: data.categories || [],
+    currentId: data.currentId || "",
+    selectedCategory: preferredCat,
+    onPick: (id, activeCategory) => {
+      setSelectedId(slotIdx, id);
+      selectedCats[slotIdx] = activeCategory || "";
+      curseBySlot[slotIdx] = null;
+
+      const chosen = getRow(id);
+      const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
+      maybeAutoSetTypeFromEffect1(nextType);
+
+      updateUI("effect-change");
+    }
+  });
+}
+
+function openCurseMenuForSlot(slotIdx, anchorBtn) {
+  closeCurseMenu();
+
+  const blockedCompat = computeBlockedCompatForCurse(slotIdx);
+  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType(true))
+    .filter(r => {
+      const cid = compatId(r);
+      if (!cid) return true;
+      return !blockedCompat.has(String(cid));
+    })
+    .sort((x, y) => getRollValue(x) - getRollValue(y));
+
+  if (!eligibleCurses.length) return;
+
+  const currentId = curseBySlot[slotIdx] ? String(curseBySlot[slotIdx]) : "";
+  if (!curseCatBySlot[slotIdx] && currentId) {
+    const curRow = getAnyRow(currentId);
+    const curCat = curRow ? String(curRow.EffectCategory || "").trim() : "";
+    curseCatBySlot[slotIdx] = curCat;
+  }
+
+  const categories = categoriesFor(eligibleCurses);
+
+  openCurseMenu({
+    slotIdx,
+    anchorBtn,
+    eligible: eligibleCurses,
+    categories,
+    currentId,
+    selectedCategory: curseCatBySlot[slotIdx] || "",
+    onPick: (id, activeCategory) => {
+      curseBySlot[slotIdx] = id;
+      curseCatBySlot[slotIdx] = activeCategory || "";
+      updateUI("curse-change");
+    }
+  });
+}
+
 function updateUI(reason = "") {
   closeEffectMenu();
+  closeCurseMenu();
   closeColorMenu();
 
   if (selectedColor === "Random") {

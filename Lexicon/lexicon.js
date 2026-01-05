@@ -1,10 +1,5 @@
-import {
-  categoriesFor as reliquaryCategoriesFor,
-  categoryColorFor,
-  baseFromSequence,
-  themeFromBase,
-  textColorFor
-} from "../Reliquary/reliquary.logic.js";
+import { textColorFor } from "../Reliquary/reliquary.logic.js";
+import { gradientFromTheme, buildCategoryThemeMap } from "../scripts/ui/theme.js";
 
 // The Lexicon — table + tile theater mode + module picker
 // Session-only: sort + text zoom. No persistence across refresh.
@@ -265,45 +260,6 @@ function escapeHtml(str) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-// Mirror the Reliquary effect menu gradients so category pills stay consistent
-function gradientFromTheme(theme) {
-  if (!theme) return "rgba(40, 40, 44, 0.85)";
-  const shades = theme.shades || [];
-  if (shades.length >= 3) {
-    return `linear-gradient(135deg, ${shades[0]} 0%, ${shades[1]} 50%, ${shades[2]} 100%)`;
-  }
-  return theme.base || "rgba(40, 40, 44, 0.85)";
-}
-
-function buildCategoryThemeMap(rows) {
-  if (!Array.isArray(rows) || !rows.length) return new Map();
-
-  const map = new Map();
-  const uncategorizedTheme = categoryColorFor("Uncategorized");
-
-  map.set("__default", categoryColorFor(""));
-  map.set("Uncategorized", uncategorizedTheme);
-
-  const cats = reliquaryCategoriesFor(rows);
-  let seqIdx = 0;
-
-  cats.forEach(cat => {
-    if (map.has(cat)) return;
-
-    const isCurse = /curse/i.test(cat);
-    if (isCurse) {
-      map.set(cat, categoryColorFor(cat));
-      return;
-    }
-
-    const base = baseFromSequence(seqIdx);
-    seqIdx += 1;
-    map.set(cat, themeFromBase(base));
-  });
-
-  return map;
 }
 
 function categoryThemeFor(value) {
