@@ -619,6 +619,7 @@ function buildEffectInfoPopover(row, rawText, kind = "effect") {
   }
 
   const name = row.EffectDescription ?? `(Effect ${row.EffectID ?? "?"})`;
+  const extendedDescription = row?.EffectExtendedDescription ?? "";
   const relicChips = chipsForRelicType(row.RelicType);
   const entryKind = kind === "curse" ? "Curse" : "Effect";
   const rawValueFull = rawText && String(rawText).trim()
@@ -642,6 +643,7 @@ function buildEffectInfoPopover(row, rawText, kind = "effect") {
   const copyRows = [
     ["Entry Type", entryKind],
     ["Effect Name", name],
+    ["Extended Description", extendedDescription],
     ["EffectID", row?.EffectID ?? ""],
     ["Relic Type", relicTypeText],
     ["Curse Required", curseRequired ? "Yes" : "No"],
@@ -662,6 +664,14 @@ function buildEffectInfoPopover(row, rawText, kind = "effect") {
         <div class="effect-info-divider" aria-hidden="true"></div>
         <div class="effect-info-value">
           <span class="effect-info-name">${escapeHtml(name)}</span>
+        </div>
+      </div>
+
+      <div class="effect-info-section">
+        <div class="effect-info-label">Extended Description</div>
+        <div class="effect-info-divider" aria-hidden="true"></div>
+        <div class="effect-info-value">
+          <span>${escapeHtml(extendedDescription || "—")}</span>
         </div>
       </div>
 
