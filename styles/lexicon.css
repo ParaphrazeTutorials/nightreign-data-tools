@@ -167,8 +167,8 @@ table.lexicon-table thead th {
   letter-spacing: 0.03em;
 
   white-space: nowrap;
-  padding: 1.00rem 0.24rem 0.32rem;
-  min-height: 2.6rem;
+  padding: 1.50rem 0.44rem 0.56rem;
+  min-height: 4.0rem;
 
   overflow: visible;
   max-width: none;
@@ -225,6 +225,13 @@ table.lexicon-table td {
   max-width: 200px;
 }
 
+/* Widen long-text headers (e.g., Extended Description) */
+table.lexicon-table th.lexicon-th--description {
+  white-space: nowrap;
+  min-width: 520px;
+  max-width: 860px;
+}
+
 /* Hover */
 table.lexicon-table tbody tr:hover td {
   background: rgba(255, 255, 255, 0.03);
@@ -240,8 +247,8 @@ table.lexicon-table tbody tr:hover td {
 
 .lexicon-cell--description {
   white-space: nowrap;
-  min-width: 320px;
-  max-width: 560px;
+  min-width: 520px;
+  max-width: 860px;
   overflow: hidden;
   text-overflow: ellipsis;
   overflow-wrap: normal;

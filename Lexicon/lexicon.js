@@ -21,6 +21,7 @@ const COLUMN_DEFINITIONS = {
     CompatibilityID: { description: "", source: "AttachEffectParam.csv" },
     EffectCategory: { description: "", source: "Compatibility.csv" },
     EffectDescription: { description: "", source: "AttachEffectName.csv" },
+    EffectExtendedDescription: { description: "", source: "AttachEffectName.csv" },
     ChanceWeight_110: { description: "", source: "AttachEffectTableParam.csv" },
     ChanceWeight_210: { description: "", source: "AttachEffectTableParam.csv" },
     ChanceWeight_310: { description: "", source: "AttachEffectTableParam.csv" },
@@ -44,6 +45,7 @@ const COLUMN_DISPLAY_NAMES = {
     CompatibilityID: "CompatibilityID",
     EffectCategory: "Category",
     EffectDescription: "Description",
+    EffectExtendedDescription: "Extended Description",
     ChanceWeight_110: "Weight 1",
     ChanceWeight_210: "Weight 2",
     ChanceWeight_310: "Weight 3",
@@ -302,7 +304,7 @@ function getDisplayLabel(col) {
   return map[col] || col;
 }
 
-const PRIORITY_COLUMNS = ["EffectID", "EffectDescription","EffectCategory","RelicType","ChanceWeight_110","ChanceWeight_210","ChanceWeight_310","ChanceWeight_2000000","ChanceWeight_2200000","ChanceWeight_3000000"];
+const PRIORITY_COLUMNS = ["EffectID", "EffectDescription", "EffectExtendedDescription", "EffectCategory", "RelicType", "ChanceWeight_110", "ChanceWeight_210", "ChanceWeight_310", "ChanceWeight_2000000", "ChanceWeight_2200000", "ChanceWeight_3000000"];
 
 function reorderColumns(columns) {
   const priLower = new Set(PRIORITY_COLUMNS.map(c => c.toLowerCase()));
@@ -619,9 +621,11 @@ function thHtml(key) {
   const isActive = state.sortKey === key && state.sortDir !== 0;
   const glyph = !isActive ? "" : (state.sortDir === 1 ? "▲" : "▼");
   const label = getDisplayLabel(key);
+  const isLongText = key.toLowerCase().includes("description");
+  const thClass = ["lexicon-th", isActive ? "is-sorted" : "", isLongText ? "lexicon-th--description" : ""].filter(Boolean).join(" ");
 
   return `
-    <th scope="col" class="lexicon-th ${isActive ? "is-sorted" : ""}"
+    <th scope="col" class="${thClass}"
         role="button" tabindex="0"
         data-col="${escapeHtml(key)}"
         title="${escapeHtml(key)}"
