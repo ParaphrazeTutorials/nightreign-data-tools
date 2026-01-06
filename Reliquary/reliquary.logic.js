@@ -1,6 +1,6 @@
 // Pure logic helpers (no DOM)
 
-import { COLORS as PALETTE_COLORS, EFFECT_COLOR_BASES } from "../scripts/ui/palette.js";
+import { COLORS as PALETTE_COLORS, EFFECT_COLOR_BASES, effectCategoryBase } from "../scripts/ui/palette.js";
 
 export const COLORS = PALETTE_COLORS;
 export const SEQ_CATEGORY_BASES = EFFECT_COLOR_BASES.sequence;
@@ -134,6 +134,11 @@ export function categoryColorFor(category) {
     const base = CURSE_COLOR_BASE;
     const shades = [adjustLightness(base, -0.22), base, adjustLightness(base, 0.18)];
     return { base, shades, border: adjustLightness(base, -0.25) };
+  }
+
+  const mappedBase = effectCategoryBase(cat);
+  if (mappedBase) {
+    return themeFromBase(mappedBase);
   }
 
   if (!cat) {

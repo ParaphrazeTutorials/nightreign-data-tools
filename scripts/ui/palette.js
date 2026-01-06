@@ -23,6 +23,31 @@ export const EFFECT_COLOR_BASES = {
   defaultBase: "#2b2f38"
 };
 
+// Effect category color canon pulled from the Reliquary Effect Category dropdown
+// Key order matches the sorted dropdown order so previews stay aligned
+export const EFFECT_CATEGORY_COLORS = {
+  "Actions": "#b12f45",
+  "Attack Power": "#0f8da4",
+  "Attributes": "#5f8d1a",
+  "Character Skills / Ultimate Arts": "#c74d2e",
+  "Character-Specific": "#1a5ba5",
+  "Damage Negation": "#3e9c7c",
+  "Demerits (Actions)": "#c67914",
+  "Demerits (Attributes)": "#177f7f",
+  "Demerits (Damage Negation)": "#b13c79",
+  "Environment": "#c49a18",
+  "Restoration": "#3a8a32",
+  "Sorceries / Incantations": "#2d46b0",
+  "Starting Armaments (Skills/Spells)": "#b02d68",
+  "Starting Armaments(Imbue)": "#8ab02d",
+  "Starting Item": "#2dacb0",
+  "Starting Item (Tear)": "#922db0",
+  "Status Ailment Resistances": "#b0702d",
+  "Team Members": "#2db04e",
+  "Weapon Discovery": "#2d2eb0",
+  "Weapon Specific": "#b02d50"
+};
+
 // UI swatches for the color chip selector
 export const COLOR_SWATCHES = {
   Red: "linear-gradient(135deg, #642121, #b84242)",
@@ -165,4 +190,15 @@ export function applyPaletteCssVars(root = typeof document !== "undefined" ? doc
   Object.entries(COLOR_SWATCHES).forEach(([key, val]) => {
     setVar(root, `--color-swatch-${key.toLowerCase()}`, val);
   });
+}
+
+const EFFECT_CATEGORY_LOOKUP = new Map(
+  Object.entries(EFFECT_CATEGORY_COLORS).map(([label, base]) => [label.toLowerCase(), base])
+);
+
+// Returns the canonical base color for an Effect Category label (case-insensitive), or null if unknown
+export function effectCategoryBase(label) {
+  const key = (label ?? "").toString().trim().toLowerCase();
+  if (!key) return null;
+  return EFFECT_CATEGORY_LOOKUP.get(key) || null;
 }

@@ -3,10 +3,8 @@
 
 import {
   ALL_THEME,
-  baseFromSequence,
   categoryColorFor,
   categoriesFor as reliquaryCategoriesFor,
-  themeFromBase,
   textColorFor
 } from "../../Reliquary/reliquary.logic.js";
 
@@ -24,26 +22,14 @@ export function buildCategoryThemeMap(rows) {
   if (!Array.isArray(rows) || !rows.length) return new Map();
 
   const map = new Map();
-  const uncategorizedTheme = categoryColorFor("Uncategorized");
-
   map.set("__default", categoryColorFor(""));
-  map.set("Uncategorized", uncategorizedTheme);
+  map.set("Uncategorized", categoryColorFor("Uncategorized"));
 
   const cats = reliquaryCategoriesFor(rows);
-  let seqIdx = 0;
 
   cats.forEach(cat => {
     if (map.has(cat)) return;
-
-    const isCurse = /curse/i.test(cat);
-    if (isCurse) {
-      map.set(cat, categoryColorFor(cat));
-      return;
-    }
-
-    const base = baseFromSequence(seqIdx);
-    seqIdx += 1;
-    map.set(cat, themeFromBase(base));
+    map.set(cat, categoryColorFor(cat));
   });
 
   return map;
@@ -52,7 +38,6 @@ export function buildCategoryThemeMap(rows) {
 // Build category palette for Reliquary menus given an explicit category list
 export function buildCategoryThemes(catList) {
   const map = new Map();
-  let seqIdx = 0;
 
   const defaultCategoryTheme = categoryColorFor("");
   const uncategorizedTheme = categoryColorFor("Uncategorized");
@@ -63,16 +48,7 @@ export function buildCategoryThemes(catList) {
 
   (catList || []).forEach(cat => {
     if (map.has(cat)) return;
-
-    const isCurse = /curse/i.test(cat);
-    if (isCurse) {
-      map.set(cat, categoryColorFor(cat));
-      return;
-    }
-
-    const base = baseFromSequence(seqIdx);
-    seqIdx += 1;
-    map.set(cat, themeFromBase(base));
+    map.set(cat, categoryColorFor(cat));
   });
 
   return map;

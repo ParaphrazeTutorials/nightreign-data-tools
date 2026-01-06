@@ -42,7 +42,7 @@
   </div>
 
   <script type="module">
-    import { applyPaletteCssVars, CHARACTERS, characterColors, CHIP_COLORS, EFFECT_COLOR_BASES } from "./palette.js";
+    import { applyPaletteCssVars, CHARACTERS, characterColors, CHIP_COLORS, EFFECT_CATEGORY_COLORS, EFFECT_COLOR_BASES } from "./palette.js";
     import { gradientFromTheme } from "./theme.js";
     import { themeFromBase } from "../../Reliquary/reliquary.logic.js";
 
@@ -81,7 +81,7 @@
         pillChars.append(makeSpan(`effect-chip effect-chip--character effect-chip--character-${slug}`, name));
       });
 
-      // Effect colors (category sequence + defaults)
+      // Effect categories (canonical Reliquary dropdown colors)
       const addEffectChip = (label, base) => {
         const theme = themeFromBase(base);
         const bg = gradientFromTheme(theme);
@@ -92,9 +92,9 @@
         pillEffects.append(chip);
       };
 
-      addEffectChip("Default", EFFECT_COLOR_BASES.defaultBase);
-      addEffectChip("Curse Base", EFFECT_COLOR_BASES.curseBase);
-      EFFECT_COLOR_BASES.sequence.forEach((base, idx) => addEffectChip(`Seq ${idx + 1}`, base));
+      Object.entries(EFFECT_CATEGORY_COLORS).forEach(([label, base]) => addEffectChip(label, base));
+      addEffectChip("Curse (fallback)", EFFECT_COLOR_BASES.curseBase);
+      addEffectChip("Default (fallback)", EFFECT_COLOR_BASES.defaultBase);
     } catch (err) {
       console.error("Palette preview failed", err);
       const warn = document.createElement("div");

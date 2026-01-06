@@ -12,7 +12,8 @@ import {
   ALL_THEME,
   textColorFor,
   relicTypeForRow,
-  computeCompatDupGroups
+  computeCompatDupGroups,
+  effectCategoryForRow
 } from "./reliquary.logic.js";
 import {
   renderChosenLine,
@@ -102,6 +103,20 @@ function escapeHtml(value) {
     };
     return map[ch] || ch;
   });
+}
+
+function statusIconPath(statusIconId) {
+  const id = (statusIconId ?? "").toString().trim();
+  if (!id) return "";
+  return new URL(`../Assets/icons/reliquary/${id}.png`, window.location.href).toString();
+}
+
+function chaliceIconHtml(statusIconId, fallbackText = "") {
+  const src = statusIconPath(statusIconId);
+  const fallback = (fallbackText || "").trim().slice(0, 2);
+  const fallbackHtml = fallback ? `<span class="chalice-slot__icon-fallback">${escapeHtml(fallback)}</span>` : "";
+  const imgHtml = src ? `<img src="${src}" alt="" onerror="this.remove()">` : fallbackHtml;
+  return `<span class="chalice-slot__icon">${imgHtml}</span>`;
 }
 
 function colorChipLabel(value) {
@@ -755,8 +770,10 @@ function parseCharactersList(value) {
   const raw = (value ?? "").toString();
   const names = raw.split(",").map(s => s.trim()).filter(Boolean);
 
-  // Normalize to canonical ordering where possible, preserve unknowns at the end
   const normalized = names.map(n => n.toLowerCase());
+  const hasAllToken = normalized.includes("all");
+
+  // Normalize to canonical ordering where possible, preserve unknowns at the end
   const selected = new Set(normalized);
 
   const ordered = [];
@@ -767,7 +784,7 @@ function parseCharactersList(value) {
   const extras = names.filter(n => !ALL_CHARACTER_SET.has(n.toLowerCase()));
   const fullList = [...ordered, ...extras];
 
-  const isAll = ALL_CHARACTER_SET.size > 0 && ordered.length === ALL_CHARACTER_SET.size && extras.length === 0;
+  const isAll = hasAllToken || (ALL_CHARACTER_SET.size > 0 && ordered.length === ALL_CHARACTER_SET.size && extras.length === 0);
   const chipMeta = fullList.map(name => {
     const token = characterColors(name);
     return { name, slug: token.slug, colors: token };
@@ -1815,19 +1832,21 @@ function isRowAllowedForSide(row, sideMeta) {
   return true;
 }
 
-function chaliceEffectCount(sideKey, effectId, ignoreSlotIdx = -1) {
+function chaliceEffectCount(sideKey, effectId) {
   if (!effectId) return 0;
   const key = sideKey === "depth" ? "depth" : "standard";
-  return chaliceSelections[key].reduce((count, cur, idx) => {
-    if (idx === ignoreSlotIdx) return count;
+  return chaliceSelections[key].reduce((count, cur) => {
     return count + (cur === String(effectId) ? 1 : 0);
   }, 0);
 }
 
 function canUseEffectOnSide(sideKey, slotIdx, effectId) {
   if (!effectId) return true;
-  const count = chaliceEffectCount(sideKey, effectId, slotIdx);
-  return count < 3;
+  const key = sideKey === "depth" ? "depth" : "standard";
+  const current = chaliceSelections[key]?.[slotIdx] || "";
+  const totalCount = chaliceEffectCount(key, effectId);
+  const effectiveCount = current === String(effectId) ? totalCount - 1 : totalCount;
+  return effectiveCount < 3;
 }
 
 function chaliceEligiblePool(sideKey) {
@@ -1836,29 +1855,74 @@ function chaliceEligiblePool(sideKey) {
   return filterByClass(baseFilteredByRelicType(rows, meta.relicType));
 }
 
+function categoryChip(label) {
+  const theme = categoryColorFor(label || "Uncategorized");
+  const bg = gradientFromTheme(theme);
+  const base = theme?.base || "#2b2f38";
+  const border = theme?.border || "rgba(255, 255, 255, 0.14)";
+  const text = textColorFor(base);
+  return `<span class="effect-chip effect-chip--category" style="background:${bg}; border-color:${border}; color:${text};">${escapeHtml(label || "Uncategorized")}</span>`;
+}
+
+function chaliceEffectChip(label, modifiers = [], style = "") {
+  const classes = ["effect-chip", ...modifiers].filter(Boolean).join(" ");
+  const styleAttr = style ? ` style="${style}"` : "";
+  return `<span class="${classes}"${styleAttr}>${escapeHtml(label)}</span>`;
+}
+
+function chaliceAttrPills(row) {
+  if (!row) return [];
+  const pills = [];
+
+  const characters = parseCharactersList(row?.Characters);
+  if (characters.isAll || !characters.list.length) {
+    pills.push(chaliceEffectChip("All Characters", ["effect-chip--character", "effect-chip--character-all"]));
+  } else {
+    characters.list.forEach(name => {
+      const token = characterColors(name);
+      pills.push(chaliceEffectChip(name, ["effect-chip--character", `effect-chip--character-${token.slug}`]));
+    });
+  }
+
+  const categoryRaw = effectCategoryForRow(row);
+  const categoryLabel = categoryRaw || "Uncategorized";
+  pills.push(categoryChip(categoryLabel));
+
+  const selfStack = selfStackingMeta(row?.SelfStacking);
+  const selfMod = selfStack.modifier === "yes"
+    ? "effect-chip--self-stack-yes"
+    : selfStack.modifier === "no"
+      ? "effect-chip--self-stack-no"
+      : "effect-chip--self-stack-unknown";
+  pills.push(chaliceEffectChip(`Self-Stacking: ${selfStack.label}`, ["effect-chip--self-stack", selfMod]));
+
+  return pills;
+}
+
 function renderChaliceSlot(sideKey, idx) {
   const meta = sideInfo(sideKey);
   const effectId = chaliceSelections[meta.key][idx];
   const row = chaliceRow(effectId);
   const curseId = chaliceCurses[meta.key][idx];
   const curseRow = curseId ? chaliceRow(curseId) : null;
-  const label = `Slot ${idx + 1}:`;
+  const label = `Slot ${meta.slotPrefix}${idx + 1}`;
   const isEmpty = !row;
 
   if (isEmpty) {
     return `
       <li>
         <div class="chalice-slot chalice-slot--empty" data-side="${meta.key}" data-slot="${idx}">
-          <div class="chalice-slot__top">
-            <span class="chalice-slot__label">${label}</span>
-            <div class="chalice-slot__actions">
+          <div class="chalice-slot__grid">
+            <div class="chalice-slot__cell chalice-slot__cell--label">${label}:</div>
+            <div class="chalice-slot__cell chalice-slot__cell--effect chalice-slot__cell--empty">
               <button
                 type="button"
                 class="chalice-slot__btn chalice-slot__btn--empty"
                 data-ch-slot="${meta.key}:${idx}"
-                aria-label="Slot ${idx + 1}: Select Effect"
+                aria-label="${label}: Select Effect"
               >Select Effect</button>
             </div>
+            <div class="chalice-slot__cell chalice-slot__cell--controls"></div>
           </div>
         </div>
       </li>
@@ -1866,34 +1930,100 @@ function renderChaliceSlot(sideKey, idx) {
   }
 
   const name = row.EffectDescription ?? `(Effect ${row.EffectID})`;
-  const cid = compatId(row) || "∅";
-  const roll = row.RollOrder == null || String(row.RollOrder).trim() === "" ? "∅" : row.RollOrder;
-  const metaLine = `CID ${cid} · Roll ${roll}`;
-  const btnLabel = "Change";
+  // Chalice builder: no status icons; keep layout simple
+  const effectIcon = "";
   const requiresCurse = meta.key === "depth" && String(row?.CurseRequired ?? "0") === "1";
-  const curseLabel = curseRow ? (curseRow.EffectDescription ?? `(Curse ${curseRow.EffectID})`) : "Select Curse";
+  const curseName = curseRow ? (curseRow.EffectDescription ?? `(Curse ${curseRow.EffectID})`) : "";
   const curseMissing = requiresCurse && !curseRow;
+  const hasCurse = requiresCurse && !!curseRow;
+  const attrPills = chaliceAttrPills(row);
+  const hasAttrPills = attrPills.length > 0;
+  const showAttrDivider = hasAttrPills;
+  const totalCount = chaliceEffectCount(meta.key, effectId);
+  const selfStack = selfStackingMeta(row?.SelfStacking);
+  const dupDisabledByCount = totalCount >= 3;
+  const dupDisabledBySelfStack = selfStack.modifier === "no";
+  const dupDisabled = dupDisabledByCount || dupDisabledBySelfStack;
+  const dupTitle = dupDisabledByCount
+    ? `Effect already used three times on the ${meta.label} side`
+    : dupDisabledBySelfStack
+      ? "This effect does not self-stack"
+      : "Copy effect to another slot";
 
   return `
     <li>
       <div class="chalice-slot" data-side="${meta.key}" data-slot="${idx}">
-        <div class="chalice-slot__top">
-          <span class="chalice-slot__label">${label}</span>
-          <div class="chalice-slot__actions">
-            <button type="button" class="chalice-slot__btn" data-ch-slot="${meta.key}:${idx}">${btnLabel}</button>
-            ${row ? `<button type="button" class="icon-btn clear-btn" data-ch-clear="${meta.key}:${idx}" aria-label="Clear ${label}">×</button>` : ""}
+        <div class="chalice-slot__grid">
+          <div class="chalice-slot__cell chalice-slot__cell--label">${label}:</div>
+          <div class="chalice-slot__cell chalice-slot__cell--effect">
+            ${effectIcon}
+            <div class="chalice-slot__text">
+              <div class="chalice-slot__title">${escapeHtml(name)}</div>
+            </div>
+            <div class="control-cluster chalice-slot__controls">
+              <button
+                type="button"
+                class="icon-btn swap-btn"
+                data-ch-slot="${meta.key}:${idx}"
+                aria-label="Change ${label}"
+                title="Change Effect"
+              >⇄</button>
+              <button type="button" class="icon-btn clear-btn" data-ch-clear="${meta.key}:${idx}" aria-label="Clear ${label}" title="Clear Effect">×</button>
+              <button
+                type="button"
+                class="icon-btn copy-id-btn"
+                aria-label="Copy EffectID ${row.EffectID}"
+                title="EffectID ${row.EffectID}"
+                data-copy-effect-id="${row.EffectID}"
+              >
+                <span class="effect-copy-icon" aria-hidden="true"></span>
+              </button>
+              <button
+                type="button"
+                class="icon-btn dup-btn${dupDisabled ? " is-disabled" : ""}"
+                data-ch-duplicate="${meta.key}:${idx}"
+                aria-label="Copy ${label} to another slot"
+                title="${dupTitle}"
+                ${dupDisabled ? "disabled" : ""}
+              >+</button>
+            </div>
           </div>
-        </div>
-        <div class="chalice-slot__body">
-          <div class="chalice-slot__title">${escapeHtml(name)}</div>
-          <div class="chalice-slot__meta">${metaLine}</div>
+          <div class="chalice-slot__cell chalice-slot__cell--controls"></div>
+
           ${requiresCurse ? `
-            <div class="chalice-slot__curse ${curseMissing ? "is-missing" : ""}">
-              <span class="chalice-slot__curse-label">Curse</span>
-              <button type="button" class="chalice-slot__btn chalice-slot__btn--ghost" data-ch-curse="${meta.key}:${idx}">${escapeHtml(curseLabel)}</button>
-              ${curseMissing ? `<span class="chalice-slot__curse-warning">Required</span>` : ""}
+            <div class="chalice-slot__cell chalice-slot__cell--label"></div>
+            <div class="chalice-slot__cell chalice-slot__cell--curse ${curseMissing ? "is-missing" : ""}">
+              ${hasCurse ? `<span class="chalice-slot__curse-name">${escapeHtml(curseName)}</span>` : `<span class="curse-required">Curse Required</span>`}
+              ${hasCurse
+                ? `<div class="control-cluster chalice-slot__controls chalice-slot__controls--curse">
+                    <button type="button" class="icon-btn swap-btn" data-ch-curse="${meta.key}:${idx}" aria-label="Change Curse" title="Change Curse">⇄</button>
+                    <button type="button" class="icon-btn clear-btn" data-ch-curse-clear="${meta.key}:${idx}" aria-label="Clear Curse" title="Clear Curse">×</button>
+                    <button
+                      type="button"
+                      class="icon-btn copy-id-btn"
+                      aria-label="Copy CurseID ${curseRow?.EffectID ?? ""}"
+                      title="CurseID ${curseRow?.EffectID ?? ""}"
+                      data-copy-curse-id="${curseRow?.EffectID ?? ""}"
+                    >
+                      <span class="effect-copy-icon" aria-hidden="true"></span>
+                    </button>
+                  </div>`
+                : `<button type="button" class="curse-btn" data-ch-curse="${meta.key}:${idx}">Select a Curse</button>`}
+            </div>
+            <div class="chalice-slot__cell"></div>
+          ` : ""}
+
+          ${showAttrDivider ? `
+            <div class="chalice-slot__divider" aria-hidden="true"></div>
+          ` : ""}
+
+          ${hasAttrPills ? `
+            <div class="chalice-slot__cell chalice-slot__cell--label"></div>
+            <div class="chalice-slot__cell chalice-slot__cell--attrs">
+              ${attrPills.join("")}
             </div>
           ` : ""}
+
         </div>
       </div>
     </li>
@@ -1908,6 +2038,7 @@ function renderChaliceLists() {
     dom.chaliceDepthList.innerHTML = chaliceSelections.depth.map((_, idx) => renderChaliceSlot("depth", idx)).join("");
   }
   installChaliceSlotButtons();
+  installRowCopyButtons();
 }
 
 function installChaliceSlotButtons() {
@@ -1937,6 +2068,19 @@ function installChaliceSlotButtons() {
     });
   });
 
+  const duplicates = document.querySelectorAll("[data-ch-duplicate]");
+  duplicates.forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.hasAttribute("disabled") || btn.classList.contains("is-disabled")) return;
+      const payload = btn.getAttribute("data-ch-duplicate") || "";
+      const [sideRaw, idxRaw] = payload.split(":");
+      const idx = Number.parseInt(idxRaw, 10);
+      const side = sideRaw === "depth" ? "depth" : "standard";
+      if (!Number.isInteger(idx) || idx < 0) return;
+      duplicateChaliceEffect(side, idx);
+    });
+  });
+
   const cursePickers = document.querySelectorAll("[data-ch-curse]");
   cursePickers.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1948,6 +2092,49 @@ function installChaliceSlotButtons() {
       openChaliceCurseMenu(side, idx, btn);
     });
   });
+
+  const curseClears = document.querySelectorAll("[data-ch-curse-clear]");
+  curseClears.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const payload = btn.getAttribute("data-ch-curse-clear") || "";
+      const [sideRaw, idxRaw] = payload.split(":");
+      const idx = Number.parseInt(idxRaw, 10);
+      const side = sideRaw === "depth" ? "depth" : "standard";
+      if (!Number.isInteger(idx) || idx < 0) return;
+      chaliceCurses[side][idx] = "";
+      renderChaliceUI();
+    });
+  });
+}
+
+function duplicateChaliceEffect(sideKey, fromIdx) {
+  const meta = sideInfo(sideKey);
+  const effects = chaliceSelections[meta.key];
+  if (!Array.isArray(effects) || fromIdx < 0 || fromIdx >= effects.length) return;
+
+  const effectId = effects[fromIdx];
+  if (!effectId) {
+    setChaliceStatus("Select an effect first to copy.");
+    return;
+  }
+
+  const totalCount = chaliceEffectCount(meta.key, effectId);
+  if (totalCount >= 3) {
+    setChaliceStatus(`You can only use an effect up to three times on the ${meta.label} side.`);
+    return;
+  }
+
+  const targetIdx = effects.findIndex((val, i) => !val && i !== fromIdx);
+  if (targetIdx === -1) {
+    setChaliceStatus(`No empty slots available on the ${meta.label} side.`);
+    return;
+  }
+
+  effects[targetIdx] = effectId;
+  chaliceCats[meta.key][targetIdx] = chaliceCats[meta.key][fromIdx] || "";
+  chaliceCurses[meta.key][targetIdx] = "";
+  setChaliceStatus("");
+  renderChaliceUI();
 }
 
 function openChaliceEffectMenu(sideKey, slotIdx, anchorBtn) {
