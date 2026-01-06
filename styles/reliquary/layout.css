@@ -701,45 +701,40 @@
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.45rem;
 }
 
 .chalice-slot {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.18));
   border-radius: 0.55rem;
-  padding: 0.65rem 0.75rem;
+  padding: 0.5rem 0.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  gap: 0.25rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
 }
 
 .chalice-slot__top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
-.chalice-slot__badge {
+.chalice-slot__label {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 34px;
-  height: 28px;
-  padding: 0 0.6rem;
-  border-radius: 0.45rem;
-  background: linear-gradient(180deg, rgba(120, 165, 255, 0.18), rgba(255, 255, 255, 0.08));
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(235, 237, 244, 0.95);
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  gap: 0.35rem;
+  color: rgba(235, 237, 244, 0.92);
+  font-weight: 760;
+  letter-spacing: 0.01em;
+  font-size: 0.94rem;
 }
 
 .chalice-slot__actions {
   display: inline-flex;
-  gap: 0.45rem;
+  gap: 0.35rem;
   align-items: center;
 }
 
@@ -747,14 +742,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 30px;
-  padding: 0 0.75rem;
-  border-radius: 0.6rem;
+  height: 28px;
+  padding: 0 0.6rem;
+  border-radius: 0.5rem;
   border: 1px solid rgba(205, 185, 255, 0.4);
-  background: linear-gradient(135deg, rgba(110, 150, 235, 0.25), rgba(150, 115, 235, 0.2));
+  background: linear-gradient(135deg, rgba(110, 150, 235, 0.22), rgba(150, 115, 235, 0.18));
   color: rgba(240, 242, 248, 0.95);
   font-weight: 760;
   letter-spacing: 0.01em;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: transform 140ms ease, filter 140ms ease;
 }
@@ -771,14 +767,14 @@
 .chalice-slot__body {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
 }
 
 .chalice-slot__curse {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.25rem;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
 }
 
 .chalice-slot__curse-label {
@@ -789,6 +785,7 @@
 .chalice-slot__curse-warning {
   color: #ff9b9b;
   font-weight: 760;
+  font-size: 0.86rem;
 }
 
 .chalice-slot__btn--ghost {
@@ -799,11 +796,47 @@
 .chalice-slot__title {
   font-weight: 760;
   letter-spacing: 0.01em;
+  font-size: 0.98rem;
 }
 
 .chalice-slot__meta {
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   color: rgba(220, 224, 234, 0.82);
+}
+
+.chalice-slot--empty {
+  padding: 0.15rem 0.25rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.14));
+  border-style: dashed;
+}
+
+.chalice-slot--empty .chalice-slot__top {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.chalice-slot--empty .chalice-slot__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.chalice-slot--empty .chalice-slot__btn {
+  margin: 0;
+  width: auto;
+  justify-content: center;
+  height: 28px;
+  gap: 0.2rem;
+  padding: 0 0.6rem;
+  font-weight: 760;
+  border-radius: 0.45rem;
+  background: linear-gradient(135deg, rgba(110, 150, 235, 0.16), rgba(150, 115, 235, 0.14));
+}
+
+.chalice-slot__btn-text {
+  flex: 1;
+  text-align: left;
 }
 
 .chalice-results {

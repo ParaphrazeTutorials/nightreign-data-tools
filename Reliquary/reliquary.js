@@ -1842,13 +1842,35 @@ function renderChaliceSlot(sideKey, idx) {
   const row = chaliceRow(effectId);
   const curseId = chaliceCurses[meta.key][idx];
   const curseRow = curseId ? chaliceRow(curseId) : null;
-  const label = `${meta.slotPrefix}${idx + 1}`;
-  const name = row ? (row.EffectDescription ?? `(Effect ${row.EffectID})`) : "Pick an effect";
-  const cid = row ? (compatId(row) || "∅") : "";
-  const roll = row ? (row.RollOrder == null || String(row.RollOrder).trim() === "" ? "∅" : row.RollOrder) : "";
-  const metaLine = row ? `CID ${cid} · Roll ${roll}` : `${meta.label} / Both effects only`;
-  const btnLabel = row ? "Change" : "Select Effect";
-  const requiresCurse = meta.key === "depth" && row && String(row?.CurseRequired ?? "0") === "1";
+  const label = `Slot ${idx + 1}:`;
+  const isEmpty = !row;
+
+  if (isEmpty) {
+    return `
+      <li>
+        <div class="chalice-slot chalice-slot--empty" data-side="${meta.key}" data-slot="${idx}">
+          <div class="chalice-slot__top">
+            <span class="chalice-slot__label">${label}</span>
+            <div class="chalice-slot__actions">
+              <button
+                type="button"
+                class="chalice-slot__btn chalice-slot__btn--empty"
+                data-ch-slot="${meta.key}:${idx}"
+                aria-label="Slot ${idx + 1}: Select Effect"
+              >Select Effect</button>
+            </div>
+          </div>
+        </div>
+      </li>
+    `;
+  }
+
+  const name = row.EffectDescription ?? `(Effect ${row.EffectID})`;
+  const cid = compatId(row) || "∅";
+  const roll = row.RollOrder == null || String(row.RollOrder).trim() === "" ? "∅" : row.RollOrder;
+  const metaLine = `CID ${cid} · Roll ${roll}`;
+  const btnLabel = "Change";
+  const requiresCurse = meta.key === "depth" && String(row?.CurseRequired ?? "0") === "1";
   const curseLabel = curseRow ? (curseRow.EffectDescription ?? `(Curse ${curseRow.EffectID})`) : "Select Curse";
   const curseMissing = requiresCurse && !curseRow;
 
@@ -1856,7 +1878,7 @@ function renderChaliceSlot(sideKey, idx) {
     <li>
       <div class="chalice-slot" data-side="${meta.key}" data-slot="${idx}">
         <div class="chalice-slot__top">
-          <span class="chalice-slot__badge">${label}</span>
+          <span class="chalice-slot__label">${label}</span>
           <div class="chalice-slot__actions">
             <button type="button" class="chalice-slot__btn" data-ch-slot="${meta.key}:${idx}">${btnLabel}</button>
             ${row ? `<button type="button" class="icon-btn clear-btn" data-ch-clear="${meta.key}:${idx}" aria-label="Clear ${label}">×</button>` : ""}
