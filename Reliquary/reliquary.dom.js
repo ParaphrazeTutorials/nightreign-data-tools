@@ -9,6 +9,17 @@ export function getDom() {
     modeBtnChalice: document.getElementById("modeChaliceBtn"),
     individualPanel: document.getElementById("individualMode"),
     chalicePanel: document.getElementById("chaliceMode"),
+    utilityBar: document.getElementById("utilityBar"),
+
+    classFilterControl: document.getElementById("classFilterControl"),
+    classFilterSlotIndividual: document.getElementById("classFilterSlotIndividual"),
+    classFilterSlotChalice: document.getElementById("classFilterSlotChalice"),
+
+    chalicePickerControl: document.getElementById("chalicePickerControl"),
+    chalicePickerSlot: document.getElementById("chalicePickerSlot"),
+
+    startOverSlotIndividual: document.getElementById("startOverSlotIndividual"),
+    startOverSlotChalice: document.getElementById("startOverSlotChalice"),
 
     showIllegalBtn: document.getElementById("showIllegalBtn"),
     illegalPill: document.getElementById("illegalPill"),
@@ -40,10 +51,12 @@ export function getDom() {
     chaliceDepthList: document.getElementById("chaliceDepthList"),
     chaliceStandardCount: document.getElementById("chaliceStandardCount"),
     chaliceDepthCount: document.getElementById("chaliceDepthCount"),
+    chaliceAddStandard: document.getElementById("chaliceAddStandard"),
+    chaliceAddDepth: document.getElementById("chaliceAddDepth"),
+    chaliceFilterTotals: document.getElementById("chaliceFilterTotals"),
     chaliceResultsStandard: document.getElementById("chaliceResultsStandard"),
     chaliceResultsDepth: document.getElementById("chaliceResultsDepth"),
     chaliceStatus: document.getElementById("chaliceStatus"),
-    chaliceColors: document.getElementById("chaliceColors"),
     chaliceStandardColors: document.getElementById("chaliceStandardColors"),
     chaliceDepthColors: document.getElementById("chaliceDepthColors")
   };

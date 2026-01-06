@@ -234,16 +234,45 @@ function setChaliceStatus(text) {
 function syncModeUI() {
   const isChalice = isChaliceMode();
 
+  const moveNode = (node, target) => {
+    if (!node || !target) return;
+    if (node.parentElement === target) return;
+    target.appendChild(node);
+  };
+
   if (dom.individualPanel) dom.individualPanel.hidden = isChalice;
   if (dom.chalicePanel) dom.chalicePanel.hidden = !isChalice;
+  if (dom.utilityBar) dom.utilityBar.hidden = isChalice;
 
-  if (dom.modeBtnIndividual) dom.modeBtnIndividual.classList.toggle("is-active", !isChalice);
-  if (dom.modeBtnChalice) dom.modeBtnChalice.classList.toggle("is-active", isChalice);
+  const relicTypeWrapper = dom.selType ? dom.selType.closest("label") : null;
+
+  if (dom.modeBtnIndividual) {
+    dom.modeBtnIndividual.classList.toggle("is-active", !isChalice);
+    dom.modeBtnIndividual.setAttribute("aria-selected", (!isChalice).toString());
+    dom.modeBtnIndividual.setAttribute("tabindex", !isChalice ? "0" : "-1");
+  }
+  if (dom.modeBtnChalice) {
+    dom.modeBtnChalice.classList.toggle("is-active", isChalice);
+    dom.modeBtnChalice.setAttribute("aria-selected", isChalice.toString());
+    dom.modeBtnChalice.setAttribute("tabindex", isChalice ? "0" : "-1");
+  }
 
   if (dom.selType) {
     dom.selType.disabled = isChalice;
+    if (relicTypeWrapper) relicTypeWrapper.hidden = isChalice;
     if (dom.selType.parentElement) dom.selType.parentElement.classList.toggle("is-disabled", isChalice);
   }
+
+  // Relocate class filter between utility bar (individual) and effect pool (chalice)
+  const classSlot = isChalice ? dom.classFilterSlotChalice : dom.classFilterSlotIndividual;
+  moveNode(dom.classFilterControl, classSlot);
+
+  // Keep chalice picker inside the effect pool
+  moveNode(dom.chalicePickerControl, dom.chalicePickerSlot);
+
+  // Move Start Over into the effect pool in chalice mode, keep in utility bar otherwise
+  const startOverSlot = isChalice ? dom.startOverSlotChalice : dom.startOverSlotIndividual;
+  moveNode(dom.startOverBtn, startOverSlot);
 
   if (dom.showIllegalBtn) dom.showIllegalBtn.hidden = isChalice;
   if (dom.illegalPill) dom.illegalPill.hidden = isChalice || !isShowIllegalActive();
@@ -1849,6 +1878,13 @@ function canUseEffectOnSide(sideKey, slotIdx, effectId) {
   return effectiveCount < 3;
 }
 
+function firstAvailableChaliceSlot(sideKey) {
+  const meta = sideInfo(sideKey);
+  const slots = Array.isArray(chaliceSelections[meta.key]) ? chaliceSelections[meta.key] : [];
+  const emptyIdx = slots.findIndex(v => !v);
+  return emptyIdx === -1 ? 0 : emptyIdx;
+}
+
 function chaliceEligiblePool(sideKey) {
   const meta = sideInfo(sideKey);
   if (!rows.length) return [];
@@ -2453,6 +2489,12 @@ function updateChaliceCounts() {
   const dep = chaliceSelections.depth.filter(Boolean).length;
   if (dom.chaliceStandardCount) dom.chaliceStandardCount.textContent = `${std} / 9 selected`;
   if (dom.chaliceDepthCount) dom.chaliceDepthCount.textContent = `${dep} / 9 selected`;
+  if (dom.chaliceFilterTotals) dom.chaliceFilterTotals.textContent = `${std} / 9 Standard • ${dep} / 9 Depth`;
+}
+
+function openQuickChalicePicker(sideKey, anchorBtn) {
+  const idx = firstAvailableChaliceSlot(sideKey);
+  openChaliceEffectMenu(sideKey, idx, anchorBtn);
 }
 
 function renderChaliceUI() {
@@ -2476,6 +2518,7 @@ function resetChaliceSelections() {
 }
 
 function getSelectedChalice() {
+  if (selectedChaliceId === "") return null;
   const list = filteredChalices();
   return list.find(c => String(c.chaliceID) === String(selectedChaliceId)) || list[0] || null;
 }
@@ -2486,29 +2529,34 @@ function colorChip(color) {
 }
 
 function renderChaliceColors() {
-  if (!dom.chaliceColors || !dom.chaliceStandardColors || !dom.chaliceDepthColors) return;
+  if (!dom.chaliceStandardColors || !dom.chaliceDepthColors) return;
   const entry = getSelectedChalice();
-  if (!entry) {
-    dom.chaliceColors.hidden = true;
-    dom.chaliceStandardColors.innerHTML = "";
-    dom.chaliceDepthColors.innerHTML = "";
-    return;
-  }
+  const isAllChalices = !entry && selectedChaliceId === "";
+  const fallbackDots = isAllChalices ? ["#ffffff", "#ffffff", "#ffffff"] : [];
+  const stdColors = entry ? [entry.standard1, entry.standard2, entry.standard3].filter(Boolean) : fallbackDots;
+  const depthColors = entry ? [entry.depth1, entry.depth2, entry.depth3].filter(Boolean) : fallbackDots;
 
-  const stdColors = [entry.standard1, entry.standard2, entry.standard3].filter(Boolean);
-  const depthColors = [entry.depth1, entry.depth2, entry.depth3].filter(Boolean);
+  const dotHtml = (list) => list.map(color => {
+    const swatch = typeof color === "string" && color.trim().startsWith("#")
+      ? color.trim()
+      : (COLOR_SWATCH[color] || "#4a4f59");
+    return `<span class="chalice-color-dot" style="background:${swatch};"></span>`;
+  }).join("");
 
-  dom.chaliceStandardColors.innerHTML = stdColors.map(colorChip).join("");
-  dom.chaliceDepthColors.innerHTML = depthColors.map(colorChip).join("");
-  dom.chaliceColors.hidden = false;
+  dom.chaliceStandardColors.innerHTML = dotHtml(stdColors);
+  dom.chaliceDepthColors.innerHTML = dotHtml(depthColors);
 }
 
 function renderChalicePickers() {
   if (dom.chaliceSelect) {
     const list = filteredChalices();
-    dom.chaliceSelect.innerHTML = list.map(c => `<option value="${c.chaliceID}">${c.chalicename}</option>`).join("");
-    if (!selectedChaliceId && list.length) selectedChaliceId = list[0].chaliceID;
-    const hasCurrent = list.some(c => String(c.chaliceID) === String(selectedChaliceId));
+    const optionsHtml = [
+      `<option value="">-- Chalice / All --</option>`,
+      ...list.map(c => `<option value="${c.chaliceID}">${c.chalicename}</option>`)
+    ].join("");
+    dom.chaliceSelect.innerHTML = optionsHtml;
+    if (!selectedChaliceId && selectedChaliceId !== "") selectedChaliceId = "";
+    const hasCurrent = selectedChaliceId === "" || list.some(c => String(c.chaliceID) === String(selectedChaliceId));
     if (!hasCurrent) selectedChaliceId = list.length ? list[0].chaliceID : "";
     dom.chaliceSelect.value = selectedChaliceId;
   }
@@ -2530,7 +2578,7 @@ function indexChaliceData(list) {
   }
 
   const initialList = filteredChalices();
-  selectedChaliceId = selectedChaliceId || (initialList[0]?.chaliceID || "");
+  if (selectedChaliceId == null) selectedChaliceId = "";
 }
 
 // Meta visibility toggle removed; info is now provided via hover tooltips on the info icon.
@@ -2650,6 +2698,14 @@ async function load() {
       selectedChaliceId = evt.target.value || "";
       renderChaliceColors();
     });
+  }
+
+  if (dom.chaliceAddStandard) {
+    dom.chaliceAddStandard.addEventListener("click", () => openQuickChalicePicker("standard", dom.chaliceAddStandard));
+  }
+
+  if (dom.chaliceAddDepth) {
+    dom.chaliceAddDepth.addEventListener("click", () => openQuickChalicePicker("depth", dom.chaliceAddDepth));
   }
 
   renderChaliceUI();
