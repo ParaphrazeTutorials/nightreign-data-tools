@@ -15,8 +15,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "1"
+  "RollOrder": "1",
+  "Characters": "Wylder"
 }, {
   "EffectID": "6500100",
   "OverrideBaseEffectID": "1",
@@ -34,8 +36,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "2"
+  "RollOrder": "2",
+  "Characters": "Guardian"
 }, {
   "EffectID": "6500200",
   "OverrideBaseEffectID": "1",
@@ -53,8 +57,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "3"
+  "RollOrder": "3",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "6500300",
   "OverrideBaseEffectID": "1",
@@ -72,8 +78,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "4"
+  "RollOrder": "4",
+  "Characters": "Duchess"
 }, {
   "EffectID": "6500400",
   "OverrideBaseEffectID": "1",
@@ -91,8 +99,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "5"
+  "RollOrder": "5",
+  "Characters": "Raider"
 }, {
   "EffectID": "6500500",
   "OverrideBaseEffectID": "1",
@@ -110,8 +120,10 @@
   "StatusIconID": "20492",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "6"
+  "RollOrder": "6",
+  "Characters": "Revenant"
 }, {
   "EffectID": "6500600",
   "OverrideBaseEffectID": "1",
@@ -129,8 +141,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "7"
+  "RollOrder": "7",
+  "Characters": "Recluse"
 }, {
   "EffectID": "6500700",
   "OverrideBaseEffectID": "1",
@@ -148,8 +162,10 @@
   "StatusIconID": "20491",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "8"
+  "RollOrder": "8",
+  "Characters": "Executor"
 }, {
   "EffectID": "6500800",
   "OverrideBaseEffectID": "1",
@@ -167,8 +183,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "9"
+  "RollOrder": "9",
+  "Characters": "Scholar"
 }, {
   "EffectID": "6500900",
   "OverrideBaseEffectID": "1",
@@ -186,8 +204,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "10"
+  "RollOrder": "10",
+  "Characters": "Undertaker"
 }, {
   "EffectID": "6640000",
   "OverrideBaseEffectID": "1",
@@ -205,8 +225,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "11"
+  "RollOrder": "11",
+  "Characters": "Wylder"
 }, {
   "EffectID": "6640100",
   "OverrideBaseEffectID": "1",
@@ -224,8 +246,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "12"
+  "RollOrder": "12",
+  "Characters": "Wylder"
 }, {
   "EffectID": "6641000",
   "OverrideBaseEffectID": "1",
@@ -243,8 +267,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "13"
+  "RollOrder": "13",
+  "Characters": "Guardian"
 }, {
   "EffectID": "6641100",
   "OverrideBaseEffectID": "1",
@@ -262,8 +288,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "14"
+  "RollOrder": "14",
+  "Characters": "Guardian"
 }, {
   "EffectID": "6642000",
   "OverrideBaseEffectID": "1",
@@ -281,8 +309,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "15"
+  "RollOrder": "15",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "6642100",
   "OverrideBaseEffectID": "1",
@@ -300,8 +330,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "16"
+  "RollOrder": "16",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "6643000",
   "OverrideBaseEffectID": "1",
@@ -319,8 +351,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "17"
+  "RollOrder": "17",
+  "Characters": "Duchess"
 }, {
   "EffectID": "6643100",
   "OverrideBaseEffectID": "1",
@@ -338,8 +372,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "18"
+  "RollOrder": "18",
+  "Characters": "Duchess"
 }, {
   "EffectID": "6644000",
   "OverrideBaseEffectID": "1",
@@ -357,8 +393,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "19"
+  "RollOrder": "19",
+  "Characters": "Raider"
 }, {
   "EffectID": "6644100",
   "OverrideBaseEffectID": "1",
@@ -376,8 +414,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "20"
+  "RollOrder": "20",
+  "Characters": "Raider"
 }, {
   "EffectID": "6645000",
   "OverrideBaseEffectID": "1",
@@ -395,8 +435,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "21"
+  "RollOrder": "21",
+  "Characters": "Revenant"
 }, {
   "EffectID": "6645100",
   "OverrideBaseEffectID": "1",
@@ -414,8 +456,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "22"
+  "RollOrder": "22",
+  "Characters": "Revenant"
 }, {
   "EffectID": "6646000",
   "OverrideBaseEffectID": "1",
@@ -433,8 +477,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "23"
+  "RollOrder": "23",
+  "Characters": "Recluse"
 }, {
   "EffectID": "6646100",
   "OverrideBaseEffectID": "1",
@@ -452,8 +498,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "24"
+  "RollOrder": "24",
+  "Characters": "Recluse"
 }, {
   "EffectID": "6647000",
   "OverrideBaseEffectID": "1",
@@ -471,8 +519,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "25"
+  "RollOrder": "25",
+  "Characters": "Executor"
 }, {
   "EffectID": "6647100",
   "OverrideBaseEffectID": "1",
@@ -490,8 +540,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "26"
+  "RollOrder": "26",
+  "Characters": "Executor"
 }, {
   "EffectID": "6647200",
   "OverrideBaseEffectID": "1",
@@ -509,8 +561,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "27"
+  "RollOrder": "27",
+  "Characters": "Scholar"
 }, {
   "EffectID": "6647300",
   "OverrideBaseEffectID": "1",
@@ -528,8 +582,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "28"
+  "RollOrder": "28",
+  "Characters": "Scholar"
 }, {
   "EffectID": "6647400",
   "OverrideBaseEffectID": "1",
@@ -547,8 +603,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "29"
+  "RollOrder": "29",
+  "Characters": "Undertaker"
 }, {
   "EffectID": "6647500",
   "OverrideBaseEffectID": "1",
@@ -566,8 +624,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "30"
+  "RollOrder": "30",
+  "Characters": "Undertaker"
 }, {
   "EffectID": "7010500",
   "OverrideBaseEffectID": "1",
@@ -585,8 +645,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "31"
+  "RollOrder": "31",
+  "Characters": "Wylder"
 }, {
   "EffectID": "7010700",
   "OverrideBaseEffectID": "1",
@@ -604,8 +666,10 @@
   "StatusIconID": "20222",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "32"
+  "RollOrder": "32",
+  "Characters": "Duchess"
 }, {
   "EffectID": "7010900",
   "OverrideBaseEffectID": "1",
@@ -623,8 +687,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "33"
+  "RollOrder": "33",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7011000",
   "OverrideBaseEffectID": "1",
@@ -642,8 +708,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "34"
+  "RollOrder": "34",
+  "Characters": "Guardian"
 }, {
   "EffectID": "7011200",
   "OverrideBaseEffectID": "1",
@@ -661,8 +729,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "35"
+  "RollOrder": "35",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7011600",
   "OverrideBaseEffectID": "1",
@@ -680,8 +750,10 @@
   "StatusIconID": "20222",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "36"
+  "RollOrder": "36",
+  "Characters": "Guardian"
 }, {
   "EffectID": "7011700",
   "OverrideBaseEffectID": "1",
@@ -699,8 +771,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "37"
+  "RollOrder": "37",
+  "Characters": "Executor"
 }, {
   "EffectID": "7012000",
   "OverrideBaseEffectID": "1",
@@ -718,8 +792,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "38"
+  "RollOrder": "38",
+  "Characters": "Guardian"
 }, {
   "EffectID": "7020000",
   "OverrideBaseEffectID": "1",
@@ -737,8 +813,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "39"
+  "RollOrder": "39",
+  "Characters": "Wylder"
 }, {
   "EffectID": "7030000",
   "OverrideBaseEffectID": "1",
@@ -756,8 +834,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "40"
+  "RollOrder": "40",
+  "Characters": "ALL"
 }, {
   "EffectID": "7031200",
   "OverrideBaseEffectID": "1",
@@ -775,8 +855,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "41"
+  "RollOrder": "41",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7031300",
   "OverrideBaseEffectID": "1",
@@ -794,8 +876,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "42"
+  "RollOrder": "42",
+  "Characters": "Raider"
 }, {
   "EffectID": "7031800",
   "OverrideBaseEffectID": "1",
@@ -813,8 +897,10 @@
   "StatusIconID": "20222",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "43"
+  "RollOrder": "43",
+  "Characters": "Duchess"
 }, {
   "EffectID": "7032400",
   "OverrideBaseEffectID": "1",
@@ -832,8 +918,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "44"
+  "RollOrder": "44",
+  "Characters": "Wylder"
 }, {
   "EffectID": "7032700",
   "OverrideBaseEffectID": "1",
@@ -851,8 +939,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "45"
+  "RollOrder": "45",
+  "Characters": "Duchess"
 }, {
   "EffectID": "7032800",
   "OverrideBaseEffectID": "1",
@@ -870,8 +960,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "46"
+  "RollOrder": "46",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7032900",
   "OverrideBaseEffectID": "1",
@@ -889,8 +981,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "47"
+  "RollOrder": "47",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7033200",
   "OverrideBaseEffectID": "1",
@@ -908,8 +1002,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "48"
+  "RollOrder": "48",
+  "Characters": "Wylder"
 }, {
   "EffectID": "7033400",
   "OverrideBaseEffectID": "1",
@@ -927,8 +1023,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "49"
+  "RollOrder": "49",
+  "Characters": "Guardian"
 }, {
   "EffectID": "7034100",
   "OverrideBaseEffectID": "1",
@@ -946,8 +1044,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "50"
+  "RollOrder": "50",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7034400",
   "OverrideBaseEffectID": "1",
@@ -965,8 +1065,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "51"
+  "RollOrder": "51",
+  "Characters": "Executor"
 }, {
   "EffectID": "7034500",
   "OverrideBaseEffectID": "1",
@@ -984,8 +1086,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "52"
+  "RollOrder": "52",
+  "Characters": "Executor"
 }, {
   "EffectID": "7034600",
   "OverrideBaseEffectID": "1",
@@ -1003,8 +1107,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "53"
+  "RollOrder": "53",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "7034700",
   "OverrideBaseEffectID": "1",
@@ -1022,8 +1128,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "54"
+  "RollOrder": "54",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "7036100",
   "OverrideBaseEffectID": "1",
@@ -1041,8 +1149,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "55"
+  "RollOrder": "55",
+  "Characters": "ALL"
 }, {
   "EffectID": "7036200",
   "OverrideBaseEffectID": "1",
@@ -1060,8 +1170,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "56"
+  "RollOrder": "56",
+  "Characters": "Scholar"
 }, {
   "EffectID": "7036300",
   "OverrideBaseEffectID": "1",
@@ -1079,8 +1191,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "57"
+  "RollOrder": "57",
+  "Characters": "Scholar"
 }, {
   "EffectID": "7036400",
   "OverrideBaseEffectID": "1",
@@ -1098,8 +1212,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "58"
+  "RollOrder": "58",
+  "Characters": "Scholar"
 }, {
   "EffectID": "7036500",
   "OverrideBaseEffectID": "1",
@@ -1117,8 +1233,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "59"
+  "RollOrder": "59",
+  "Characters": "Scholar"
 }, {
   "EffectID": "7036800",
   "OverrideBaseEffectID": "1",
@@ -1136,8 +1254,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "60"
+  "RollOrder": "60",
+  "Characters": "Undertaker"
 }, {
   "EffectID": "7036900",
   "OverrideBaseEffectID": "1",
@@ -1155,8 +1275,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "61"
+  "RollOrder": "61",
+  "Characters": "Undertaker"
 }, {
   "EffectID": "7037000",
   "OverrideBaseEffectID": "1",
@@ -1174,8 +1296,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "62"
+  "RollOrder": "62",
+  "Characters": "Undertaker"
 }, {
   "EffectID": "7037300",
   "OverrideBaseEffectID": "1",
@@ -1193,8 +1317,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "63"
+  "RollOrder": "63",
+  "Characters": "Undertaker"
 }, {
   "EffectID": "7090300",
   "OverrideBaseEffectID": "1",
@@ -1212,8 +1338,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "64"
+  "RollOrder": "64",
+  "Characters": "ALL"
 }, {
   "EffectID": "7220000",
   "OverrideBaseEffectID": "1",
@@ -1231,8 +1359,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "65"
+  "RollOrder": "65",
+  "Characters": "Revenant, Scholar, Undertaker"
 }, {
   "EffectID": "7270100",
   "OverrideBaseEffectID": "1",
@@ -1250,8 +1380,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "66"
+  "RollOrder": "66",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "7280000",
   "OverrideBaseEffectID": "1",
@@ -1269,8 +1401,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "67"
+  "RollOrder": "67",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "7290000",
   "OverrideBaseEffectID": "1",
@@ -1288,8 +1422,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "68"
+  "RollOrder": "68",
+  "Characters": "Duchess"
 }, {
   "EffectID": "7310000",
   "OverrideBaseEffectID": "1",
@@ -1307,8 +1443,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "69"
+  "RollOrder": "69",
+  "Characters": "Raider"
 }, {
   "EffectID": "7080000",
   "OverrideBaseEffectID": "10",
@@ -1326,8 +1464,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "70"
+  "RollOrder": "70",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080100",
   "OverrideBaseEffectID": "10",
@@ -1345,8 +1485,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "71"
+  "RollOrder": "71",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080200",
   "OverrideBaseEffectID": "10",
@@ -1364,8 +1506,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "72"
+  "RollOrder": "72",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080300",
   "OverrideBaseEffectID": "10",
@@ -1383,8 +1527,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "73"
+  "RollOrder": "73",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080400",
   "OverrideBaseEffectID": "10",
@@ -1402,8 +1548,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "74"
+  "RollOrder": "74",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080500",
   "OverrideBaseEffectID": "10",
@@ -1421,8 +1569,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "75"
+  "RollOrder": "75",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080600",
   "OverrideBaseEffectID": "10",
@@ -1440,8 +1590,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "76"
+  "RollOrder": "76",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080700",
   "OverrideBaseEffectID": "10",
@@ -1459,8 +1611,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "77"
+  "RollOrder": "77",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080800",
   "OverrideBaseEffectID": "10",
@@ -1478,8 +1632,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "78"
+  "RollOrder": "78",
+  "Characters": "ALL"
 }, {
   "EffectID": "7080900",
   "OverrideBaseEffectID": "10",
@@ -1497,8 +1653,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "79"
+  "RollOrder": "79",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081000",
   "OverrideBaseEffectID": "10",
@@ -1516,8 +1674,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "80"
+  "RollOrder": "80",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081100",
   "OverrideBaseEffectID": "10",
@@ -1535,8 +1695,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "81"
+  "RollOrder": "81",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081200",
   "OverrideBaseEffectID": "10",
@@ -1554,8 +1716,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "82"
+  "RollOrder": "82",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081300",
   "OverrideBaseEffectID": "10",
@@ -1573,8 +1737,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "83"
+  "RollOrder": "83",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081400",
   "OverrideBaseEffectID": "10",
@@ -1592,8 +1758,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "84"
+  "RollOrder": "84",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081500",
   "OverrideBaseEffectID": "10",
@@ -1611,8 +1779,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "85"
+  "RollOrder": "85",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081700",
   "OverrideBaseEffectID": "10",
@@ -1630,8 +1800,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "86"
+  "RollOrder": "86",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081800",
   "OverrideBaseEffectID": "10",
@@ -1649,8 +1821,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "87"
+  "RollOrder": "87",
+  "Characters": "ALL"
 }, {
   "EffectID": "7081900",
   "OverrideBaseEffectID": "10",
@@ -1668,8 +1842,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "88"
+  "RollOrder": "88",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082000",
   "OverrideBaseEffectID": "10",
@@ -1687,8 +1863,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "89"
+  "RollOrder": "89",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082100",
   "OverrideBaseEffectID": "10",
@@ -1706,8 +1884,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "90"
+  "RollOrder": "90",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082200",
   "OverrideBaseEffectID": "10",
@@ -1725,8 +1905,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "91"
+  "RollOrder": "91",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082300",
   "OverrideBaseEffectID": "10",
@@ -1744,8 +1926,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "92"
+  "RollOrder": "92",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082400",
   "OverrideBaseEffectID": "10",
@@ -1763,8 +1947,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "93"
+  "RollOrder": "93",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082500",
   "OverrideBaseEffectID": "10",
@@ -1782,8 +1968,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "94"
+  "RollOrder": "94",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082600",
   "OverrideBaseEffectID": "10",
@@ -1801,8 +1989,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "95"
+  "RollOrder": "95",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082700",
   "OverrideBaseEffectID": "10",
@@ -1820,8 +2010,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "96"
+  "RollOrder": "96",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082800",
   "OverrideBaseEffectID": "10",
@@ -1839,8 +2031,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "97"
+  "RollOrder": "97",
+  "Characters": "ALL"
 }, {
   "EffectID": "7082900",
   "OverrideBaseEffectID": "10",
@@ -1858,8 +2052,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "98"
+  "RollOrder": "98",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330000",
   "OverrideBaseEffectID": "10",
@@ -1877,8 +2073,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "99"
+  "RollOrder": "99",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330100",
   "OverrideBaseEffectID": "10",
@@ -1896,8 +2094,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "100"
+  "RollOrder": "100",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330200",
   "OverrideBaseEffectID": "10",
@@ -1915,8 +2115,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "101"
+  "RollOrder": "101",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330300",
   "OverrideBaseEffectID": "10",
@@ -1934,8 +2136,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "102"
+  "RollOrder": "102",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330400",
   "OverrideBaseEffectID": "10",
@@ -1953,8 +2157,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "103"
+  "RollOrder": "103",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330500",
   "OverrideBaseEffectID": "10",
@@ -1972,8 +2178,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "104"
+  "RollOrder": "104",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330600",
   "OverrideBaseEffectID": "10",
@@ -1991,8 +2199,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "105"
+  "RollOrder": "105",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330700",
   "OverrideBaseEffectID": "10",
@@ -2010,8 +2220,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "106"
+  "RollOrder": "106",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330800",
   "OverrideBaseEffectID": "10",
@@ -2029,8 +2241,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "107"
+  "RollOrder": "107",
+  "Characters": "ALL"
 }, {
   "EffectID": "7330900",
   "OverrideBaseEffectID": "10",
@@ -2048,8 +2262,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "108"
+  "RollOrder": "108",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331000",
   "OverrideBaseEffectID": "10",
@@ -2067,8 +2283,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "109"
+  "RollOrder": "109",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331100",
   "OverrideBaseEffectID": "10",
@@ -2086,8 +2304,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "110"
+  "RollOrder": "110",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331200",
   "OverrideBaseEffectID": "10",
@@ -2105,8 +2325,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "111"
+  "RollOrder": "111",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331300",
   "OverrideBaseEffectID": "10",
@@ -2124,8 +2346,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "112"
+  "RollOrder": "112",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331400",
   "OverrideBaseEffectID": "10",
@@ -2143,8 +2367,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "113"
+  "RollOrder": "113",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331500",
   "OverrideBaseEffectID": "10",
@@ -2162,8 +2388,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "114"
+  "RollOrder": "114",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331700",
   "OverrideBaseEffectID": "10",
@@ -2181,8 +2409,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "115"
+  "RollOrder": "115",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331800",
   "OverrideBaseEffectID": "10",
@@ -2200,8 +2430,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "116"
+  "RollOrder": "116",
+  "Characters": "ALL"
 }, {
   "EffectID": "7331900",
   "OverrideBaseEffectID": "10",
@@ -2219,8 +2451,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "117"
+  "RollOrder": "117",
+  "Characters": "ALL"
 }, {
   "EffectID": "7332000",
   "OverrideBaseEffectID": "10",
@@ -2238,8 +2472,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "118"
+  "RollOrder": "118",
+  "Characters": "ALL"
 }, {
   "EffectID": "7332100",
   "OverrideBaseEffectID": "10",
@@ -2257,8 +2493,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "119"
+  "RollOrder": "119",
+  "Characters": "ALL"
 }, {
   "EffectID": "7332200",
   "OverrideBaseEffectID": "10",
@@ -2276,8 +2514,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "120"
+  "RollOrder": "120",
+  "Characters": "ALL"
 }, {
   "EffectID": "7332300",
   "OverrideBaseEffectID": "10",
@@ -2295,8 +2535,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "121"
+  "RollOrder": "121",
+  "Characters": "ALL"
 }, {
   "EffectID": "7332400",
   "OverrideBaseEffectID": "10",
@@ -2314,8 +2556,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "122"
+  "RollOrder": "122",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340000",
   "OverrideBaseEffectID": "10",
@@ -2333,8 +2577,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "123"
+  "RollOrder": "123",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340100",
   "OverrideBaseEffectID": "10",
@@ -2352,8 +2598,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "124"
+  "RollOrder": "124",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340200",
   "OverrideBaseEffectID": "10",
@@ -2371,8 +2619,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "125"
+  "RollOrder": "125",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340300",
   "OverrideBaseEffectID": "10",
@@ -2390,8 +2640,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "126"
+  "RollOrder": "126",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340400",
   "OverrideBaseEffectID": "10",
@@ -2409,8 +2661,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "127"
+  "RollOrder": "127",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340500",
   "OverrideBaseEffectID": "10",
@@ -2428,8 +2682,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "128"
+  "RollOrder": "128",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340600",
   "OverrideBaseEffectID": "10",
@@ -2447,8 +2703,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "129"
+  "RollOrder": "129",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340700",
   "OverrideBaseEffectID": "10",
@@ -2466,8 +2724,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "130"
+  "RollOrder": "130",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340800",
   "OverrideBaseEffectID": "10",
@@ -2485,8 +2745,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "131"
+  "RollOrder": "131",
+  "Characters": "ALL"
 }, {
   "EffectID": "7340900",
   "OverrideBaseEffectID": "10",
@@ -2504,8 +2766,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "132"
+  "RollOrder": "132",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341000",
   "OverrideBaseEffectID": "10",
@@ -2523,8 +2787,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "133"
+  "RollOrder": "133",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341100",
   "OverrideBaseEffectID": "10",
@@ -2542,8 +2808,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "134"
+  "RollOrder": "134",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341200",
   "OverrideBaseEffectID": "10",
@@ -2561,8 +2829,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "135"
+  "RollOrder": "135",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341300",
   "OverrideBaseEffectID": "10",
@@ -2580,8 +2850,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "136"
+  "RollOrder": "136",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341400",
   "OverrideBaseEffectID": "10",
@@ -2599,8 +2871,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "137"
+  "RollOrder": "137",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341500",
   "OverrideBaseEffectID": "10",
@@ -2618,8 +2892,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "138"
+  "RollOrder": "138",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341700",
   "OverrideBaseEffectID": "10",
@@ -2637,8 +2913,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "139"
+  "RollOrder": "139",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341800",
   "OverrideBaseEffectID": "10",
@@ -2656,8 +2934,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "140"
+  "RollOrder": "140",
+  "Characters": "ALL"
 }, {
   "EffectID": "7341900",
   "OverrideBaseEffectID": "10",
@@ -2675,8 +2955,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "141"
+  "RollOrder": "141",
+  "Characters": "ALL"
 }, {
   "EffectID": "7342000",
   "OverrideBaseEffectID": "10",
@@ -2694,8 +2976,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "142"
+  "RollOrder": "142",
+  "Characters": "ALL"
 }, {
   "EffectID": "7342100",
   "OverrideBaseEffectID": "10",
@@ -2713,8 +2997,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "143"
+  "RollOrder": "143",
+  "Characters": "ALL"
 }, {
   "EffectID": "7342200",
   "OverrideBaseEffectID": "10",
@@ -2732,8 +3018,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "144"
+  "RollOrder": "144",
+  "Characters": "ALL"
 }, {
   "EffectID": "7342300",
   "OverrideBaseEffectID": "10",
@@ -2751,8 +3039,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "145"
+  "RollOrder": "145",
+  "Characters": "ALL"
 }, {
   "EffectID": "7342400",
   "OverrideBaseEffectID": "10",
@@ -2770,8 +3060,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "146"
+  "RollOrder": "146",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350000",
   "OverrideBaseEffectID": "10",
@@ -2789,8 +3081,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "147"
+  "RollOrder": "147",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350100",
   "OverrideBaseEffectID": "10",
@@ -2808,8 +3102,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "148"
+  "RollOrder": "148",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350200",
   "OverrideBaseEffectID": "10",
@@ -2827,8 +3123,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "149"
+  "RollOrder": "149",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350300",
   "OverrideBaseEffectID": "10",
@@ -2846,8 +3144,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "150"
+  "RollOrder": "150",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350400",
   "OverrideBaseEffectID": "10",
@@ -2865,8 +3165,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "151"
+  "RollOrder": "151",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350500",
   "OverrideBaseEffectID": "10",
@@ -2884,8 +3186,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "152"
+  "RollOrder": "152",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350600",
   "OverrideBaseEffectID": "10",
@@ -2903,8 +3207,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "153"
+  "RollOrder": "153",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350700",
   "OverrideBaseEffectID": "10",
@@ -2922,8 +3228,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "154"
+  "RollOrder": "154",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350800",
   "OverrideBaseEffectID": "10",
@@ -2941,8 +3249,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "155"
+  "RollOrder": "155",
+  "Characters": "ALL"
 }, {
   "EffectID": "7350900",
   "OverrideBaseEffectID": "10",
@@ -2960,8 +3270,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "156"
+  "RollOrder": "156",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351000",
   "OverrideBaseEffectID": "10",
@@ -2979,8 +3291,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "157"
+  "RollOrder": "157",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351100",
   "OverrideBaseEffectID": "10",
@@ -2998,8 +3312,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "158"
+  "RollOrder": "158",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351200",
   "OverrideBaseEffectID": "10",
@@ -3017,8 +3333,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "159"
+  "RollOrder": "159",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351300",
   "OverrideBaseEffectID": "10",
@@ -3036,8 +3354,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "160"
+  "RollOrder": "160",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351400",
   "OverrideBaseEffectID": "10",
@@ -3055,8 +3375,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "161"
+  "RollOrder": "161",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351500",
   "OverrideBaseEffectID": "10",
@@ -3074,8 +3396,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "162"
+  "RollOrder": "162",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351700",
   "OverrideBaseEffectID": "10",
@@ -3093,8 +3417,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "163"
+  "RollOrder": "163",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351800",
   "OverrideBaseEffectID": "10",
@@ -3112,8 +3438,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "164"
+  "RollOrder": "164",
+  "Characters": "ALL"
 }, {
   "EffectID": "7351900",
   "OverrideBaseEffectID": "10",
@@ -3131,8 +3459,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "165"
+  "RollOrder": "165",
+  "Characters": "ALL"
 }, {
   "EffectID": "7352000",
   "OverrideBaseEffectID": "10",
@@ -3150,8 +3480,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "166"
+  "RollOrder": "166",
+  "Characters": "ALL"
 }, {
   "EffectID": "7352100",
   "OverrideBaseEffectID": "10",
@@ -3169,8 +3501,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "167"
+  "RollOrder": "167",
+  "Characters": "ALL"
 }, {
   "EffectID": "7352200",
   "OverrideBaseEffectID": "10",
@@ -3188,8 +3522,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "168"
+  "RollOrder": "168",
+  "Characters": "ALL"
 }, {
   "EffectID": "7352300",
   "OverrideBaseEffectID": "10",
@@ -3207,8 +3543,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "169"
+  "RollOrder": "169",
+  "Characters": "ALL"
 }, {
   "EffectID": "7352400",
   "OverrideBaseEffectID": "10",
@@ -3226,8 +3564,10 @@
   "StatusIconID": "20014",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "170"
+  "RollOrder": "170",
+  "Characters": "ALL"
 }, {
   "EffectID": "6005600",
   "OverrideBaseEffectID": "100",
@@ -3245,8 +3585,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "171"
+  "RollOrder": "171",
+  "Characters": "ALL"
 }, {
   "EffectID": "6005601",
   "OverrideBaseEffectID": "100",
@@ -3264,8 +3606,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "172"
+  "RollOrder": "172",
+  "Characters": "ALL"
 }, {
   "EffectID": "6030200",
   "OverrideBaseEffectID": "100",
@@ -3283,8 +3627,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "173"
+  "RollOrder": "173",
+  "Characters": "ALL"
 }, {
   "EffectID": "6030600",
   "OverrideBaseEffectID": "100",
@@ -3302,8 +3648,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "174"
+  "RollOrder": "174",
+  "Characters": "ALL"
 }, {
   "EffectID": "6030800",
   "OverrideBaseEffectID": "100",
@@ -3321,8 +3669,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "175"
+  "RollOrder": "175",
+  "Characters": "ALL"
 }, {
   "EffectID": "6030900",
   "OverrideBaseEffectID": "100",
@@ -3340,8 +3690,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "176"
+  "RollOrder": "176",
+  "Characters": "ALL"
 }, {
   "EffectID": "6030901",
   "OverrideBaseEffectID": "100",
@@ -3359,8 +3711,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "177"
+  "RollOrder": "177",
+  "Characters": "ALL"
 }, {
   "EffectID": "6035100",
   "OverrideBaseEffectID": "100",
@@ -3378,8 +3732,10 @@
   "StatusIconID": "20015",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "178"
+  "RollOrder": "178",
+  "Characters": "ALL"
 }, {
   "EffectID": "6040100",
   "OverrideBaseEffectID": "100",
@@ -3397,8 +3753,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "179"
+  "RollOrder": "179",
+  "Characters": "ALL"
 }, {
   "EffectID": "6040101",
   "OverrideBaseEffectID": "100",
@@ -3416,8 +3774,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "180"
+  "RollOrder": "180",
+  "Characters": "ALL"
 }, {
   "EffectID": "6040300",
   "OverrideBaseEffectID": "100",
@@ -3435,8 +3795,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "181"
+  "RollOrder": "181",
+  "Characters": "ALL"
 }, {
   "EffectID": "6040400",
   "OverrideBaseEffectID": "100",
@@ -3454,8 +3816,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "182"
+  "RollOrder": "182",
+  "Characters": "ALL"
 }, {
   "EffectID": "6040500",
   "OverrideBaseEffectID": "100",
@@ -3473,8 +3837,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "183"
+  "RollOrder": "183",
+  "Characters": "ALL"
 }, {
   "EffectID": "6043100",
   "OverrideBaseEffectID": "100",
@@ -3492,8 +3858,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "184"
+  "RollOrder": "184",
+  "Characters": "ALL"
 }, {
   "EffectID": "6060300",
   "OverrideBaseEffectID": "100",
@@ -3511,8 +3879,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "185"
+  "RollOrder": "185",
+  "Characters": "ALL"
 }, {
   "EffectID": "6060400",
   "OverrideBaseEffectID": "100",
@@ -3530,8 +3900,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "186"
+  "RollOrder": "186",
+  "Characters": "ALL"
 }, {
   "EffectID": "6060500",
   "OverrideBaseEffectID": "100",
@@ -3549,8 +3921,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "187"
+  "RollOrder": "187",
+  "Characters": "ALL"
 }, {
   "EffectID": "6060600",
   "OverrideBaseEffectID": "100",
@@ -3568,8 +3942,10 @@
   "StatusIconID": "20293",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "188"
+  "RollOrder": "188",
+  "Characters": "ALL"
 }, {
   "EffectID": "6090000",
   "OverrideBaseEffectID": "100",
@@ -3587,8 +3963,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "189"
+  "RollOrder": "189",
+  "Characters": "ALL"
 }, {
   "EffectID": "6160000",
   "OverrideBaseEffectID": "100",
@@ -3606,8 +3984,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "190"
+  "RollOrder": "190",
+  "Characters": "ALL"
 }, {
   "EffectID": "6260000",
   "OverrideBaseEffectID": "100",
@@ -3625,8 +4005,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "191"
+  "RollOrder": "191",
+  "Characters": "ALL"
 }, {
   "EffectID": "6260001",
   "OverrideBaseEffectID": "100",
@@ -3644,8 +4026,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "192"
+  "RollOrder": "192",
+  "Characters": "ALL"
 }, {
   "EffectID": "6260300",
   "OverrideBaseEffectID": "100",
@@ -3663,8 +4047,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "193"
+  "RollOrder": "193",
+  "Characters": "ALL"
 }, {
   "EffectID": "6260301",
   "OverrideBaseEffectID": "100",
@@ -3682,8 +4068,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "194"
+  "RollOrder": "194",
+  "Characters": "ALL"
 }, {
   "EffectID": "6260400",
   "OverrideBaseEffectID": "100",
@@ -3701,8 +4089,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "195"
+  "RollOrder": "195",
+  "Characters": "ALL"
 }, {
   "EffectID": "6260401",
   "OverrideBaseEffectID": "100",
@@ -3720,8 +4110,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "196"
+  "RollOrder": "196",
+  "Characters": "ALL"
 }, {
   "EffectID": "6600000",
   "OverrideBaseEffectID": "100",
@@ -3739,8 +4131,10 @@
   "StatusIconID": "20006",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "197"
+  "RollOrder": "197",
+  "Characters": "ALL"
 }, {
   "EffectID": "6600001",
   "OverrideBaseEffectID": "100",
@@ -3758,8 +4152,10 @@
   "StatusIconID": "20006",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "198"
+  "RollOrder": "198",
+  "Characters": "ALL"
 }, {
   "EffectID": "6600100",
   "OverrideBaseEffectID": "100",
@@ -3777,8 +4173,10 @@
   "StatusIconID": "20006",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "199"
+  "RollOrder": "199",
+  "Characters": "ALL"
 }, {
   "EffectID": "6600101",
   "OverrideBaseEffectID": "100",
@@ -3796,8 +4194,10 @@
   "StatusIconID": "20006",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Depth Of Night",
-  "RollOrder": "200"
+  "RollOrder": "200",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611200",
   "OverrideBaseEffectID": "100",
@@ -3815,8 +4215,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "201"
+  "RollOrder": "201",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611201",
   "OverrideBaseEffectID": "100",
@@ -3834,8 +4236,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "202"
+  "RollOrder": "202",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611202",
   "OverrideBaseEffectID": "100",
@@ -3853,8 +4257,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "203"
+  "RollOrder": "203",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611300",
   "OverrideBaseEffectID": "100",
@@ -3872,8 +4278,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "204"
+  "RollOrder": "204",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611301",
   "OverrideBaseEffectID": "100",
@@ -3891,8 +4299,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "205"
+  "RollOrder": "205",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611302",
   "OverrideBaseEffectID": "100",
@@ -3910,8 +4320,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "206"
+  "RollOrder": "206",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611400",
   "OverrideBaseEffectID": "100",
@@ -3929,8 +4341,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "207"
+  "RollOrder": "207",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621000",
   "OverrideBaseEffectID": "100",
@@ -3948,8 +4362,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "208"
+  "RollOrder": "208",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621100",
   "OverrideBaseEffectID": "100",
@@ -3967,8 +4383,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "209"
+  "RollOrder": "209",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621200",
   "OverrideBaseEffectID": "100",
@@ -3986,8 +4404,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "210"
+  "RollOrder": "210",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621300",
   "OverrideBaseEffectID": "100",
@@ -4005,8 +4425,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "211"
+  "RollOrder": "211",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621400",
   "OverrideBaseEffectID": "100",
@@ -4024,8 +4446,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "212"
+  "RollOrder": "212",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621500",
   "OverrideBaseEffectID": "100",
@@ -4043,8 +4467,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "213"
+  "RollOrder": "213",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621600",
   "OverrideBaseEffectID": "100",
@@ -4062,8 +4488,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "214"
+  "RollOrder": "214",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621700",
   "OverrideBaseEffectID": "100",
@@ -4081,8 +4509,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "215"
+  "RollOrder": "215",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621800",
   "OverrideBaseEffectID": "100",
@@ -4100,8 +4530,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "216"
+  "RollOrder": "216",
+  "Characters": "ALL"
 }, {
   "EffectID": "6621900",
   "OverrideBaseEffectID": "100",
@@ -4119,8 +4551,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "217"
+  "RollOrder": "217",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622000",
   "OverrideBaseEffectID": "100",
@@ -4138,8 +4572,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "218"
+  "RollOrder": "218",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622100",
   "OverrideBaseEffectID": "100",
@@ -4157,8 +4593,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "219"
+  "RollOrder": "219",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622200",
   "OverrideBaseEffectID": "100",
@@ -4176,8 +4614,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "220"
+  "RollOrder": "220",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622300",
   "OverrideBaseEffectID": "100",
@@ -4195,8 +4635,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "221"
+  "RollOrder": "221",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622400",
   "OverrideBaseEffectID": "100",
@@ -4214,8 +4656,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "222"
+  "RollOrder": "222",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622500",
   "OverrideBaseEffectID": "100",
@@ -4233,8 +4677,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "223"
+  "RollOrder": "223",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622600",
   "OverrideBaseEffectID": "100",
@@ -4252,8 +4698,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "224"
+  "RollOrder": "224",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622700",
   "OverrideBaseEffectID": "100",
@@ -4271,8 +4719,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "225"
+  "RollOrder": "225",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622800",
   "OverrideBaseEffectID": "100",
@@ -4290,8 +4740,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "226"
+  "RollOrder": "226",
+  "Characters": "ALL"
 }, {
   "EffectID": "6622900",
   "OverrideBaseEffectID": "100",
@@ -4309,8 +4761,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "227"
+  "RollOrder": "227",
+  "Characters": "ALL"
 }, {
   "EffectID": "6623000",
   "OverrideBaseEffectID": "100",
@@ -4328,8 +4782,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "228"
+  "RollOrder": "228",
+  "Characters": "ALL"
 }, {
   "EffectID": "6623100",
   "OverrideBaseEffectID": "100",
@@ -4347,8 +4803,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "229"
+  "RollOrder": "229",
+  "Characters": "ALL"
 }, {
   "EffectID": "6623200",
   "OverrideBaseEffectID": "100",
@@ -4366,8 +4824,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "230"
+  "RollOrder": "230",
+  "Characters": "ALL"
 }, {
   "EffectID": "6624000",
   "OverrideBaseEffectID": "100",
@@ -4385,8 +4845,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "231"
+  "RollOrder": "231",
+  "Characters": "ALL"
 }, {
   "EffectID": "6624100",
   "OverrideBaseEffectID": "100",
@@ -4404,8 +4866,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "232"
+  "RollOrder": "232",
+  "Characters": "ALL"
 }, {
   "EffectID": "6624200",
   "OverrideBaseEffectID": "100",
@@ -4423,8 +4887,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "233"
+  "RollOrder": "233",
+  "Characters": "ALL"
 }, {
   "EffectID": "6624300",
   "OverrideBaseEffectID": "100",
@@ -4442,8 +4908,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "234"
+  "RollOrder": "234",
+  "Characters": "ALL"
 }, {
   "EffectID": "6624400",
   "OverrideBaseEffectID": "100",
@@ -4461,8 +4929,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "235"
+  "RollOrder": "235",
+  "Characters": "ALL"
 }, {
   "EffectID": "6624500",
   "OverrideBaseEffectID": "100",
@@ -4480,8 +4950,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "236"
+  "RollOrder": "236",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630000",
   "OverrideBaseEffectID": "100",
@@ -4499,8 +4971,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "237"
+  "RollOrder": "237",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630100",
   "OverrideBaseEffectID": "100",
@@ -4518,8 +4992,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "238"
+  "RollOrder": "238",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630200",
   "OverrideBaseEffectID": "100",
@@ -4537,8 +5013,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "239"
+  "RollOrder": "239",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630300",
   "OverrideBaseEffectID": "100",
@@ -4556,8 +5034,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "240"
+  "RollOrder": "240",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630400",
   "OverrideBaseEffectID": "100",
@@ -4575,8 +5055,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "241"
+  "RollOrder": "241",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630500",
   "OverrideBaseEffectID": "100",
@@ -4594,8 +5076,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "242"
+  "RollOrder": "242",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630600",
   "OverrideBaseEffectID": "100",
@@ -4613,8 +5097,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "243"
+  "RollOrder": "243",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630700",
   "OverrideBaseEffectID": "100",
@@ -4632,8 +5118,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "244"
+  "RollOrder": "244",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630800",
   "OverrideBaseEffectID": "100",
@@ -4651,8 +5139,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "245"
+  "RollOrder": "245",
+  "Characters": "ALL"
 }, {
   "EffectID": "6630900",
   "OverrideBaseEffectID": "100",
@@ -4670,8 +5160,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "246"
+  "RollOrder": "246",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631000",
   "OverrideBaseEffectID": "100",
@@ -4689,8 +5181,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "247"
+  "RollOrder": "247",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631100",
   "OverrideBaseEffectID": "100",
@@ -4708,8 +5202,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "248"
+  "RollOrder": "248",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631200",
   "OverrideBaseEffectID": "100",
@@ -4727,8 +5223,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "249"
+  "RollOrder": "249",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631300",
   "OverrideBaseEffectID": "100",
@@ -4746,8 +5244,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "250"
+  "RollOrder": "250",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631400",
   "OverrideBaseEffectID": "100",
@@ -4765,8 +5265,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "251"
+  "RollOrder": "251",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631500",
   "OverrideBaseEffectID": "100",
@@ -4784,8 +5286,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "252"
+  "RollOrder": "252",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631600",
   "OverrideBaseEffectID": "100",
@@ -4803,8 +5307,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "253"
+  "RollOrder": "253",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631700",
   "OverrideBaseEffectID": "100",
@@ -4822,8 +5328,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "254"
+  "RollOrder": "254",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631800",
   "OverrideBaseEffectID": "100",
@@ -4841,8 +5349,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "255"
+  "RollOrder": "255",
+  "Characters": "ALL"
 }, {
   "EffectID": "6631900",
   "OverrideBaseEffectID": "100",
@@ -4860,8 +5370,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "256"
+  "RollOrder": "256",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632000",
   "OverrideBaseEffectID": "100",
@@ -4879,8 +5391,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "257"
+  "RollOrder": "257",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632100",
   "OverrideBaseEffectID": "100",
@@ -4898,8 +5412,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "258"
+  "RollOrder": "258",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632200",
   "OverrideBaseEffectID": "100",
@@ -4917,8 +5433,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "259"
+  "RollOrder": "259",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632300",
   "OverrideBaseEffectID": "100",
@@ -4936,8 +5454,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "260"
+  "RollOrder": "260",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632400",
   "OverrideBaseEffectID": "100",
@@ -4955,8 +5475,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "261"
+  "RollOrder": "261",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632500",
   "OverrideBaseEffectID": "100",
@@ -4974,8 +5496,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "262"
+  "RollOrder": "262",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632600",
   "OverrideBaseEffectID": "100",
@@ -4993,8 +5517,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "263"
+  "RollOrder": "263",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632700",
   "OverrideBaseEffectID": "100",
@@ -5012,8 +5538,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "264"
+  "RollOrder": "264",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632800",
   "OverrideBaseEffectID": "100",
@@ -5031,8 +5559,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "265"
+  "RollOrder": "265",
+  "Characters": "ALL"
 }, {
   "EffectID": "6632900",
   "OverrideBaseEffectID": "100",
@@ -5050,8 +5580,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "266"
+  "RollOrder": "266",
+  "Characters": "ALL"
 }, {
   "EffectID": "6633000",
   "OverrideBaseEffectID": "100",
@@ -5069,8 +5601,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "267"
+  "RollOrder": "267",
+  "Characters": "ALL"
 }, {
   "EffectID": "6633100",
   "OverrideBaseEffectID": "100",
@@ -5088,8 +5622,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "268"
+  "RollOrder": "268",
+  "Characters": "ALL"
 }, {
   "EffectID": "7005600",
   "OverrideBaseEffectID": "100",
@@ -5107,8 +5643,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "269"
+  "RollOrder": "269",
+  "Characters": "ALL"
 }, {
   "EffectID": "7006000",
   "OverrideBaseEffectID": "100",
@@ -5126,8 +5664,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "270"
+  "RollOrder": "270",
+  "Characters": "ALL"
 }, {
   "EffectID": "7006100",
   "OverrideBaseEffectID": "100",
@@ -5145,8 +5685,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "271"
+  "RollOrder": "271",
+  "Characters": "ALL"
 }, {
   "EffectID": "7010200",
   "OverrideBaseEffectID": "100",
@@ -5164,8 +5706,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "272"
+  "RollOrder": "272",
+  "Characters": "ALL"
 }, {
   "EffectID": "7012200",
   "OverrideBaseEffectID": "100",
@@ -5183,8 +5727,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "273"
+  "RollOrder": "273",
+  "Characters": "ALL"
 }, {
   "EffectID": "7012300",
   "OverrideBaseEffectID": "100",
@@ -5202,8 +5748,10 @@
   "StatusIconID": "20408",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "274"
+  "RollOrder": "274",
+  "Characters": "ALL"
 }, {
   "EffectID": "7030200",
   "OverrideBaseEffectID": "100",
@@ -5221,8 +5769,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "275"
+  "RollOrder": "275",
+  "Characters": "ALL"
 }, {
   "EffectID": "7030600",
   "OverrideBaseEffectID": "100",
@@ -5240,8 +5790,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "276"
+  "RollOrder": "276",
+  "Characters": "ALL"
 }, {
   "EffectID": "7030700",
   "OverrideBaseEffectID": "100",
@@ -5259,8 +5811,10 @@
   "StatusIconID": "20429",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "277"
+  "RollOrder": "277",
+  "Characters": "ALL"
 }, {
   "EffectID": "7030800",
   "OverrideBaseEffectID": "100",
@@ -5278,8 +5832,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "278"
+  "RollOrder": "278",
+  "Characters": "ALL"
 }, {
   "EffectID": "7030900",
   "OverrideBaseEffectID": "100",
@@ -5297,8 +5853,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "279"
+  "RollOrder": "279",
+  "Characters": "ALL"
 }, {
   "EffectID": "7032200",
   "OverrideBaseEffectID": "100",
@@ -5316,8 +5874,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "280"
+  "RollOrder": "280",
+  "Characters": "ALL"
 }, {
   "EffectID": "7035100",
   "OverrideBaseEffectID": "100",
@@ -5335,8 +5895,10 @@
   "StatusIconID": "20015",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "281"
+  "RollOrder": "281",
+  "Characters": "ALL"
 }, {
   "EffectID": "7040000",
   "OverrideBaseEffectID": "100",
@@ -5354,8 +5916,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "282"
+  "RollOrder": "282",
+  "Characters": "ALL"
 }, {
   "EffectID": "7040100",
   "OverrideBaseEffectID": "100",
@@ -5373,8 +5937,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "283"
+  "RollOrder": "283",
+  "Characters": "ALL"
 }, {
   "EffectID": "7040200",
   "OverrideBaseEffectID": "100",
@@ -5392,8 +5958,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "284"
+  "RollOrder": "284",
+  "Characters": "ALL"
 }, {
   "EffectID": "7040300",
   "OverrideBaseEffectID": "100",
@@ -5411,8 +5979,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "285"
+  "RollOrder": "285",
+  "Characters": "ALL"
 }, {
   "EffectID": "7040400",
   "OverrideBaseEffectID": "100",
@@ -5430,8 +6000,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "286"
+  "RollOrder": "286",
+  "Characters": "ALL"
 }, {
   "EffectID": "7040500",
   "OverrideBaseEffectID": "100",
@@ -5449,8 +6021,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "287"
+  "RollOrder": "287",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043000",
   "OverrideBaseEffectID": "100",
@@ -5468,8 +6042,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "288"
+  "RollOrder": "288",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043100",
   "OverrideBaseEffectID": "100",
@@ -5487,8 +6063,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "289"
+  "RollOrder": "289",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043200",
   "OverrideBaseEffectID": "100",
@@ -5506,8 +6084,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "290"
+  "RollOrder": "290",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043300",
   "OverrideBaseEffectID": "100",
@@ -5525,8 +6105,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "291"
+  "RollOrder": "291",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043400",
   "OverrideBaseEffectID": "100",
@@ -5544,8 +6126,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "292"
+  "RollOrder": "292",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043500",
   "OverrideBaseEffectID": "100",
@@ -5563,8 +6147,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "293"
+  "RollOrder": "293",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043600",
   "OverrideBaseEffectID": "100",
@@ -5582,8 +6168,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "294"
+  "RollOrder": "294",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043700",
   "OverrideBaseEffectID": "100",
@@ -5601,8 +6189,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "295"
+  "RollOrder": "295",
+  "Characters": "ALL"
 }, {
   "EffectID": "7043800",
   "OverrideBaseEffectID": "100",
@@ -5620,8 +6210,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "296"
+  "RollOrder": "296",
+  "Characters": "ALL"
 }, {
   "EffectID": "7044000",
   "OverrideBaseEffectID": "100",
@@ -5639,8 +6231,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "297"
+  "RollOrder": "297",
+  "Characters": "ALL"
 }, {
   "EffectID": "7044100",
   "OverrideBaseEffectID": "100",
@@ -5658,8 +6252,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "298"
+  "RollOrder": "298",
+  "Characters": "ALL"
 }, {
   "EffectID": "7044200",
   "OverrideBaseEffectID": "100",
@@ -5677,8 +6273,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "299"
+  "RollOrder": "299",
+  "Characters": "ALL"
 }, {
   "EffectID": "7044300",
   "OverrideBaseEffectID": "100",
@@ -5696,8 +6294,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "300"
+  "RollOrder": "300",
+  "Characters": "ALL"
 }, {
   "EffectID": "7044400",
   "OverrideBaseEffectID": "100",
@@ -5715,8 +6315,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "301"
+  "RollOrder": "301",
+  "Characters": "ALL"
 }, {
   "EffectID": "7044500",
   "OverrideBaseEffectID": "100",
@@ -5734,8 +6336,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "302"
+  "RollOrder": "302",
+  "Characters": "ALL"
 }, {
   "EffectID": "7044600",
   "OverrideBaseEffectID": "100",
@@ -5753,8 +6357,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "303"
+  "RollOrder": "303",
+  "Characters": "ALL"
 }, {
   "EffectID": "7050000",
   "OverrideBaseEffectID": "100",
@@ -5772,8 +6378,10 @@
   "StatusIconID": "20293",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "304"
+  "RollOrder": "304",
+  "Characters": "ALL"
 }, {
   "EffectID": "7050100",
   "OverrideBaseEffectID": "100",
@@ -5791,8 +6399,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "305"
+  "RollOrder": "305",
+  "Characters": "ALL"
 }, {
   "EffectID": "7060000",
   "OverrideBaseEffectID": "100",
@@ -5810,8 +6420,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "306"
+  "RollOrder": "306",
+  "Characters": "ALL"
 }, {
   "EffectID": "7060100",
   "OverrideBaseEffectID": "100",
@@ -5829,8 +6441,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "307"
+  "RollOrder": "307",
+  "Characters": "ALL"
 }, {
   "EffectID": "7060200",
   "OverrideBaseEffectID": "100",
@@ -5848,8 +6462,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Standard",
-  "RollOrder": "308"
+  "RollOrder": "308",
+  "Characters": "ALL"
 }, {
   "EffectID": "7070000",
   "OverrideBaseEffectID": "100",
@@ -5867,8 +6483,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "309"
+  "RollOrder": "309",
+  "Characters": "ALL"
 }, {
   "EffectID": "7090000",
   "OverrideBaseEffectID": "100",
@@ -5886,8 +6504,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "310"
+  "RollOrder": "310",
+  "Characters": "ALL"
 }, {
   "EffectID": "7090100",
   "OverrideBaseEffectID": "100",
@@ -5905,8 +6525,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "311"
+  "RollOrder": "311",
+  "Characters": "ALL"
 }, {
   "EffectID": "7100100",
   "OverrideBaseEffectID": "100",
@@ -5924,8 +6546,10 @@
   "StatusIconID": "20293",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "312"
+  "RollOrder": "312",
+  "Characters": "ALL"
 }, {
   "EffectID": "7110000",
   "OverrideBaseEffectID": "100",
@@ -5943,8 +6567,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "313"
+  "RollOrder": "313",
+  "Characters": "ALL"
 }, {
   "EffectID": "7120000",
   "OverrideBaseEffectID": "100",
@@ -5962,8 +6588,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "314"
+  "RollOrder": "314",
+  "Characters": "Duchess, Executor, Guardian, Ironeye, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7120100",
   "OverrideBaseEffectID": "100",
@@ -5981,8 +6609,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "315"
+  "RollOrder": "315",
+  "Characters": "Duchess, Executor, Guardian, Ironeye, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7120200",
   "OverrideBaseEffectID": "100",
@@ -6000,8 +6630,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "316"
+  "RollOrder": "316",
+  "Characters": "Duchess, Executor, Guardian, Ironeye, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7120300",
   "OverrideBaseEffectID": "100",
@@ -6019,8 +6651,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "317"
+  "RollOrder": "317",
+  "Characters": "Duchess, Executor, Guardian, Ironeye, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7120400",
   "OverrideBaseEffectID": "100",
@@ -6038,8 +6672,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "318"
+  "RollOrder": "318",
+  "Characters": "Duchess, Executor, Guardian, Ironeye, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7120500",
   "OverrideBaseEffectID": "100",
@@ -6057,8 +6693,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "319"
+  "RollOrder": "319",
+  "Characters": "Duchess, Executor, Guardian, Ironeye, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7120600",
   "OverrideBaseEffectID": "100",
@@ -6076,8 +6714,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "320"
+  "RollOrder": "320",
+  "Characters": "Duchess, Executor, Guardian, Ironeye, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7120900",
   "OverrideBaseEffectID": "100",
@@ -6095,8 +6735,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "321"
+  "RollOrder": "321",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121000",
   "OverrideBaseEffectID": "100",
@@ -6114,8 +6756,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "322"
+  "RollOrder": "322",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121100",
   "OverrideBaseEffectID": "100",
@@ -6133,8 +6777,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "323"
+  "RollOrder": "323",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121200",
   "OverrideBaseEffectID": "100",
@@ -6152,8 +6798,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "324"
+  "RollOrder": "324",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121300",
   "OverrideBaseEffectID": "100",
@@ -6171,8 +6819,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "325"
+  "RollOrder": "325",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121400",
   "OverrideBaseEffectID": "100",
@@ -6190,8 +6840,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "326"
+  "RollOrder": "326",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121500",
   "OverrideBaseEffectID": "100",
@@ -6209,8 +6861,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "327"
+  "RollOrder": "327",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121600",
   "OverrideBaseEffectID": "100",
@@ -6228,8 +6882,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "328"
+  "RollOrder": "328",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121700",
   "OverrideBaseEffectID": "100",
@@ -6247,8 +6903,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "329"
+  "RollOrder": "329",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121800",
   "OverrideBaseEffectID": "100",
@@ -6266,8 +6924,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "330"
+  "RollOrder": "330",
+  "Characters": "ALL"
 }, {
   "EffectID": "7121900",
   "OverrideBaseEffectID": "100",
@@ -6285,8 +6945,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "331"
+  "RollOrder": "331",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122000",
   "OverrideBaseEffectID": "100",
@@ -6304,8 +6966,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "332"
+  "RollOrder": "332",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122100",
   "OverrideBaseEffectID": "100",
@@ -6323,8 +6987,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "333"
+  "RollOrder": "333",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122200",
   "OverrideBaseEffectID": "100",
@@ -6342,8 +7008,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "334"
+  "RollOrder": "334",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122300",
   "OverrideBaseEffectID": "100",
@@ -6361,8 +7029,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "335"
+  "RollOrder": "335",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122400",
   "OverrideBaseEffectID": "100",
@@ -6380,8 +7050,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "336"
+  "RollOrder": "336",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122500",
   "OverrideBaseEffectID": "100",
@@ -6399,8 +7071,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "337"
+  "RollOrder": "337",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122600",
   "OverrideBaseEffectID": "100",
@@ -6418,8 +7092,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "338"
+  "RollOrder": "338",
+  "Characters": "ALL"
 }, {
   "EffectID": "7122700",
   "OverrideBaseEffectID": "100",
@@ -6437,8 +7113,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "339"
+  "RollOrder": "339",
+  "Characters": "Duchess, Executor, Guardian, Scholar, Wylder"
 }, {
   "EffectID": "7122800",
   "OverrideBaseEffectID": "100",
@@ -6456,8 +7134,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "340"
+  "RollOrder": "340",
+  "Characters": "Executor, Guardian, Raider, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7122900",
   "OverrideBaseEffectID": "100",
@@ -6475,8 +7155,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "341"
+  "RollOrder": "341",
+  "Characters": "Duchess, Executor, Guardian, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7123000",
   "OverrideBaseEffectID": "100",
@@ -6494,8 +7176,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "342"
+  "RollOrder": "342",
+  "Characters": "Raider, Wylder"
 }, {
   "EffectID": "7123100",
   "OverrideBaseEffectID": "100",
@@ -6513,8 +7197,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "343"
+  "RollOrder": "343",
+  "Characters": "Duchess, Executor, Guardian, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7123200",
   "OverrideBaseEffectID": "100",
@@ -6532,8 +7218,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "344"
+  "RollOrder": "344",
+  "Characters": "Duchess, Executor, Raider, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7123300",
   "OverrideBaseEffectID": "100",
@@ -6551,8 +7239,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "345"
+  "RollOrder": "345",
+  "Characters": "Duchess, Executor, Guardian, Raider, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7123400",
   "OverrideBaseEffectID": "100",
@@ -6570,8 +7260,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "346"
+  "RollOrder": "346",
+  "Characters": "Raider, Undertaker"
 }, {
   "EffectID": "7123500",
   "OverrideBaseEffectID": "100",
@@ -6589,8 +7281,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "347"
+  "RollOrder": "347",
+  "Characters": "Duchess, Executor, Guardian, Raider, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7123600",
   "OverrideBaseEffectID": "100",
@@ -6608,8 +7302,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "348"
+  "RollOrder": "348",
+  "Characters": "Duchess, Executor, Scholar"
 }, {
   "EffectID": "7123700",
   "OverrideBaseEffectID": "100",
@@ -6627,8 +7323,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "349"
+  "RollOrder": "349",
+  "Characters": "Duchess, Executor, Scholar"
 }, {
   "EffectID": "7123800",
   "OverrideBaseEffectID": "100",
@@ -6646,8 +7344,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "350"
+  "RollOrder": "350",
+  "Characters": "Executor, Guardian, Scholar, Wylder"
 }, {
   "EffectID": "7123900",
   "OverrideBaseEffectID": "100",
@@ -6665,8 +7365,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "351"
+  "RollOrder": "351",
+  "Characters": "Duchess, Executor, Guardian, Raider, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7124000",
   "OverrideBaseEffectID": "100",
@@ -6684,8 +7386,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "352"
+  "RollOrder": "352",
+  "Characters": "Duchess, Executor, Guardian, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7124100",
   "OverrideBaseEffectID": "100",
@@ -6703,8 +7407,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "353"
+  "RollOrder": "353",
+  "Characters": "Duchess, Executor, Guardian, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7124300",
   "OverrideBaseEffectID": "100",
@@ -6722,8 +7428,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "354"
+  "RollOrder": "354",
+  "Characters": "Duchess, Executor, Guardian, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7124400",
   "OverrideBaseEffectID": "100",
@@ -6741,8 +7449,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "355"
+  "RollOrder": "355",
+  "Characters": "Duchess, Executor, Guardian, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7124500",
   "OverrideBaseEffectID": "100",
@@ -6760,8 +7470,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "356"
+  "RollOrder": "356",
+  "Characters": "Duchess, Executor, Guardian, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7124600",
   "OverrideBaseEffectID": "100",
@@ -6779,8 +7491,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "357"
+  "RollOrder": "357",
+  "Characters": "Duchess, Executor, Guardian, Raider, Revenant, Scholar, Undertaker, Wylder"
 }, {
   "EffectID": "7124700",
   "OverrideBaseEffectID": "100",
@@ -6798,8 +7512,10 @@
   "StatusIconID": "20295",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "358"
+  "RollOrder": "358",
+  "Characters": "Ironeye"
 }, {
   "EffectID": "7126000",
   "OverrideBaseEffectID": "100",
@@ -6817,8 +7533,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "359"
+  "RollOrder": "359",
+  "Characters": "ALL"
 }, {
   "EffectID": "7150000",
   "OverrideBaseEffectID": "100",
@@ -6836,8 +7554,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "360"
+  "RollOrder": "360",
+  "Characters": "ALL"
 }, {
   "EffectID": "7160000",
   "OverrideBaseEffectID": "100",
@@ -6855,8 +7575,10 @@
   "StatusIconID": "20013",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "361"
+  "RollOrder": "361",
+  "Characters": "ALL"
 }, {
   "EffectID": "7230000",
   "OverrideBaseEffectID": "100",
@@ -6874,8 +7596,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "362"
+  "RollOrder": "362",
+  "Characters": "ALL"
 }, {
   "EffectID": "7240000",
   "OverrideBaseEffectID": "100",
@@ -6893,8 +7617,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "363"
+  "RollOrder": "363",
+  "Characters": "ALL"
 }, {
   "EffectID": "7260000",
   "OverrideBaseEffectID": "100",
@@ -6912,8 +7638,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "364"
+  "RollOrder": "364",
+  "Characters": "ALL"
 }, {
   "EffectID": "7260300",
   "OverrideBaseEffectID": "100",
@@ -6931,8 +7659,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Both",
-  "RollOrder": "365"
+  "RollOrder": "365",
+  "Characters": "ALL"
 }, {
   "EffectID": "7260400",
   "OverrideBaseEffectID": "100",
@@ -6950,8 +7680,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "366"
+  "RollOrder": "366",
+  "Characters": "ALL"
 }, {
   "EffectID": "7360600",
   "OverrideBaseEffectID": "100",
@@ -6969,8 +7701,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "367"
+  "RollOrder": "367",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7360900",
   "OverrideBaseEffectID": "100",
@@ -6988,8 +7722,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "368"
+  "RollOrder": "368",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7361200",
   "OverrideBaseEffectID": "100",
@@ -7007,8 +7743,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "369"
+  "RollOrder": "369",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7361300",
   "OverrideBaseEffectID": "100",
@@ -7026,8 +7764,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "370"
+  "RollOrder": "370",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7362100",
   "OverrideBaseEffectID": "100",
@@ -7045,8 +7785,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "371"
+  "RollOrder": "371",
+  "Characters": "Recluse"
 }, {
   "EffectID": "7370300",
   "OverrideBaseEffectID": "100",
@@ -7064,8 +7806,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "372"
+  "RollOrder": "372",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7370400",
   "OverrideBaseEffectID": "100",
@@ -7083,8 +7827,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "373"
+  "RollOrder": "373",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7370600",
   "OverrideBaseEffectID": "100",
@@ -7102,8 +7848,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "374"
+  "RollOrder": "374",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7370900",
   "OverrideBaseEffectID": "100",
@@ -7121,8 +7869,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "375"
+  "RollOrder": "375",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7371500",
   "OverrideBaseEffectID": "100",
@@ -7140,8 +7890,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Standard",
-  "RollOrder": "376"
+  "RollOrder": "376",
+  "Characters": "Revenant"
 }, {
   "EffectID": "7031900",
   "OverrideBaseEffectID": "101",
@@ -7159,8 +7911,10 @@
   "StatusIconID": "20267",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "0",
   "RelicType": "Both",
-  "RollOrder": "377"
+  "RollOrder": "377",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001400",
   "OverrideBaseEffectID": "1000",
@@ -7178,8 +7932,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": "378"
+  "RollOrder": "378",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001401",
   "OverrideBaseEffectID": "1000",
@@ -7197,8 +7953,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "379"
+  "RollOrder": "379",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001500",
   "OverrideBaseEffectID": "1000",
@@ -7216,8 +7974,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "380"
+  "RollOrder": "380",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001501",
   "OverrideBaseEffectID": "1000",
@@ -7235,8 +7995,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "381"
+  "RollOrder": "381",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001600",
   "OverrideBaseEffectID": "1000",
@@ -7254,8 +8016,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "382"
+  "RollOrder": "382",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001601",
   "OverrideBaseEffectID": "1000",
@@ -7273,8 +8037,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "383"
+  "RollOrder": "383",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001700",
   "OverrideBaseEffectID": "1000",
@@ -7292,8 +8058,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "384"
+  "RollOrder": "384",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001701",
   "OverrideBaseEffectID": "1000",
@@ -7311,8 +8079,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "385"
+  "RollOrder": "385",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001800",
   "OverrideBaseEffectID": "1000",
@@ -7330,8 +8100,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "386"
+  "RollOrder": "386",
+  "Characters": "ALL"
 }, {
   "EffectID": "6001801",
   "OverrideBaseEffectID": "1000",
@@ -7349,8 +8121,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "387"
+  "RollOrder": "387",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002600",
   "OverrideBaseEffectID": "1000",
@@ -7368,8 +8142,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "388"
+  "RollOrder": "388",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002601",
   "OverrideBaseEffectID": "1000",
@@ -7387,8 +8163,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "389"
+  "RollOrder": "389",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002700",
   "OverrideBaseEffectID": "1000",
@@ -7406,8 +8184,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "390"
+  "RollOrder": "390",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002701",
   "OverrideBaseEffectID": "1000",
@@ -7425,8 +8205,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "391"
+  "RollOrder": "391",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002800",
   "OverrideBaseEffectID": "1000",
@@ -7444,8 +8226,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "392"
+  "RollOrder": "392",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002801",
   "OverrideBaseEffectID": "1000",
@@ -7463,8 +8247,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "393"
+  "RollOrder": "393",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002900",
   "OverrideBaseEffectID": "1000",
@@ -7482,8 +8268,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "394"
+  "RollOrder": "394",
+  "Characters": "ALL"
 }, {
   "EffectID": "6002901",
   "OverrideBaseEffectID": "1000",
@@ -7501,8 +8289,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "395"
+  "RollOrder": "395",
+  "Characters": "ALL"
 }, {
   "EffectID": "6003000",
   "OverrideBaseEffectID": "1000",
@@ -7520,8 +8310,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "396"
+  "RollOrder": "396",
+  "Characters": "ALL"
 }, {
   "EffectID": "6003100",
   "OverrideBaseEffectID": "1000",
@@ -7539,8 +8331,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "397"
+  "RollOrder": "397",
+  "Characters": "ALL"
 }, {
   "EffectID": "6003200",
   "OverrideBaseEffectID": "1000",
@@ -7558,8 +8352,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "398"
+  "RollOrder": "398",
+  "Characters": "ALL"
 }, {
   "EffectID": "6003300",
   "OverrideBaseEffectID": "1000",
@@ -7577,8 +8373,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "399"
+  "RollOrder": "399",
+  "Characters": "ALL"
 }, {
   "EffectID": "6003400",
   "OverrideBaseEffectID": "1000",
@@ -7596,8 +8394,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "400"
+  "RollOrder": "400",
+  "Characters": "ALL"
 }, {
   "EffectID": "6003500",
   "OverrideBaseEffectID": "1000",
@@ -7615,8 +8415,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "401"
+  "RollOrder": "401",
+  "Characters": "ALL"
 }, {
   "EffectID": "6003600",
   "OverrideBaseEffectID": "1000",
@@ -7634,8 +8436,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "402"
+  "RollOrder": "402",
+  "Characters": "ALL"
 }, {
   "EffectID": "6610400",
   "OverrideBaseEffectID": "1000",
@@ -7653,8 +8457,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "403"
+  "RollOrder": "403",
+  "Characters": "ALL"
 }, {
   "EffectID": "6610500",
   "OverrideBaseEffectID": "1000",
@@ -7672,8 +8478,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "404"
+  "RollOrder": "404",
+  "Characters": "ALL"
 }, {
   "EffectID": "6610600",
   "OverrideBaseEffectID": "1000",
@@ -7691,8 +8499,10 @@
   "StatusIconID": "20293",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "405"
+  "RollOrder": "405",
+  "Characters": "ALL"
 }, {
   "EffectID": "6610700",
   "OverrideBaseEffectID": "1000",
@@ -7710,8 +8520,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "406"
+  "RollOrder": "406",
+  "Characters": "ALL"
 }, {
   "EffectID": "6610800",
   "OverrideBaseEffectID": "1000",
@@ -7729,8 +8541,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "407"
+  "RollOrder": "407",
+  "Characters": "ALL"
 }, {
   "EffectID": "6610801",
   "OverrideBaseEffectID": "1000",
@@ -7748,8 +8562,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "408"
+  "RollOrder": "408",
+  "Characters": "ALL"
 }, {
   "EffectID": "6610802",
   "OverrideBaseEffectID": "1000",
@@ -7767,8 +8583,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "409"
+  "RollOrder": "409",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611001",
   "OverrideBaseEffectID": "1000",
@@ -7786,8 +8604,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "410"
+  "RollOrder": "410",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611002",
   "OverrideBaseEffectID": "1000",
@@ -7805,8 +8625,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "411"
+  "RollOrder": "411",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611100",
   "OverrideBaseEffectID": "1000",
@@ -7824,8 +8646,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "412"
+  "RollOrder": "412",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611101",
   "OverrideBaseEffectID": "1000",
@@ -7843,8 +8667,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "413"
+  "RollOrder": "413",
+  "Characters": "ALL"
 }, {
   "EffectID": "6611102",
   "OverrideBaseEffectID": "1000",
@@ -7862,8 +8688,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "1",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": "414"
+  "RollOrder": "414",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000000",
   "OverrideBaseEffectID": "1000",
@@ -7881,8 +8709,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "415"
+  "RollOrder": "415",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000001",
   "OverrideBaseEffectID": "1000",
@@ -7900,8 +8730,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "416"
+  "RollOrder": "416",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000002",
   "OverrideBaseEffectID": "1000",
@@ -7919,8 +8751,10 @@
   "StatusIconID": "20291",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "417"
+  "RollOrder": "417",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000100",
   "OverrideBaseEffectID": "1000",
@@ -7938,8 +8772,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "418"
+  "RollOrder": "418",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000101",
   "OverrideBaseEffectID": "1000",
@@ -7957,8 +8793,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "419"
+  "RollOrder": "419",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000102",
   "OverrideBaseEffectID": "1000",
@@ -7976,8 +8814,10 @@
   "StatusIconID": "20292",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "420"
+  "RollOrder": "420",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000200",
   "OverrideBaseEffectID": "1000",
@@ -7995,8 +8835,10 @@
   "StatusIconID": "20293",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "421"
+  "RollOrder": "421",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000201",
   "OverrideBaseEffectID": "1000",
@@ -8014,8 +8856,10 @@
   "StatusIconID": "20293",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "422"
+  "RollOrder": "422",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000202",
   "OverrideBaseEffectID": "1000",
@@ -8033,8 +8877,10 @@
   "StatusIconID": "20293",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "423"
+  "RollOrder": "423",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000300",
   "OverrideBaseEffectID": "1000",
@@ -8052,8 +8898,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "424"
+  "RollOrder": "424",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000301",
   "OverrideBaseEffectID": "1000",
@@ -8071,8 +8919,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "425"
+  "RollOrder": "425",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000302",
   "OverrideBaseEffectID": "1000",
@@ -8090,8 +8940,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "426"
+  "RollOrder": "426",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000400",
   "OverrideBaseEffectID": "1000",
@@ -8109,8 +8961,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "427"
+  "RollOrder": "427",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000401",
   "OverrideBaseEffectID": "1000",
@@ -8128,8 +8982,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "428"
+  "RollOrder": "428",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000402",
   "OverrideBaseEffectID": "1000",
@@ -8147,8 +9003,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "429"
+  "RollOrder": "429",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000500",
   "OverrideBaseEffectID": "1000",
@@ -8166,8 +9024,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "430"
+  "RollOrder": "430",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000501",
   "OverrideBaseEffectID": "1000",
@@ -8185,8 +9045,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "431"
+  "RollOrder": "431",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000502",
   "OverrideBaseEffectID": "1000",
@@ -8204,8 +9066,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "432"
+  "RollOrder": "432",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000600",
   "OverrideBaseEffectID": "1000",
@@ -8223,8 +9087,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "433"
+  "RollOrder": "433",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000601",
   "OverrideBaseEffectID": "1000",
@@ -8242,8 +9108,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "434"
+  "RollOrder": "434",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000602",
   "OverrideBaseEffectID": "1000",
@@ -8261,8 +9129,10 @@
   "StatusIconID": "20207",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "435"
+  "RollOrder": "435",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000700",
   "OverrideBaseEffectID": "1000",
@@ -8280,8 +9150,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "436"
+  "RollOrder": "436",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000701",
   "OverrideBaseEffectID": "1000",
@@ -8299,8 +9171,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "437"
+  "RollOrder": "437",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000702",
   "OverrideBaseEffectID": "1000",
@@ -8318,8 +9192,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "438"
+  "RollOrder": "438",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000800",
   "OverrideBaseEffectID": "1000",
@@ -8337,8 +9213,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "439"
+  "RollOrder": "439",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000801",
   "OverrideBaseEffectID": "1000",
@@ -8356,8 +9234,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "440"
+  "RollOrder": "440",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000802",
   "OverrideBaseEffectID": "1000",
@@ -8375,8 +9255,10 @@
   "StatusIconID": "20296",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "441"
+  "RollOrder": "441",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000900",
   "OverrideBaseEffectID": "1000",
@@ -8394,8 +9276,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "442"
+  "RollOrder": "442",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000901",
   "OverrideBaseEffectID": "1000",
@@ -8413,8 +9297,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "443"
+  "RollOrder": "443",
+  "Characters": "ALL"
 }, {
   "EffectID": "7000902",
   "OverrideBaseEffectID": "1000",
@@ -8432,8 +9318,10 @@
   "StatusIconID": "20297",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "444"
+  "RollOrder": "444",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001000",
   "OverrideBaseEffectID": "1000",
@@ -8451,8 +9339,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "445"
+  "RollOrder": "445",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001001",
   "OverrideBaseEffectID": "1000",
@@ -8470,8 +9360,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "446"
+  "RollOrder": "446",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001002",
   "OverrideBaseEffectID": "1000",
@@ -8489,8 +9381,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "447"
+  "RollOrder": "447",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001400",
   "OverrideBaseEffectID": "1000",
@@ -8508,8 +9402,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "448"
+  "RollOrder": "448",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001401",
   "OverrideBaseEffectID": "1000",
@@ -8527,8 +9423,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "449"
+  "RollOrder": "449",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001402",
   "OverrideBaseEffectID": "1000",
@@ -8546,8 +9444,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "450"
+  "RollOrder": "450",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001500",
   "OverrideBaseEffectID": "1000",
@@ -8565,8 +9465,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "451"
+  "RollOrder": "451",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001501",
   "OverrideBaseEffectID": "1000",
@@ -8584,8 +9486,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "452"
+  "RollOrder": "452",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001502",
   "OverrideBaseEffectID": "1000",
@@ -8603,8 +9507,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "453"
+  "RollOrder": "453",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001600",
   "OverrideBaseEffectID": "1000",
@@ -8622,8 +9528,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "454"
+  "RollOrder": "454",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001601",
   "OverrideBaseEffectID": "1000",
@@ -8641,8 +9549,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "455"
+  "RollOrder": "455",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001602",
   "OverrideBaseEffectID": "1000",
@@ -8660,8 +9570,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "456"
+  "RollOrder": "456",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001700",
   "OverrideBaseEffectID": "1000",
@@ -8679,8 +9591,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "457"
+  "RollOrder": "457",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001701",
   "OverrideBaseEffectID": "1000",
@@ -8698,8 +9612,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "458"
+  "RollOrder": "458",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001702",
   "OverrideBaseEffectID": "1000",
@@ -8717,8 +9633,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "459"
+  "RollOrder": "459",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001800",
   "OverrideBaseEffectID": "1000",
@@ -8736,8 +9654,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "460"
+  "RollOrder": "460",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001801",
   "OverrideBaseEffectID": "1000",
@@ -8755,8 +9675,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Standard",
-  "RollOrder": "461"
+  "RollOrder": "461",
+  "Characters": "ALL"
 }, {
   "EffectID": "7001802",
   "OverrideBaseEffectID": "1000",
@@ -8774,8 +9696,10 @@
   "StatusIconID": "20206",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "462"
+  "RollOrder": "462",
+  "Characters": "ALL"
 }, {
   "EffectID": "7002600",
   "OverrideBaseEffectID": "1000",
@@ -8793,8 +9717,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "463"
+  "RollOrder": "463",
+  "Characters": "ALL"
 }, {
   "EffectID": "7002700",
   "OverrideBaseEffectID": "1000",
@@ -8812,8 +9738,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "464"
+  "RollOrder": "464",
+  "Characters": "ALL"
 }, {
   "EffectID": "7002800",
   "OverrideBaseEffectID": "1000",
@@ -8831,8 +9759,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "465"
+  "RollOrder": "465",
+  "Characters": "ALL"
 }, {
   "EffectID": "7002900",
   "OverrideBaseEffectID": "1000",
@@ -8850,8 +9780,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "466"
+  "RollOrder": "466",
+  "Characters": "ALL"
 }, {
   "EffectID": "7003000",
   "OverrideBaseEffectID": "1000",
@@ -8869,8 +9801,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "467"
+  "RollOrder": "467",
+  "Characters": "ALL"
 }, {
   "EffectID": "7003100",
   "OverrideBaseEffectID": "1000",
@@ -8888,8 +9822,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "468"
+  "RollOrder": "468",
+  "Characters": "ALL"
 }, {
   "EffectID": "7003200",
   "OverrideBaseEffectID": "1000",
@@ -8907,8 +9843,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "469"
+  "RollOrder": "469",
+  "Characters": "ALL"
 }, {
   "EffectID": "7003300",
   "OverrideBaseEffectID": "1000",
@@ -8926,8 +9864,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "470"
+  "RollOrder": "470",
+  "Characters": "ALL"
 }, {
   "EffectID": "7003400",
   "OverrideBaseEffectID": "1000",
@@ -8945,8 +9885,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "471"
+  "RollOrder": "471",
+  "Characters": "ALL"
 }, {
   "EffectID": "7003500",
   "OverrideBaseEffectID": "1000",
@@ -8964,8 +9906,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "472"
+  "RollOrder": "472",
+  "Characters": "ALL"
 }, {
   "EffectID": "7003600",
   "OverrideBaseEffectID": "1000",
@@ -8983,8 +9927,10 @@
   "StatusIconID": "20208",
   "CurseRequired": "0",
   "Curse": "0",
+  "SelfStacking": "1",
   "RelicType": "Both",
-  "RollOrder": "473"
+  "RollOrder": "473",
+  "Characters": "ALL"
 }, {
   "EffectID": "6820000",
   "OverrideBaseEffectID": "6820000",
@@ -9002,8 +9948,10 @@
   "StatusIconID": "20980",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6820100",
   "OverrideBaseEffectID": "6820100",
@@ -9021,8 +9969,10 @@
   "StatusIconID": "20981",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6820200",
   "OverrideBaseEffectID": "6820200",
@@ -9040,8 +9990,10 @@
   "StatusIconID": "20983",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6820300",
   "OverrideBaseEffectID": "6820300",
@@ -9059,8 +10011,10 @@
   "StatusIconID": "20982",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6820400",
   "OverrideBaseEffectID": "6820400",
@@ -9078,8 +10032,10 @@
   "StatusIconID": "20985",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6820500",
   "OverrideBaseEffectID": "6820500",
@@ -9097,8 +10053,10 @@
   "StatusIconID": "20984",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6820600",
   "OverrideBaseEffectID": "6820600",
@@ -9116,8 +10074,10 @@
   "StatusIconID": "20986",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6830000",
   "OverrideBaseEffectID": "6830000",
@@ -9135,8 +10095,10 @@
   "StatusIconID": "20268",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6830100",
   "OverrideBaseEffectID": "6830100",
@@ -9154,8 +10116,10 @@
   "StatusIconID": "20268",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6830200",
   "OverrideBaseEffectID": "6830200",
@@ -9173,8 +10137,10 @@
   "StatusIconID": "20268",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6830300",
   "OverrideBaseEffectID": "6830300",
@@ -9192,8 +10158,10 @@
   "StatusIconID": "20268",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6830400",
   "OverrideBaseEffectID": "6830400",
@@ -9211,8 +10179,10 @@
   "StatusIconID": "20260",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6840000",
   "OverrideBaseEffectID": "6840000",
@@ -9230,8 +10200,10 @@
   "StatusIconID": "20302",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6840100",
   "OverrideBaseEffectID": "6840100",
@@ -9249,8 +10221,10 @@
   "StatusIconID": "20260",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6840200",
   "OverrideBaseEffectID": "6840200",
@@ -9268,8 +10242,10 @@
   "StatusIconID": "20315",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "1",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6850200",
   "OverrideBaseEffectID": "8762000",
@@ -9287,8 +10263,10 @@
   "StatusIconID": "20269",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6850500",
   "OverrideBaseEffectID": "8766000",
@@ -9306,8 +10284,10 @@
   "StatusIconID": "20260",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6850700",
   "OverrideBaseEffectID": "8800100",
@@ -9325,8 +10305,10 @@
   "StatusIconID": "20069",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6850800",
   "OverrideBaseEffectID": "8800200",
@@ -9344,8 +10326,10 @@
   "StatusIconID": "20069",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6850900",
   "OverrideBaseEffectID": "8801000",
@@ -9363,8 +10347,10 @@
   "StatusIconID": "20069",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6851200",
   "OverrideBaseEffectID": "8810000",
@@ -9382,8 +10368,10 @@
   "StatusIconID": "20068",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6851300",
   "OverrideBaseEffectID": "8810300",
@@ -9401,8 +10389,10 @@
   "StatusIconID": "20980",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6851400",
   "OverrideBaseEffectID": "8810400",
@@ -9420,8 +10410,10 @@
   "StatusIconID": "20981",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }, {
   "EffectID": "6851700",
   "OverrideBaseEffectID": "8831200",
@@ -9439,6 +10431,8 @@
   "StatusIconID": "20060",
   "CurseRequired": "0",
   "Curse": "1",
+  "SelfStacking": "2",
   "RelicType": "Depth Of Night",
-  "RollOrder": null
+  "RollOrder": null,
+  "Characters": "ALL"
 }]

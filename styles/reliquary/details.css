@@ -522,21 +522,105 @@
 }
 
 .effect-chip--curse-yes {
-  background: linear-gradient(135deg, #4c2a80, #8b5fd4);
-  border-color: rgba(168, 120, 230, 0.7);
-  color: #f7f1ff;
+  background: var(--chip-curse-yes-bg, linear-gradient(135deg, #4c2a80, #8b5fd4));
+  border-color: var(--chip-curse-yes-border, rgba(168, 120, 230, 0.7));
+  color: var(--chip-curse-yes-text, #f7f1ff);
 }
 
 .effect-chip--curse-no {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.14);
-  color: rgba(245, 245, 245, 0.92);
+  background: var(--chip-curse-no-bg, rgba(255, 255, 255, 0.08));
+  border-color: var(--chip-curse-no-border, rgba(255, 255, 255, 0.14));
+  color: var(--chip-curse-no-text, rgba(245, 245, 245, 0.92));
+}
+
+.effect-chip--self-stack.effect-chip--self-stack-yes {
+  background: var(--chip-self-stack-yes-bg, linear-gradient(135deg, #103828, #27a06a));
+  border-color: var(--chip-self-stack-yes-border, rgba(120, 230, 170, 0.8));
+  color: var(--chip-self-stack-yes-text, #e9fff5);
+}
+
+.effect-chip--self-stack.effect-chip--self-stack-no {
+  background: var(--chip-self-stack-no-bg, linear-gradient(135deg, #3d1318, #9b2f35));
+  border-color: var(--chip-self-stack-no-border, rgba(255, 130, 150, 0.8));
+  color: var(--chip-self-stack-no-text, #ffeef2);
+}
+
+.effect-chip--self-stack.effect-chip--self-stack-unknown {
+  background: var(--chip-self-stack-unknown-bg, linear-gradient(135deg, #2e2f36, #4b4e57));
+  border-color: var(--chip-self-stack-unknown-border, rgba(255, 255, 255, 0.18));
+  color: var(--chip-self-stack-unknown-text, rgba(245, 245, 245, 0.92));
+}
+
+.effect-chip--character {
+  background: var(--chip-character-bg, rgba(255, 255, 255, 0.08));
+  border-color: var(--chip-character-border, rgba(255, 255, 255, 0.16));
+  color: var(--chip-character-text, rgba(245, 245, 245, 0.92));
+}
+
+.effect-chip--character.effect-chip--character-all {
+  background: var(--chip-character-all-bg, linear-gradient(135deg, #4c2a80, #8b5fd4));
+  border-color: var(--chip-character-all-border, rgba(168, 120, 230, 0.7));
+  color: var(--chip-character-all-text, #f7f1ff);
+}
+
+.effect-chip--character.effect-chip--character-duchess {
+  background: var(--chip-character-duchess-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-duchess-border, var(--chip-character-border));
+  color: var(--chip-character-duchess-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-executor {
+  background: var(--chip-character-executor-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-executor-border, var(--chip-character-border));
+  color: var(--chip-character-executor-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-guardian {
+  background: var(--chip-character-guardian-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-guardian-border, var(--chip-character-border));
+  color: var(--chip-character-guardian-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-ironeye {
+  background: var(--chip-character-ironeye-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-ironeye-border, var(--chip-character-border));
+  color: var(--chip-character-ironeye-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-raider {
+  background: var(--chip-character-raider-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-raider-border, var(--chip-character-border));
+  color: var(--chip-character-raider-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-revenant {
+  background: var(--chip-character-revenant-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-revenant-border, var(--chip-character-border));
+  color: var(--chip-character-revenant-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-scholar {
+  background: var(--chip-character-scholar-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-scholar-border, var(--chip-character-border));
+  color: var(--chip-character-scholar-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-undertaker {
+  background: var(--chip-character-undertaker-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-undertaker-border, var(--chip-character-border));
+  color: var(--chip-character-undertaker-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-wylder {
+  background: var(--chip-character-wylder-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-wylder-border, var(--chip-character-border));
+  color: var(--chip-character-wylder-text, var(--chip-character-text));
 }
 
 .effect-chip--placeholder {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--chip-placeholder-bg, rgba(255, 255, 255, 0.08));
+  border-color: var(--chip-placeholder-border, rgba(255, 255, 255, 0.12));
+  color: var(--chip-placeholder-text, rgba(255, 255, 255, 0.9));
 }
 
 .effect-toggle {

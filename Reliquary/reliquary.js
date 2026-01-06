@@ -22,9 +22,12 @@ import {
 } from "./reliquary.ui.js";
 import { getDom } from "./reliquary.dom.js";
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
+import { applyPaletteCssVars, COLOR_SWATCHES, RANDOM_SWATCH, CHARACTERS, characterColors } from "../scripts/ui/palette.js";
 import { openEffectMenu, closeEffectMenu, openCurseMenu, closeCurseMenu } from "./reliquary.menus.js";
 
 const dom = getDom();
+
+applyPaletteCssVars();
 
 const resultsEl = document.getElementById("results");
 const resultsHeader = document.querySelector("#results .panel-header");
@@ -61,13 +64,7 @@ function setShowIllegalActive(active) {
   }
 }
 
-const COLOR_SWATCH = {
-  Red: "linear-gradient(135deg, #642121, #b84242)",
-  Blue: "linear-gradient(135deg, #1e4275, #3f7ad0)",
-  Yellow: "linear-gradient(135deg, #645019, #b28d2c)",
-  Green: "linear-gradient(135deg, #10482a, #2f8a52)"
-};
-const RANDOM_SWATCH = "linear-gradient(135deg, #c94b4b, #3b82f6, #f2c94c, #2fa44a)";
+const COLOR_SWATCH = COLOR_SWATCHES;
 
 const defaultCategoryTheme = categoryColorFor("");
 
@@ -601,6 +598,41 @@ function chipsForRelicType(value) {
   return [single];
 }
 
+function selfStackingMeta(value) {
+  const v = String(value ?? "").trim();
+  if (v === "1") return { label: "Yes", modifier: "yes" };
+  if (v === "0") return { label: "No", modifier: "no" };
+  if (v === "2") return { label: "Unknown", modifier: "unknown" };
+  return { label: "Unknown", modifier: "unknown" };
+}
+
+const ALL_CHARACTER_SET = new Set((CHARACTERS || []).map(c => c.toLowerCase()));
+
+function parseCharactersList(value) {
+  const raw = (value ?? "").toString();
+  const names = raw.split(",").map(s => s.trim()).filter(Boolean);
+
+  // Normalize to canonical ordering where possible, preserve unknowns at the end
+  const normalized = names.map(n => n.toLowerCase());
+  const selected = new Set(normalized);
+
+  const ordered = [];
+  for (const canonical of CHARACTERS) {
+    if (selected.has(canonical.toLowerCase())) ordered.push(canonical);
+  }
+
+  const extras = names.filter(n => !ALL_CHARACTER_SET.has(n.toLowerCase()));
+  const fullList = [...ordered, ...extras];
+
+  const isAll = ALL_CHARACTER_SET.size > 0 && ordered.length === ALL_CHARACTER_SET.size && extras.length === 0;
+  const chipMeta = fullList.map(name => {
+    const token = characterColors(name);
+    return { name, slug: token.slug, colors: token };
+  });
+
+  return { list: fullList, isAll, chipMeta };
+}
+
 function buildEffectInfoPopover(row, rawText, kind = "effect") {
   const pop = document.createElement("div");
   pop.setAttribute("data-pop-kind", kind === "curse" ? "curse" : "effect");
@@ -621,6 +653,8 @@ function buildEffectInfoPopover(row, rawText, kind = "effect") {
   const name = row.EffectDescription ?? `(Effect ${row.EffectID ?? "?"})`;
   const extendedDescription = row?.EffectExtendedDescription ?? "";
   const relicChips = chipsForRelicType(row.RelicType);
+  const selfStacking = selfStackingMeta(row?.SelfStacking);
+  const characters = parseCharactersList(row?.Characters);
   const entryKind = kind === "curse" ? "Curse" : "Effect";
   const rawValueFull = rawText && String(rawText).trim()
     ? String(rawText).trim()
@@ -647,6 +681,8 @@ function buildEffectInfoPopover(row, rawText, kind = "effect") {
     ["EffectID", row?.EffectID ?? ""],
     ["Relic Type", relicTypeText],
     ["Curse Required", curseRequired ? "Yes" : "No"],
+    ["Self-Stacking", selfStacking.label],
+    ["Characters", characters.list.join(", ") || "∅"],
     ["Compatibility", compatibility === "" ? "∅" : compatibility],
     ["Roll Order", rollOrder === "" ? "∅" : rollOrder],
     ["Raw", rawValue]
@@ -694,10 +730,16 @@ function buildEffectInfoPopover(row, rawText, kind = "effect") {
       </div>
 
       <div class="effect-info-section">
-        <div class="effect-info-label">Eligible Classes</div>
+        <div class="effect-info-label">Characters</div>
         <div class="effect-info-divider" aria-hidden="true"></div>
         <div class="effect-info-value">
-          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+          ${(() => {
+            if (!characters.list.length) return `<span class="effect-chip effect-chip--placeholder">None Listed</span>`;
+            if (characters.isAll) return `<span class="effect-chip effect-chip--character effect-chip--character-all">All Characters</span>`;
+            return characters.chipMeta.map(({ name, slug }) => `
+              <span class="effect-chip effect-chip--character effect-chip--character-${slug}">${escapeHtml(name)}</span>
+            `).join("");
+          })()}
         </div>
       </div>
 
@@ -705,15 +747,7 @@ function buildEffectInfoPopover(row, rawText, kind = "effect") {
         <div class="effect-info-label">Self-Stacking</div>
         <div class="effect-info-divider" aria-hidden="true"></div>
         <div class="effect-info-value">
-          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
-        </div>
-      </div>
-
-      <div class="effect-info-section">
-        <div class="effect-info-label">Similar-Stacking</div>
-        <div class="effect-info-divider" aria-hidden="true"></div>
-        <div class="effect-info-value">
-          <span class="effect-chip effect-chip--placeholder">Coming Soon</span>
+          <span class="effect-chip effect-chip--self-stack effect-chip--self-stack-${selfStacking.modifier}">${selfStacking.label}</span>
         </div>
       </div>
 

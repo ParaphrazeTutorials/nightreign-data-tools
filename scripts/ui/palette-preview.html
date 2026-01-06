@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Palette Preview</title>
+  <link rel="stylesheet" href="../../styles/reliquary/details.css" />
+  <style>
+    body {
+      margin: 24px;
+      background: #0f1117;
+      color: #e9ecf5;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    h1, h2 { margin: 0 0 12px; font-weight: 800; }
+    .pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .section { margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <h1>Palette Preview</h1>
+  <div class="section">
+    <h2>Self-Stacking</h2>
+    <div class="pill-grid" id="pillSelf"></div>
+  </div>
+  <div class="section">
+    <h2>Curse</h2>
+    <div class="pill-grid" id="pillCurse"></div>
+  </div>
+  <div class="section">
+    <h2>Characters</h2>
+    <div class="pill-grid" id="pillChars"></div>
+  </div>
+
+  <div class="section">
+    <h2>Effect Colors</h2>
+    <div class="pill-grid" id="pillEffects"></div>
+  </div>
+
+  <script type="module">
+    import { applyPaletteCssVars, CHARACTERS, characterColors, CHIP_COLORS, EFFECT_COLOR_BASES } from "./palette.js";
+    import { gradientFromTheme } from "./theme.js";
+    import { themeFromBase } from "../../Reliquary/reliquary.logic.js";
+
+    try {
+      applyPaletteCssVars();
+
+      const pillSelf = document.getElementById("pillSelf");
+      const pillCurse = document.getElementById("pillCurse");
+      const pillChars = document.getElementById("pillChars");
+      const pillEffects = document.getElementById("pillEffects");
+
+      const makeSpan = (className, label) => {
+        const el = document.createElement("span");
+        el.className = `effect-chip ${className}`;
+        el.textContent = label;
+        return el;
+      };
+
+      // Self-Stacking states
+      pillSelf.append(
+        makeSpan("effect-chip--self-stack effect-chip--self-stack-yes", "Yes"),
+        makeSpan("effect-chip--self-stack effect-chip--self-stack-no", "No"),
+        makeSpan("effect-chip--self-stack effect-chip--self-stack-unknown", "Unknown")
+      );
+
+      // Curse states
+      pillCurse.append(
+        makeSpan("effect-chip effect-chip--curse-yes", "Curse: Yes"),
+        makeSpan("effect-chip effect-chip--curse-no", "Curse: No")
+      );
+
+      // Characters
+      pillChars.append(makeSpan("effect-chip effect-chip--character effect-chip--character-all", "All Characters"));
+      CHARACTERS.forEach(name => {
+        const { slug } = characterColors(name);
+        pillChars.append(makeSpan(`effect-chip effect-chip--character effect-chip--character-${slug}`, name));
+      });
+
+      // Effect colors (category sequence + defaults)
+      const addEffectChip = (label, base) => {
+        const theme = themeFromBase(base);
+        const bg = gradientFromTheme(theme);
+        const chip = makeSpan("effect-chip", label);
+        chip.style.background = bg;
+        chip.style.borderColor = theme.border || "rgba(255,255,255,0.12)";
+        chip.style.color = theme.text || "#f7f9ff";
+        pillEffects.append(chip);
+      };
+
+      addEffectChip("Default", EFFECT_COLOR_BASES.defaultBase);
+      addEffectChip("Curse Base", EFFECT_COLOR_BASES.curseBase);
+      EFFECT_COLOR_BASES.sequence.forEach((base, idx) => addEffectChip(`Seq ${idx + 1}`, base));
+    } catch (err) {
+      console.error("Palette preview failed", err);
+      const warn = document.createElement("div");
+      warn.style.marginTop = "16px";
+      warn.style.padding = "12px 14px";
+      warn.style.border = "1px solid #ff8a8a";
+      warn.style.background = "rgba(255, 80, 80, 0.12)";
+      warn.style.color = "#ffdede";
+      warn.textContent = `Error rendering preview: ${err}`;
+      document.body.appendChild(warn);
+    }
+  </script>
+</body>
+</html>

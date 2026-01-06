@@ -1,25 +1,12 @@
 // Pure logic helpers (no DOM)
 
-export const COLORS = ["Red", "Blue", "Yellow", "Green"];
+import { COLORS as PALETTE_COLORS, EFFECT_COLOR_BASES } from "../scripts/ui/palette.js";
 
-// Category color configuration (non-purple palette by default; purple reserved for curses)
-// Wide-gamut palette to keep adjacent categories visually distinct
-export const SEQ_CATEGORY_BASES = [
-  "#b12f45", // deep crimson
-  "#0f8da4", // storm cyan
-  "#5f8d1a", // moss green
-  "#c74d2e", // ember coral
-  "#1a5ba5", // dusk cobalt
-  "#3e9c7c", // pine mint
-  "#c67914", // burnt amber
-  "#177f7f", // shadow teal
-  "#b13c79", // wine rose
-  "#c49a18", // dark goldenrod
-  "#3a8a32", // forest leaf
-  "#2d46b0"  // indigo royal
-];
+export const COLORS = PALETTE_COLORS;
+export const SEQ_CATEGORY_BASES = EFFECT_COLOR_BASES.sequence;
 
-const CURSE_COLOR_BASE = "#7a4bc6"; // reserved purple for curse-related categories
+const CURSE_COLOR_BASE = EFFECT_COLOR_BASES.curseBase; // reserved purple for curse-related categories
+const DEFAULT_EFFECT_BASE = EFFECT_COLOR_BASES.defaultBase;
 
 function clamp01(v) {
   return Math.min(1, Math.max(0, v));
@@ -150,7 +137,7 @@ export function categoryColorFor(category) {
   }
 
   if (!cat) {
-    const base = "#2b2f38";
+    const base = DEFAULT_EFFECT_BASE;
     const shades = [adjustLightness(base, -0.16), base, adjustLightness(base, 0.14)];
     return { base, shades, border: adjustLightness(base, -0.22) };
   }

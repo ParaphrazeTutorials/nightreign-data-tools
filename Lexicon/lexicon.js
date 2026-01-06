@@ -1,5 +1,8 @@
 import { textColorFor } from "../Reliquary/reliquary.logic.js";
 import { gradientFromTheme, buildCategoryThemeMap } from "../scripts/ui/theme.js";
+import { applyPaletteCssVars } from "../scripts/ui/palette.js";
+
+applyPaletteCssVars();
 
 // The Lexicon — table + tile theater mode + module picker
 // Session-only: sort + text zoom. No persistence across refresh.
