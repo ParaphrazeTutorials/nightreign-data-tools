@@ -1,6 +1,7 @@
 // Paths + image helpers (ALL Asset casing respected)
 
 export const DATA_URL = new URL("../Data/reliquary.json", window.location.href).toString();
+export const CHALICE_DATA_URL = new URL("../Data/chalicedata.json", window.location.href).toString();
 
 
 // Icon folder:

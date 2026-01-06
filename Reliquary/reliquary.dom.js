@@ -2,6 +2,13 @@ export function getDom() {
   return {
     // Top controls
     selType: document.getElementById("relicType"),
+    selClass: document.getElementById("classFilter"),
+
+    // Mode switching
+    modeBtnIndividual: document.getElementById("modeIndividualBtn"),
+    modeBtnChalice: document.getElementById("modeChaliceBtn"),
+    individualPanel: document.getElementById("individualMode"),
+    chalicePanel: document.getElementById("chaliceMode"),
 
     showIllegalBtn: document.getElementById("showIllegalBtn"),
     illegalPill: document.getElementById("illegalPill"),
@@ -25,6 +32,19 @@ export function getDom() {
     detailsBody: document.getElementById("detailsBody"),
 
     // Optional (safe if missing)
-    statusText: document.getElementById("statusText") || null
+    statusText: document.getElementById("statusText") || null,
+
+    // Chalice builder
+    chaliceSelect: document.getElementById("chaliceSelect"),
+    chaliceStandardList: document.getElementById("chaliceStandardList"),
+    chaliceDepthList: document.getElementById("chaliceDepthList"),
+    chaliceStandardCount: document.getElementById("chaliceStandardCount"),
+    chaliceDepthCount: document.getElementById("chaliceDepthCount"),
+    chaliceResultsStandard: document.getElementById("chaliceResultsStandard"),
+    chaliceResultsDepth: document.getElementById("chaliceResultsDepth"),
+    chaliceStatus: document.getElementById("chaliceStatus"),
+    chaliceColors: document.getElementById("chaliceColors"),
+    chaliceStandardColors: document.getElementById("chaliceStandardColors"),
+    chaliceDepthColors: document.getElementById("chaliceDepthColors")
   };
 }

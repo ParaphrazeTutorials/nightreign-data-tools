@@ -1,4 +1,4 @@
-import { DATA_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
+import { CHALICE_DATA_URL, DATA_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
 import {
   COLORS,
   compatId,
@@ -34,11 +34,34 @@ const resultsHeader = document.querySelector("#results .panel-header");
 const validityBadge = document.getElementById("relicValidity");
 const autoSortBtn = document.getElementById("autoSortBtn");
 
+const MODES = { INDIVIDUAL: "individual", CHALICE: "chalice" };
+let activeMode = MODES.INDIVIDUAL;
+
 let rows = [];
 let byId = new Map();
 let rowsAll = [];
 let byIdAll = new Map();
 let curses = [];
+let selectedClass = "";
+
+let chaliceData = [];
+let chalicesByCharacter = new Map();
+let selectedChaliceId = "";
+
+const chaliceSelections = {
+  standard: Array(9).fill(""),
+  depth: Array(9).fill("")
+};
+
+const chaliceCurses = {
+  standard: Array(9).fill(""),
+  depth: Array(9).fill("")
+};
+
+const chaliceCats = {
+  standard: Array(9).fill(""),
+  depth: Array(9).fill("")
+};
 
 const selectedEffects = ["", "", ""];
 const selectedCats = ["", "", ""];
@@ -172,6 +195,126 @@ function installColorChipMenu() {
 
   document.addEventListener("click", handleColorMenuOutsideClick);
   updateColorChipLabel();
+}
+
+function isChaliceMode() {
+  return activeMode === MODES.CHALICE;
+}
+
+function sideInfo(side) {
+  const key = side === "depth" ? "depth" : "standard";
+  return {
+    key,
+    label: key === "depth" ? "Depth of Night" : "Standard",
+    relicType: key === "depth" ? "Depth Of Night" : "Standard",
+    slotPrefix: key === "depth" ? "D" : "S"
+  };
+}
+
+function setChaliceStatus(text) {
+  if (!dom.chaliceStatus) return;
+  dom.chaliceStatus.textContent = text || "";
+}
+
+function syncModeUI() {
+  const isChalice = isChaliceMode();
+
+  if (dom.individualPanel) dom.individualPanel.hidden = isChalice;
+  if (dom.chalicePanel) dom.chalicePanel.hidden = !isChalice;
+
+  if (dom.modeBtnIndividual) dom.modeBtnIndividual.classList.toggle("is-active", !isChalice);
+  if (dom.modeBtnChalice) dom.modeBtnChalice.classList.toggle("is-active", isChalice);
+
+  if (dom.selType) {
+    dom.selType.disabled = isChalice;
+    if (dom.selType.parentElement) dom.selType.parentElement.classList.toggle("is-disabled", isChalice);
+  }
+
+  if (dom.showIllegalBtn) dom.showIllegalBtn.hidden = isChalice;
+  if (dom.illegalPill) dom.illegalPill.hidden = isChalice || !isShowIllegalActive();
+}
+
+function setMode(next) {
+  const normalized = next === MODES.CHALICE ? MODES.CHALICE : MODES.INDIVIDUAL;
+  if (normalized === activeMode) return;
+  activeMode = normalized;
+  syncModeUI();
+  if (isChaliceMode()) {
+    setChaliceStatus("");
+    renderChaliceUI();
+  }
+}
+
+function handleStartOver() {
+  if (isChaliceMode()) {
+    resetClassFilter();
+    resetChaliceSelections();
+  } else {
+    resetClassFilter();
+    resetAll();
+  }
+}
+
+function populateClassOptions() {
+  if (!dom.selClass) return;
+  const chars = Array.isArray(CHARACTERS) ? [...new Set(CHARACTERS)] : [];
+  const options = [`<option value=""${!selectedClass ? " selected" : ""}>-- Class / All --</option>`,
+    ...chars.map(c => {
+      const v = c || "";
+      const sel = normalizeLower(v) === normalizeLower(selectedClass) ? " selected" : "";
+      return `<option value="${v}"${sel}>${v}</option>`;
+    })
+  ];
+  dom.selClass.innerHTML = options.join("");
+}
+
+function pruneChaliceSelectionsForClass() {
+  const pruneSide = (key) => {
+    for (let i = 0; i < chaliceSelections[key].length; i++) {
+      const id = chaliceSelections[key][i];
+      if (!id) continue;
+      const row = chaliceRow(id);
+      if (!rowMatchesClass(row)) {
+        chaliceSelections[key][i] = "";
+        chaliceCats[key][i] = "";
+        chaliceCurses[key][i] = "";
+      }
+      const curseId = chaliceCurses[key][i];
+      if (curseId) {
+        const curseRow = chaliceRow(curseId);
+        if (!rowMatchesClass(curseRow)) chaliceCurses[key][i] = "";
+      }
+    }
+  };
+  pruneSide("standard");
+  pruneSide("depth");
+}
+
+function filteredChalices() {
+  if (!Array.isArray(chaliceData) || !chaliceData.length) return [];
+  if (!selectedClass) return chaliceData.filter(entry => (entry?.chalicename || "").toString().trim());
+  const target = normalizeLower(selectedClass);
+  return chaliceData.filter(entry => normalizeLower(entry?.character || "") === target);
+}
+
+function normalizeLower(value) {
+  return (value ?? "").toString().trim().toLowerCase();
+}
+
+function rowMatchesClass(row) {
+  if (!selectedClass) return true;
+  const target = normalizeLower(selectedClass);
+  const charactersRaw = (row?.Characters ?? "").toString();
+  const list = charactersRaw.split(",").map(s => normalizeLower(s)).filter(Boolean);
+
+  if (!list.length) return true; // treat empty as ALL
+  if (list.includes("all")) return true;
+  return list.includes(target);
+}
+
+function filterByClass(list) {
+  if (!selectedClass) return list;
+  return (list || []).filter(rowMatchesClass);
 }
 
 function computeRollOrderIssue(a, b, c) {
@@ -1070,7 +1213,7 @@ function computeEligibilityForSlot(slotIdx, showIllegalOverride = null) {
   }
 
   const type = effectiveRelicType(true);
-  const base = baseFilteredByRelicType(rows, type);
+  const base = filterByClass(baseFilteredByRelicType(rows, type));
   const selectedRows = [getSelectedRow(0), getSelectedRow(1), getSelectedRow(2)];
 
   const taken = new Set();
@@ -1086,7 +1229,7 @@ function computeEligibilityForSlot(slotIdx, showIllegalOverride = null) {
     if (cid) blocked.add(cid);
   }
 
-  const eligible = eligibleList(rows, type, blocked, taken, showIllegal);
+  const eligible = eligibleList(base, type, blocked, taken, showIllegal);
   const categorySource = eligible.length ? eligible : base;
 
   return {
@@ -1439,7 +1582,7 @@ function openCurseMenuForSlot(slotIdx, anchorBtn) {
   closeCurseMenu();
 
   const blockedCompat = computeBlockedCompatForCurse(slotIdx);
-  const eligibleCurses = baseFilteredByRelicType(curses, effectiveRelicType(true))
+  const eligibleCurses = filterByClass(baseFilteredByRelicType(curses, effectiveRelicType(true)))
     .filter(r => {
       const cid = compatId(r);
       if (!cid) return true;
@@ -1635,11 +1778,560 @@ function updateUI(reason = "") {
   updateCounts(dom, activeIndex, availableCount);
 }
 
+// ---------------------- Chalice Builder ----------------------
+
+function chaliceRow(effectId) {
+  if (!effectId) return null;
+  return getRow(effectId) || getAnyRow(effectId) || null;
+}
+
+function computeChaliceBlockedCompat(slotIdx) {
+  const blocked = new Set();
+  const effects = chaliceSelections.depth;
+  const cursesSel = chaliceCurses.depth;
+
+  for (let i = 0; i < effects.length; i++) {
+    if (i === slotIdx) continue;
+    const eff = chaliceRow(effects[i]);
+    const cur = chaliceRow(cursesSel[i]);
+    const effCid = compatId(eff);
+    if (effCid) blocked.add(effCid);
+    const curCid = compatId(cur);
+    if (curCid) blocked.add(curCid);
+  }
+
+  // also block the effect in the slot itself
+  const selfEff = chaliceRow(effects[slotIdx]);
+  const selfCid = compatId(selfEff);
+  if (selfCid) blocked.add(selfCid);
+
+  return blocked;
+}
+
+function isRowAllowedForSide(row, sideMeta) {
+  const t = relicTypeForRow(row);
+  if (sideMeta.relicType === "Standard") return t === "Standard" || t === "Both";
+  if (sideMeta.relicType === "Depth Of Night") return t === "Depth Of Night" || t === "Both";
+  return true;
+}
+
+function chaliceEffectCount(sideKey, effectId, ignoreSlotIdx = -1) {
+  if (!effectId) return 0;
+  const key = sideKey === "depth" ? "depth" : "standard";
+  return chaliceSelections[key].reduce((count, cur, idx) => {
+    if (idx === ignoreSlotIdx) return count;
+    return count + (cur === String(effectId) ? 1 : 0);
+  }, 0);
+}
+
+function canUseEffectOnSide(sideKey, slotIdx, effectId) {
+  if (!effectId) return true;
+  const count = chaliceEffectCount(sideKey, effectId, slotIdx);
+  return count < 3;
+}
+
+function chaliceEligiblePool(sideKey) {
+  const meta = sideInfo(sideKey);
+  if (!rows.length) return [];
+  return filterByClass(baseFilteredByRelicType(rows, meta.relicType));
+}
+
+function renderChaliceSlot(sideKey, idx) {
+  const meta = sideInfo(sideKey);
+  const effectId = chaliceSelections[meta.key][idx];
+  const row = chaliceRow(effectId);
+  const curseId = chaliceCurses[meta.key][idx];
+  const curseRow = curseId ? chaliceRow(curseId) : null;
+  const label = `${meta.slotPrefix}${idx + 1}`;
+  const name = row ? (row.EffectDescription ?? `(Effect ${row.EffectID})`) : "Pick an effect";
+  const cid = row ? (compatId(row) || "∅") : "";
+  const roll = row ? (row.RollOrder == null || String(row.RollOrder).trim() === "" ? "∅" : row.RollOrder) : "";
+  const metaLine = row ? `CID ${cid} · Roll ${roll}` : `${meta.label} / Both effects only`;
+  const btnLabel = row ? "Change" : "Select Effect";
+  const requiresCurse = meta.key === "depth" && row && String(row?.CurseRequired ?? "0") === "1";
+  const curseLabel = curseRow ? (curseRow.EffectDescription ?? `(Curse ${curseRow.EffectID})`) : "Select Curse";
+  const curseMissing = requiresCurse && !curseRow;
+
+  return `
+    <li>
+      <div class="chalice-slot" data-side="${meta.key}" data-slot="${idx}">
+        <div class="chalice-slot__top">
+          <span class="chalice-slot__badge">${label}</span>
+          <div class="chalice-slot__actions">
+            <button type="button" class="chalice-slot__btn" data-ch-slot="${meta.key}:${idx}">${btnLabel}</button>
+            ${row ? `<button type="button" class="icon-btn clear-btn" data-ch-clear="${meta.key}:${idx}" aria-label="Clear ${label}">×</button>` : ""}
+          </div>
+        </div>
+        <div class="chalice-slot__body">
+          <div class="chalice-slot__title">${escapeHtml(name)}</div>
+          <div class="chalice-slot__meta">${metaLine}</div>
+          ${requiresCurse ? `
+            <div class="chalice-slot__curse ${curseMissing ? "is-missing" : ""}">
+              <span class="chalice-slot__curse-label">Curse</span>
+              <button type="button" class="chalice-slot__btn chalice-slot__btn--ghost" data-ch-curse="${meta.key}:${idx}">${escapeHtml(curseLabel)}</button>
+              ${curseMissing ? `<span class="chalice-slot__curse-warning">Required</span>` : ""}
+            </div>
+          ` : ""}
+        </div>
+      </div>
+    </li>
+  `;
+}
+
+function renderChaliceLists() {
+  if (dom.chaliceStandardList) {
+    dom.chaliceStandardList.innerHTML = chaliceSelections.standard.map((_, idx) => renderChaliceSlot("standard", idx)).join("");
+  }
+  if (dom.chaliceDepthList) {
+    dom.chaliceDepthList.innerHTML = chaliceSelections.depth.map((_, idx) => renderChaliceSlot("depth", idx)).join("");
+  }
+  installChaliceSlotButtons();
+}
+
+function installChaliceSlotButtons() {
+  const pickers = document.querySelectorAll("[data-ch-slot]");
+  pickers.forEach(btn => {
+    btn.addEventListener("click", evt => {
+      const payload = btn.getAttribute("data-ch-slot") || "";
+      const [sideRaw, idxRaw] = payload.split(":");
+      const idx = Number.parseInt(idxRaw, 10);
+      if (!Number.isInteger(idx) || idx < 0) return;
+      openChaliceEffectMenu(sideRaw, idx, btn, evt);
+    });
+  });
+
+  const clears = document.querySelectorAll("[data-ch-clear]");
+  clears.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const payload = btn.getAttribute("data-ch-clear") || "";
+      const [sideRaw, idxRaw] = payload.split(":");
+      const idx = Number.parseInt(idxRaw, 10);
+      const side = sideRaw === "depth" ? "depth" : "standard";
+      if (!Number.isInteger(idx) || idx < 0) return;
+      chaliceSelections[side][idx] = "";
+      chaliceCats[side][idx] = "";
+      chaliceCurses[side][idx] = "";
+      renderChaliceUI();
+    });
+  });
+
+  const cursePickers = document.querySelectorAll("[data-ch-curse]");
+  cursePickers.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const payload = btn.getAttribute("data-ch-curse") || "";
+      const [sideRaw, idxRaw] = payload.split(":");
+      const idx = Number.parseInt(idxRaw, 10);
+      const side = sideRaw === "depth" ? "depth" : "standard";
+      if (!Number.isInteger(idx) || idx < 0) return;
+      openChaliceCurseMenu(side, idx, btn);
+    });
+  });
+}
+
+function openChaliceEffectMenu(sideKey, slotIdx, anchorBtn) {
+  closeEffectMenu();
+  const meta = sideInfo(sideKey);
+  const pool = chaliceEligiblePool(meta.key);
+  const categories = categoriesFor(pool);
+  const currentId = chaliceSelections[meta.key][slotIdx] || "";
+  const selectedCat = chaliceCats[meta.key][slotIdx] || "";
+
+  openEffectMenu({
+    slotIdx,
+    anchorBtn,
+    eligible: pool,
+    categories,
+    currentId,
+    selectedCategory: selectedCat,
+    onPick: (id, activeCategory) => {
+      if (!canUseEffectOnSide(meta.key, slotIdx, id)) {
+        setChaliceStatus(`You can only use an effect up to three times on the ${meta.label} side.`);
+        return;
+      }
+      chaliceSelections[meta.key][slotIdx] = id;
+      chaliceCats[meta.key][slotIdx] = activeCategory || "";
+      chaliceCurses[meta.key][slotIdx] = ""; // reset curse when effect changes
+      setChaliceStatus("");
+      renderChaliceUI();
+    }
+  });
+}
+
+function openChaliceCurseMenu(sideKey, slotIdx, anchorBtn) {
+  if (sideKey !== "depth") return;
+  const effectRow = chaliceRow(chaliceSelections.depth[slotIdx]);
+  if (!effectRow) return;
+  const requiresCurse = String(effectRow?.CurseRequired ?? "0") === "1";
+  if (!requiresCurse) return;
+
+  const blockedCompat = computeChaliceBlockedCompat(slotIdx);
+  const eligibleCurses = filterByClass(baseFilteredByRelicType(curses, "Depth Of Night"))
+    .filter(r => {
+      const cid = compatId(r);
+      if (!cid) return true;
+      return !blockedCompat.has(String(cid));
+    })
+    .sort((x, y) => getRollValue(x) - getRollValue(y));
+
+  const currentId = chaliceCurses.depth[slotIdx] || "";
+  const categories = categoriesFor(eligibleCurses);
+
+  openCurseMenu({
+    slotIdx,
+    anchorBtn,
+    eligible: eligibleCurses,
+    categories,
+    currentId,
+    selectedCategory: "",
+    onPick: (id, activeCategory) => {
+      chaliceCurses.depth[slotIdx] = id;
+      renderChaliceUI();
+    }
+  });
+}
+
+function tally(ids) {
+  const map = new Map();
+  ids.forEach(id => {
+    if (!id) return;
+    const key = String(id);
+    map.set(key, (map.get(key) || 0) + 1);
+  });
+  return map;
+}
+
+function evaluateComboForSide(ids, meta) {
+  const rowsCombo = ids.map(id => chaliceRow(id)).filter(Boolean);
+  if (rowsCombo.length !== ids.length) return null;
+
+  // Enforce relic type and duplicate EffectID rules
+  const seenEffect = new Set();
+  const seenCompat = new Set();
+  for (const row of rowsCombo) {
+    if (!isRowAllowedForSide(row, meta)) return null;
+    const eid = String(row.EffectID);
+    if (seenEffect.has(eid)) return null;
+    seenEffect.add(eid);
+
+    const cid = compatId(row);
+    if (cid) {
+      if (seenCompat.has(cid)) return null;
+      seenCompat.add(cid);
+    }
+  }
+
+  const needsCurse = rowsCombo.some(r => String(r?.CurseRequired ?? "0") === "1");
+  const sorted = [...rowsCombo].sort((a, b) => getRollValue(a) - getRollValue(b));
+
+  return {
+    ids: ids.map(String),
+    rows: sorted,
+    needsCurse,
+    valid: !needsCurse
+  };
+}
+
+function hasCountsForCombo(combo, counts) {
+  for (const id of combo.ids) {
+    if ((counts.get(id) || 0) <= 0) return false;
+  }
+  return true;
+}
+
+function decrementCounts(counts, combo) {
+  const next = new Map(counts);
+  combo.ids.forEach(id => {
+    next.set(id, (next.get(id) || 0) - 1);
+  });
+  return next;
+}
+
+function selectBestCombosSlots(combos) {
+  let best = [];
+
+  function dfs(startIdx, usedSlots, slate) {
+    let advanced = false;
+    for (let i = startIdx; i < combos.length; i++) {
+      const combo = combos[i];
+      if (combo.indices.some(idx => usedSlots.has(idx))) continue;
+      advanced = true;
+      const nextUsed = new Set(usedSlots);
+      combo.indices.forEach(idx => nextUsed.add(idx));
+      dfs(i + 1, nextUsed, [...slate, combo]);
+    }
+    if (!advanced && slate.length > best.length) {
+      best = slate;
+    }
+  }
+
+  dfs(0, new Set(), []);
+  return best;
+}
+
+function selectBestCombos(validCombos, counts) {
+  let best = [];
+
+  function dfs(startIdx, countsLeft, slate) {
+    let advanced = false;
+    for (let i = startIdx; i < validCombos.length; i++) {
+      const combo = validCombos[i];
+      if (!hasCountsForCombo(combo, countsLeft)) continue;
+      advanced = true;
+      const nextCounts = decrementCounts(countsLeft, combo);
+      dfs(i, nextCounts, [...slate, combo]);
+    }
+    if (!advanced && slate.length > best.length) {
+      best = slate;
+    }
+  }
+
+  dfs(0, counts, []);
+  return best;
+}
+
+function computeLeftoverCounts(total, used) {
+  const out = new Map(total);
+  for (const [id, usedCount] of used.entries()) {
+    out.set(id, Math.max(0, (out.get(id) || 0) - usedCount));
+  }
+  return out;
+}
+
+function countMapTotal(map) {
+  let total = 0;
+  for (const [, v] of map.entries()) total += Number(v || 0);
+  return total;
+}
+
+function generateCombosForSide(meta) {
+  const slots = chaliceSelections[meta.key];
+  const curseSlots = chaliceCurses[meta.key];
+  const filledIdx = slots.map((id, idx) => ({ id, idx })).filter(x => x.id);
+
+  const combos = [];
+  const blocked = [];
+
+  for (let a = 0; a < filledIdx.length; a++) {
+    for (let b = a + 1; b < filledIdx.length; b++) {
+      for (let c = b + 1; c < filledIdx.length; c++) {
+        const triple = [filledIdx[a], filledIdx[b], filledIdx[c]];
+        const ids = triple.map(t => t.id);
+        const rowsCombo = ids.map(id => chaliceRow(id));
+        if (rowsCombo.some(r => !r)) continue;
+
+        // type/class check
+        if (!rowsCombo.every(r => isRowAllowedForSide(r, meta) && rowMatchesClass(r))) continue;
+
+        // Effect uniqueness and compatibility across effects + curses
+        const seenEffect = new Set();
+        const usedCompat = new Set();
+
+        let invalid = false;
+        for (const row of rowsCombo) {
+          const eid = String(row.EffectID);
+          if (seenEffect.has(eid)) { invalid = true; break; }
+          seenEffect.add(eid);
+          const cid = compatId(row);
+          if (cid) {
+            if (usedCompat.has(cid)) { invalid = true; break; }
+            usedCompat.add(cid);
+          }
+        }
+        if (invalid) continue;
+
+        const cursesForCombo = [];
+        if (meta.key === "depth") {
+          for (const slot of triple) {
+            const effectRow = chaliceRow(slot.id);
+            const needsCurse = String(effectRow?.CurseRequired ?? "0") === "1";
+            const curseId = curseSlots[slot.idx];
+            const curseRow = curseId ? chaliceRow(curseId) : null;
+            if (needsCurse && !curseRow) {
+              invalid = true;
+              break;
+            }
+            if (curseRow) {
+              if (!rowMatchesClass(curseRow)) { invalid = true; break; }
+              const ccid = compatId(curseRow);
+              if (ccid && usedCompat.has(ccid)) { invalid = true; break; }
+              usedCompat.add(ccid);
+              cursesForCombo.push(curseRow);
+            }
+          }
+        }
+
+        if (invalid) continue;
+
+        const sorted = [...rowsCombo].sort((x, y) => getRollValue(x) - getRollValue(y));
+        combos.push({
+          ids,
+          indices: triple.map(t => t.idx),
+          rows: sorted,
+          curses: cursesForCombo
+        });
+      }
+    }
+  }
+
+  const best = selectBestCombosSlots(combos);
+  const usedSlots = new Set(best.flatMap(c => c.indices));
+  const leftoverCount = slots.filter(Boolean).length - usedSlots.size;
+
+  return {
+    combos: best,
+    blocked,
+    leftoverSlots: leftoverCount,
+    selectedCount: filledIdx.length,
+    uniqueCount: filledIdx.length
+  };
+}
+
+function relicCardHtml(combo, idx, sideLabel) {
+  return `
+    <div class="chalice-card">
+      <div class="chalice-card__title-row">
+        <span class="chalice-card__title">${sideLabel} Relic ${idx + 1}</span>
+        <span class="chalice-card__meta">Roll order ready</span>
+      </div>
+      <ol class="chalice-card__effects">
+        ${combo.rows.map(row => {
+          const name = row.EffectDescription ?? `(Effect ${row.EffectID})`;
+          const cid = compatId(row) || "∅";
+          const roll = row.RollOrder == null || String(row.RollOrder).trim() === "" ? "∅" : row.RollOrder;
+          const typeLabel = formatRelicTypeLabel(row.RelicType).label;
+          return `
+            <li>
+              <div class="chalice-card__effect">
+                <div class="chalice-card__effect-name">${escapeHtml(name)}</div>
+                <div class="chalice-card__effect-meta">CID ${cid} · Roll ${roll} · ${escapeHtml(typeLabel)}</div>
+              </div>
+            </li>
+          `;
+        }).join("")}
+      </ol>
+    </div>
+  `;
+}
+
+function renderResultList(targetEl, result, sideLabel) {
+  if (!targetEl) return;
+  if (!result.combos.length) {
+    targetEl.innerHTML = `<div class="chalice-empty">No valid ${sideLabel.toLowerCase()} relics yet.</div>`;
+    return;
+  }
+  targetEl.innerHTML = result.combos.map((combo, idx) => relicCardHtml(combo, idx, sideLabel)).join("");
+}
+
+function renderChaliceResults() {
+  const standard = generateCombosForSide(sideInfo("standard"));
+  const depth = generateCombosForSide(sideInfo("depth"));
+
+  renderResultList(dom.chaliceResultsStandard, standard, "Standard");
+  renderResultList(dom.chaliceResultsDepth, depth, "Depth of Night");
+
+  const blockedCount = (standard.blocked?.length || 0) + (depth.blocked?.length || 0);
+  const statusParts = [];
+
+  statusParts.push(`Standard: ${standard.combos.length} built${standard.leftoverSlots ? `, ${standard.leftoverSlots} slots unused` : ""}`);
+  statusParts.push(`Depth: ${depth.combos.length} built${depth.leftoverSlots ? `, ${depth.leftoverSlots} slots unused` : ""}`);
+  if (blockedCount) statusParts.push(`${blockedCount} combos need a curse and were skipped.`);
+
+  setChaliceStatus(statusParts.join(" | "));
+}
+
+function updateChaliceCounts() {
+  const std = chaliceSelections.standard.filter(Boolean).length;
+  const dep = chaliceSelections.depth.filter(Boolean).length;
+  if (dom.chaliceStandardCount) dom.chaliceStandardCount.textContent = `${std} / 9 selected`;
+  if (dom.chaliceDepthCount) dom.chaliceDepthCount.textContent = `${dep} / 9 selected`;
+}
+
+function renderChaliceUI() {
+  renderChaliceLists();
+  updateChaliceCounts();
+  renderChaliceResults();
+  renderChaliceColors();
+}
+
+function resetChaliceSelections() {
+  chaliceSelections.standard.fill("");
+  chaliceSelections.depth.fill("");
+  chaliceCats.standard.fill("");
+  chaliceCats.depth.fill("");
+  chaliceCurses.standard.fill("");
+  chaliceCurses.depth.fill("");
+  selectedChaliceId = "";
+  setChaliceStatus("");
+  renderChalicePickers();
+  renderChaliceUI();
+}
+
+function getSelectedChalice() {
+  const list = filteredChalices();
+  return list.find(c => String(c.chaliceID) === String(selectedChaliceId)) || list[0] || null;
+}
+
+function colorChip(color) {
+  const swatch = COLOR_SWATCH[color] || "#4a4f59";
+  return `<span class="chalice-color-chip" data-color="${color}" style="--chip-color:${swatch}" title="${color}">${color}</span>`;
+}
+
+function renderChaliceColors() {
+  if (!dom.chaliceColors || !dom.chaliceStandardColors || !dom.chaliceDepthColors) return;
+  const entry = getSelectedChalice();
+  if (!entry) {
+    dom.chaliceColors.hidden = true;
+    dom.chaliceStandardColors.innerHTML = "";
+    dom.chaliceDepthColors.innerHTML = "";
+    return;
+  }
+
+  const stdColors = [entry.standard1, entry.standard2, entry.standard3].filter(Boolean);
+  const depthColors = [entry.depth1, entry.depth2, entry.depth3].filter(Boolean);
+
+  dom.chaliceStandardColors.innerHTML = stdColors.map(colorChip).join("");
+  dom.chaliceDepthColors.innerHTML = depthColors.map(colorChip).join("");
+  dom.chaliceColors.hidden = false;
+}
+
+function renderChalicePickers() {
+  if (dom.chaliceSelect) {
+    const list = filteredChalices();
+    dom.chaliceSelect.innerHTML = list.map(c => `<option value="${c.chaliceID}">${c.chalicename}</option>`).join("");
+    if (!selectedChaliceId && list.length) selectedChaliceId = list[0].chaliceID;
+    const hasCurrent = list.some(c => String(c.chaliceID) === String(selectedChaliceId));
+    if (!hasCurrent) selectedChaliceId = list.length ? list[0].chaliceID : "";
+    dom.chaliceSelect.value = selectedChaliceId;
+  }
+
+  renderChaliceColors();
+}
+
+function indexChaliceData(list) {
+  chalicesByCharacter = new Map();
+  for (const entry of list || []) {
+    const char = (entry?.character || "").toString().trim();
+    if (!char) continue;
+    if (!chalicesByCharacter.has(char)) chalicesByCharacter.set(char, []);
+    chalicesByCharacter.get(char).push(entry);
+  }
+
+  for (const [, arr] of chalicesByCharacter.entries()) {
+    arr.sort((a, b) => String(a?.chalicename || "").localeCompare(String(b?.chalicename || "")));
+  }
+
+  const initialList = filteredChalices();
+  selectedChaliceId = selectedChaliceId || (initialList[0]?.chaliceID || "");
+}
+
 // Meta visibility toggle removed; info is now provided via hover tooltips on the info icon.
 
 function resetAllPreserveIllegal(desiredIllegal) {
   dom.selType.value = "";
+  if (dom.selClass) dom.selClass.value = "";
   selectedColor = "Random";
+
+  selectedClass = "";
 
   setShowIllegalActive(Boolean(desiredIllegal));
 
@@ -1651,11 +2343,22 @@ function resetAllPreserveIllegal(desiredIllegal) {
   updateUI("illegal-change");
 }
 
+function resetClassFilter() {
+  selectedClass = "";
+  if (dom.selClass) {
+    dom.selClass.value = "";
+    populateClassOptions();
+  }
+}
+
 function resetAll() {
   dom.selType.value = "";
+  if (dom.selClass) dom.selClass.value = "";
   selectedColor = "Random";
 
   setShowIllegalActive(false);
+
+  selectedClass = "";
 
   for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
   for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
@@ -1666,15 +2369,31 @@ function resetAll() {
 }
 
 async function load() {
-  const res = await fetch(DATA_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to load ${DATA_URL} (${res.status})`);
+  const [relicRes, chaliceRes] = await Promise.all([
+    fetch(DATA_URL, { cache: "no-store" }),
+    fetch(CHALICE_DATA_URL, { cache: "no-store" }).catch(() => null)
+  ]);
 
-  rowsAll = await res.json();
+  if (!relicRes.ok) throw new Error(`Failed to load ${DATA_URL} (${relicRes.status})`);
+
+  rowsAll = await relicRes.json();
   byIdAll = new Map(rowsAll.map(r => [String(r.EffectID), r]));
   curses = rowsAll.filter(r => String(r?.Curse ?? "0") === "1");
   rows = rowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
   byId = new Map(rows.map(r => [String(r.EffectID), r]));
   pickRandomColor();
+
+  if (chaliceRes && chaliceRes.ok) {
+    try {
+      chaliceData = await chaliceRes.json();
+      indexChaliceData(chaliceData);
+      renderChalicePickers();
+    } catch (err) {
+      console.warn("Failed to parse chalice data", err);
+    }
+  } else {
+    console.warn("Chalice data not loaded; builder will be empty.");
+  }
 
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
   installRelicImgFallback(dom.relicImg, () => effectiveRelicType());
@@ -1685,7 +2404,21 @@ async function load() {
   // Default illegal toggle is off
   setShowIllegalActive(false);
 
+  if (dom.modeBtnIndividual) dom.modeBtnIndividual.addEventListener("click", () => setMode(MODES.INDIVIDUAL));
+  if (dom.modeBtnChalice) dom.modeBtnChalice.addEventListener("click", () => setMode(MODES.CHALICE));
+
   dom.selType.addEventListener("change", () => updateUI("type-change"));
+  if (dom.selClass) {
+    populateClassOptions();
+    dom.selClass.addEventListener("change", evt => {
+      selectedClass = evt.target.value || "";
+      populateClassOptions();
+      pruneChaliceSelectionsForClass();
+      renderChalicePickers();
+      updateUI("class-change");
+      renderChaliceUI();
+    });
+  }
   if (dom.showIllegalBtn) {
     dom.showIllegalBtn.addEventListener("click", () => {
       const next = !isShowIllegalActive();
@@ -1693,8 +2426,25 @@ async function load() {
       resetAllPreserveIllegal(next);
     });
   }
-  if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", resetAll);
+  if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", handleStartOver);
 
+  if (dom.chaliceCharacter) {
+    dom.chaliceCharacter.addEventListener("change", evt => {
+      selectedCharacter = evt.target.value || "";
+      renderChalicePickers();
+      renderChaliceUI();
+    });
+  }
+
+  if (dom.chaliceSelect) {
+    dom.chaliceSelect.addEventListener("change", evt => {
+      selectedChaliceId = evt.target.value || "";
+      renderChaliceColors();
+    });
+  }
+
+  renderChaliceUI();
+  syncModeUI();
   updateUI("init");
 }
 

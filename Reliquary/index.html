@@ -45,6 +45,14 @@
 
       <section class="tool-shell">
 
+        <section class="mode-toggle" aria-label="Reliquary mode">
+          <div class="mode-toggle__group" role="group">
+            <button id="modeIndividualBtn" class="mode-toggle__btn is-active" type="button" data-mode="individual">Individual Relics</button>
+            <button id="modeChaliceBtn" class="mode-toggle__btn" type="button" data-mode="chalice">Chalice Builder</button>
+          </div>
+          <small class="subtext mode-toggle__hint">Switch between the classic relic view or the new chalice builder prototype.</small>
+        </section>
+
         <!-- UTILITY BAR (Filters + Actions) -->
         <section class="utility-bar" aria-label="Reliquary controls">
           <div class="utility-bar__col utility-bar__col--left">
@@ -55,6 +63,12 @@
                     <option value="" selected>-- Relic Type --</option>
                     <option value="Standard">Standard</option>
                     <option value="Depth Of Night">Depth Of Night</option>
+                  </select>
+                </label>
+
+                <label class="utility-field">
+                  <select id="classFilter">
+                    <option value="" selected>-- Class / All --</option>
                   </select>
                 </label>
 
@@ -115,54 +129,126 @@
 
         <!-- MAIN GRID -->
         <section class="main-grid">
+          <section id="individualMode" class="mode-panel is-active" aria-label="Individual relic builder">
+            <section class="right-column">
 
-          <section class="right-column">
-
-            <article id="results">
-              <div class="panel-header">
-                <h3>Relic Preview</h3>
-                <div class="panel-header__right">
-                  <span id="relicValidity" class="validity-badge" hidden>Valid</span>
-                  <button id="autoSortBtn" class="auto-sort-btn" type="button" hidden>Auto-Sort</button>
-                </div>
-              </div>
-
-              <div class="relic-preview">
-                <div class="relic-frame">
-                  <img id="relicImg" alt="Relic preview" />
-                  <div id="relicColorControl" class="relic-color-control" hidden>
-                    <button
-                      id="relicColorChip"
-                      class="relic-color-chip"
-                      type="button"
-                      aria-haspopup="listbox"
-                      aria-expanded="false"
-                    >
-                      <span class="sr-only">Relic color</span>
-                    </button>
-                    <div id="relicColorMenu" class="relic-color-menu" role="listbox" aria-label="Choose relic color"></div>
+              <article id="results">
+                <div class="panel-header">
+                  <h3>Relic Preview</h3>
+                  <div class="panel-header__right">
+                    <span id="relicValidity" class="validity-badge" hidden>Valid</span>
+                    <button id="autoSortBtn" class="auto-sort-btn" type="button" hidden>Auto-Sort</button>
                   </div>
                 </div>
 
-                <div class="relic-effects">
-                  <div class="slot-counts">
-                    <small class="subtext" id="count1"></small>
-                    <small class="subtext" id="count2"></small>
-                    <small class="subtext" id="count3"></small>
+                <div class="relic-preview">
+                  <div class="relic-frame">
+                    <img id="relicImg" alt="Relic preview" />
+                    <div id="relicColorControl" class="relic-color-control" hidden>
+                      <button
+                        id="relicColorChip"
+                        class="relic-color-chip"
+                        type="button"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                      >
+                        <span class="sr-only">Relic color</span>
+                      </button>
+                      <div id="relicColorMenu" class="relic-color-menu" role="listbox" aria-label="Choose relic color"></div>
+                    </div>
                   </div>
-                  <ul class="chosen-effects" id="chosenList"></ul>
+
+                  <div class="relic-effects">
+                    <div class="slot-counts">
+                      <small class="subtext" id="count1"></small>
+                      <small class="subtext" id="count2"></small>
+                      <small class="subtext" id="count3"></small>
+                    </div>
+                    <ul class="chosen-effects" id="chosenList"></ul>
+                  </div>
+                </div>
+              </article>
+
+              <article id="details">
+                <div class="panel-header">
+                  <h3>Details</h3>
+                </div>
+
+                <div id="detailsBody" class="details-body"></div>
+              </article>
+
+            </section>
+          </section>
+
+          <section id="chaliceMode" class="mode-panel" aria-label="Chalice builder" hidden>
+            <article class="chalice-panel">
+              <div class="panel-header chalice-panel__header">
+                <div>
+                  <h3>Chalice Builder (prototype)</h3>
+                  <p class="subtext">Pick 9 Standard/Both effects and 9 Depth of Night/Both effects, then we will assemble as many valid relics as possible.</p>
+                </div>
+                <div class="chalice-picker">
+                  <label class="utility-field">
+                    <span class="utility-label">Chalice</span>
+                    <select id="chaliceSelect"></select>
+                  </label>
                 </div>
               </div>
-            </article>
 
-            <article id="details">
-              <div class="panel-header">
-                <h3>Details</h3>
+              <div class="chalice-colors" id="chaliceColors" hidden>
+                <div class="chalice-color-group">
+                  <div class="chalice-color-label">Standard slots</div>
+                  <div class="chalice-color-row" id="chaliceStandardColors"></div>
+                </div>
+                <div class="chalice-color-group">
+                  <div class="chalice-color-label">Depth of Night slots</div>
+                  <div class="chalice-color-row" id="chaliceDepthColors"></div>
+                </div>
               </div>
 
-              <div id="detailsBody" class="details-body"></div>
-            </article>
+              <div class="chalice-grid">
+                <article class="chalice-column" data-side="standard">
+                  <div class="panel-header">
+                    <div>
+                      <h4>Standard / Both Effects</h4>
+                      <p class="subtext">Up to 9 picks. You can reuse the same effect up to three times on this side.</p>
+                    </div>
+                    <span class="pill pill--ghost" id="chaliceStandardCount" aria-live="polite"></span>
+                  </div>
+                  <ol class="chalice-slot-list" id="chaliceStandardList"></ol>
+                </article>
 
+                <article class="chalice-column" data-side="depth">
+                  <div class="panel-header">
+                    <div>
+                      <h4>Depth of Night / Both Effects</h4>
+                      <p class="subtext">Up to 9 picks. You can reuse the same effect up to three times on this side.</p>
+                    </div>
+                    <span class="pill pill--ghost" id="chaliceDepthCount" aria-live="polite"></span>
+                  </div>
+                  <ol class="chalice-slot-list" id="chaliceDepthList"></ol>
+                </article>
+              </div>
+
+              <article class="chalice-results">
+                <div class="panel-header">
+                  <h4>Generated Relics</h4>
+                  <div class="panel-header__right">
+                    <small class="subtext" id="chaliceStatus" aria-live="polite"></small>
+                  </div>
+                </div>
+                <div class="chalice-results__grid">
+                  <div class="chalice-results__group">
+                    <div class="chalice-results__title">Standard Relics</div>
+                    <div class="chalice-results__list" id="chaliceResultsStandard"></div>
+                  </div>
+                  <div class="chalice-results__group">
+                    <div class="chalice-results__title">Depth of Night Relics</div>
+                    <div class="chalice-results__list" id="chaliceResultsDepth"></div>
+                  </div>
+                </div>
+              </article>
+            </article>
           </section>
         </section>
 

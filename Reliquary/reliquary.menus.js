@@ -18,18 +18,22 @@ function positionMenu(menuEl, anchorRect) {
   const { innerWidth, innerHeight } = window;
   const rect = menuEl.getBoundingClientRect();
 
-  // Anchor rect is viewport-based; account for scroll to position in document space
-  let left = anchorRect.left + window.scrollX;
-  let top = anchorRect.bottom + 4 + window.scrollY;
+  const rectIsZeroed = !anchorRect || (!anchorRect.width && !anchorRect.height && !anchorRect.top && !anchorRect.left);
+  const anchorLeft = rectIsZeroed ? (innerWidth - rect.width) / 2 : anchorRect.left;
+  const anchorTop = rectIsZeroed ? (innerHeight - rect.height) / 2 : anchorRect.top;
+  const anchorBottom = rectIsZeroed ? anchorTop + rect.height : anchorRect.bottom;
 
-  if (left + rect.width > innerWidth + window.scrollX - 8) left = innerWidth + window.scrollX - rect.width - 8;
-  if (left < 8 + window.scrollX) left = 8 + window.scrollX;
+  let left = anchorLeft;
+  let top = anchorBottom + 4;
 
-  if (top + rect.height > innerHeight + window.scrollY - 8) top = anchorRect.top + window.scrollY - rect.height - 4;
-  if (top < 8 + window.scrollY) top = 8 + window.scrollY;
+  if (left + rect.width > innerWidth - 8) left = innerWidth - rect.width - 8;
+  if (left < 8) left = 8;
 
-  menuEl.style.left = `${left}px`;
-  menuEl.style.top = `${top}px`;
+  if (top + rect.height > innerHeight - 8) top = anchorTop - rect.height - 4;
+  if (top < 8) top = 8;
+
+  menuEl.style.left = `${Math.round(left)}px`;
+  menuEl.style.top = `${Math.round(top)}px`;
 }
 
 function renderMenuList(container, list, activeCategory, currentId, onPick, categoryThemes, showCurseBadge) {
@@ -265,7 +269,9 @@ export function openEffectMenu({ slotIdx, anchorBtn, eligible, categories, curre
   });
 
   renderAll();
-  positionMenu(effectMenu, anchorBtn.getBoundingClientRect());
+  const position = () => positionMenu(effectMenu, anchorBtn ? anchorBtn.getBoundingClientRect() : null);
+  position();
+  requestAnimationFrame(position);
 
   requestAnimationFrame(() => {
     const primarySearch = effectMenu.querySelector("[data-effect-search]");
@@ -475,7 +481,9 @@ export function openCurseMenu({ slotIdx, anchorBtn, eligible, categories, curren
   });
 
   renderAll();
-  positionMenu(curseMenu, anchorBtn.getBoundingClientRect());
+  const position = () => positionMenu(curseMenu, anchorBtn ? anchorBtn.getBoundingClientRect() : null);
+  position();
+  requestAnimationFrame(position);
 
   requestAnimationFrame(() => {
     const primarySearch = curseMenu.querySelector("[data-curse-search]");
