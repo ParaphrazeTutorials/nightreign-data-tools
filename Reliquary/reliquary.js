@@ -555,10 +555,142 @@ function exclusiveRelicTypeFromSelections() {
   return null;
 }
 
+function weightColumnsFor(count) {
+  if (count <= 1) return ["ChanceWeight_110"]; // single-slot uses 110 only
+  if (count === 2) return ["ChanceWeight_210", "ChanceWeight_110"]; // double-slot uses 210 then 110
+  return ["ChanceWeight_310", "ChanceWeight_210", "ChanceWeight_110"]; // triple-slot default
+}
+
+function weightForSlot(row, slotIdx, weightCols) {
+  const cols = weightCols && weightCols.length ? weightCols : weightColumnsFor(3);
+  const col = cols[Math.max(0, Math.min(slotIdx, cols.length - 1))];
+  const raw = Number(row?.[col]);
+  return Number.isFinite(raw) ? raw : 0;
+}
+
+function totalWeightForSlot(pool, slotIdx, weightCols) {
+  return (pool || []).reduce((sum, r) => sum + weightForSlot(r, slotIdx, weightCols), 0);
+}
+
+function poolAfterPick(pool, pickedRow) {
+  const cid = compatId(pickedRow);
+  const pickedId = String(pickedRow?.EffectID || "");
+  return (pool || []).filter(r => {
+    if (!r) return false;
+    if (String(r.EffectID) === pickedId) return false;
+    if (!cid) return true;
+    return compatId(r) !== cid;
+  });
+}
+
+function permutations(list) {
+  if (!Array.isArray(list) || list.length <= 1) return [list.slice()];
+  const out = [];
+  list.forEach((item, idx) => {
+    const rest = [...list.slice(0, idx), ...list.slice(idx + 1)];
+    permutations(rest).forEach(p => out.push([item, ...p]));
+  });
+  return out;
+}
+
+function formatPercent(value) {
+  if (!Number.isFinite(value)) return "";
+  return value.toFixed(6);
+}
+
+function formatOneIn(probability) {
+  if (!Number.isFinite(probability) || probability <= 0) return "Impossible";
+  const denom = 1 / probability;
+  const rounded = Math.max(1, Math.round(denom));
+  return rounded.toLocaleString();
+}
+
+function computeRelicProbability(selectedRows, selectedType) {
+  const typeRaw = (selectedType ?? "").toString().trim();
+  const effectiveType = typeRaw && typeRaw !== "All" ? typeRaw : exclusiveRelicTypeFromSelections();
+  const isStandardish = !effectiveType || effectiveType === "Standard" || effectiveType === "Both";
+  if (!isStandardish) return null;
+
+  const picked = (selectedRows || []).filter(Boolean);
+  if (!picked.length) return null;
+
+  const hasDepth = picked.some(r => relicTypeForRow(r) === "Depth Of Night");
+  if (hasDepth) return null; // Depth of Night math deferred for now
+
+  const pool = filterByClass(baseFilteredByRelicType(rows, "Standard"));
+  if (!pool.length) return null;
+
+  const weightCols = weightColumnsFor(picked.length);
+  const perms = permutations(picked);
+
+  const probability = perms.reduce((sum, order) => {
+    let p = 1;
+    let remaining = pool.slice();
+
+    for (let i = 0; i < order.length; i++) {
+      const target = order[i];
+      const w = weightForSlot(target, i, weightCols);
+      const total = totalWeightForSlot(remaining, i, weightCols);
+      if (!Number.isFinite(total) || total <= 0 || w <= 0) return sum; // impossible path
+      p *= w / total;
+      remaining = poolAfterPick(remaining, target);
+    }
+
+    return sum + p;
+  }, 0);
+
+  if (!Number.isFinite(probability) || probability <= 0) return { probability: 0, percentText: "0.000000", oneInText: "Impossible" };
+
+  const percentText = formatPercent(probability * 100);
+  const oneInText = formatOneIn(probability);
+
+  return { probability, percentText, oneInText };
+}
+
+function setRelicProbability(probabilityResult) {
+  if (!dom.relicProbability || !dom.relicProbabilityValue) return;
+
+  const hasValue = probabilityResult && Number.isFinite(probabilityResult.probability);
+  if (!hasValue) {
+    dom.relicProbability.hidden = true;
+    dom.relicProbability.removeAttribute("data-tooltip");
+    dom.relicProbability.removeAttribute("aria-label");
+    dom.relicProbability.removeAttribute("title");
+    dom.relicProbabilityValue.textContent = "%";
+    return;
+  }
+
+  const { percentText, oneInText } = probabilityResult;
+  const tooltip = `${percentText}% chance • 1 in ${oneInText}`;
+
+  dom.relicProbability.hidden = false;
+  dom.relicProbabilityValue.textContent = "%";
+  dom.relicProbability.setAttribute("data-tooltip", tooltip);
+  dom.relicProbability.setAttribute("aria-label", tooltip);
+  dom.relicProbability.setAttribute("title", "");
+}
+
 function effectiveRelicType(forFiltering = false) {
   // When showing illegal combinations, filtering should ignore relic type entirely
   if (forFiltering && isShowIllegalActive()) return "";
   return exclusiveRelicTypeFromSelections() || dom.selType.value;
+}
+
+function clearSelectionsIncompatibleWithType(nextType) {
+  const type = (nextType ?? "").toString().trim();
+  if (!type || type === "All") return false;
+  let changed = false;
+  for (let i = 0; i < selectedEffects.length; i++) {
+    const row = getSelectedRow(i);
+    if (!row) continue;
+    const allowed = baseFilteredByRelicType([row], type).length > 0;
+    if (!allowed) {
+      setSelectedId(i, "");
+      curseBySlot[i] = null;
+      changed = true;
+    }
+  }
+  return changed;
 }
 
 function relicTypeMismatchInfo(rows) {
@@ -1721,6 +1853,9 @@ function updateUI(reason = "") {
 
   updateColorChipLabel();
 
+  const probabilityResult = computeRelicProbability(cSelections, dom.selType ? dom.selType.value : "");
+  setRelicProbability(probabilityResult);
+
   const anySelected = cSelections.some(Boolean);
   const dupGroups = computeCompatDupGroups(cSelections.filter(Boolean));
   const hasCompatIssue = dupGroups.length > 0;
@@ -2663,7 +2798,10 @@ async function load() {
   if (dom.modeBtnIndividual) dom.modeBtnIndividual.addEventListener("click", () => setMode(MODES.INDIVIDUAL));
   if (dom.modeBtnChalice) dom.modeBtnChalice.addEventListener("click", () => setMode(MODES.CHALICE));
 
-  dom.selType.addEventListener("change", () => updateUI("type-change"));
+  dom.selType.addEventListener("change", () => {
+    clearSelectionsIncompatibleWithType(dom.selType.value);
+    updateUI("type-change");
+  });
   if (dom.selClass) {
     populateClassOptions();
     dom.selClass.addEventListener("change", evt => {

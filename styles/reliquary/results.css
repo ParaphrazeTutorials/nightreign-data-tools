@@ -42,6 +42,7 @@
   border-radius: 0.65rem;
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: visible;
   margin-bottom: 0.75rem;
   transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
@@ -53,6 +54,7 @@
     rgba(0, 0, 0, 0.22) 62%,
     rgba(0, 0, 0, 0.55) 100%
   );
+    overflow: visible;
   border-color: rgba(18, 74, 44, 0.35);
   box-shadow: inset 0 0 0 1px rgba(18, 74, 44, 0.18);
 }
@@ -61,7 +63,8 @@
   background: linear-gradient(
     90deg,
     rgba(92, 22, 22, 0.58) 0%,
-    rgba(0, 0, 0, 0.22) 62%,
+    overflow: visible;
+    position: relative;
     rgba(0, 0, 0, 0.55) 100%
   );
   border-color: rgba(92, 22, 22, 0.38);
@@ -75,8 +78,88 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.35rem;
-  flex-wrap: wrap;
+    z-index: 3;
   white-space: nowrap;
+}
+
+.relic-probability {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: transparent;
+  color: #ffffff;
+  font-weight: 760;
+  font-size: 1rem;
+  letter-spacing: 0;
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+  position: relative;
+  overflow: visible;
+  z-index: 3;
+  cursor: default;
+}
+
+.relic-probability__value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  font-weight: 860;
+  font-size: 1rem;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.relic-probability[data-tooltip]:hover::after,
+.relic-probability[data-tooltip]:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.55rem;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12) 0%, rgba(24,34,54,0.95) 55%, rgba(10,16,28,0.95) 100%);
+  color: #eaf1ff;
+  border: 1px solid rgba(120, 170, 255, 0.4);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.42);
+  white-space: normal;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  z-index: 40;
+  pointer-events: none;
+  min-width: 200px;
+  max-width: min(420px, 90vw);
+  width: max-content;
+  text-align: center;
+}
+
+/* When showing the tooltip, hide the pill styling so it doesn't glow behind it */
+.relic-probability[data-tooltip]:hover::before,
+.relic-probability[data-tooltip]:focus-visible::before {
+  display: none;
+  content: none;
+}
+
+.relic-probability[data-tooltip]:hover::before,
+.relic-probability[data-tooltip]:focus-visible::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 2px);
+  left: 50%;
+  transform: translate(-50%, 0);
+  border: 7px solid transparent;
+  border-top-color: rgba(24, 34, 54, 0.95);
+  z-index: 40;
+  pointer-events: none;
 }
 
 .auto-sort-btn {
@@ -89,10 +172,10 @@
   margin: 0;
   border-radius: 999px;
   border: 1px solid rgba(200, 165, 255, 0.45);
-  background:
-    radial-gradient(120% 140% at 10% 15%, rgba(230, 200, 255, 0.25), rgba(0, 0, 0, 0) 62%),
-    linear-gradient(135deg,
-      rgba(120, 80, 200, 0.90) 0%,
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.55rem 0.8rem;
       rgba(170, 110, 255, 0.78) 55%,
       rgba(30, 18, 48, 0.82) 100%
     );
@@ -103,21 +186,21 @@
   letter-spacing: 0.01em;
   line-height: 22.23px;
   transform: none;
-  transition: background 140ms ease, border-color 140ms ease, transform 120ms ease;
-}
-
-.auto-sort-btn:hover:not(:disabled) {
+    min-width: 200px;
+    max-width: min(420px, 90vw);
+    width: max-content;
+    text-align: center;
   background: rgba(80, 110, 150, 0.38);
   border-color: rgba(255, 255, 255, 0.24);
 }
 
 .auto-sort-btn:active:not(:disabled) {
   transform: translateY(1px);
-}
-
-.auto-sort-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+    bottom: calc(100% - 2px);
+    left: 50%;
+    transform: translate(-50%, 0);
+    border: 7px solid transparent;
+    border-top-color: rgba(24, 34, 54, 0.95);
 }
 
 .validity-badge {

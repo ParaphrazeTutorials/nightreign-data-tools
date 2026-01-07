@@ -41,6 +41,8 @@ export function getDom() {
 
     // Preview / Details
     relicImg: document.getElementById("relicImg"),
+    relicProbability: document.getElementById("relicProbability"),
+    relicProbabilityValue: document.getElementById("relicProbabilityValue"),
     relicColorControl: document.getElementById("relicColorControl"),
     relicColorChip: document.getElementById("relicColorChip"),
     relicColorMenu: document.getElementById("relicColorMenu"),
