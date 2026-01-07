@@ -244,6 +244,11 @@ function syncModeUI() {
   if (dom.chalicePanel) dom.chalicePanel.hidden = !isChalice;
   if (dom.utilityBar) dom.utilityBar.hidden = isChalice;
 
+  const modeTabsSlot = isChalice ? dom.modeTabsChaliceSlot : dom.modeTabsHomeSlot;
+  moveNode(dom.modeSwitchGroup, modeTabsSlot);
+  if (dom.modeTabs) dom.modeTabs.classList.toggle("mode-tabs--attached", isChalice);
+  if (dom.modeSwitchGroup) dom.modeSwitchGroup.classList.toggle("mode-switch-group--attached", isChalice);
+
   const relicTypeWrapper = dom.selType ? dom.selType.closest("label") : null;
 
   if (dom.modeBtnIndividual) {
@@ -979,7 +984,8 @@ function openInfoPopoverForButton(btn) {
 function installUtilityPopoverButtons() {
   const pairs = [
     [dom.instructionsBtn, dom.instructionsPopover],
-    [dom.disclaimerBtn, dom.disclaimerPopover]
+    [dom.disclaimerBtn, dom.disclaimerPopover],
+    [dom.instructionsBtnChalice, dom.instructionsPopover]
   ];
 
   pairs.forEach(([btn, pop]) => {
@@ -1948,8 +1954,7 @@ function renderChaliceSlot(sideKey, idx) {
     return `
       <li>
         <div class="chalice-slot chalice-slot--empty" data-side="${meta.key}" data-slot="${idx}">
-          <div class="chalice-slot__grid">
-            <div class="chalice-slot__cell chalice-slot__cell--label">${label}:</div>
+          <div class="chalice-slot__grid chalice-slot__grid--single">
             <div class="chalice-slot__cell chalice-slot__cell--effect chalice-slot__cell--empty">
               <button
                 type="button"
@@ -1958,7 +1963,6 @@ function renderChaliceSlot(sideKey, idx) {
                 aria-label="${label}: Select Effect"
               >Select Effect</button>
             </div>
-            <div class="chalice-slot__cell chalice-slot__cell--controls"></div>
           </div>
         </div>
       </li>
@@ -1989,8 +1993,7 @@ function renderChaliceSlot(sideKey, idx) {
   return `
     <li>
       <div class="chalice-slot" data-side="${meta.key}" data-slot="${idx}">
-        <div class="chalice-slot__grid">
-          <div class="chalice-slot__cell chalice-slot__cell--label">${label}:</div>
+        <div class="chalice-slot__grid chalice-slot__grid--single">
           <div class="chalice-slot__cell chalice-slot__cell--effect">
             ${effectIcon}
             <div class="chalice-slot__text">
@@ -2024,10 +2027,8 @@ function renderChaliceSlot(sideKey, idx) {
               >+</button>
             </div>
           </div>
-          <div class="chalice-slot__cell chalice-slot__cell--controls"></div>
 
           ${requiresCurse ? `
-            <div class="chalice-slot__cell chalice-slot__cell--label"></div>
             <div class="chalice-slot__cell chalice-slot__cell--curse ${curseMissing ? "is-missing" : ""}">
               ${hasCurse ? `<span class="chalice-slot__curse-name">${escapeHtml(curseName)}</span>` : `<span class="curse-required">Curse Required</span>`}
               ${hasCurse
@@ -2046,7 +2047,6 @@ function renderChaliceSlot(sideKey, idx) {
                   </div>`
                 : `<button type="button" class="curse-btn" data-ch-curse="${meta.key}:${idx}">Select a Curse</button>`}
             </div>
-            <div class="chalice-slot__cell"></div>
           ` : ""}
 
           ${showAttrDivider ? `
@@ -2054,7 +2054,6 @@ function renderChaliceSlot(sideKey, idx) {
           ` : ""}
 
           ${hasAttrPills ? `
-            <div class="chalice-slot__cell chalice-slot__cell--label"></div>
             <div class="chalice-slot__cell chalice-slot__cell--attrs">
               ${attrPills.join("")}
             </div>

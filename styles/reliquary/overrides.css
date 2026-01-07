@@ -39,9 +39,9 @@
    ------------------------------------------------------------ */
 
 /* ------------------------------------------------------------
-   Start Over button spacing + tan gradient (LEFT → RIGHT)
-   (Overrides layout.css which uses !important)
-   ------------------------------------------------------------ */
+  Start Over button spacing + deep red gradient
+  (Overrides layout.css which uses !important)
+  ------------------------------------------------------------ */
 
 /* Keep the utility-bar row vertically centered */
 .utility-bar button#startOver {
@@ -59,66 +59,52 @@
   padding-left: 0.85rem;
 }
 
-/* Purple gradients for Instructions / Disclaimer */
+/* Purple gradients for Instructions / Disclaimer (palette tokens) */
 button#instructionsBtn,
-button#disclaimerBtn {
-  background: linear-gradient(135deg, #5b3c9f 0%, #8f6bd8 55%, #2b1a4f 100%) !important;
-  color: #f5f0ff !important;
-  border: 1px solid rgba(180, 150, 255, 0.55) !important;
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+button#disclaimerBtn,
+button#instructionsBtnChalice {
+  background: var(--btn-instructions-bg) !important;
+  color: var(--btn-instructions-text) !important;
+  border: 1px solid var(--btn-instructions-border) !important;
+  box-shadow: var(--btn-instructions-shadow) !important;
 }
 
 button#instructionsBtn:hover,
-button#disclaimerBtn:hover {
-  filter: brightness(1.06);
-  border-color: rgba(200, 175, 255, 0.8) !important;
+button#disclaimerBtn:hover,
+button#instructionsBtnChalice:hover {
+  filter: var(--btn-instructions-hover-filter);
+  border-color: var(--btn-instructions-hover-border) !important;
 }
 
 button#instructionsBtn:active,
-button#disclaimerBtn:active {
-  filter: brightness(0.98);
+button#disclaimerBtn:active,
+button#instructionsBtnChalice:active {
+  filter: var(--btn-instructions-active-filter);
 }
 
 button#startOver {
   margin-top: 0.85rem !important;
   margin-bottom: 0.35rem !important;
 
-  background: linear-gradient(
-    90deg,
-    #d6c29a 0%,
-    #b9a47a 45%,
-    #1a1a1a 100%
-  ) !important;
-  color: #111 !important;
-  border: 1px solid rgba(0, 0, 0, 0.55) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 6px 16px rgba(0, 0, 0, 0.45) !important;
+  background: var(--btn-startover-bg) !important;
+  color: var(--btn-startover-color) !important;
+  border: 1px solid var(--btn-startover-border) !important;
+  box-shadow: var(--btn-startover-shadow) !important;
 }
 
 button#startOver:hover {
-  background: linear-gradient(
-    90deg,
-    #cdb88f 0%,
-    #a79267 45%,
-    #111 100%
-  ) !important;
+  background: var(--btn-startover-hover-bg) !important;
+  border-color: var(--btn-startover-hover-border) !important;
+  filter: var(--btn-startover-hover-filter);
 }
 
 button#startOver:active {
-  background: linear-gradient(
-    90deg,
-    #bca577 0%,
-    #8f7b55 45%,
-    #000 100%
-  ) !important;
+  background: var(--btn-startover-active-bg) !important;
   transform: translateY(1px);
 }
 
 button#startOver:focus-visible {
-  outline: 2px solid rgba(214, 194, 154, 0.9) !important;
+  outline: 2px solid var(--btn-startover-focus-outline) !important;
   outline-offset: 2px;
 }
 

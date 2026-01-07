@@ -128,6 +128,30 @@ export const CHIP_COLORS = {
   }
 };
 
+// Button styling tokens (canonical gradients + states)
+export const BUTTONS = {
+  instructions: {
+    bg: "linear-gradient(135deg, #5b3c9f 0%, #8f6bd8 55%, #2b1a4f 100%)",
+    text: "#f5f0ff",
+    border: "rgba(180, 150, 255, 0.55)",
+    shadow: "0 8px 18px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset",
+    hoverBorder: "rgba(200, 175, 255, 0.8)",
+    hoverFilter: "brightness(1.06)",
+    activeFilter: "brightness(0.98)"
+  },
+  startOver: {
+    bg: "linear-gradient(135deg, #7a0b1a 0%, #c71f3a 50%, #3a0007 100%)",
+    text: "#fff6f6",
+    border: "rgba(255, 115, 115, 0.55)",
+    shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 18px rgba(0, 0, 0, 0.5)",
+    hoverBg: "linear-gradient(135deg, #8d0f24 0%, #da2646 50%, #4a000a 100%)",
+    hoverBorder: "rgba(255, 145, 145, 0.75)",
+    hoverFilter: "brightness(1.04)",
+    activeBg: "linear-gradient(135deg, #6b0b19 0%, #b01c34 50%, #2b0005 100%)",
+    focusOutline: "rgba(255, 145, 145, 0.85)"
+  }
+};
+
 export function characterSlug(name) {
   return (name || "").toString().trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "unknown";
 }
@@ -178,6 +202,25 @@ export function applyPaletteCssVars(root = typeof document !== "undefined" ? doc
   setVar(root, "--chip-character-all-bg", CHIP_COLORS.characterAll.bg);
   setVar(root, "--chip-character-all-border", CHIP_COLORS.characterAll.border);
   setVar(root, "--chip-character-all-text", CHIP_COLORS.characterAll.text);
+
+  // Buttons (canonical styles)
+  setVar(root, "--btn-instructions-bg", BUTTONS.instructions.bg);
+  setVar(root, "--btn-instructions-text", BUTTONS.instructions.text);
+  setVar(root, "--btn-instructions-border", BUTTONS.instructions.border);
+  setVar(root, "--btn-instructions-shadow", BUTTONS.instructions.shadow);
+  setVar(root, "--btn-instructions-hover-border", BUTTONS.instructions.hoverBorder);
+  setVar(root, "--btn-instructions-hover-filter", BUTTONS.instructions.hoverFilter);
+  setVar(root, "--btn-instructions-active-filter", BUTTONS.instructions.activeFilter);
+
+  setVar(root, "--btn-startover-bg", BUTTONS.startOver.bg);
+  setVar(root, "--btn-startover-color", BUTTONS.startOver.text);
+  setVar(root, "--btn-startover-border", BUTTONS.startOver.border);
+  setVar(root, "--btn-startover-shadow", BUTTONS.startOver.shadow);
+  setVar(root, "--btn-startover-hover-bg", BUTTONS.startOver.hoverBg);
+  setVar(root, "--btn-startover-hover-border", BUTTONS.startOver.hoverBorder);
+  setVar(root, "--btn-startover-hover-filter", BUTTONS.startOver.hoverFilter);
+  setVar(root, "--btn-startover-active-bg", BUTTONS.startOver.activeBg);
+  setVar(root, "--btn-startover-focus-outline", BUTTONS.startOver.focusOutline);
 
   Object.entries(CHARACTER_COLORS).forEach(([slug, val]) => {
     setVar(root, `--chip-character-${slug}-bg`, val.bg);

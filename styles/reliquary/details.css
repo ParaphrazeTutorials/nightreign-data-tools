@@ -44,13 +44,18 @@
 #details .details-body{
   display: grid;
   gap: 0.75rem;
+  align-content: start;
+  justify-content: stretch;
+  align-items: stretch;
+  width: 100%;
 }
 
 #details .info-box{
   border: 1px solid rgba(255,255,255,0.10);
   background: rgba(0,0,0,0.14);
-  border-radius: 0.85rem;
-  padding: 0.85rem 0.95rem;
+  border-radius: 0.7rem;
+  padding: 0.45rem 0.65rem;
+  min-height: 0;
 }
 
 /* red stays vibrant */

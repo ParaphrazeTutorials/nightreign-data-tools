@@ -45,73 +45,32 @@
 
       <section class="tool-shell">
 
-        <section class="mode-toggle" aria-label="Reliquary mode">
-          <div class="mode-toggle__row">
-            <div class="mode-tabs" role="tablist" aria-label="Reliquary mode tabs">
-              <button
-                id="modeIndividualBtn"
-                class="mode-tab is-active"
-                type="button"
-                role="tab"
-                aria-selected="true"
-                tabindex="0"
-                data-mode="individual"
-              >Individual Relics</button>
-              <button
-                id="modeChaliceBtn"
-                class="mode-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                tabindex="-1"
-                data-mode="chalice"
-              >Chalice Builder</button>
-            </div>
-            <div class="mode-toggle__actions">
-              <button id="instructionsBtn" class="utility-ghost" type="button">Instructions</button>
-              <button id="disclaimerBtn" class="utility-ghost" type="button">Disclaimer</button>
-            </div>
-          </div>
-          <small class="subtext mode-toggle__hint">Switch between the classic relic view or the new chalice builder prototype.</small>
-        </section>
-
         <!-- UTILITY BAR (Filters + Actions) -->
         <section id="utilityBar" class="utility-bar" aria-label="Reliquary controls">
           <div class="utility-bar__col utility-bar__col--left">
-            <div class="utility-stack">
-              <div class="utility-inline utility-inline--row utility-inline--fill">
-                <label class="utility-field">
-                  <select id="relicType">
-                    <option value="" selected>-- Relic Type --</option>
-                    <option value="Standard">Standard</option>
-                    <option value="Depth Of Night">Depth Of Night</option>
-                  </select>
-                </label>
-
-                <div id="classFilterSlotIndividual" class="utility-field-slot">
-                  <label id="classFilterControl" class="utility-field">
-                    <select id="classFilter">
-                      <option value="" selected>-- Class / All --</option>
-                    </select>
-                  </label>
+            <div id="modeTabsHomeSlot" class="mode-tabs-slot mode-tabs-slot--home">
+              <div id="modeSwitchGroup" class="mode-switch-group">
+                <div class="mode-tabs mode-tabs--tight" id="modeTabs" role="tablist" aria-label="Reliquary mode tabs">
+                  <button
+                    id="modeIndividualBtn"
+                    class="mode-tab is-active"
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    tabindex="0"
+                    data-mode="individual"
+                  >Individual Relics</button>
+                  <button
+                    id="modeChaliceBtn"
+                    class="mode-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    tabindex="-1"
+                    data-mode="chalice"
+                  >Chalice Builder</button>
                 </div>
-
-                <button id="showIllegalBtn" class="utility-toggle" type="button" aria-pressed="false" title="Show Illegal Effect Combinations">
-                  <span class="utility-toggle__icon" aria-hidden="true">
-                    <svg class="utility-toggle__svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                      <path d="M5.75 5.75L18.25 18.25M12 21C7.029 21 3 16.971 3 12S7.029 3 12 3s9 4.029 9 9-4.029 9-9 9Z" />
-                    </svg>
-                  </span>
-                  <span class="sr-only">Show Illegal Effect Combinations</span>
-                </button>
-
-                <div id="illegalPill" class="illegal-pill" role="status" aria-live="polite" hidden>
-                  Illegal Effect Combinations Enabled
-                </div>
-
-                <div id="startOverSlotIndividual" class="utility-field-slot utility-inline__push">
-                  <button id="startOver" class="secondary" type="button">Start Over</button>
-                </div>
+                <small class="subtext mode-toggle__hint" data-mode-hint>Switch between the classic relic view or the new chalice builder prototype.</small>
               </div>
             </div>
           </div>
@@ -150,110 +109,178 @@
         <!-- MAIN GRID -->
         <section class="main-grid">
           <section id="individualMode" class="mode-panel is-active" aria-label="Individual relic builder">
-            <section class="right-column">
+            <article class="chalice-panel individual-panel">
+              <div class="chalice-layout individual-layout">
 
-              <article id="results">
-                <div class="panel-header">
-                  <h3>Relic Preview</h3>
-                  <div class="panel-header__right">
-                    <span id="relicValidity" class="validity-badge" hidden>Valid</span>
-                    <button id="autoSortBtn" class="auto-sort-btn" type="button" hidden>Auto-Sort</button>
-                  </div>
-                </div>
-
-                <div class="relic-preview">
-                  <div class="relic-frame">
-                    <img id="relicImg" alt="Relic preview" />
-                    <div id="relicColorControl" class="relic-color-control" hidden>
-                      <button
-                        id="relicColorChip"
-                        class="relic-color-chip"
-                        type="button"
-                        aria-haspopup="listbox"
-                        aria-expanded="false"
-                      >
-                        <span class="sr-only">Relic color</span>
-                      </button>
-                      <div id="relicColorMenu" class="relic-color-menu" role="listbox" aria-label="Choose relic color"></div>
+                <div class="chalice-layout__main individual-layout__main">
+                  <aside class="chalice-filter individual-filter" aria-label="Select effects">
+                    <div class="panel-header chalice-filter__header">
+                      <div class="chalice-filter__header-left">
+                        <div class="chalice-filter__title-row">
+                          <h4>Select Effects</h4>
+                          <div class="individual-filter__controls">
+                            <button id="showIllegalBtn" class="utility-toggle" type="button" aria-pressed="false" title="Show Illegal Effect Combinations">
+                              <span class="utility-toggle__icon" aria-hidden="true">
+                                <svg class="utility-toggle__svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                  <path d="M5.75 5.75L18.25 18.25M12 21C7.029 21 3 16.971 3 12S7.029 3 12 3s9 4.029 9 9-4.029 9-9 9Z" />
+                                </svg>
+                              </span>
+                              <span class="sr-only">Show Illegal Effect Combinations</span>
+                            </button>
+                            <div id="illegalPill" class="illegal-pill" role="status" aria-live="polite" hidden>
+                              Illegal Effect Combinations Enabled
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="panel-header__right chalice-filter__header-right individual-filter__header-right">
+                        <span class="pill pill--ghost individual-filter__count" aria-live="polite" hidden></span>
+                        <div class="chalice-filter__selectors chalice-filter__selectors--inline individual-filter__selectors">
+                          <div id="classFilterSlotIndividual" class="utility-field-slot">
+                            <label id="classFilterControl" class="utility-field">
+                              <select id="classFilter">
+                                <option value="" selected>-- Class / All --</option>
+                              </select>
+                            </label>
+                          </div>
+                          <div id="relicTypeSlot" class="utility-field-slot">
+                            <label id="relicTypeControl" class="utility-field">
+                              <select id="relicType">
+                                <option value="" selected>-- Relic Type --</option>
+                                <option value="Standard">Standard</option>
+                                <option value="Depth Of Night">Depth Of Night</option>
+                              </select>
+                            </label>
+                          </div>
+                        </div>
+                        <button id="instructionsBtn" class="utility-ghost utility-ghost--small" type="button">Instructions</button>
+                        <div id="startOverSlotIndividual" class="utility-field-slot utility-field-slot--inline">
+                          <button id="startOver" class="secondary" type="button">Start Over</button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
 
-                  <div class="relic-effects">
-                    <div class="slot-counts">
-                      <small class="subtext" id="count1"></small>
-                      <small class="subtext" id="count2"></small>
-                      <small class="subtext" id="count3"></small>
+                    <div class="chalice-filter__body individual-filter__body">
+                      <div class="individual-filter__hint subtext">Select your relic type and class, then pick effects using the Relic Preview.</div>
                     </div>
-                    <ul class="chosen-effects" id="chosenList"></ul>
-                  </div>
+                  </aside>
+
+                  <section class="chalice-layout__middle individual-preview" aria-label="Relic preview">
+                    <div class="chalice-grid individual-preview-grid">
+                      <article id="results" class="chalice-column individual-preview__panel">
+                        <div class="panel-header">
+                          <h3>Relic Preview</h3>
+                          <div class="panel-header__right">
+                            <span id="relicValidity" class="validity-badge" hidden>Valid</span>
+                            <button id="autoSortBtn" class="auto-sort-btn" type="button" hidden>Auto-Sort</button>
+                          </div>
+                        </div>
+
+                        <div class="relic-preview">
+                          <div class="relic-frame">
+                            <img id="relicImg" alt="Relic preview" />
+                            <div id="relicColorControl" class="relic-color-control" hidden>
+                              <button
+                                id="relicColorChip"
+                                class="relic-color-chip"
+                                type="button"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                              >
+                                <span class="sr-only">Relic color</span>
+                              </button>
+                              <div id="relicColorMenu" class="relic-color-menu" role="listbox" aria-label="Choose relic color"></div>
+                            </div>
+                          </div>
+
+                          <div class="relic-effects">
+                            <div class="slot-counts">
+                              <small class="subtext" id="count1"></small>
+                              <small class="subtext" id="count2"></small>
+                              <small class="subtext" id="count3"></small>
+                            </div>
+                            <ul class="chosen-effects" id="chosenList"></ul>
+                          </div>
+                        </div>
+                      </article>
+                    </div>
+                  </section>
                 </div>
-              </article>
 
-              <article id="details">
-                <div class="panel-header">
-                  <h3>Details</h3>
-                </div>
+                <aside class="chalice-layout__results individual-details" aria-label="Relic details">
+                  <article id="details" class="chalice-results individual-details__panel">
+                    <div class="panel-header">
+                      <h3>Details</h3>
+                    </div>
 
-                <div id="detailsBody" class="details-body"></div>
-              </article>
-
-            </section>
+                    <div id="detailsBody" class="details-body"></div>
+                  </article>
+                </aside>
+              </div>
+            </article>
           </section>
 
           <section id="chaliceMode" class="mode-panel" aria-label="Chalice builder" hidden>
+            <div class="chalice-mode-tabs">
+              <div id="modeTabsChaliceSlot" class="mode-tabs-slot mode-tabs-slot--chalice"></div>
+            </div>
             <article class="chalice-panel">
               <div class="chalice-layout">
-                <aside class="chalice-filter" aria-label="Effect pool">
-                  <div class="panel-header">
-                    <h4>Effect Pool</h4>
-                    <div class="panel-header__right">
-                      <span class="pill pill--ghost" id="chaliceFilterTotals" aria-live="polite"></span>
-                    </div>
-                  </div>
-                  <div class="chalice-filter__body">
-                    <div class="chalice-filter__selectors">
-                      <div id="classFilterSlotChalice" class="utility-field-slot"></div>
-                      <div id="chalicePickerSlot" class="utility-field-slot">
-                        <label id="chalicePickerControl" class="utility-field">
-                          <select id="chaliceSelect" aria-label="Chalice"></select>
-                        </label>
-                      </div>
-                    </div>
-                    <p class="subtext">Pick effects, then drop them into Standard or Depth slots. Each side allows up to 9 picks, and effects can appear up to three times per side.</p>
-                    <div class="chalice-filter__actions">
-                      <button id="chaliceAddStandard" class="chalice-filter__btn" type="button">Add Standard Effect</button>
-                      <button id="chaliceAddDepth" class="chalice-filter__btn chalice-filter__btn--depth" type="button">Add Depth Effect</button>
-                    </div>
-                    <div id="startOverSlotChalice" class="utility-field-slot"></div>
-                    <small class="subtext chalice-filter__hint">Opens the effect browser so you can search and filter before assigning an effect.</small>
-                  </div>
-                </aside>
-
-                <section class="chalice-layout__middle" aria-label="Chalice slots">
-                  <div class="chalice-grid">
-                    <article class="chalice-column" data-side="standard">
-                      <div class="panel-header">
-                        <div>
-                          <h4>Standard / Both Effects</h4>
-                          <p class="subtext">Up to 9 picks. You can reuse the same effect up to three times on this side.</p>
+                <div class="chalice-layout__main">
+                  <aside class="chalice-filter" aria-label="Effect pool">
+                    <div class="panel-header chalice-filter__header">
+                      <div class="chalice-filter__header-left">
+                        <div class="chalice-filter__title-row">
+                          <h4>Select Effects</h4>
+                          <div class="chalice-filter__selectors chalice-filter__selectors--inline">
+                            <div id="classFilterSlotChalice" class="utility-field-slot"></div>
+                            <div id="chalicePickerSlot" class="utility-field-slot">
+                              <label id="chalicePickerControl" class="utility-field">
+                                <select id="chaliceSelect" aria-label="Chalice"></select>
+                              </label>
+                            </div>
+                          </div>
                         </div>
-                        <span class="pill pill--ghost" id="chaliceStandardCount" aria-live="polite"></span>
                       </div>
-                      <ol class="chalice-slot-list" id="chaliceStandardList"></ol>
-                    </article>
+                      <div class="panel-header__right chalice-filter__header-right">
+                        <span class="pill pill--ghost chalice-filter__count" id="chaliceFilterTotals" aria-live="polite"></span>
+                        <button id="instructionsBtnChalice" class="utility-ghost utility-ghost--small" type="button">Instructions</button>
+                        <div id="startOverSlotChalice" class="utility-field-slot utility-field-slot--inline"></div>
+                      </div>
+                    </div>
+                    <div class="chalice-filter__body">
 
-                    <article class="chalice-column" data-side="depth">
-                      <div class="panel-header">
-                        <div>
-                          <h4>Depth of Night / Both Effects</h4>
-                          <p class="subtext">Up to 9 picks. You can reuse the same effect up to three times on this side.</p>
-                        </div>
-                        <span class="pill pill--ghost" id="chaliceDepthCount" aria-live="polite"></span>
+                      <div class="chalice-filter__actions">
+                        <button id="chaliceAddStandard" class="chalice-filter__btn" type="button">Add Standard Effect</button>
+                        <button id="chaliceAddDepth" class="chalice-filter__btn chalice-filter__btn--depth" type="button">Add Depth Effect</button>
                       </div>
-                      <ol class="chalice-slot-list" id="chaliceDepthList"></ol>
-                    </article>
-                  </div>
-                </section>
+                    </div>
+                  </aside>
+
+                  <section class="chalice-layout__middle" aria-label="Chalice slots">
+                    <div class="chalice-grid">
+                      <article class="chalice-column" data-side="standard">
+                        <div class="panel-header">
+                          <div class="panel-header__title-row">
+                            <h4>Standard Relics</h4>
+                            <span class="pill pill--ghost" id="chaliceStandardCount" aria-live="polite"></span>
+                          </div>
+                        </div>
+                        <ol class="chalice-slot-list" id="chaliceStandardList"></ol>
+                      </article>
+
+                      <article class="chalice-column" data-side="depth">
+                        <div class="panel-header">
+                          <div class="panel-header__title-row">
+                            <h4>Depth of Night Relics</h4>
+                            <span class="pill pill--ghost" id="chaliceDepthCount" aria-live="polite"></span>
+                          </div>
+                        </div>
+                        <ol class="chalice-slot-list" id="chaliceDepthList"></ol>
+                      </article>
+                    </div>
+                  </section>
+                </div>
 
                 <aside class="chalice-layout__results" aria-label="Generated relics">
                   <article class="chalice-results">

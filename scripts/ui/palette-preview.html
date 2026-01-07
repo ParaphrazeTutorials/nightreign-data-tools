@@ -18,6 +18,58 @@
       gap: 10px;
       align-items: center;
     }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .demo-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.48rem 0.9rem;
+      border-radius: 0.65rem;
+      font-weight: 760;
+      letter-spacing: 0.01em;
+      border: 1px solid transparent;
+      box-shadow: none;
+      cursor: pointer;
+      transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+    }
+    .demo-btn--instructions {
+      background: var(--btn-instructions-bg);
+      color: var(--btn-instructions-text);
+      border-color: var(--btn-instructions-border);
+      box-shadow: var(--btn-instructions-shadow);
+    }
+    .demo-btn--instructions:hover {
+      filter: var(--btn-instructions-hover-filter);
+      border-color: var(--btn-instructions-hover-border);
+    }
+    .demo-btn--instructions:active {
+      filter: var(--btn-instructions-active-filter);
+    }
+    .demo-btn--startover {
+      background: var(--btn-startover-bg);
+      color: var(--btn-startover-color);
+      border-color: var(--btn-startover-border);
+      box-shadow: var(--btn-startover-shadow);
+    }
+    .demo-btn--startover:hover {
+      background: var(--btn-startover-hover-bg);
+      border-color: var(--btn-startover-hover-border);
+      filter: var(--btn-startover-hover-filter);
+      transform: translateY(-1px);
+    }
+    .demo-btn--startover:active {
+      background: var(--btn-startover-active-bg);
+      transform: translateY(1px);
+    }
+    .demo-btn--startover:focus-visible {
+      outline: 2px solid var(--btn-startover-focus-outline);
+      outline-offset: 2px;
+    }
     .section { margin-bottom: 24px; }
   </style>
 </head>
@@ -39,6 +91,14 @@
   <div class="section">
     <h2>Effect Colors</h2>
     <div class="pill-grid" id="pillEffects"></div>
+  </div>
+
+  <div class="section">
+    <h2>Buttons</h2>
+    <div class="button-row">
+      <button type="button" class="demo-btn demo-btn--instructions">Instructions</button>
+      <button type="button" class="demo-btn demo-btn--startover">Start Over</button>
+    </div>
   </div>
 
   <script type="module">

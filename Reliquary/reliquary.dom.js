@@ -10,6 +10,10 @@ export function getDom() {
     individualPanel: document.getElementById("individualMode"),
     chalicePanel: document.getElementById("chaliceMode"),
     utilityBar: document.getElementById("utilityBar"),
+    modeTabs: document.getElementById("modeTabs"),
+    modeTabsHomeSlot: document.getElementById("modeTabsHomeSlot"),
+    modeTabsChaliceSlot: document.getElementById("modeTabsChaliceSlot"),
+    modeSwitchGroup: document.getElementById("modeSwitchGroup"),
 
     classFilterControl: document.getElementById("classFilterControl"),
     classFilterSlotIndividual: document.getElementById("classFilterSlotIndividual"),
@@ -25,6 +29,7 @@ export function getDom() {
     illegalPill: document.getElementById("illegalPill"),
     startOverBtn: document.getElementById("startOver"),
     instructionsBtn: document.getElementById("instructionsBtn") || null,
+    instructionsBtnChalice: document.getElementById("instructionsBtnChalice") || null,
     disclaimerBtn: document.getElementById("disclaimerBtn") || null,
     instructionsPopover: document.getElementById("instructionsPopover") || null,
     disclaimerPopover: document.getElementById("disclaimerPopover") || null,
