@@ -786,9 +786,257 @@ function permutations(list) {
   return out;
 }
 
+const DEPTH_EFFECT_SLOTS = {
+  Small: ["ChanceWeight_2000000"],
+  Medium: ["ChanceWeight_2000000", "ChanceWeight_2000000"],
+  Large: ["ChanceWeight_2000000", "ChanceWeight_2000000", "ChanceWeight_2200000"]
+};
+
+const DEPTH_CURSE_COLUMN = "ChanceWeight_3000000";
+
+const LARGE_CURSE_PRIORS = {
+  0: 0.4,
+  1: 0.3,
+  2: 0.2,
+  3: 0.1
+};
+
+function buildColumnStats(list, columns) {
+  const totalWeightByColumn = {};
+  const compatGroupWeightByColumn = {};
+  const effectWeightByColumn = {};
+  const compatOfEffect = new Map();
+
+  for (const col of columns) {
+    totalWeightByColumn[col] = 0;
+    compatGroupWeightByColumn[col] = new Map();
+    effectWeightByColumn[col] = new Map();
+  }
+
+  for (const row of list || []) {
+    if (!row) continue;
+    const id = String(row.EffectID ?? "");
+    const cid = compatId(row);
+    compatOfEffect.set(id, cid);
+
+    for (const col of columns) {
+      const w = Number(row?.[col]) || 0;
+      if (w <= 0) continue;
+
+      totalWeightByColumn[col] += w;
+      effectWeightByColumn[col].set(id, w);
+
+      if (cid) {
+        const map = compatGroupWeightByColumn[col];
+        map.set(cid, (map.get(cid) || 0) + w);
+      }
+    }
+  }
+
+  return { totalWeightByColumn, compatGroupWeightByColumn, effectWeightByColumn, compatOfEffect };
+}
+
+function denomForColumn(col, blockedCompat, stats) {
+  const total = stats.totalWeightByColumn[col] || 0;
+  const compatWeights = stats.compatGroupWeightByColumn[col] || new Map();
+  let blocked = 0;
+  if (blockedCompat && blockedCompat.size) {
+    for (const cid of blockedCompat) {
+      blocked += compatWeights.get(cid) || 0;
+    }
+  }
+  return total - blocked;
+}
+
+function sumUnblockedCompat(col, blockedCompat, stats) {
+  const compatWeights = stats.compatGroupWeightByColumn[col] || new Map();
+  let sum = 0;
+  compatWeights.forEach((w, cid) => {
+    if (blockedCompat && blockedCompat.has(cid)) return;
+    sum += w;
+  });
+  return sum;
+}
+
+function blockedKey(blockedCompat) {
+  if (!blockedCompat || blockedCompat.size === 0) return "";
+  return [...blockedCompat].sort().join("|");
+}
+
+function slotCombinations(slotCount, pickCount, start = 0, path = [], out = []) {
+  if (path.length === pickCount) {
+    out.push(path.slice());
+    return out;
+  }
+  for (let i = start; i < slotCount; i++) {
+    path.push(i);
+    slotCombinations(slotCount, pickCount, i + 1, path, out);
+    path.pop();
+  }
+  return out;
+}
+
+function generateAssignmentsForSlots(slotCount, requiredIds) {
+  if (!requiredIds.length) return [Array(slotCount).fill(null)];
+
+  const combos = slotCombinations(slotCount, requiredIds.length);
+  const permutes = permutations(requiredIds);
+  const out = [];
+  const seen = new Set();
+
+  combos.forEach(indices => {
+    permutes.forEach(perm => {
+      const slots = Array(slotCount).fill(null);
+      indices.forEach((slotIdx, j) => {
+        slots[slotIdx] = perm[j];
+      });
+      const key = slots.join("|");
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push(slots);
+    });
+  });
+
+  return out.length ? out : [Array(slotCount).fill(null)];
+}
+
+function probabilityMapForAssignment(slotCols, assignment, stats, blockedCompat = new Set(), idx = 0) {
+  if (idx >= slotCols.length) {
+    const map = new Map();
+    map.set(blockedKey(blockedCompat), { probability: 1, blocked: new Set(blockedCompat) });
+    return map;
+  }
+
+  const col = slotCols[idx];
+  const denom = denomForColumn(col, blockedCompat, stats);
+  if (!Number.isFinite(denom) || denom <= 0) return new Map();
+
+  const targetId = assignment[idx];
+  const out = new Map();
+
+  if (targetId) {
+    const weight = (stats.effectWeightByColumn[col] || new Map()).get(targetId) || 0;
+    const cid = stats.compatOfEffect.get(targetId) || "";
+    if (weight > 0 && (!cid || !blockedCompat.has(cid))) {
+      const nextBlocked = new Set(blockedCompat);
+      if (cid) nextBlocked.add(cid);
+      const p = weight / denom;
+      const child = probabilityMapForAssignment(slotCols, assignment, stats, nextBlocked, idx + 1);
+      child.forEach(({ probability, blocked }) => {
+        const key = blockedKey(blocked);
+        const prev = out.get(key);
+        const nextProb = p * probability;
+        if (prev) {
+          prev.probability += nextProb;
+        } else {
+          out.set(key, { probability: nextProb, blocked });
+        }
+      });
+    }
+    return out;
+  }
+
+  const compatWeights = stats.compatGroupWeightByColumn[col] || new Map();
+  const sumCompat = sumUnblockedCompat(col, blockedCompat, stats);
+  const noCompatWeight = denom - sumCompat;
+
+  if (noCompatWeight > 0) {
+    const p = noCompatWeight / denom;
+    const child = probabilityMapForAssignment(slotCols, assignment, stats, new Set(blockedCompat), idx + 1);
+    child.forEach(({ probability, blocked }) => {
+      const key = blockedKey(blocked);
+      const prev = out.get(key);
+      const nextProb = p * probability;
+      if (prev) {
+        prev.probability += nextProb;
+      } else {
+        out.set(key, { probability: nextProb, blocked });
+      }
+    });
+  }
+
+  compatWeights.forEach((w, cid) => {
+    if (blockedCompat.has(cid)) return;
+    const p = w / denom;
+    const nextBlocked = new Set(blockedCompat);
+    nextBlocked.add(cid);
+    const child = probabilityMapForAssignment(slotCols, assignment, stats, nextBlocked, idx + 1);
+    child.forEach(({ probability, blocked }) => {
+      const key = blockedKey(blocked);
+      const prev = out.get(key);
+      const nextProb = p * probability;
+      if (prev) {
+        prev.probability += nextProb;
+      } else {
+        out.set(key, { probability: nextProb, blocked });
+      }
+    });
+  });
+
+  return out;
+}
+
+function probabilityForCursePermutation(slotCols, permutationIds, blockedCompat, stats) {
+  let p = 1;
+  for (let i = 0; i < slotCols.length; i++) {
+    const col = slotCols[i];
+    const id = permutationIds[i];
+    const denom = denomForColumn(col, blockedCompat, stats);
+    if (!Number.isFinite(denom) || denom <= 0) return 0;
+
+    const weight = (stats.effectWeightByColumn[col] || new Map()).get(id) || 0;
+    const cid = stats.compatOfEffect.get(id) || "";
+    if (!weight || (cid && blockedCompat.has(cid))) return 0;
+
+    p *= weight / denom;
+    if (cid) blockedCompat.add(cid);
+  }
+  return p;
+}
+
+function hasCompatConflict(entries) {
+  const seen = new Set();
+  for (const r of entries || []) {
+    if (!r) continue;
+    const cid = compatId(r);
+    if (!cid) continue;
+    if (seen.has(cid)) return true;
+    seen.add(cid);
+  }
+  return false;
+}
+
+function depthTooltip(sizeSummaries, overallProbability, curseCount) {
+  if (!sizeSummaries.length) return "No valid Depth of Night rolls for these picks.";
+
+  const lines = [];
+  if (Number.isFinite(overallProbability)) {
+    lines.push(`Depth of Night • ${formatPercent(overallProbability * 100)}% • 1 in ${formatOneIn(overallProbability)}`);
+  } else {
+    lines.push("Depth of Night probabilities (conditional on size)");
+  }
+
+  if (curseCount > 0) lines.push(`Required curses: ${curseCount}`);
+
+  sizeSummaries.forEach(s => {
+    const totalPct = formatPercent(s.totalProbability * 100);
+    const oneIn = s.totalProbability > 0 ? formatOneIn(s.totalProbability) : "Impossible";
+    const effPct = formatPercent(s.effectsProbability * 100);
+    const cursePct = formatPercent(s.cursesGivenEffects * 100);
+    const priorText = s.cursePrior !== 1 ? ` • curse-count prior ${s.cursePrior}` : "";
+    lines.push(`${s.size}: ${totalPct}% • 1 in ${oneIn}${priorText} (effects ${effPct}%, curses ${cursePct}%)`);
+  });
+
+  if (!Number.isFinite(overallProbability) && sizeSummaries.length > 1) {
+    lines.push("Overall depends on relic size odds; multiply by your size distribution to combine.");
+  }
+
+  return lines.join("\n");
+}
+
 function formatPercent(value) {
   if (!Number.isFinite(value)) return "";
-  return value.toFixed(6);
+  return value.toFixed(10);
 }
 
 function formatOneIn(probability) {
@@ -802,13 +1050,17 @@ function computeRelicProbability(selectedRows, selectedType) {
   const typeRaw = (selectedType ?? "").toString().trim();
   const effectiveType = typeRaw && typeRaw !== "All" ? typeRaw : exclusiveRelicTypeFromSelections();
   const isStandardish = !effectiveType || effectiveType === "Standard" || effectiveType === "Both";
-  if (!isStandardish) return null;
+  const isDepth = effectiveType === "Depth Of Night";
+  if (!isStandardish && !isDepth) return null;
 
   const picked = (selectedRows || []).filter(Boolean);
   if (!picked.length) return null;
 
   const hasDepth = picked.some(r => relicTypeForRow(r) === "Depth Of Night");
-  if (hasDepth) return null; // Depth of Night math deferred for now
+
+  if (isDepth || hasDepth) {
+    return computeDepthRelicProbability(picked);
+  }
 
   const pool = filterByClass(baseFilteredByRelicType(rows, "Standard"));
   if (!pool.length) return null;
@@ -840,10 +1092,142 @@ function computeRelicProbability(selectedRows, selectedType) {
   return { probability, percentText, oneInText };
 }
 
+function computeDepthRelicProbability(selectedEffectRows) {
+  const requiredEffects = (selectedEffectRows || []).filter(Boolean);
+  const requiredEffectIds = requiredEffects.map(r => String(r.EffectID));
+
+  const requiredCurses = (curseBySlot || [])
+    .map(id => getAnyRow(id))
+    .filter(Boolean);
+  const requiredCurseIds = requiredCurses.map(r => String(r.EffectID));
+
+  if (!requiredEffects.length) return null;
+
+  const allDepthEffects = filterByClass(baseFilteredByRelicType(rows, "Depth Of Night"));
+  const allDepthCurses = filterByClass(baseFilteredByRelicType(curses, "Depth Of Night"));
+  if (!allDepthEffects.length) return null;
+
+  const effectsAllowed = requiredEffects.every(r => baseFilteredByRelicType([r], "Depth Of Night").length > 0);
+  const cursesAllowed = requiredCurses.every(r => baseFilteredByRelicType([r], "Depth Of Night").length > 0);
+  if (!effectsAllowed || !cursesAllowed) return null;
+
+  if (hasCompatConflict([...requiredEffects, ...requiredCurses])) {
+    const tooltip = "Selected effects or curses share a CompatibilityID, so this relic is impossible.";
+    return { probability: 0, percentText: "0.000000", oneInText: "Impossible", tooltip };
+  }
+
+  const effectStats = buildColumnStats(allDepthEffects, ["ChanceWeight_2000000", "ChanceWeight_2200000"]);
+  const curseStats = buildColumnStats(allDepthCurses, [DEPTH_CURSE_COLUMN]);
+
+  const colForEffect = (() => {
+    const map = new Map();
+    for (const r of allDepthEffects) {
+      const id = String(r.EffectID);
+      const needsCurse = String(r?.CurseRequired ?? "0") === "1";
+      map.set(id, needsCurse ? "ChanceWeight_2000000" : "ChanceWeight_2200000");
+    }
+    return (id) => map.get(String(id)) || "ChanceWeight_2000000";
+  })();
+
+  const allowedSizes = (() => {
+    if (requiredEffectIds.length >= 3) return ["Large"];
+    if (requiredEffectIds.length === 2) return ["Medium"];
+    return ["Small"];
+  })();
+
+  const sizeSummaries = [];
+
+  for (const size of allowedSizes) {
+    const slots = DEPTH_EFFECT_SLOTS[size];
+    if (!slots || requiredEffectIds.length > slots.length) continue;
+
+    const effectAssignments = generateAssignmentsForSlots(slots.length, requiredEffectIds)
+      .filter(assign => assign.every((id) => {
+        if (!id) return true;
+        const col = colForEffect(id);
+        const w = (effectStats.effectWeightByColumn[col] || new Map()).get(id) || 0;
+        return w > 0;
+      }));
+
+    const curseSlots = Array(requiredCurseIds.length).fill(DEPTH_CURSE_COLUMN);
+    const cursePermutations = permutations(requiredCurseIds)
+      .filter(ids => ids.every((id, idx) => {
+        const col = curseSlots[idx];
+        const w = (curseStats.effectWeightByColumn[col] || new Map()).get(id) || 0;
+        return w > 0;
+      }));
+
+    if (!effectAssignments.length) continue;
+    if (!cursePermutations.length && curseSlots.length > 0) continue;
+    const cursePrior = size === "Large" ? (LARGE_CURSE_PRIORS[requiredCurseIds.length] ?? 0) : 1;
+    if (cursePrior <= 0) continue;
+
+    let effectsProbability = 0;
+    let cursesJoint = 0;
+    let totalJoint = 0;
+
+    for (const assignment of effectAssignments) {
+      const slotCols = assignment.map(id => colForEffect(id));
+      const outcomeMap = probabilityMapForAssignment(slotCols, assignment, effectStats, new Set(), 0);
+
+      let assignmentProb = 0;
+      outcomeMap.forEach(v => {
+        assignmentProb += v.probability;
+      });
+      effectsProbability += assignmentProb;
+
+      outcomeMap.forEach(({ probability, blocked }) => {
+        const blockedSet = new Set(blocked);
+        if (!curseSlots.length) {
+          totalJoint += probability;
+          cursesJoint += probability;
+          return;
+        }
+
+        for (const perm of cursePermutations) {
+          const pCurse = probabilityForCursePermutation(curseSlots, perm, new Set(blockedSet), curseStats);
+          if (pCurse <= 0) continue;
+          const joint = probability * pCurse;
+          totalJoint += joint;
+          cursesJoint += joint;
+        }
+      });
+    }
+
+    const totalProbability = totalJoint * cursePrior;
+    const cursesGivenEffects = effectsProbability > 0 ? (cursesJoint / effectsProbability) : 0;
+
+    sizeSummaries.push({
+      size,
+      effectsProbability,
+      cursesGivenEffects,
+      cursePrior,
+      totalProbability,
+      effectAssignments: effectAssignments.length,
+      curseAssignments: cursePermutations.length
+    });
+  }
+
+  if (!sizeSummaries.length) {
+    const tooltip = "No valid Depth of Night sizes can satisfy these effects/curses.";
+    return { probability: 0, percentText: "0.000000", oneInText: "Impossible", tooltip };
+  }
+
+  const overallProbability = sizeSummaries.length >= 1 ? sizeSummaries[0].totalProbability : Number.NaN;
+  const percentText = Number.isFinite(overallProbability) ? formatPercent(overallProbability * 100) : "";
+  const oneInText = Number.isFinite(overallProbability) ? formatOneIn(overallProbability) : "";
+
+  const tooltip = Number.isFinite(overallProbability)
+    ? (overallProbability > 0 ? `${percentText}% chance • 1 in ${oneInText}` : "Depth of Night roll is impossible with the current picks.")
+    : "Depth of Night roll is impossible with the current picks.";
+
+  return { probability: overallProbability, percentText, oneInText, tooltip, sizeSummaries };
+}
+
 function setRelicProbability(probabilityResult) {
   if (!dom.relicProbability || !dom.relicProbabilityValue) return;
 
-  const hasValue = probabilityResult && Number.isFinite(probabilityResult.probability);
+  const hasValue = probabilityResult && (Number.isFinite(probabilityResult.probability) || typeof probabilityResult.tooltip === "string");
   if (!hasValue) {
     dom.relicProbability.hidden = true;
     dom.relicProbability.removeAttribute("data-tooltip");
@@ -853,8 +1237,11 @@ function setRelicProbability(probabilityResult) {
     return;
   }
 
-  const { percentText, oneInText } = probabilityResult;
-  const tooltip = `${percentText}% chance • 1 in ${oneInText}`;
+  const percentText = probabilityResult.percentText ?? (Number.isFinite(probabilityResult.probability) ? formatPercent(probabilityResult.probability * 100) : "");
+  const oneInText = probabilityResult.oneInText ?? (Number.isFinite(probabilityResult.probability) ? formatOneIn(probabilityResult.probability) : "");
+  const tooltip = probabilityResult.tooltip
+    ? probabilityResult.tooltip
+    : (percentText && oneInText ? `${percentText}% chance • 1 in ${oneInText}` : "Probability depends on relic size distribution.");
 
   dom.relicProbability.hidden = false;
   dom.relicProbabilityValue.textContent = "%";
@@ -1037,12 +1424,20 @@ function openDetailsPopover(pop, kind = "") {
 
         if (navigator?.clipboard?.writeText) {
           navigator.clipboard.writeText(val).then(success).catch(() => {
-            fallbackCopy(val);
-            success();
+            try {
+              fallbackCopy(val);
+              success();
+            } catch (err) {
+              fail();
+            }
           });
         } else {
-          fallbackCopy(val);
-          success();
+          try {
+            fallbackCopy(val);
+            success();
+          } catch (err) {
+            fail();
+          }
         }
       });
     });
@@ -1058,20 +1453,6 @@ function closeDetailsPopover() {
   detailsPopoverRoot.classList.remove("is-open");
   detailsPopoverRoot.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
-}
-
-function fallbackCopy(text) {
-  const ta = document.createElement("textarea");
-  ta.value = text;
-  ta.setAttribute("readonly", "");
-  ta.style.position = "absolute";
-  ta.style.left = "-9999px";
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand("copy"); } catch (err) {
-    console.warn("Copy failed", err);
-  }
-  document.body.removeChild(ta);
 }
 
 function showCopyStatus(btn, message, isError = false) {
