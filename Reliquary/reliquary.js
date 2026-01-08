@@ -38,6 +38,9 @@ const autoSortBtn = document.getElementById("autoSortBtn");
 const MODES = { INDIVIDUAL: "individual", CHALICE: "chalice" };
 let activeMode = MODES.INDIVIDUAL;
 
+const RESULTS_VIEW = { COLLAPSED: 0, NORMAL: 1, TAKEOVER: 2 };
+let chaliceResultsView = RESULTS_VIEW.COLLAPSED;
+
 let rows = [];
 let byId = new Map();
 let rowsAll = [];
@@ -69,23 +72,92 @@ const selectedCats = ["", "", ""];
 const curseBySlot = [null, null, null];
 const curseCatBySlot = ["", "", ""];
 
+const chaliceColorCache = {
+  standard: "#ffffff",
+  depth: "#ffffff"
+};
+const chaliceColorListCache = {
+  standard: [],
+  depth: []
+};
+
+function normalizeChaliceColor(value) {
+  if (!value) return "#ffffff";
+  const trimmed = String(value).trim();
+  if (trimmed.startsWith("#")) return trimmed;
+  const rgbMatch = trimmed.match(/rgba?\([^\)]+\)/i);
+  if (rgbMatch) return rgbMatch[0];
+  if (trimmed.includes("gradient")) {
+    const hexMatch = trimmed.match(/#([0-9a-fA-F]{3,8})/);
+    if (hexMatch) return `#${hexMatch[1]}`;
+  }
+  // Attempt to resolve named colors
+  const probe = document.createElement("div");
+  probe.style.display = "none";
+  probe.style.color = trimmed;
+  document.body.appendChild(probe);
+  const resolved = window.getComputedStyle(probe).color;
+  probe.remove();
+  return resolved || "#ffffff";
+}
+
+function setChaliceSideColorVar(meta, color) {
+  const colEl = document.querySelector(`article.chalice-column[data-side="${meta.key}"]`);
+  if (colEl) colEl.style.setProperty("--chalice-side-color", color);
+}
+
 let currentRandomColor = "Red";
 let selectedColor = "Random";
 const COLOR_CHOICES = ["Random", ...COLORS];
+let showIllegalActive = false;
+
+function showIllegalButtons() {
+  if (Array.isArray(dom.showIllegalButtons) && dom.showIllegalButtons.length) return dom.showIllegalButtons;
+  return [dom.showIllegalBtn, dom.showIllegalBtnChalice].filter(Boolean);
+}
+
+function installHoverTooltip(btn) {
+  if (!btn || btn.dataset.tooltipHoverInstalled) return;
+  const apply = () => {
+    const txt = btn.dataset.tooltipText || "";
+    if (txt) btn.setAttribute("data-tooltip", txt);
+  };
+  const clear = () => {
+    btn.removeAttribute("data-tooltip");
+  };
+  btn.addEventListener("pointerenter", apply);
+  btn.addEventListener("pointerleave", clear);
+  btn.addEventListener("blur", clear);
+  btn.dataset.tooltipHoverInstalled = "true";
+}
+
+function setHoverTooltip(btn, text) {
+  if (!btn) return;
+  btn.dataset.tooltipText = text || "";
+  btn.removeAttribute("data-tooltip");
+  installHoverTooltip(btn);
+}
 
 function isShowIllegalActive() {
-  return !!(dom.showIllegalBtn && dom.showIllegalBtn.classList.contains("is-active"));
+  return showIllegalActive;
 }
 
 function setShowIllegalActive(active) {
-  if (!dom.showIllegalBtn) return;
-  dom.showIllegalBtn.classList.toggle("is-active", !!active);
-  dom.showIllegalBtn.setAttribute("aria-pressed", String(!!active));
+  showIllegalActive = !!active;
+  const tooltip = showIllegalActive
+    ? "Showing illegal effect combinations. Type filtering is ignored and incompatible effects will appear."
+    : "Show Illegal Effect Combinations";
+  const ariaLabel = showIllegalActive
+    ? "Hide illegal effect combinations (currently showing all effects, including illegal)"
+    : "Show illegal effect combinations";
 
-  if (dom.illegalPill) {
-    dom.illegalPill.hidden = !active;
-    dom.illegalPill.classList.toggle("is-active", !!active);
-  }
+  showIllegalButtons().forEach(btn => {
+    btn.classList.toggle("is-active", showIllegalActive);
+    btn.setAttribute("aria-pressed", String(showIllegalActive));
+    btn.setAttribute("aria-label", ariaLabel);
+    btn.setAttribute("title", "");
+    setHoverTooltip(btn, tooltip);
+  });
 }
 
 const COLOR_SWATCH = COLOR_SWATCHES;
@@ -231,6 +303,74 @@ function setChaliceStatus(text) {
   dom.chaliceStatus.textContent = text || "";
 }
 
+function updateCollapsedResultsSummary(stdCount, depthCount, statusText) {
+  if (dom.chaliceResultsCollapsedStandard) dom.chaliceResultsCollapsedStandard.textContent = `${stdCount} Std`;
+  if (dom.chaliceResultsCollapsedDepth) dom.chaliceResultsCollapsedDepth.textContent = `${depthCount} Depth`;
+  if (dom.chaliceResultsCollapsedStatus) dom.chaliceResultsCollapsedStatus.textContent = statusText || "";
+}
+
+function updateResultsToggleLabel(view) {
+  const state = view ?? chaliceResultsView;
+  const primaryLabel = state === RESULTS_VIEW.COLLAPSED
+    ? "Expand details"
+    : state === RESULTS_VIEW.TAKEOVER
+      ? "Collapse details"
+      : "Maximize details";
+
+  const collapseLabel = state === RESULTS_VIEW.TAKEOVER
+    ? "Collapse to normal size"
+    : state === RESULTS_VIEW.NORMAL
+      ? "Collapse to compact"
+      : "Expand details";
+
+  if (dom.chaliceResultsToggle) {
+    dom.chaliceResultsToggle.setAttribute("aria-pressed", state !== RESULTS_VIEW.NORMAL ? "true" : "false");
+    dom.chaliceResultsToggle.setAttribute("title", primaryLabel);
+    dom.chaliceResultsToggle.setAttribute("aria-label", primaryLabel);
+  }
+
+  if (dom.chaliceResultsToggleAlt) {
+    dom.chaliceResultsToggleAlt.setAttribute("aria-pressed", state !== RESULTS_VIEW.COLLAPSED ? "true" : "false");
+    dom.chaliceResultsToggleAlt.setAttribute("title", collapseLabel);
+    dom.chaliceResultsToggleAlt.setAttribute("aria-label", collapseLabel);
+  }
+}
+
+function applyChaliceResultsView(view) {
+  const target = dom.chaliceLayout;
+  const normalized = Object.values(RESULTS_VIEW).includes(view) ? view : RESULTS_VIEW.NORMAL;
+  chaliceResultsView = normalized;
+
+  if (target) {
+    target.classList.toggle("is-results-collapsed", normalized === RESULTS_VIEW.COLLAPSED);
+    target.classList.toggle("is-results-takeover", normalized === RESULTS_VIEW.TAKEOVER);
+  }
+
+  if (dom.chaliceResultsCollapsed) {
+    dom.chaliceResultsCollapsed.setAttribute("aria-hidden", normalized === RESULTS_VIEW.COLLAPSED ? "false" : "true");
+  }
+
+  updateResultsToggleLabel(normalized);
+}
+
+function cycleChaliceResultsView() {
+  const next = chaliceResultsView === RESULTS_VIEW.COLLAPSED
+    ? RESULTS_VIEW.NORMAL
+    : chaliceResultsView === RESULTS_VIEW.NORMAL
+      ? RESULTS_VIEW.TAKEOVER
+      : RESULTS_VIEW.COLLAPSED;
+  applyChaliceResultsView(next);
+}
+
+function collapseChaliceResultsView() {
+  const next = chaliceResultsView === RESULTS_VIEW.TAKEOVER
+    ? RESULTS_VIEW.NORMAL
+    : chaliceResultsView === RESULTS_VIEW.NORMAL
+      ? RESULTS_VIEW.COLLAPSED
+      : RESULTS_VIEW.COLLAPSED;
+  applyChaliceResultsView(next);
+}
+
 function syncModeUI() {
   const isChalice = isChaliceMode();
 
@@ -279,8 +419,14 @@ function syncModeUI() {
   const startOverSlot = isChalice ? dom.startOverSlotChalice : dom.startOverSlotIndividual;
   moveNode(dom.startOverBtn, startOverSlot);
 
-  if (dom.showIllegalBtn) dom.showIllegalBtn.hidden = isChalice;
-  if (dom.illegalPill) dom.illegalPill.hidden = isChalice || !isShowIllegalActive();
+  if (isChalice) {
+    applyChaliceResultsView(chaliceResultsView);
+  } else {
+    if (dom.chaliceLayout) {
+      dom.chaliceLayout.classList.remove("is-results-collapsed", "is-results-takeover");
+    }
+    if (dom.chaliceResultsCollapsed) dom.chaliceResultsCollapsed.setAttribute("aria-hidden", "true");
+  }
 }
 
 function setMode(next) {
@@ -315,6 +461,33 @@ function populateClassOptions() {
     })
   ];
   dom.selClass.innerHTML = options.join("");
+}
+
+function resolveCharacterOption(normChar) {
+  return (CHARACTERS || []).find(c => normalizeLower(c) === normalizeLower(normChar)) || "";
+}
+
+function setSelectedClass(next, triggerUI = true) {
+  const normalized = (next ?? "").toString().trim();
+  if (normalized === selectedClass) {
+    if (dom.selClass) dom.selClass.value = normalized;
+    return;
+  }
+
+  selectedClass = normalized;
+
+  if (dom.selClass) {
+    populateClassOptions();
+    dom.selClass.value = normalized;
+  }
+
+  pruneChaliceSelectionsForClass();
+
+  if (triggerUI) {
+    renderChalicePickers();
+    updateUI("class-change");
+    renderChaliceUI();
+  }
 }
 
 function pruneChaliceSelectionsForClass() {
@@ -359,6 +532,26 @@ function rowMatchesClass(row) {
   if (!list.length) return true; // treat empty as ALL
   if (list.includes("all")) return true;
   return list.includes(target);
+}
+
+function singleCharacterForRow(row) {
+  const charactersRaw = (row?.Characters ?? "").toString();
+  const rawList = charactersRaw.split(",").map(s => s.trim()).filter(Boolean);
+  if (!rawList.length) return null;
+  const normalized = [...new Set(rawList.map(normalizeLower))].filter(ch => ch && ch !== "all");
+  if (normalized.length !== 1) return null;
+  const norm = normalized[0];
+  const original = rawList.find(c => normalizeLower(c) === norm) || norm;
+  return { normalized: norm, label: original };
+}
+
+function maybeAutoSetClassFromRow(row) {
+  if (!row || isShowIllegalActive()) return;
+  const info = singleCharacterForRow(row);
+  if (!info) return;
+  const resolved = resolveCharacterOption(info.normalized) || info.label;
+  if (!resolved) return;
+  setSelectedClass(resolved, true);
 }
 
 function filterByClass(list) {
@@ -1516,6 +1709,7 @@ function openEffectDialog(slotIdx) {
     const chosen = getRow(v);
     const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
     maybeAutoSetTypeFromEffect1(nextType);
+    maybeAutoSetClassFromRow(chosen);
 
     effectDialog.close("apply");
     updateUI("effect-change");
@@ -1756,6 +1950,7 @@ function openEffectMenuForSlot(slotIdx, anchorBtn) {
       const chosen = getRow(id);
       const nextType = autoRelicTypeFromEffect1(dom.selType.value, chosen);
       maybeAutoSetTypeFromEffect1(nextType);
+      maybeAutoSetClassFromRow(chosen);
 
       updateUI("effect-change");
     }
@@ -1804,6 +1999,12 @@ function updateUI(reason = "") {
   closeEffectMenu();
   closeCurseMenu();
   closeColorMenu();
+
+  // regroup after UI changes that can alter validity/colors
+  if (isChaliceMode()) {
+    renderChaliceColors();
+    applyChaliceGrouping();
+  }
 
   if (selectedColor === "Random") {
     const modifierReasons = new Set([
@@ -2331,6 +2532,7 @@ function openChaliceEffectMenu(sideKey, slotIdx, anchorBtn) {
       chaliceCats[meta.key][slotIdx] = activeCategory || "";
       chaliceCurses[meta.key][slotIdx] = ""; // reset curse when effect changes
       setChaliceStatus("");
+      maybeAutoSetClassFromRow(chaliceRow(id));
       renderChaliceUI();
     }
   });
@@ -2490,6 +2692,29 @@ function generateCombosForSide(meta) {
   const combos = [];
   const blocked = [];
 
+  const reasonForSlot = (slotIdx) => {
+    const effectRow = chaliceRow(slots[slotIdx]);
+    const curseId = curseSlots[slotIdx];
+    const curseRow = curseId ? chaliceRow(curseId) : null;
+
+    if (!rowMatchesClass(effectRow)) return "Does not match the selected class.";
+    if (!isRowAllowedForSide(effectRow, meta)) return "Not allowed on this relic type.";
+
+    const needsCurse = String(effectRow?.CurseRequired ?? "0") === "1";
+    if (needsCurse && !curseRow) return "Requires a curse but none is selected.";
+
+    const cid = compatId(effectRow);
+    if (cid) {
+      const countCid = slots.reduce((acc, val) => {
+        const r = val ? chaliceRow(val) : null;
+        return acc + (compatId(r) === cid ? 1 : 0);
+      }, 0);
+      if (countCid > 1) return "Conflicts with another selected effect (compatibility ID clash).";
+    }
+
+    return "Cannot form a valid trio with the other selected effects on this side.";
+  };
+
   for (let a = 0; a < filledIdx.length; a++) {
     for (let b = a + 1; b < filledIdx.length; b++) {
       for (let c = b + 1; c < filledIdx.length; c++) {
@@ -2556,22 +2781,34 @@ function generateCombosForSide(meta) {
   const usedSlots = new Set(best.flatMap(c => c.indices));
   const leftoverCount = slots.filter(Boolean).length - usedSlots.size;
 
+  const unused = [];
+  for (const { id, idx } of filledIdx) {
+    if (usedSlots.has(idx)) continue;
+    const row = chaliceRow(id);
+    const name = row?.EffectDescription ?? `(Effect ${id})`;
+    const reason = reasonForSlot(idx);
+    unused.push({ id, name, reason, slotIdx: idx });
+  }
+
   return {
     combos: best,
     blocked,
+    unused,
     leftoverSlots: leftoverCount,
     selectedCount: filledIdx.length,
     uniqueCount: filledIdx.length
   };
 }
 
-function relicCardHtml(combo, idx, sideLabel) {
+function relicCardHtml(combo, idx, meta) {
+  const sideLabel = meta.label;
+  const color = chaliceSideColor(meta, idx) || "#ffffff";
   return `
-    <div class="chalice-card">
-      <div class="chalice-card__title-row">
+    <details class="chalice-card" data-side="${meta.key}" style="--chalice-card-color:${color}; border-color:${color};">
+      <summary class="chalice-card__summary">
         <span class="chalice-card__title">${sideLabel} Relic ${idx + 1}</span>
         <span class="chalice-card__meta">Roll order ready</span>
-      </div>
+      </summary>
       <ol class="chalice-card__effects">
         ${combo.rows.map(row => {
           const name = row.EffectDescription ?? `(Effect ${row.EffectID})`;
@@ -2588,25 +2825,50 @@ function relicCardHtml(combo, idx, sideLabel) {
           `;
         }).join("")}
       </ol>
-    </div>
+    </details>
   `;
 }
 
-function renderResultList(targetEl, result, sideLabel) {
+function renderResultList(targetEl, result, meta) {
   if (!targetEl) return;
   if (!result.combos.length) {
-    targetEl.innerHTML = `<div class="chalice-empty">No valid ${sideLabel.toLowerCase()} relics yet.</div>`;
+    targetEl.innerHTML = `<div class="chalice-empty">No valid ${meta.label.toLowerCase()} relics yet.</div>`;
     return;
   }
-  targetEl.innerHTML = result.combos.map((combo, idx) => relicCardHtml(combo, idx, sideLabel)).join("");
+  const cards = result.combos.map((combo, idx) => relicCardHtml(combo, idx, meta)).join("");
+  const unused = Array.isArray(result.unused) && result.unused.length
+    ? `
+      <div class="chalice-blocked">
+        <div class="chalice-blocked__title">Unused effects</div>
+        <ul class="chalice-blocked__list">
+          ${result.unused.map(item => `<li><strong>${escapeHtml(item.name)}</strong>: ${escapeHtml(item.reason || "Cannot be placed into a valid relic combination.")}</li>`).join("")}
+        </ul>
+      </div>
+    `
+    : "";
+
+  targetEl.innerHTML = cards + unused;
 }
 
 function renderChaliceResults() {
-  const standard = generateCombosForSide(sideInfo("standard"));
-  const depth = generateCombosForSide(sideInfo("depth"));
+  const standardMeta = sideInfo("standard");
+  const depthMeta = sideInfo("depth");
+  const standard = generateCombosForSide(standardMeta);
+  const depth = generateCombosForSide(depthMeta);
 
-  renderResultList(dom.chaliceResultsStandard, standard, "Standard");
-  renderResultList(dom.chaliceResultsDepth, depth, "Depth of Night");
+  renderResultList(dom.chaliceResultsStandard, standard, standardMeta);
+  renderResultList(dom.chaliceResultsDepth, depth, depthMeta);
+
+  if (dom.chaliceStatus) {
+    const stdUnused = standard.unused?.length || 0;
+    const depUnused = depth.unused?.length || 0;
+    if (stdUnused || depUnused) {
+      const parts = [];
+      if (stdUnused) parts.push(`${stdUnused} unused on Standard side`);
+      if (depUnused) parts.push(`${depUnused} unused on Depth side`);
+      dom.chaliceStatus.textContent = parts.join(" | ");
+    }
+  }
 
   const blockedCount = (standard.blocked?.length || 0) + (depth.blocked?.length || 0);
   const statusParts = [];
@@ -2614,15 +2876,16 @@ function renderChaliceResults() {
   statusParts.push(`Standard: ${standard.combos.length} built${standard.leftoverSlots ? `, ${standard.leftoverSlots} slots unused` : ""}`);
   statusParts.push(`Depth: ${depth.combos.length} built${depth.leftoverSlots ? `, ${depth.leftoverSlots} slots unused` : ""}`);
   if (blockedCount) statusParts.push(`${blockedCount} combos need a curse and were skipped.`);
-
-  setChaliceStatus(statusParts.join(" | "));
+  const statusText = statusParts.join(" | ");
+  setChaliceStatus(statusText);
+  updateCollapsedResultsSummary(standard.combos.length, depth.combos.length, statusText);
 }
 
 function updateChaliceCounts() {
   const std = chaliceSelections.standard.filter(Boolean).length;
   const dep = chaliceSelections.depth.filter(Boolean).length;
-  if (dom.chaliceStandardCount) dom.chaliceStandardCount.textContent = `${std} / 9 selected`;
-  if (dom.chaliceDepthCount) dom.chaliceDepthCount.textContent = `${dep} / 9 selected`;
+  if (dom.chaliceStandardCount) dom.chaliceStandardCount.textContent = `${std} / 9`;
+  if (dom.chaliceDepthCount) dom.chaliceDepthCount.textContent = `${dep} / 9`;
   if (dom.chaliceFilterTotals) dom.chaliceFilterTotals.textContent = `${std} / 9 Standard • ${dep} / 9 Depth`;
 }
 
@@ -2634,8 +2897,9 @@ function openQuickChalicePicker(sideKey, anchorBtn) {
 function renderChaliceUI() {
   renderChaliceLists();
   updateChaliceCounts();
-  renderChaliceResults();
   renderChaliceColors();
+  renderChaliceResults();
+  applyChaliceGrouping();
 }
 
 function resetChaliceSelections() {
@@ -2670,15 +2934,97 @@ function renderChaliceColors() {
   const stdColors = entry ? [entry.standard1, entry.standard2, entry.standard3].filter(Boolean) : fallbackDots;
   const depthColors = entry ? [entry.depth1, entry.depth2, entry.depth3].filter(Boolean) : fallbackDots;
 
+  const toSwatch = (color) => {
+    if (color == null) return "#ffffff";
+    const raw = COLOR_SWATCH[color] || color;
+    return normalizeChaliceColor(raw);
+  };
+
   const dotHtml = (list) => list.map(color => {
-    const swatch = typeof color === "string" && color.trim().startsWith("#")
-      ? color.trim()
-      : (COLOR_SWATCH[color] || "#4a4f59");
-    return `<span class="chalice-color-dot" style="background:${swatch};"></span>`;
+    const swatch = toSwatch(color);
+    return `<span class="chalice-color-dot" data-color="${swatch}" style="background:${swatch};"></span>`;
   }).join("");
+
+  const stdSwatches = stdColors.map(toSwatch);
+  const depthSwatches = depthColors.map(toSwatch);
+
+  chaliceColorListCache.standard = stdSwatches;
+  chaliceColorListCache.depth = depthSwatches;
+
+  chaliceColorCache.standard = stdSwatches.length ? stdSwatches[0] : "#ffffff";
+  chaliceColorCache.depth = depthSwatches.length ? depthSwatches[0] : "#ffffff";
+
+  setChaliceSideColorVar(sideInfo("standard"), chaliceColorCache.standard);
+  setChaliceSideColorVar(sideInfo("depth"), chaliceColorCache.depth);
+
+  applyChaliceGrouping();
 
   dom.chaliceStandardColors.innerHTML = dotHtml(stdColors);
   dom.chaliceDepthColors.innerHTML = dotHtml(depthColors);
+}
+
+function chaliceSideColor(meta, index = 0) {
+  const list = chaliceColorListCache[meta.key] || [];
+  if (list.length) return list[index % list.length] || list[0];
+  return chaliceColorCache[meta.key] || "#ffffff";
+}
+
+function applyChaliceGroupingForSide(meta) {
+  const listEl = meta.key === "depth" ? dom.chaliceDepthList : dom.chaliceStandardList;
+  if (!listEl) return;
+
+  // Unwrap previous groupings so we start from a clean list
+  const priorGroups = Array.from(listEl.querySelectorAll(".chalice-slot-group"));
+  priorGroups.forEach(group => {
+    const inner = group.querySelector(".chalice-slot-group__list");
+    if (inner) {
+      Array.from(inner.children).forEach(li => {
+        listEl.insertBefore(li, group);
+      });
+    }
+    group.remove();
+  });
+
+  const result = generateCombosForSide(meta);
+  if (!result.combos.length) return;
+
+  const slotLiByIdx = new Map();
+  listEl.querySelectorAll(".chalice-slot").forEach(slot => {
+    const idx = Number(slot.getAttribute("data-slot"));
+    if (Number.isInteger(idx)) slotLiByIdx.set(idx, slot.closest("li"));
+  });
+
+  const used = new Set();
+
+  result.combos.forEach((combo, comboIdx) => {
+    const indices = [...combo.indices].sort((a, b) => a - b);
+    const members = indices.map(i => slotLiByIdx.get(i)).filter(Boolean);
+    if (members.length !== indices.length) return;
+    if (members.some(node => used.has(node))) return;
+
+    const groupLi = document.createElement("li");
+    groupLi.className = "chalice-slot-group";
+    const color = chaliceSideColor(meta, comboIdx) || "#ffffff";
+    groupLi.style.setProperty("--chalice-group-color", color);
+    groupLi.style.borderColor = color;
+
+    const innerList = document.createElement("ol");
+    innerList.className = "chalice-slot-group__list";
+    groupLi.appendChild(innerList);
+
+    const insertBeforeNode = members[0];
+    listEl.insertBefore(groupLi, insertBeforeNode);
+
+    members.forEach(node => {
+      used.add(node);
+      innerList.appendChild(node);
+    });
+  });
+}
+
+function applyChaliceGrouping() {
+  applyChaliceGroupingForSide(sideInfo("standard"));
+  applyChaliceGroupingForSide(sideInfo("depth"));
 }
 
 function renderChalicePickers() {
@@ -2805,19 +3151,17 @@ async function load() {
   if (dom.selClass) {
     populateClassOptions();
     dom.selClass.addEventListener("change", evt => {
-      selectedClass = evt.target.value || "";
-      populateClassOptions();
-      pruneChaliceSelectionsForClass();
-      renderChalicePickers();
-      updateUI("class-change");
-      renderChaliceUI();
+      setSelectedClass(evt.target.value || "", true);
     });
   }
-  if (dom.showIllegalBtn) {
-    dom.showIllegalBtn.addEventListener("click", () => {
-      const next = !isShowIllegalActive();
-      setShowIllegalActive(next);
-      resetAllPreserveIllegal(next);
+  const illegalButtons = showIllegalButtons();
+  if (illegalButtons.length) {
+    illegalButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const next = !isShowIllegalActive();
+        setShowIllegalActive(next);
+        resetAllPreserveIllegal(next);
+      });
     });
   }
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", handleStartOver);
@@ -2833,7 +3177,7 @@ async function load() {
   if (dom.chaliceSelect) {
     dom.chaliceSelect.addEventListener("change", evt => {
       selectedChaliceId = evt.target.value || "";
-      renderChaliceColors();
+      renderChaliceUI();
     });
   }
 
@@ -2845,7 +3189,15 @@ async function load() {
     dom.chaliceAddDepth.addEventListener("click", () => openQuickChalicePicker("depth", dom.chaliceAddDepth));
   }
 
+  if (dom.chaliceResultsToggle) {
+    dom.chaliceResultsToggle.addEventListener("click", () => cycleChaliceResultsView());
+  }
+  if (dom.chaliceResultsToggleAlt) {
+    dom.chaliceResultsToggleAlt.addEventListener("click", () => collapseChaliceResultsView());
+  }
+
   renderChaliceUI();
+  applyChaliceResultsView(chaliceResultsView);
   syncModeUI();
   updateUI("init");
 }

@@ -26,7 +26,8 @@ export function getDom() {
     startOverSlotChalice: document.getElementById("startOverSlotChalice"),
 
     showIllegalBtn: document.getElementById("showIllegalBtn"),
-    illegalPill: document.getElementById("illegalPill"),
+    showIllegalBtnChalice: document.getElementById("showIllegalBtnChalice"),
+    showIllegalButtons: Array.from(document.querySelectorAll("[data-show-illegal]")),
     startOverBtn: document.getElementById("startOver"),
     instructionsBtn: document.getElementById("instructionsBtn") || null,
     instructionsBtnChalice: document.getElementById("instructionsBtnChalice") || null,
@@ -63,8 +64,18 @@ export function getDom() {
     chaliceFilterTotals: document.getElementById("chaliceFilterTotals"),
     chaliceResultsStandard: document.getElementById("chaliceResultsStandard"),
     chaliceResultsDepth: document.getElementById("chaliceResultsDepth"),
-    chaliceStatus: document.getElementById("chaliceStatus"),
     chaliceStandardColors: document.getElementById("chaliceStandardColors"),
-    chaliceDepthColors: document.getElementById("chaliceDepthColors")
+    chaliceDepthColors: document.getElementById("chaliceDepthColors"),
+
+    // Results panel state
+    chaliceLayout: document.getElementById("chaliceLayout"),
+    chaliceResultsPane: document.getElementById("chaliceResultsPane"),
+    chaliceResultsToggle: document.getElementById("chaliceResultsToggle"),
+    chaliceResultsToggleAlt: document.getElementById("chaliceResultsToggleAlt"),
+    chaliceResultsContent: document.getElementById("chaliceResultsContent"),
+    chaliceResultsCollapsed: document.getElementById("chaliceResultsCollapsed"),
+    chaliceResultsCollapsedStandard: document.getElementById("chaliceResultsCollapsedStandard"),
+    chaliceResultsCollapsedDepth: document.getElementById("chaliceResultsCollapsedDepth"),
+    chaliceResultsCollapsedStatus: document.getElementById("chaliceResultsCollapsedStatus")
   };
 }

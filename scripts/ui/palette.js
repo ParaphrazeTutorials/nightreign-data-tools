@@ -139,6 +139,15 @@ export const BUTTONS = {
     hoverFilter: "brightness(1.06)",
     activeFilter: "brightness(0.98)"
   },
+  autoSort: {
+    bg: "linear-gradient(135deg, #5b3c9f 0%, #8f6bd8 55%, #2b1a4f 100%)",
+    text: "#f5f0ff",
+    border: "rgba(180, 150, 255, 0.55)",
+    shadow: "0 8px 18px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset",
+    hoverBorder: "rgba(200, 175, 255, 0.8)",
+    hoverFilter: "brightness(1.06)",
+    activeFilter: "brightness(0.98)"
+  },
   startOver: {
     bg: "linear-gradient(135deg, #7a0b1a 0%, #c71f3a 50%, #3a0007 100%)",
     text: "#fff6f6",
@@ -211,6 +220,14 @@ export function applyPaletteCssVars(root = typeof document !== "undefined" ? doc
   setVar(root, "--btn-instructions-hover-border", BUTTONS.instructions.hoverBorder);
   setVar(root, "--btn-instructions-hover-filter", BUTTONS.instructions.hoverFilter);
   setVar(root, "--btn-instructions-active-filter", BUTTONS.instructions.activeFilter);
+
+  setVar(root, "--btn-auto-sort-bg", BUTTONS.autoSort.bg);
+  setVar(root, "--btn-auto-sort-text", BUTTONS.autoSort.text);
+  setVar(root, "--btn-auto-sort-border", BUTTONS.autoSort.border);
+  setVar(root, "--btn-auto-sort-shadow", BUTTONS.autoSort.shadow);
+  setVar(root, "--btn-auto-sort-hover-border", BUTTONS.autoSort.hoverBorder);
+  setVar(root, "--btn-auto-sort-hover-filter", BUTTONS.autoSort.hoverFilter);
+  setVar(root, "--btn-auto-sort-active-filter", BUTTONS.autoSort.activeFilter);
 
   setVar(root, "--btn-startover-bg", BUTTONS.startOver.bg);
   setVar(root, "--btn-startover-color", BUTTONS.startOver.text);

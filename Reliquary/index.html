@@ -118,8 +118,14 @@
                       <div class="chalice-filter__header-left">
                         <div class="chalice-filter__title-row">
                           <h4>Select Effects</h4>
-                          <div class="individual-filter__controls">
-                            <button id="showIllegalBtn" class="utility-toggle" type="button" aria-pressed="false" title="Show Illegal Effect Combinations">
+                          <div class="chalice-filter__controls individual-filter__controls">
+                            <button
+                              id="showIllegalBtn"
+                              class="utility-toggle"
+                              type="button"
+                              aria-pressed="false"
+                              data-show-illegal="true"
+                            >
                               <span class="utility-toggle__icon" aria-hidden="true">
                                 <svg class="utility-toggle__svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                   <path d="M5.75 5.75L18.25 18.25M12 21C7.029 21 3 16.971 3 12S7.029 3 12 3s9 4.029 9 9-4.029 9-9 9Z" />
@@ -127,9 +133,6 @@
                               </span>
                               <span class="sr-only">Show Illegal Effect Combinations</span>
                             </button>
-                            <div id="illegalPill" class="illegal-pill" role="status" aria-live="polite" hidden>
-                              Illegal Effect Combinations Enabled
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -175,7 +178,7 @@
                               <span id="relicProbabilityValue" class="relic-probability__value">%</span>
                             </div>
                             <span id="relicValidity" class="validity-badge" hidden>Valid</span>
-                            <button id="autoSortBtn" class="auto-sort-btn" type="button" hidden>Auto-Sort</button>
+                            <button id="autoSortBtn" class="auto-sort-btn utility-ghost utility-ghost--small" type="button" hidden>Auto-Sort</button>
                           </div>
                         </div>
 
@@ -228,24 +231,40 @@
               <div id="modeTabsChaliceSlot" class="mode-tabs-slot mode-tabs-slot--chalice"></div>
             </div>
             <article class="chalice-panel">
-              <div class="chalice-layout">
+              <div class="chalice-layout" id="chaliceLayout">
                 <div class="chalice-layout__main">
                   <aside class="chalice-filter" aria-label="Effect pool">
                     <div class="panel-header chalice-filter__header">
                       <div class="chalice-filter__header-left">
                         <div class="chalice-filter__title-row">
                           <h4>Select Effects</h4>
-                          <div class="chalice-filter__selectors chalice-filter__selectors--inline">
-                            <div id="classFilterSlotChalice" class="utility-field-slot"></div>
-                            <div id="chalicePickerSlot" class="utility-field-slot">
-                              <label id="chalicePickerControl" class="utility-field">
-                                <select id="chaliceSelect" aria-label="Chalice"></select>
-                              </label>
-                            </div>
+                          <div class="individual-filter__controls individual-filter__controls--chalice">
+                            <button
+                              id="showIllegalBtnChalice"
+                              class="utility-toggle"
+                              type="button"
+                              aria-pressed="false"
+                              data-show-illegal="true"
+                            >
+                              <span class="utility-toggle__icon" aria-hidden="true">
+                                <svg class="utility-toggle__svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                  <path d="M5.75 5.75L18.25 18.25M12 21C7.029 21 3 16.971 3 12S7.029 3 12 3s9 4.029 9 9-4.029 9-9 9Z" />
+                                </svg>
+                              </span>
+                              <span class="sr-only">Show Illegal Effect Combinations</span>
+                            </button>
                           </div>
                         </div>
                       </div>
                       <div class="panel-header__right chalice-filter__header-right">
+                        <div class="chalice-filter__selectors chalice-filter__selectors--inline chalice-filter__selectors--compact">
+                          <div id="classFilterSlotChalice" class="utility-field-slot"></div>
+                          <div id="chalicePickerSlot" class="utility-field-slot">
+                            <label id="chalicePickerControl" class="utility-field">
+                              <select id="chaliceSelect" aria-label="Chalice"></select>
+                            </label>
+                          </div>
+                        </div>
                         <span class="pill pill--ghost chalice-filter__count" id="chaliceFilterTotals" aria-live="polite"></span>
                         <button id="instructionsBtnChalice" class="utility-ghost utility-ghost--small" type="button">Instructions</button>
                         <div id="startOverSlotChalice" class="utility-field-slot utility-field-slot--inline"></div>
@@ -254,8 +273,14 @@
                     <div class="chalice-filter__body">
 
                       <div class="chalice-filter__actions">
-                        <button id="chaliceAddStandard" class="chalice-filter__btn" type="button">Add Standard Effect</button>
-                        <button id="chaliceAddDepth" class="chalice-filter__btn chalice-filter__btn--depth" type="button">Add Depth Effect</button>
+                        <button id="chaliceAddStandard" class="chalice-filter__btn" type="button">
+                          <span class="chalice-filter__btn-label">Add Standard Effect</span>
+                          <span class="pill pill--ghost chalice-filter__btn-pill" id="chaliceStandardCount" aria-live="polite"></span>
+                        </button>
+                        <button id="chaliceAddDepth" class="chalice-filter__btn chalice-filter__btn--depth" type="button">
+                          <span class="chalice-filter__btn-label">Add Depth Effect</span>
+                          <span class="pill pill--ghost chalice-filter__btn-pill" id="chaliceDepthCount" aria-live="polite"></span>
+                        </button>
                       </div>
                     </div>
                   </aside>
@@ -266,7 +291,7 @@
                         <div class="panel-header">
                           <div class="panel-header__title-row">
                             <h4>Standard Relics</h4>
-                            <span class="pill pill--ghost" id="chaliceStandardCount" aria-live="polite"></span>
+                            <div class="chalice-color-dots" id="chaliceStandardColors"></div>
                           </div>
                         </div>
                         <ol class="chalice-slot-list" id="chaliceStandardList"></ol>
@@ -276,7 +301,7 @@
                         <div class="panel-header">
                           <div class="panel-header__title-row">
                             <h4>Depth of Night Relics</h4>
-                            <span class="pill pill--ghost" id="chaliceDepthCount" aria-live="polite"></span>
+                            <div class="chalice-color-dots" id="chaliceDepthColors"></div>
                           </div>
                         </div>
                         <ol class="chalice-slot-list" id="chaliceDepthList"></ol>
@@ -285,28 +310,53 @@
                   </section>
                 </div>
 
-                <aside class="chalice-layout__results" aria-label="Generated relics">
+                <aside class="chalice-layout__results" id="chaliceResultsPane" aria-label="Generated relics">
                   <article class="chalice-results">
-                    <div class="panel-header">
-                      <h4>Generated Relics</h4>
-                      <div class="panel-header__right">
-                        <small class="subtext" id="chaliceStatus" aria-live="polite"></small>
+                    <div class="chalice-results__frame">
+                      <div class="details-rail">
+                        <button
+                          id="chaliceResultsToggle"
+                          class="utility-ghost utility-ghost--small chalice-results__toggle"
+                          type="button"
+                          aria-pressed="false"
+                          title="Collapse results panel"
+                        >
+                          <span class="sr-only">Toggle details panel size</span>
+                        </button>
                       </div>
-                    </div>
-                    <div class="chalice-results__grid">
-                      <div class="chalice-results__group">
-                        <div class="chalice-results__title-row">
-                          <div class="chalice-results__title">Standard Relics</div>
-                          <div class="chalice-color-dots" id="chaliceStandardColors"></div>
+
+                      <div class="details-shell" id="detailsShell">
+                        <div class="panel-header">
+                          <h4>Details</h4>
+                          <div class="panel-header__right">
+                            <button
+                              id="chaliceResultsToggleAlt"
+                              class="utility-ghost utility-ghost--small chalice-results__toggle chalice-results__toggle--mirror"
+                              type="button"
+                              aria-pressed="false"
+                              title="Collapse details"
+                            >
+                              <span class="sr-only">Toggle details panel size</span>
+                            </button>
+                          </div>
                         </div>
-                        <div class="chalice-results__list" id="chaliceResultsStandard"></div>
-                      </div>
-                      <div class="chalice-results__group">
-                        <div class="chalice-results__title-row">
-                          <div class="chalice-results__title">Depth of Night Relics</div>
-                          <div class="chalice-color-dots" id="chaliceDepthColors"></div>
+
+                        <div class="chalice-results__content" id="chaliceResultsContent">
+                          <div class="chalice-results__grid">
+                            <div class="chalice-results__group">
+                              <div class="chalice-results__title-row">
+                                <div class="chalice-results__title">Standard Relics</div>
+                              </div>
+                              <div class="chalice-results__list" id="chaliceResultsStandard"></div>
+                            </div>
+                            <div class="chalice-results__group">
+                              <div class="chalice-results__title-row">
+                                <div class="chalice-results__title">Depth of Night Relics</div>
+                              </div>
+                              <div class="chalice-results__list" id="chaliceResultsDepth"></div>
+                            </div>
+                          </div>
                         </div>
-                        <div class="chalice-results__list" id="chaliceResultsDepth"></div>
                       </div>
                     </div>
                   </article>

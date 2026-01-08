@@ -11,6 +11,21 @@
   --color-text-main: #ffffff;
   --color-text-muted: rgba(255,255,255,0.75);
 
+  /* Tooltip palette */
+  --tooltip-bg: rgba(10, 16, 28, 0.96);
+  --tooltip-border: rgba(120, 170, 255, 0.55);
+  --tooltip-shadow: 0 12px 28px rgba(0, 0, 0, 0.52);
+  --tooltip-color: #f4f7ff;
+  --tooltip-radius: 0.55rem;
+  --tooltip-padding: 0.55rem 0.8rem;
+  --tooltip-font-size: 0.82rem;
+  --tooltip-line-height: 1.2;
+  --tooltip-min-width: 200px;
+  --tooltip-max-width: min(420px, 90vw);
+  --tooltip-arrow: rgba(10, 16, 28, 0.96);
+  --tooltip-offset: 4px;
+  --tooltip-z: 40;
+
   --overlay-strong: rgba(0,0,0,0.30);
   --overlay-light: rgba(0,0,0,0.18);
 
@@ -21,6 +36,41 @@
   --hero-art-zoom: 0.4;
   --hero-art-x: 65%;
   --hero-art-y: 100%;
+}
+
+/* ------------------------------------------------------------
+   Shared tooltips
+   ------------------------------------------------------------ */
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + var(--tooltip-offset));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--tooltip-padding);
+  border-radius: var(--tooltip-radius);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-color);
+  border: 1px solid var(--tooltip-border);
+  box-shadow: var(--tooltip-shadow);
+  white-space: normal;
+  font-size: var(--tooltip-font-size);
+  line-height: var(--tooltip-line-height);
+  z-index: var(--tooltip-z);
+  pointer-events: none;
+  min-width: var(--tooltip-min-width);
+  max-width: var(--tooltip-max-width);
+  width: max-content;
+  text-align: center;
+}
+
+[data-tooltip]:hover::before {
+  content: none;
 }
 
 

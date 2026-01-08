@@ -82,6 +82,22 @@ button#instructionsBtnChalice:active {
   filter: var(--btn-instructions-active-filter);
 }
 
+button#autoSortBtn {
+  background: var(--btn-auto-sort-bg) !important;
+  color: var(--btn-auto-sort-text) !important;
+  border: 1px solid var(--btn-auto-sort-border) !important;
+  box-shadow: var(--btn-auto-sort-shadow) !important;
+}
+
+button#autoSortBtn:hover {
+  filter: var(--btn-auto-sort-hover-filter);
+  border-color: var(--btn-auto-sort-hover-border) !important;
+}
+
+button#autoSortBtn:active {
+  filter: var(--btn-auto-sort-active-filter);
+}
+
 button#startOver {
   margin-top: 0.85rem !important;
   margin-bottom: 0.35rem !important;
