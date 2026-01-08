@@ -18,24 +18,24 @@ const DATASETS = {
 // Optional column definitions per module. Add entries as needed.
 const COLUMN_DEFINITIONS = {
   reliquary: {
-    EffectID: { description: "", source: "AttachEffectParam.csv" },
-    OverrideBaseEffectID: { description: "", source: "AttachEffectParam.csv" },
-    RawRollOrder: { description: "", source: "Calculated (See Query)" },
-    CompatibilityID: { description: "", source: "AttachEffectParam.csv" },
-    EffectCategory: { description: "", source: "Compatibility.csv" },
-    EffectDescription: { description: "", source: "AttachEffectName.csv" },
-    EffectExtendedDescription: { description: "", source: "AttachEffectName.csv" },
-    ChanceWeight_110: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_210: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_310: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_2000000: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_2200000: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_3000000: { description: "", source: "AttachEffectTableParam.csv" },
-    StatusIconID: { description: "", source: "AttachEffectParam.csv" },
-    CurseRequired: { description: "", source: "Calculated (See Query)" },
-    Curse: { description: "", source: "Calculated (See Query)" },
-    RelicType: { description: "", source: "Calculated (See Query)" },
-    RollOrder: { description: "Calculated (See Query)", source: "" }
+    EffectID: { description: "A unique identifier that represents an individual effect.", source: "AttachEffectParam.csv" },
+    OverrideBaseEffectID: { description: "Used for calculating Roll Order, this an ID that works in conjunction with the EffectID.", source: "AttachEffectParam.csv" },
+    RawRollOrder: { description: "A concatenation of OverrideBaseEffectID and EffectID to determine the truly unique order of effect rolls.", source: "Calculated (See Query)" },
+    CompatibilityID: { description: "Determines which effects share compatibility with one another, excluding them from rolling on the same relic at the same time.", source: "AttachEffectParam.csv" },
+    EffectCategory: { description: "Created by manually matching up the EffectID with the categories used on the in-game Relic Effect filters.", source: "Compatibility.csv" },
+    EffectDescription: { description: "Contains the in-game description of the effect.", source: "AttachEffectName.csv" },
+    EffectExtendedDescription: { description: "Contains a community written version of the effect with more detail.", source: "AttachEffectName.csv" },
+    ChanceWeight_110: { description: "Standard Relic Effects Only. Used for calculating the likilihood of rolling the third roll of a large relic, second roll of a medium relic, and only roll of a small relic.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_210: { description: "Standard Relic Effects Only. Used for calculating the likilihood of rolling the second roll of a large relic, or the first roll of a medium relic.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_310: { description: "Standard Relic Effects Only. Used for calculating the likilihood of rolling the first roll of a large relic.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_2000000: { description: "Depth of Night Effects Only. Used for calculating the likilihood of rolling an effect that requires a curse effect.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_2200000: { description: "Depth of Night Effects Only. Used for calculating the likilihood of rolling an effect that does not require a curse effect.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_3000000: { description: "Depth of Night Curses Only. Used for calculating the likilihood of rolling a curse effect.", source: "AttachEffectTableParam.csv" },
+    StatusIconID: { description: "The unique identifier for the Status Icon of the effect.", source: "AttachEffectParam.csv" },
+    CurseRequired: { description: "Indicates if the effect requires a curse.", source: "Calculated (See Query)" },
+    Curse: { description: "Indicates if the effect is a curse.", source: "Calculated (See Query)" },
+    RelicType: { description: "Indicates if the effect can be found on Standard, Depth of Night, or both types of relics.", source: "Calculated (See Query)" },
+    RollOrder: { description: "Determines the order that effects must be presented on a relic to be valid for online play.", source: "Calculated (See Query)" }
   }
 };
 
@@ -561,11 +561,41 @@ function openInfoModal(col) {
   if (dom.infoModalTitle) dom.infoModalTitle.textContent = label;
 
   if (dom.infoModalBody) {
+    const typeLabel = escapeHtml(type);
     dom.infoModalBody.innerHTML = `
-      <div class="lex-info__row"><strong>Data Type:</strong> <code>${escapeHtml(type)}</code></div>
-      <div class="lex-info__row"><strong>Raw Column Name:</strong> ${rawNameHtml}</div>
-      <div class="lex-info__row"><strong>Data Source:</strong> ${sourceHtml}</div>
-      <div class="lex-info__row"><strong>Description:</strong> ${defHtml}</div>
+      <div class="effect-info-grid lex-info-grid" role="list">
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Data Type</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <span class="effect-chip effect-chip--datatype">${typeLabel}</span>
+          </div>
+        </div>
+
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Raw Column Name</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <span class="lex-info-plain">${rawNameHtml}</span>
+          </div>
+        </div>
+
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Data Source</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <span class="lex-info-plain">${sourceHtml}</span>
+          </div>
+        </div>
+
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Description</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <p class="lex-info-description">${defHtml}</p>
+          </div>
+        </div>
+      </div>
     `;
   }
 
