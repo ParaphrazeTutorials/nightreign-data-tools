@@ -342,19 +342,59 @@
                         </div>
 
                         <div class="chalice-results__content" id="chaliceResultsContent">
-                          <div class="chalice-results__grid">
-                            <div class="chalice-results__group">
-                              <div class="chalice-results__title-row">
-                                <div class="chalice-results__title">Standard Relics</div>
+                          <section class="stat-overview" id="statOverviewSection" aria-label="Stat overview">
+                            <div class="stat-overview__header">
+                              <div id="statOverviewPortrait" class="stat-overview__portrait" aria-label="Character portrait placeholder"></div>
+                              <div class="stat-overview__identity">
+                                <div class="stat-overview__name" id="statOverviewName">Character Name</div>
+                                <div class="stat-overview__vitals" aria-label="Character vitals">
+                                  <div class="stat-overview__vital">
+                                    <span class="stat-overview__vital-icon" aria-hidden="true">HP</span>
+                                    <span class="stat-overview__vital-value" id="statOverviewHP">0.00%</span>
+                                  </div>
+                                  <div class="stat-overview__vital">
+                                    <span class="stat-overview__vital-icon" aria-hidden="true">FP</span>
+                                    <span class="stat-overview__vital-value" id="statOverviewFP">0.00%</span>
+                                  </div>
+                                  <div class="stat-overview__vital">
+                                    <span class="stat-overview__vital-icon" aria-hidden="true">ST</span>
+                                    <span class="stat-overview__vital-value" id="statOverviewST">0.00%</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div class="chalice-results__list" id="chaliceResultsStandard"></div>
                             </div>
-                            <div class="chalice-results__group">
-                              <div class="chalice-results__title-row">
-                                <div class="chalice-results__title">Depth of Night Relics</div>
-                              </div>
-                              <div class="chalice-results__list" id="chaliceResultsDepth"></div>
+
+                            <div class="stat-overview__section">
+                              <div class="stat-overview__section-title">Attributes</div>
+                              <div class="stat-overview__box-grid" id="statOverviewAttributes"></div>
+                              <div class="stat-overview__placeholder" aria-hidden="true">Additional Effects</div>
                             </div>
+
+                            <div class="stat-overview__section">
+                              <div class="stat-overview__section-title">Attack</div>
+                              <div class="stat-overview__box-grid stat-overview__box-grid--tight" id="statOverviewAttack"></div>
+                              <div class="stat-overview__placeholder" aria-hidden="true">Additional Effects</div>
+                            </div>
+
+                            <div class="stat-overview__section">
+                              <div class="stat-overview__section-title">Defense</div>
+                              <div class="stat-overview__box-grid stat-overview__box-grid--tight" id="statOverviewDefense"></div>
+                              <div class="stat-overview__placeholder" aria-hidden="true">Additional Effects</div>
+                            </div>
+
+                            <div class="stat-overview__section">
+                              <div class="stat-overview__section-title">Utility</div>
+                              <div class="stat-overview__placeholder" aria-hidden="true">Additional Effects</div>
+                            </div>
+
+                            <div class="stat-overview__section" id="statOverviewOtherSection">
+                              <div class="stat-overview__section-title">Other Effects</div>
+                              <ul class="stat-overview__list" id="statOverviewOther"></ul>
+                            </div>
+                          </section>
+
+                          <div class="chalice-results__takeover-note" id="chaliceResultsTakeoverNote" role="status" hidden>
+                            Coming soon: full relic breakdowns in takeover view.
                           </div>
                         </div>
                       </div>

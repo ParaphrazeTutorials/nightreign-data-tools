@@ -84,6 +84,30 @@ export const CHARACTER_COLORS = {
   wylder: { bg: "linear-gradient(135deg, #21311f, #395339)", border: "rgba(170, 215, 150, 0.65)", text: "#f0fff0" }
 };
 
+const CHARACTER_BACKDROPS = {
+  duchess: 'url("../../Assets/characters/duchess_full_default.png")',
+  executor: 'url("../../Assets/characters/executor_full_default.png")',
+  guardian: 'url("../../Assets/characters/guardian_full_default.png")',
+  ironeye: 'url("../../Assets/characters/ironeye_full_default.png")',
+  raider: 'url("../../Assets/characters/raider_full_default.png")',
+  revenant: 'url("../../Assets/characters/revenant_full_default.png")',
+  scholar: 'url("../../Assets/characters/scholar_full_default.png")',
+  undertaker: 'url("../../Assets/characters/undertaker_full_default.png")',
+  wylder: 'url("../../Assets/characters/wylder_full_default.png")'
+};
+
+const CHARACTER_PORTRAITS = {
+  duchess: 'url("../../Assets/characters/duchess_portrait.png")',
+  executor: 'url("../../Assets/characters/executor_portrait.png")',
+  guardian: 'url("../../Assets/characters/guardian_portrait.png")',
+  ironeye: 'url("../../Assets/characters/ironeye_portrait.png")',
+  raider: 'url("../../Assets/characters/raider_portrait.png")',
+  revenant: 'url("../../Assets/characters/revenant_portrait.png")',
+  scholar: 'url("../../Assets/characters/scholar_portrait.png")',
+  undertaker: 'url("../../Assets/characters/undertaker_portrait.png")',
+  wylder: 'url("../../Assets/characters/wylder_portrait.png")'
+};
+
 // Chip color tokens; keep gradients centralized
 export const CHIP_COLORS = {
   curseYes: {
@@ -169,6 +193,16 @@ export function characterColors(name) {
   const slug = characterSlug(name);
   const token = CHARACTER_COLORS[slug];
   return token ? { ...token, slug } : { ...CHIP_COLORS.character, slug };
+}
+
+export function characterBackdrop(name) {
+  const slug = characterSlug(name);
+  return CHARACTER_BACKDROPS[slug] || null;
+}
+
+export function characterPortrait(name) {
+  const slug = characterSlug(name);
+  return CHARACTER_PORTRAITS[slug] || null;
 }
 
 function setVar(root, name, value) {

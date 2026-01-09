@@ -1,4 +1,4 @@
-import { CHALICE_DATA_URL, DATA_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
+import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
 import {
   COLORS,
   compatId,
@@ -23,7 +23,7 @@ import {
 } from "./reliquary.ui.js";
 import { getDom } from "./reliquary.dom.js";
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
-import { applyPaletteCssVars, COLOR_SWATCHES, RANDOM_SWATCH, CHARACTERS, characterColors } from "../scripts/ui/palette.js";
+import { applyPaletteCssVars, COLOR_SWATCHES, RANDOM_SWATCH, CHARACTERS, characterColors, characterBackdrop, characterPortrait } from "../scripts/ui/palette.js";
 import { openEffectMenu, closeEffectMenu, openCurseMenu, closeCurseMenu } from "./reliquary.menus.js";
 
 const dom = getDom();
@@ -80,6 +80,9 @@ const chaliceColorListCache = {
   standard: [],
   depth: []
 };
+
+let effectStatsRows = [];
+let effectStatsByEffectId = new Map();
 
 function normalizeChaliceColor(value) {
   if (!value) return "#ffffff";
@@ -195,6 +198,152 @@ function colorChipLabel(value) {
   const v = value || "Random";
   if (v === "Random") return `Color: Random (${currentRandomColor})`;
   return `Color: ${v}`;
+}
+
+function twoDecimal(value) {
+  if (!Number.isFinite(value)) return "0.00";
+  return (Math.round(value * 100) / 100).toFixed(2);
+}
+
+function isZeroish(value) {
+  return !Number.isFinite(value) ? false : Math.abs(value) < 1e-6;
+}
+
+function formatSignedInt(value) {
+  if (!Number.isFinite(value)) return "0";
+  const rounded = Math.round(value);
+  const sign = rounded > 0 ? "+" : "";
+  return `${sign}${rounded}`;
+}
+
+function formatSigned(value, suffix = "") {
+  const fixed = twoDecimal(value);
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${fixed}${suffix}`;
+}
+
+const DEFAULT_STAT_ICON = { label: "Stat", badge: "ST" };
+const STAT_ICON_MAP = {
+  "Attack:Physical": { label: "Attack Physical", badge: "PH" },
+  "Attack:Fire": { label: "Attack Fire", badge: "AF" },
+  "Attack:Lightning": { label: "Attack Lightning", badge: "AL" },
+  "Attack:Magic": { label: "Attack Magic", badge: "AM" },
+  "Attack:Dark": { label: "Attack Dark", badge: "AD" },
+  "Attack:Pierce": { label: "Attack Pierce", badge: "AP" },
+  "Attack:Slash": { label: "Attack Slash", badge: "AS" },
+  "Attack:Strike": { label: "Attack Strike", badge: "AK" },
+  "Attack:Holy": { label: "Attack Holy", badge: "AH" },
+  "Negation:Physical": { label: "Negation Physical", badge: "PH" },
+  "Negation:Fire": { label: "Negation Fire", badge: "NF" },
+  "Negation:Lightning": { label: "Negation Lightning", badge: "NL" },
+  "Negation:Magic": { label: "Negation Magic", badge: "NM" },
+  "Negation:Dark": { label: "Negation Dark", badge: "ND" },
+  "Negation:Holy": { label: "Negation Holy", badge: "NH" },
+  "Negation:Pierce": { label: "Negation Pierce", badge: "NP" },
+  "Negation:Slash": { label: "Negation Slash", badge: "NS" },
+  "Negation:Strike": { label: "Negation Strike", badge: "NK" },
+  "Attributes:Strength": { label: "Strength", badge: "ST" },
+  "Attributes:Dexterity": { label: "Dexterity", badge: "DX" },
+  "Attributes:Intelligence": { label: "Intelligence", badge: "IN" },
+  "Attributes:Faith": { label: "Faith", badge: "FA" },
+  "Attributes:Endurance": { label: "Endurance", badge: "EN" },
+  "Attributes:Vigor": { label: "Vigor", badge: "VI" },
+  "Attributes:Mind": { label: "Mind", badge: "MI" },
+  "Attributes:Arcane": { label: "Arcane", badge: "AR" },
+  "Recovery:HP": { label: "Recovery HP", badge: "RH" },
+  "Recovery:FP": { label: "Recovery FP", badge: "RF" },
+  "Poise:Poise": { label: "Poise", badge: "PO" },
+  "Other:Status": { label: "Status", badge: "ST" }
+};
+
+const STAT_LAYOUT = {
+  attributes: [
+    { label: "STR", group: "Attributes", type: "Strength", unit: "flat" },
+    { label: "DEX", group: "Attributes", type: "Dexterity", unit: "flat" },
+    { label: "VIG", group: "Attributes", type: "Vigor", unit: "flat" },
+    { label: "END", group: "Attributes", type: "Endurance", unit: "flat" },
+    { label: "MND", group: "Attributes", type: "Mind", unit: "flat" },
+    { label: "INT", group: "Attributes", type: "Intelligence", unit: "flat" },
+    { label: "FTH", group: "Attributes", type: "Faith", unit: "flat" },
+    { label: "ARC", group: "Attributes", type: "Arcane", unit: "flat" }
+  ],
+  attack: [
+    { label: "Physical", group: "Attack", type: "Physical" },
+    { label: "Slashing", group: "Attack", type: "Slash" },
+    { label: "Bludgeoning", group: "Attack", type: "Strike" },
+    { label: "Piercing", group: "Attack", type: "Pierce" },
+    { label: "Magic", group: "Attack", type: "Magic" },
+    { label: "Fire", group: "Attack", type: "Fire" },
+    { label: "Lightning", group: "Attack", type: "Lightning" },
+    { label: "Holy", group: "Attack", type: "Holy", altTypes: ["Dark"] }
+  ],
+  defense: [
+    { label: "Physical", group: "Negation", type: "Physical" },
+    { label: "Slashing", group: "Negation", type: "Slash" },
+    { label: "Bludgeoning", group: "Negation", type: "Strike" },
+    { label: "Piercing", group: "Negation", type: "Pierce" },
+    { label: "Magic", group: "Negation", type: "Magic" },
+    { label: "Fire", group: "Negation", type: "Fire" },
+    { label: "Lightning", group: "Negation", type: "Lightning" },
+    { label: "Holy", group: "Negation", type: "Holy", altTypes: ["Dark"] }
+  ]
+};
+
+function statIconMeta(metricGroup, metricType) {
+  const key = `${metricGroup}:${metricType}`;
+  return STAT_ICON_MAP[key] || STAT_ICON_MAP[metricGroup] || DEFAULT_STAT_ICON;
+}
+
+function statIconHtml(metricGroup, metricType) {
+  const meta = statIconMeta(metricGroup, metricType);
+  const badge = (meta.badge || metricType || "?").slice(0, 3).toUpperCase();
+  return `<span class="stat-box__icon" title="${escapeHtml(meta.label || badge)}">${escapeHtml(badge)}</span>`;
+}
+
+function updateCharacterNameLabel() {
+  if (!dom.statOverviewName) return;
+  const resolved = selectedClass ? resolveCharacterOption(selectedClass) || selectedClass : "Character Name";
+  dom.statOverviewName.textContent = resolved;
+  updateStatOverviewGlow();
+}
+
+function updateStatOverviewGlow() {
+  if (!dom.statOverviewSection) return;
+  const token = selectedClass ? characterColors(selectedClass) : null;
+  const backdrop = selectedClass ? characterBackdrop(selectedClass) : null;
+  const portrait = selectedClass ? characterPortrait(selectedClass) : null;
+  const border = token?.border || "rgba(255, 255, 255, 0.4)";
+  const glow = token?.border || "rgba(255, 255, 255, 0.4)";
+  dom.statOverviewSection.style.setProperty("--stat-border-color", border);
+  dom.statOverviewSection.style.setProperty("--stat-glow-color", glow);
+  dom.statOverviewSection.style.setProperty("--stat-bg-url", backdrop || "none");
+  dom.statOverviewSection.style.setProperty("--stat-bg-opacity", backdrop ? "0.32" : "0");
+
+  if (dom.statOverviewPortrait) {
+    dom.statOverviewPortrait.style.backgroundImage = portrait || "";
+  }
+}
+
+function resetVitalsPlaceholders() {
+  if (dom.statOverviewHP) dom.statOverviewHP.textContent = "-";
+  if (dom.statOverviewFP) dom.statOverviewFP.textContent = "-";
+  if (dom.statOverviewST) dom.statOverviewST.textContent = "-";
+}
+
+function ingestEffectStats(list) {
+  effectStatsRows = Array.isArray(list) ? list : [];
+  effectStatsByEffectId = new Map();
+  for (const row of effectStatsRows) {
+    const id = String(row?.EffectID ?? "").trim();
+    if (!id) continue;
+    if (!effectStatsByEffectId.has(id)) effectStatsByEffectId.set(id, []);
+    effectStatsByEffectId.get(id).push(row);
+  }
+}
+
+function statRowsForEffect(effectId) {
+  if (!effectId) return [];
+  return effectStatsByEffectId.get(String(effectId)) || [];
 }
 
 function updateColorChipLabel() {
@@ -351,6 +500,7 @@ function applyChaliceResultsView(view) {
   }
 
   updateResultsToggleLabel(normalized);
+  renderChaliceStatOverview();
 }
 
 function cycleChaliceResultsView() {
@@ -480,6 +630,8 @@ function setSelectedClass(next, triggerUI = true) {
     populateClassOptions();
     dom.selClass.value = normalized;
   }
+
+  updateCharacterNameLabel();
 
   pruneChaliceSelectionsForClass();
 
@@ -3181,65 +3333,146 @@ function generateCombosForSide(meta) {
   };
 }
 
-function relicCardHtml(combo, idx, meta) {
-  const sideLabel = meta.label;
-  const color = chaliceSideColor(meta, idx) || "#ffffff";
+function computeStatOverviewTotals(effectIds) {
+  const totals = new Map();
+  const ids = Array.isArray(effectIds) ? effectIds : [];
+
+  for (const effectId of ids) {
+    const rows = statRowsForEffect(effectId);
+    if (!rows.length) continue;
+    for (const row of rows) {
+      const group = row?.MetricGroup || "Other";
+      const type = row?.MetricType || "Unknown";
+      const unit = (row?.Unit || "pct").toLowerCase();
+      const key = `${group}||${type}`;
+      const valueNum = Number.parseFloat(row?.Value ?? "0");
+      const value = Number.isFinite(valueNum) ? valueNum : 0;
+
+      if (!totals.has(key)) {
+        totals.set(key, {
+          group,
+          type,
+          unit,
+          multiplier: 1,
+          flat: 0,
+          count: 0
+        });
+      }
+
+      const entry = totals.get(key);
+      entry.count += 1;
+      if (unit === "pct") {
+        const factor = 1 + value / 100;
+        entry.multiplier *= factor;
+      } else {
+        entry.flat += value;
+      }
+    }
+  }
+
+  totals.forEach(entry => {
+    entry.percentChange = entry.unit === "pct" ? (entry.multiplier - 1) * 100 : 0;
+  });
+
+  return totals;
+}
+
+function selectedChaliceEffectIds() {
+  return [...chaliceSelections.standard, ...chaliceSelections.depth].filter(Boolean);
+}
+
+function statValueText(entry) {
+  if (entry.unit === "pct") {
+    if (isZeroish(entry.percentChange)) return "-";
+    return formatSigned(entry.percentChange, "%");
+  }
+  if (isZeroish(entry.flat)) return "-";
+  return formatSignedInt(entry.flat);
+}
+
+function statMultiplierText(entry) {
+  if (entry.unit !== "pct") return "";
+  return `${twoDecimal(entry.multiplier)}x`;
+}
+
+function findStatTotal(item, totals, usedKeys) {
+  const candidates = [item.type, ...(item.altTypes || [])];
+  for (const type of candidates) {
+    const key = `${item.group}||${type}`;
+    if (totals.has(key)) {
+      usedKeys.add(key);
+      return totals.get(key);
+    }
+  }
+  return {
+    group: item.group,
+    type: item.type,
+    unit: item.unit || "pct",
+    multiplier: 1,
+    flat: 0,
+    percentChange: 0
+  };
+}
+
+function statBoxHtml(item, totals, usedKeys) {
+  const total = findStatTotal(item, totals, usedKeys);
+  const isPositive = total.unit === "pct" ? total.percentChange > 0 : total.flat > 0;
+  const isNegative = total.unit === "pct" ? total.percentChange < 0 : total.flat < 0;
+  const trend = isPositive ? "is-positive" : isNegative ? "is-negative" : "";
+  const valueText = statValueText(total);
+  const icon = statIconHtml(item.group, item.type);
+  const title = `${item.label}: ${valueText}`;
+
   return `
-    <details class="chalice-card" data-side="${meta.key}" style="--chalice-card-color:${color}; border-color:${color};">
-      <summary class="chalice-card__summary">
-        <span class="chalice-card__title">${sideLabel} Relic ${idx + 1}</span>
-        <span class="chalice-card__meta">Roll order ready</span>
-      </summary>
-      <ol class="chalice-card__effects">
-        ${combo.rows.map(row => {
-          const name = row.EffectDescription ?? `(Effect ${row.EffectID})`;
-          const cid = compatId(row) || "∅";
-          const roll = row.RollOrder == null || String(row.RollOrder).trim() === "" ? "∅" : row.RollOrder;
-          const typeLabel = formatRelicTypeLabel(row.RelicType).label;
-          return `
-            <li>
-              <div class="chalice-card__effect">
-                <div class="chalice-card__effect-name">${escapeHtml(name)}</div>
-                <div class="chalice-card__effect-meta">CID ${cid} · Roll ${roll} · ${escapeHtml(typeLabel)}</div>
-              </div>
-            </li>
-          `;
-        }).join("")}
-      </ol>
-    </details>
+    <article class="stat-box ${trend}" aria-label="${escapeHtml(title)}">
+      ${icon}
+      <div class="stat-box__value">${valueText}</div>
+    </article>
   `;
 }
 
-function renderResultList(targetEl, result, meta) {
-  if (!targetEl) return;
-  if (!result.combos.length) {
-    targetEl.innerHTML = `<div class="chalice-empty">No valid ${meta.label.toLowerCase()} relics yet.</div>`;
-    return;
-  }
-  const cards = result.combos.map((combo, idx) => relicCardHtml(combo, idx, meta)).join("");
-  const unused = Array.isArray(result.unused) && result.unused.length
-    ? `
-      <div class="chalice-blocked">
-        <div class="chalice-blocked__title">Unused effects</div>
-        <ul class="chalice-blocked__list">
-          ${result.unused.map(item => `<li><strong>${escapeHtml(item.name)}</strong>: ${escapeHtml(item.reason || "Cannot be placed into a valid relic combination.")}</li>`).join("")}
-        </ul>
-      </div>
-    `
-    : "";
-
-  targetEl.innerHTML = cards + unused;
+function renderStatGrid(target, items, totals, usedKeys) {
+  if (!target) return;
+  const count = Array.isArray(items) ? items.length : 0;
+  target.style.setProperty("--stat-count", count || 1);
+  target.innerHTML = items.map(item => statBoxHtml(item, totals, usedKeys)).join("");
 }
 
-function renderChaliceResults() {
-  const standardMeta = sideInfo("standard");
-  const depthMeta = sideInfo("depth");
-  const standard = generateCombosForSide(standardMeta);
-  const depth = generateCombosForSide(depthMeta);
+function renderOtherEffects(totals, usedKeys) {
+  if (!dom.statOverviewOther || !dom.statOverviewOtherSection) return;
+  const rows = [];
+  totals.forEach((entry, key) => {
+    if (usedKeys.has(key)) return;
+    const text = `${entry.group}: ${entry.type}`;
+    rows.push({ text, value: statValueText(entry), unit: entry.unit });
+  });
 
-  renderResultList(dom.chaliceResultsStandard, standard, standardMeta);
-  renderResultList(dom.chaliceResultsDepth, depth, depthMeta);
+  rows.sort((a, b) => a.text.localeCompare(b.text));
+  dom.statOverviewOtherSection.hidden = rows.length === 0;
+  dom.statOverviewOther.innerHTML = rows
+    .map(r => `<li><span class="stat-list__name">${escapeHtml(r.text)}</span><span class="stat-list__value">${escapeHtml(r.value)}</span></li>`)
+    .join("");
+}
 
+function renderChaliceStatOverview() {
+  const isTakeover = chaliceResultsView === RESULTS_VIEW.TAKEOVER;
+  if (dom.statOverviewSection) dom.statOverviewSection.hidden = isTakeover;
+  if (dom.chaliceResultsTakeoverNote) dom.chaliceResultsTakeoverNote.hidden = !isTakeover;
+  if (isTakeover) return;
+
+  resetVitalsPlaceholders();
+
+  const ids = selectedChaliceEffectIds();
+  const totals = computeStatOverviewTotals(ids);
+  const usedKeys = new Set();
+
+  renderStatGrid(dom.statOverviewAttributes, STAT_LAYOUT.attributes, totals, usedKeys);
+  renderStatGrid(dom.statOverviewAttack, STAT_LAYOUT.attack, totals, usedKeys);
+  renderStatGrid(dom.statOverviewDefense, STAT_LAYOUT.defense, totals, usedKeys);
+  renderOtherEffects(totals, usedKeys);
+}
+
+function updateChaliceStatusFromResults(standard, depth) {
   if (dom.chaliceStatus) {
     const stdUnused = standard.unused?.length || 0;
     const depUnused = depth.unused?.length || 0;
@@ -3260,6 +3493,16 @@ function renderChaliceResults() {
   const statusText = statusParts.join(" | ");
   setChaliceStatus(statusText);
   updateCollapsedResultsSummary(standard.combos.length, depth.combos.length, statusText);
+}
+
+function renderChaliceResults() {
+  const standardMeta = sideInfo("standard");
+  const depthMeta = sideInfo("depth");
+  const standard = generateCombosForSide(standardMeta);
+  const depth = generateCombosForSide(depthMeta);
+
+  updateChaliceStatusFromResults(standard, depth);
+  renderChaliceStatOverview();
 }
 
 function updateChaliceCounts() {
@@ -3450,6 +3693,8 @@ function resetAllPreserveIllegal(desiredIllegal) {
   selectedColor = "Random";
 
   selectedClass = "";
+  updateCharacterNameLabel();
+  resetVitalsPlaceholders();
 
   setShowIllegalActive(Boolean(desiredIllegal));
 
@@ -3467,6 +3712,8 @@ function resetClassFilter() {
     dom.selClass.value = "";
     populateClassOptions();
   }
+  updateCharacterNameLabel();
+  resetVitalsPlaceholders();
 }
 
 function resetAll() {
@@ -3477,6 +3724,8 @@ function resetAll() {
   setShowIllegalActive(false);
 
   selectedClass = "";
+  updateCharacterNameLabel();
+  resetVitalsPlaceholders();
 
   for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
   for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
@@ -3487,9 +3736,10 @@ function resetAll() {
 }
 
 async function load() {
-  const [relicRes, chaliceRes] = await Promise.all([
+  const [relicRes, chaliceRes, effectStatsRes] = await Promise.all([
     fetch(DATA_URL, { cache: "no-store" }),
-    fetch(CHALICE_DATA_URL, { cache: "no-store" }).catch(() => null)
+    fetch(CHALICE_DATA_URL, { cache: "no-store" }).catch(() => null),
+    fetch(EFFECT_STATS_URL, { cache: "no-store" }).catch(() => null)
   ]);
 
   if (!relicRes.ok) throw new Error(`Failed to load ${DATA_URL} (${relicRes.status})`);
@@ -3513,6 +3763,17 @@ async function load() {
     console.warn("Chalice data not loaded; builder will be empty.");
   }
 
+  if (effectStatsRes && effectStatsRes.ok) {
+    try {
+      const statsJson = await effectStatsRes.json();
+      ingestEffectStats(statsJson);
+    } catch (err) {
+      console.warn("Failed to parse effect stats", err);
+    }
+  } else {
+    console.warn("Effect stats not loaded; Stat Overview will be empty.");
+  }
+
   dom.relicImg.src = relicDefaultPath(visualRelicType(dom.selType.value));
   installRelicImgFallback(dom.relicImg, () => effectiveRelicType());
 
@@ -3531,6 +3792,7 @@ async function load() {
   });
   if (dom.selClass) {
     populateClassOptions();
+    updateCharacterNameLabel();
     dom.selClass.addEventListener("change", evt => {
       setSelectedClass(evt.target.value || "", true);
     });
