@@ -84,29 +84,17 @@ export const CHARACTER_COLORS = {
   wylder: { bg: "linear-gradient(135deg, #21311f, #395339)", border: "rgba(170, 215, 150, 0.65)", text: "#f0fff0" }
 };
 
-const CHARACTER_BACKDROPS = {
-  duchess: 'url("../../Assets/characters/duchess_full_default.png")',
-  executor: 'url("../../Assets/characters/executor_full_default.png")',
-  guardian: 'url("../../Assets/characters/guardian_full_default.png")',
-  ironeye: 'url("../../Assets/characters/ironeye_full_default.png")',
-  raider: 'url("../../Assets/characters/raider_full_default.png")',
-  revenant: 'url("../../Assets/characters/revenant_full_default.png")',
-  scholar: 'url("../../Assets/characters/scholar_full_default.png")',
-  undertaker: 'url("../../Assets/characters/undertaker_full_default.png")',
-  wylder: 'url("../../Assets/characters/wylder_full_default.png")'
-};
-
-const CHARACTER_PORTRAITS = {
-  duchess: 'url("../../Assets/characters/duchess_portrait.png")',
-  executor: 'url("../../Assets/characters/executor_portrait.png")',
-  guardian: 'url("../../Assets/characters/guardian_portrait.png")',
-  ironeye: 'url("../../Assets/characters/ironeye_portrait.png")',
-  raider: 'url("../../Assets/characters/raider_portrait.png")',
-  revenant: 'url("../../Assets/characters/revenant_portrait.png")',
-  scholar: 'url("../../Assets/characters/scholar_portrait.png")',
-  undertaker: 'url("../../Assets/characters/undertaker_portrait.png")',
-  wylder: 'url("../../Assets/characters/wylder_portrait.png")'
-};
+// Build character art URLs relative to the current page so both local file:// and
+// subpath-hosted dev servers resolve correctly.
+function characterAssetUrl(file) {
+  if (!file) return null;
+  try {
+    return new URL(`../Assets/characters/${file}`, window.location.href).toString();
+  } catch (err) {
+    // Fallback to a simple relative path if URL construction fails (e.g., non-browser env)
+    return `../Assets/characters/${file}`;
+  }
+}
 
 // Chip color tokens; keep gradients centralized
 export const CHIP_COLORS = {
@@ -197,12 +185,16 @@ export function characterColors(name) {
 
 export function characterBackdrop(name) {
   const slug = characterSlug(name);
-  return CHARACTER_BACKDROPS[slug] || null;
+  if (!slug || slug === "unknown") return null;
+  const url = characterAssetUrl(`${slug}_full_default.png`);
+  return url ? `url("${url}")` : null;
 }
 
 export function characterPortrait(name) {
   const slug = characterSlug(name);
-  return CHARACTER_PORTRAITS[slug] || null;
+  if (!slug || slug === "unknown") return null;
+  const url = characterAssetUrl(`${slug}_portrait.png`);
+  return url ? `url("${url}")` : null;
 }
 
 function setVar(root, name, value) {
