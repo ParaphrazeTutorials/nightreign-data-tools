@@ -9,7 +9,7 @@
   --row-pad-top: 0.38rem;
   --row-pad-x: 0.52rem;
   --row-gap: 0.4rem;
-  --icon-size: 24px;
+  --icon-size: 36px;
   --row-min-height-compact: 90px;
   --row-min-height-raw: 140px;
 }
@@ -546,9 +546,9 @@
 .chosen-effects li .effect-icon {
   width: var(--icon-size);
   height: var(--icon-size);
-  border-radius: 0.55rem;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0;
+  border: none;
+  background: none;
   display: grid;
   place-items: center;
   overflow: hidden;
