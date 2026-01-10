@@ -38,6 +38,17 @@
   --hero-art-y: 100%;
 }
 
+/* Force a consistent dark canvas using Pico's dark palette */
+html {
+  background-color: var(--pico-background-color);
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--pico-background-color);
+  color: var(--color-text-main);
+}
+
 /* ------------------------------------------------------------
    Shared tooltips
    ------------------------------------------------------------ */

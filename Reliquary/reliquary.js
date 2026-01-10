@@ -83,6 +83,7 @@ const chaliceColorListCache = {
 
 let effectStatsRows = [];
 let effectStatsByEffectId = new Map();
+let conditionalEffectState = new Map();
 
 function normalizeChaliceColor(value) {
   if (!value) return "#ffffff";
@@ -317,7 +318,7 @@ function updateStatOverviewGlow() {
   dom.statOverviewSection.style.setProperty("--stat-border-color", border);
   dom.statOverviewSection.style.setProperty("--stat-glow-color", glow);
   dom.statOverviewSection.style.setProperty("--stat-bg-url", backdrop || "none");
-  dom.statOverviewSection.style.setProperty("--stat-bg-opacity", backdrop ? "0.32" : "0");
+  dom.statOverviewSection.style.setProperty("--stat-bg-opacity", backdrop ? "0.16" : "0");
 
   if (dom.statOverviewPortrait) {
     dom.statOverviewPortrait.style.backgroundImage = portrait || "";
@@ -344,6 +345,24 @@ function ingestEffectStats(list) {
 function statRowsForEffect(effectId) {
   if (!effectId) return [];
   return effectStatsByEffectId.get(String(effectId)) || [];
+}
+
+function isConditionalEffectEnabled(effectId) {
+  const key = String(effectId || "").trim();
+  if (!conditionalEffectState.has(key)) conditionalEffectState.set(key, true);
+  return conditionalEffectState.get(key);
+}
+
+function setConditionalEffectEnabled(effectId, enabled) {
+  const key = String(effectId || "").trim();
+  conditionalEffectState.set(key, Boolean(enabled));
+}
+
+function pruneConditionalEffectState(activeEffectIds) {
+  const allowed = new Set((activeEffectIds || []).map(id => String(id)));
+  for (const key of conditionalEffectState.keys()) {
+    if (!allowed.has(key)) conditionalEffectState.delete(key);
+  }
 }
 
 function updateColorChipLabel() {
@@ -3352,6 +3371,9 @@ function computeStatOverviewTotals(effectIds) {
     const rows = statRowsForEffect(effectId);
     if (!rows.length) continue;
     for (const row of rows) {
+      const requiresCondition = String(row?.ConditionRequired ?? "0") === "1";
+      if (requiresCondition && !isConditionalEffectEnabled(effectId)) continue;
+
       const group = row?.MetricGroup || "Other";
       const type = row?.MetricType || "Unknown";
       const unit = (row?.Unit || "pct").toLowerCase();
@@ -3465,6 +3487,101 @@ function renderOtherEffects(totals, usedKeys) {
     .join("");
 }
 
+function formatConditionalSummary(rows) {
+  const parts = [];
+  for (const row of rows) {
+    const unit = (row?.Unit || "pct").toLowerCase();
+    const valNum = Number.parseFloat(row?.Value ?? "0");
+    const val = Number.isFinite(valNum) ? valNum : 0;
+    const text = unit === "pct" ? formatSigned(val, "%") : formatSignedInt(val);
+    const label = row?.MetricType || "Stat";
+    parts.push(`${label} ${text}`);
+    if (parts.length >= 3) break;
+  }
+  if (rows.length > parts.length) parts.push("…");
+  return parts.join(", ");
+}
+
+function renderConditionalExtras(target, list) {
+  if (!target) return;
+  if (!list.length) {
+    target.innerHTML = '<div class="stat-overview__placeholder" aria-hidden="true">Additional Effects</div>';
+    return;
+  }
+
+  target.innerHTML = `
+    <ul class="stat-overview__extras-list">
+      ${list.map(item => `
+        <li class="stat-extra">
+          <label class="stat-extra__label">
+            <span class="stat-extra__name">${escapeHtml(item.name)}</span>
+            <span class="stat-extra__toggle-wrap">
+              <input
+                type="checkbox"
+                class="stat-extra__toggle"
+                data-conditional-effect="${escapeHtml(item.id)}"
+                ${item.enabled ? "checked" : ""}
+              >
+              <span class="stat-extra__fakebox" aria-hidden="true"></span>
+            </span>
+          </label>
+        </li>
+      `).join("")}
+    </ul>
+  `;
+
+  const toggles = target.querySelectorAll("[data-conditional-effect]");
+  toggles.forEach(toggle => {
+    toggle.addEventListener("change", evt => {
+      const id = evt.target.getAttribute("data-conditional-effect") || "";
+      setConditionalEffectEnabled(id, evt.target.checked);
+      renderChaliceStatOverview();
+    });
+  });
+}
+
+function renderConditionalEffectLists(effectIds) {
+  const buckets = {
+    attributes: [],
+    attack: [],
+    defense: [],
+    utility: []
+  };
+
+  const sectionForGroup = (group) => {
+    if (group === "Attributes") return "attributes";
+    if (group === "Attack") return "attack";
+    if (group === "Negation") return "defense";
+    return "utility";
+  };
+
+  const ids = Array.isArray(effectIds) ? effectIds : [];
+  const seen = new Set();
+
+  for (const effectId of ids) {
+    const key = String(effectId || "");
+    if (seen.has(key)) continue;
+    const rows = statRowsForEffect(effectId).filter(r => String(r?.ConditionRequired ?? "0") === "1");
+    if (!rows.length) continue;
+    seen.add(key);
+
+    const sectionKey = sectionForGroup(rows[0]?.MetricGroup || "");
+    const entry = {
+      id: key,
+      name: rows[0]?.EffectName || `Effect ${key}`,
+      summary: formatConditionalSummary(rows),
+      enabled: isConditionalEffectEnabled(effectId)
+    };
+
+    buckets[sectionKey].push(entry);
+  }
+
+  renderConditionalExtras(dom.statOverviewAttributesExtras, buckets.attributes);
+  renderConditionalExtras(dom.statOverviewAttackExtras, buckets.attack);
+  renderConditionalExtras(dom.statOverviewDefenseExtras, buckets.defense);
+  renderConditionalExtras(dom.statOverviewUtilityExtras, buckets.utility);
+}
+
 function renderChaliceStatOverview() {
   const isTakeover = chaliceResultsView === RESULTS_VIEW.TAKEOVER;
   if (dom.statOverviewSection) dom.statOverviewSection.hidden = isTakeover;
@@ -3474,6 +3591,8 @@ function renderChaliceStatOverview() {
   resetVitalsPlaceholders();
 
   const ids = selectedChaliceEffectIds();
+  pruneConditionalEffectState(ids);
+  renderConditionalEffectLists(ids);
   const totals = computeStatOverviewTotals(ids);
   const usedKeys = new Set();
 
@@ -3544,6 +3663,7 @@ function resetChaliceSelections() {
   chaliceCats.depth.fill("");
   chaliceCurses.standard.fill("");
   chaliceCurses.depth.fill("");
+  conditionalEffectState.clear();
   selectedChaliceId = "";
   setChaliceStatus("");
   renderChalicePickers();
@@ -3712,6 +3832,7 @@ function resetAllPreserveIllegal(desiredIllegal) {
   for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
   for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
   for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
+  conditionalEffectState.clear();
 
   pickRandomColor();
   updateUI("illegal-change");
@@ -3741,6 +3862,7 @@ function resetAll() {
   for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
   for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
   for (let i = 0; i < curseBySlot.length; i++) curseBySlot[i] = null;
+  conditionalEffectState.clear();
 
   pickRandomColor();
   updateUI("reset");
