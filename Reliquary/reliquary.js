@@ -1214,22 +1214,25 @@ function computeRelicProbability(selectedRows, selectedType) {
     return computeDepthRelicProbability(picked);
   }
 
-  const pool = filterByClass(baseFilteredByRelicType(rows, "Standard"));
-  if (!pool.length) return null;
+  // For Standard probability, ignore class filtering entirely; only self/compat removals apply.
+  const poolAllStandard = baseFilteredByRelicType(rows, "Standard");
+  if (!poolAllStandard.length) return null;
 
   const weightCols = weightColumnsFor(picked.length);
   const perms = permutations(picked);
 
   const probability = perms.reduce((sum, order) => {
     let p = 1;
-    let remaining = pool.slice();
+    let remaining = poolAllStandard.slice();
 
     for (let i = 0; i < order.length; i++) {
       const target = order[i];
       const w = weightForSlot(target, i, weightCols);
       const total = totalWeightForSlot(remaining, i, weightCols);
+
       if (!Number.isFinite(total) || total <= 0 || w <= 0) return sum; // impossible path
       p *= w / total;
+
       remaining = poolAfterPick(remaining, target);
     }
 
@@ -1253,10 +1256,18 @@ function computeDepthRelicProbability(selectedEffectRows) {
     .filter(Boolean);
   const requiredCurseIds = requiredCurses.map(r => String(r.EffectID));
 
+  // Enforce that curse-required effects imply the same number of curses
+  const requiredEffectCurseCount = requiredEffects.filter(r => String(r?.CurseRequired ?? "0") === "1").length;
+  if (requiredCurseIds.length < requiredEffectCurseCount) {
+    const tooltip = `Need at least ${requiredEffectCurseCount} curse${requiredEffectCurseCount === 1 ? "" : "s"} to satisfy curse-required effects.`;
+    return { probability: 0, percentText: "0.000000", oneInText: "Impossible", tooltip };
+  }
+
   if (!requiredEffects.length) return null;
 
-  const allDepthEffects = filterByClass(baseFilteredByRelicType(rows, "Depth Of Night"));
-  const allDepthCurses = filterByClass(baseFilteredByRelicType(curses, "Depth Of Night"));
+    // Depth probability also ignores class filtering; only type/compat constraints apply.
+    const allDepthEffects = baseFilteredByRelicType(rows, "Depth Of Night");
+    const allDepthCurses = baseFilteredByRelicType(curses, "Depth Of Night");
   if (!allDepthEffects.length) return null;
 
   const effectsAllowed = requiredEffects.every(r => baseFilteredByRelicType([r], "Depth Of Night").length > 0);
