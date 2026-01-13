@@ -84,6 +84,7 @@ const chaliceColorListCache = {
 let effectStatsRows = [];
 let effectStatsByEffectId = new Map();
 let conditionalEffectState = new Map();
+let conditionalEffectStacks = new Map();
 
 function normalizeChaliceColor(value) {
   if (!value) return "#ffffff";
@@ -347,6 +348,31 @@ function statRowsForEffect(effectId) {
   return effectStatsByEffectId.get(String(effectId)) || [];
 }
 
+function maxStacksForEffect(effectId) {
+  const rows = statRowsForEffect(effectId);
+  let max = 1;
+  for (const row of rows) {
+    if (String(row?.Stackable ?? "0") !== "1") continue;
+    const m = Number.parseInt(row?.MaxStacks ?? "0", 10);
+    if (Number.isFinite(m) && m > max) max = m;
+  }
+  return max;
+}
+
+function stackCountForEffect(effectId) {
+  const key = String(effectId || "").trim();
+  const max = maxStacksForEffect(effectId);
+  const current = conditionalEffectStacks.has(key) ? conditionalEffectStacks.get(key) : (max > 1 ? 1 : 1);
+  return Math.min(Math.max(1, current), Math.max(1, max));
+}
+
+function setStackCountForEffect(effectId, count) {
+  const key = String(effectId || "").trim();
+  const max = maxStacksForEffect(effectId);
+  const clamped = Math.min(Math.max(1, Number(count) || 1), Math.max(1, max));
+  conditionalEffectStacks.set(key, clamped);
+}
+
 function isConditionalEffectEnabled(effectId) {
   const key = String(effectId || "").trim();
   if (!conditionalEffectState.has(key)) conditionalEffectState.set(key, true);
@@ -356,12 +382,18 @@ function isConditionalEffectEnabled(effectId) {
 function setConditionalEffectEnabled(effectId, enabled) {
   const key = String(effectId || "").trim();
   conditionalEffectState.set(key, Boolean(enabled));
+  if (enabled && !conditionalEffectStacks.has(key)) {
+    setStackCountForEffect(key, 1);
+  }
 }
 
 function pruneConditionalEffectState(activeEffectIds) {
   const allowed = new Set((activeEffectIds || []).map(id => String(id)));
   for (const key of conditionalEffectState.keys()) {
     if (!allowed.has(key)) conditionalEffectState.delete(key);
+  }
+  for (const key of conditionalEffectStacks.keys()) {
+    if (!allowed.has(key)) conditionalEffectStacks.delete(key);
   }
 }
 
@@ -3376,10 +3408,12 @@ function computeStatOverviewTotals(effectIds) {
 
       const group = row?.MetricGroup || "Other";
       const type = row?.MetricType || "Unknown";
-      const unit = (row?.Unit || "pct").toLowerCase();
+      const unitRaw = String(row?.Unit || "pct").trim();
+      const unit = unitRaw === "%" ? "pct" : (unitRaw === "#" ? "flat" : unitRaw.toLowerCase());
       const key = `${group}||${type}`;
       const valueNum = Number.parseFloat(row?.Value ?? "0");
-      const value = Number.isFinite(valueNum) ? valueNum : 0;
+      const stacks = String(row?.Stackable ?? "0") === "1" ? stackCountForEffect(effectId) : 1;
+      const value = Number.isFinite(valueNum) ? valueNum * stacks : 0;
 
       if (!totals.has(key)) {
         totals.set(key, {
@@ -3421,6 +3455,16 @@ function statValueText(entry) {
   }
   if (isZeroish(entry.flat)) return "-";
   return formatSignedInt(entry.flat);
+}
+
+function updateVitalsFromTotals(totals) {
+  const hp = totals.get("MaxStat||HP");
+  const fp = totals.get("MaxStat||FP");
+  const st = totals.get("MaxStat||ST") || totals.get("MaxStat||Stamina");
+
+  if (dom.statOverviewHP) dom.statOverviewHP.textContent = hp ? statValueText(hp) : "-";
+  if (dom.statOverviewFP) dom.statOverviewFP.textContent = fp ? statValueText(fp) : "-";
+  if (dom.statOverviewST) dom.statOverviewST.textContent = st ? statValueText(st) : "-";
 }
 
 function statMultiplierText(entry) {
@@ -3476,6 +3520,7 @@ function renderOtherEffects(totals, usedKeys) {
   const rows = [];
   totals.forEach((entry, key) => {
     if (usedKeys.has(key)) return;
+    if (entry.group === "MaxStat") return;
     const text = `${entry.group}: ${entry.type}`;
     rows.push({ text, value: statValueText(entry), unit: entry.unit });
   });
@@ -3490,7 +3535,8 @@ function renderOtherEffects(totals, usedKeys) {
 function formatConditionalSummary(rows) {
   const parts = [];
   for (const row of rows) {
-    const unit = (row?.Unit || "pct").toLowerCase();
+    const unitRaw = String(row?.Unit || "pct").trim();
+    const unit = unitRaw === "%" ? "pct" : (unitRaw === "#" ? "flat" : unitRaw.toLowerCase());
     const valNum = Number.parseFloat(row?.Value ?? "0");
     const val = Number.isFinite(valNum) ? valNum : 0;
     const text = unit === "pct" ? formatSigned(val, "%") : formatSignedInt(val);
@@ -3525,6 +3571,13 @@ function renderConditionalExtras(target, list) {
               <span class="stat-extra__fakebox" aria-hidden="true"></span>
             </span>
           </label>
+          ${item.stackable ? `
+            <div class="stat-extra__stacker" data-stack-effect="${escapeHtml(item.id)}">
+              <button type="button" class="stat-extra__stack-btn" data-stack-dec aria-label="Decrease stacks">-</button>
+              <span class="stat-extra__stack-count" title="Max ${item.maxStacks}" aria-label="Stacks">${item.stacks}</span>
+              <button type="button" class="stat-extra__stack-btn" data-stack-inc aria-label="Increase stacks">+</button>
+            </div>
+          ` : ""}
         </li>
       `).join("")}
     </ul>
@@ -3537,6 +3590,36 @@ function renderConditionalExtras(target, list) {
       setConditionalEffectEnabled(id, evt.target.checked);
       renderChaliceStatOverview();
     });
+  });
+
+  const stackers = target.querySelectorAll("[data-stack-effect]");
+  stackers.forEach(stacker => {
+    const id = stacker.getAttribute("data-stack-effect") || "";
+    const dec = stacker.querySelector("[data-stack-dec]");
+    const inc = stacker.querySelector("[data-stack-inc]");
+    const label = stacker.querySelector(".stat-extra__stack-count");
+    const updateLabel = () => {
+      const max = maxStacksForEffect(id);
+      const val = stackCountForEffect(id);
+      if (label) {
+        label.textContent = `${val}`;
+        label.setAttribute("title", `Max ${max}`);
+        label.setAttribute("aria-label", `Stacks ${val} of max ${max}`);
+      }
+    };
+    if (dec) dec.addEventListener("click", () => {
+      const current = stackCountForEffect(id);
+      setStackCountForEffect(id, current - 1);
+      renderChaliceStatOverview();
+      updateLabel();
+    });
+    if (inc) inc.addEventListener("click", () => {
+      const current = stackCountForEffect(id);
+      setStackCountForEffect(id, current + 1);
+      renderChaliceStatOverview();
+      updateLabel();
+    });
+    updateLabel();
   });
 }
 
@@ -3565,12 +3648,20 @@ function renderConditionalEffectLists(effectIds) {
     if (!rows.length) continue;
     seen.add(key);
 
+    const effectMeta = byId.get(key);
+    const stackable = rows.some(r => String(r?.Stackable ?? "0") === "1");
+    const maxStacks = maxStacksForEffect(key);
+    const stacks = stackable ? stackCountForEffect(key) : 1;
+
     const sectionKey = sectionForGroup(rows[0]?.MetricGroup || "");
     const entry = {
       id: key,
-      name: rows[0]?.EffectName || `Effect ${key}`,
+      name: effectMeta?.EffectDescription || rows[0]?.EffectName || `Effect ${key}`,
       summary: formatConditionalSummary(rows),
-      enabled: isConditionalEffectEnabled(effectId)
+      enabled: isConditionalEffectEnabled(effectId),
+      stackable,
+      maxStacks,
+      stacks
     };
 
     buckets[sectionKey].push(entry);
@@ -3595,6 +3686,8 @@ function renderChaliceStatOverview() {
   renderConditionalEffectLists(ids);
   const totals = computeStatOverviewTotals(ids);
   const usedKeys = new Set();
+
+  updateVitalsFromTotals(totals);
 
   renderStatGrid(dom.statOverviewAttributes, STAT_LAYOUT.attributes, totals, usedKeys);
   renderStatGrid(dom.statOverviewAttack, STAT_LAYOUT.attack, totals, usedKeys);
