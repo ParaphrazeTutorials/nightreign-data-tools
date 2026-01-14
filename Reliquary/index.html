@@ -314,8 +314,9 @@
                   <article class="chalice-results" id="chaliceDetails" data-details-state="collapsed">
                     <div class="chalice-results__frame">
                       <div class="details-rail" aria-hidden="true">
-                        <div id="chaliceAlertRail" class="chalice-alert-rail" hidden>
-                          <img id="chaliceAlertRailIcon" class="chalice-alert-rail__icon" alt="" />
+                        <div id="chaliceAlertIconStack" class="chalice-alert-icon-stack" hidden aria-hidden="true">
+                          <img id="chaliceAlertIconWarning" class="chalice-alert-icon" alt="Warnings present" hidden />
+                          <img id="chaliceAlertIconError" class="chalice-alert-icon" alt="Errors present" hidden />
                         </div>
                       </div>
 
@@ -338,24 +339,6 @@
                               </h4>
                             </div>
                           </div>
-                          <div class="panel-header__right chalice-filter__header-right chalice-details__actions">
-                            <button
-                              id="chaliceResultsToggle"
-                              class="utility-ghost utility-ghost--small chalice-results__toggle"
-                              type="button"
-                              aria-pressed="false"
-                              aria-expanded="false"
-                              aria-controls="chaliceResultsContent"
-                              aria-label="Toggle details panel"
-                            >
-                              <span class="sr-only">Toggle details panel</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        <div id="chaliceAlertIconStack" class="chalice-alert-icon-stack" hidden aria-hidden="true">
-                          <img id="chaliceAlertIconError" class="chalice-alert-icon" alt="Errors present" hidden />
-                          <img id="chaliceAlertIconWarning" class="chalice-alert-icon" alt="Warnings present" hidden />
                         </div>
 
                         <div class="chalice-results__content" id="chaliceResultsContent" aria-hidden="true">
@@ -420,6 +403,22 @@
                           <div class="chalice-results__takeover-note" id="chaliceResultsTakeoverNote" role="status" hidden>
                             Coming soon: full relic breakdowns in takeover view.
                           </div>
+                        </div>
+                      </div>
+
+                      <div class="chalice-results__full" id="chaliceResultsFullCol" aria-hidden="false">
+                        <div class="chalice-full__top">
+                          <button
+                            id="chaliceResultsToggle"
+                            class="utility-ghost utility-ghost--small chalice-results__toggle"
+                            type="button"
+                            aria-pressed="false"
+                            aria-expanded="false"
+                            aria-controls="chaliceResultsContent"
+                            aria-label="Toggle details panel"
+                          >
+                            <span class="sr-only">Toggle details panel</span>
+                          </button>
                         </div>
                       </div>
                     </div>

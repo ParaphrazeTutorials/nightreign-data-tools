@@ -737,21 +737,27 @@
 }
 
 .chalice-layout[data-details-state="collapsed"] {
-  --chalice-layout-cols: minmax(640px, 1fr) 72px;
+  --chalice-layout-cols: minmax(640px, 1fr) 48px;
+  padding-right: 10px;
 }
 
 .chalice-layout[data-details-state="collapsed"] .chalice-layout__results {
-  max-width: 80px;
-  min-width: 64px;
+  max-width: 54px;
+  min-width: 46px;
   overflow: visible;
+  margin-right: 12px;
 }
 
 .chalice-layout[data-details-state="collapsed"] .chalice-results__content {
   display: none;
 }
 
+.chalice-layout[data-details-state="collapsed"] .chalice-results {
+  padding: 0.4rem 0.5rem;
+}
+
 .chalice-layout[data-details-state="collapsed"] .details-rail {
-  display: none;
+  display: flex;
 }
 
 .chalice-layout[data-details-state="full"] {
@@ -866,6 +872,7 @@
   min-height: var(--chalice-header-height, 52px);
   height: var(--chalice-header-height, 52px);
   gap: 0.65rem;
+  padding: 0;
 }
 
 .chalice-filter__header-left {
@@ -1687,19 +1694,101 @@
 
 .chalice-results__frame {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 44px 1fr 0;
+  grid-template-rows: auto 1fr;
   align-items: start;
-  gap: 0.75rem;
+  gap: 0.65rem;
   justify-items: stretch;
   height: 100%;
   min-height: 0;
+}
+
+.chalice-results__full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-column: 1;
+  grid-row: 1;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+}
+
+.chalice-results__full::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.6) 70%,
+    rgba(255, 255, 255, 0.0) 90%);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.chalice-full__top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--chalice-header-height, 52px);
+  width: 100%;
+}
+
+.details-rail {
+  grid-column: 1;
+  grid-row: 2;
+  height: auto;
+  min-height: 0;
+  padding: 0.35rem 0 0;
+  gap: 0.15rem;
+}
+
+.chalice-results[data-details-state="collapsed"] .chalice-results__frame {
+  grid-template-columns: 44px;
+  grid-template-rows: auto 1fr;
+  gap: 0;
+}
+
+.chalice-results[data-details-state="collapsed"] .details-shell {
+  display: none;
+}
+
+.chalice-results[data-details-state="collapsed"] .chalice-results__full {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.chalice-results[data-details-state="partial"] .chalice-results__frame {
+  grid-template-columns: 46px 1fr 0;
+}
+
+.chalice-results[data-details-state="partial"] .chalice-results__full {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.chalice-results[data-details-state="full"] .chalice-results__frame {
+  grid-template-columns: 46px 1fr minmax(46px, 1fr);
+}
+
+.chalice-results[data-details-state="full"] .chalice-results__full {
+  grid-column: 3;
+  grid-row: 1;
 }
 
 .details-rail {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   height: var(--chalice-header-height, 52px);
   align-self: start;
   gap: 0.25rem;
@@ -1708,15 +1797,22 @@
   min-height: 0;
   padding: 0.25rem 0.2rem;
   width: 100%;
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .chalice-layout.has-chalice-alerts .details-rail {
   display: flex;
 }
 
-.chalice-layout.has-chalice-alerts .chalice-results__frame {
-  grid-template-columns: 46px 1fr;
+.chalice-layout[data-details-state="collapsed"] .details-rail {
+  display: none;
 }
+
+.chalice-layout.has-chalice-alerts[data-details-state="collapsed"] .details-rail {
+  display: flex;
+}
+
 
 .details-shell {
   display: flex;
@@ -1743,14 +1839,7 @@
 }
 
 .chalice-details__actions {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  height: 100%;
-  position: relative;
-  min-height: var(--chalice-header-height, 52px);
-  margin-left: auto;
+  display: none;
 }
 
 .chalice-results__toggle {
@@ -1764,10 +1853,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(calc(-50% - 0.25px));
+  position: static;
+  right: auto;
+  top: auto;
+  transform: none;
   background: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -1787,8 +1876,9 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  top: 50%;
-  transform: translateY(calc(-50% - 0.25px));
+  align-self: center;
+  top: auto;
+  transform: none;
   background: none !important;
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: none !important;
@@ -1805,7 +1895,7 @@
 .chalice-results__toggle:hover,
 .chalice-results__toggle:focus-visible,
 .chalice-results__toggle:active {
-  transform: translateY(calc(-50% - 0.25px));
+  transform: none;
   transition: none !important;
 }
 .chalice-results__toggle::after {
@@ -1820,41 +1910,30 @@
   display: block;
 }
 
-.chalice-alert-rail {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  margin-top: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.chalice-layout.has-chalice-alerts .chalice-alert-rail {
-  display: flex;
-}
-
-.chalice-alert-rail__icon {
-  width: 22px;
-  height: 22px;
-  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
-}
-
 .chalice-alert-icon-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
+  gap: 1.15rem;
   width: 100%;
-  margin: 0.25rem auto 0.35rem;
+  margin: 0.9rem auto 0;
+}
+
+.chalice-alert-divider {
+  width: 26px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0.75;
+  margin: 12px 0 40px;
+  border-radius: 999px;
 }
 
 .chalice-alert-icon {
-  width: 22px;
-  height: 22px;
+  width: calc(22px * 1.625);
+  height: calc(22px * 1.625);
   filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
 }
+
 
 .chalice-alert-panel {
   display: block;
@@ -1932,11 +2011,7 @@
 }
 
 .chalice-results[data-details-state="collapsed"] .details-rail {
-  display: none;
-}
-
-.chalice-results[data-details-state="collapsed"] .chalice-results__frame {
-  grid-template-columns: 1fr;
+  display: flex;
 }
 
 .chalice-results__grid {

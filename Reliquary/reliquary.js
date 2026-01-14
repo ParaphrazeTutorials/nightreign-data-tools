@@ -3749,8 +3749,6 @@ function renderChaliceAlerts(issues) {
   lastChaliceIssues = issues || { errors: [], warnings: [] };
 
   const layout = dom.chaliceLayout;
-  const rail = dom.chaliceAlertRail;
-  const railIcon = dom.chaliceAlertRailIcon;
   const iconStack = dom.chaliceAlertIconStack;
   const iconError = dom.chaliceAlertIconError;
   const iconWarning = dom.chaliceAlertIconWarning;
@@ -3759,7 +3757,7 @@ function renderChaliceAlerts(issues) {
   const panelTitle = dom.chaliceAlertPanelTitle;
   const list = dom.chaliceAlertList;
 
-  if (!rail || !panel || !list) return;
+  if (!panel || !list) return;
 
   const errors = Array.isArray(issues?.errors) ? issues.errors : [];
   const warnings = Array.isArray(issues?.warnings) ? issues.warnings : [];
@@ -3770,17 +3768,14 @@ function renderChaliceAlerts(issues) {
 
   if (!hasAny) {
     if (layout) layout.classList.remove("has-chalice-alerts");
-    rail.hidden = true;
-    rail.setAttribute("aria-hidden", "true");
     panel.hidden = true;
     panel.setAttribute("aria-hidden", "true");
     panel.classList.remove("is-error", "is-warning");
     list.innerHTML = "";
     if (panelIcon) panelIcon.removeAttribute("src");
-    if (railIcon) railIcon.removeAttribute("src");
     if (iconStack) {
-      iconStack.hidden = true;
-      iconStack.setAttribute("aria-hidden", "true");
+      iconStack.hidden = false;
+      iconStack.setAttribute("aria-hidden", "false");
     }
     if (iconError) {
       iconError.hidden = true;
@@ -3798,18 +3793,11 @@ function renderChaliceAlerts(issues) {
   const icon = alertIconUrl(severity);
   const label = hasErrors ? "Errors present" : "Warnings present";
 
-  if (railIcon) {
-    railIcon.src = icon;
-    railIcon.alt = label;
-  }
-
   if (panelIcon) {
     panelIcon.src = icon;
     panelIcon.alt = label;
   }
 
-  rail.hidden = false;
-  rail.setAttribute("aria-hidden", "false");
   panel.hidden = false;
   panel.setAttribute("aria-hidden", "false");
   panel.classList.toggle("is-error", hasErrors);
@@ -3817,11 +3805,10 @@ function renderChaliceAlerts(issues) {
 
   const showErrorIcon = hasErrors;
   const showWarningIcon = hasWarnings;
-  const stackVisible = showErrorIcon || showWarningIcon;
 
   if (iconStack) {
-    iconStack.hidden = !stackVisible;
-    iconStack.setAttribute("aria-hidden", stackVisible ? "false" : "true");
+    iconStack.hidden = false;
+    iconStack.setAttribute("aria-hidden", "false");
   }
 
   if (iconError) {
