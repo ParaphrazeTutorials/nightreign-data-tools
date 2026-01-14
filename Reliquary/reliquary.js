@@ -96,6 +96,7 @@ let effectStatsByEffectId = new Map();
 let conditionalEffectState = new Map();
 let conditionalEffectStacks = new Map();
 let lastChaliceIssues = { errors: [], warnings: [] };
+let lastChaliceIconOffsets = { warning: null, error: null };
 
 function normalizeChaliceColor(value) {
   if (!value) return "#ffffff";
@@ -524,7 +525,7 @@ function updateDetailsToggleLabel(view) {
   const rightLabel = state === DETAILS_VIEW.FULL
     ? "Collapse to details"
     : state === DETAILS_VIEW.PARTIAL
-      ? "Collapse details"
+      ? "Expand details"
       : "Expand details";
 
   const rightExpanded = state !== DETAILS_VIEW.COLLAPSED;
@@ -537,13 +538,13 @@ function updateDetailsToggleLabel(view) {
     dom.chaliceResultsToggle.setAttribute("aria-label", rightLabel);
   }
 
-  if (dom.chaliceDetailsExpandBtn) {
-    const showLeft = state === DETAILS_VIEW.PARTIAL;
-    dom.chaliceDetailsExpandBtn.hidden = !showLeft;
-    dom.chaliceDetailsExpandBtn.setAttribute("aria-hidden", showLeft ? "false" : "true");
-    dom.chaliceDetailsExpandBtn.setAttribute("aria-expanded", state === DETAILS_VIEW.FULL ? "true" : "false");
-    dom.chaliceDetailsExpandBtn.setAttribute("title", "Expand details to full");
-    dom.chaliceDetailsExpandBtn.setAttribute("aria-label", "Expand details to full");
+  if (dom.chaliceDetailsCollapseBtn) {
+    const showCollapse = state !== DETAILS_VIEW.COLLAPSED;
+    dom.chaliceDetailsCollapseBtn.hidden = !showCollapse;
+    dom.chaliceDetailsCollapseBtn.setAttribute("aria-hidden", showCollapse ? "false" : "true");
+    dom.chaliceDetailsCollapseBtn.setAttribute("aria-expanded", showCollapse ? "true" : "false");
+    dom.chaliceDetailsCollapseBtn.setAttribute("title", "Collapse details");
+    dom.chaliceDetailsCollapseBtn.setAttribute("aria-label", "Collapse details");
   }
 }
 
@@ -558,13 +559,15 @@ function applyChaliceDetailsView(view) {
   updateDetailsToggleLabel(normalized);
   renderChaliceStatOverview();
   renderChaliceAlerts(lastChaliceIssues);
+  // Re-align alert icons when the view state changes so collapsed state picks up offsets
+  positionChaliceAlertIcons();
 }
 
 function cycleChaliceDetailsView() {
   const next = chaliceDetailsView === DETAILS_VIEW.COLLAPSED
     ? DETAILS_VIEW.PARTIAL
     : chaliceDetailsView === DETAILS_VIEW.PARTIAL
-      ? DETAILS_VIEW.COLLAPSED
+      ? DETAILS_VIEW.FULL
       : DETAILS_VIEW.PARTIAL;
   applyChaliceDetailsView(next);
 }
@@ -3752,12 +3755,14 @@ function renderChaliceAlerts(issues) {
   const iconStack = dom.chaliceAlertIconStack;
   const iconError = dom.chaliceAlertIconError;
   const iconWarning = dom.chaliceAlertIconWarning;
-  const panel = dom.chaliceAlertPanel;
-  const panelIcon = dom.chaliceAlertPanelIcon;
-  const panelTitle = dom.chaliceAlertPanelTitle;
-  const list = dom.chaliceAlertList;
+  const panelWarn = dom.chaliceAlertPanelWarning;
+  const panelWarnTitle = dom.chaliceAlertPanelTitleWarning;
+  const listWarn = dom.chaliceAlertListWarning;
+  const panelErr = dom.chaliceAlertPanelError;
+  const panelErrTitle = dom.chaliceAlertPanelTitleError;
+  const listErr = dom.chaliceAlertListError;
 
-  if (!panel || !list) return;
+  if (!panelWarn || !panelErr || !listWarn || !listErr) return;
 
   const errors = Array.isArray(issues?.errors) ? issues.errors : [];
   const warnings = Array.isArray(issues?.warnings) ? issues.warnings : [];
@@ -3768,11 +3773,12 @@ function renderChaliceAlerts(issues) {
 
   if (!hasAny) {
     if (layout) layout.classList.remove("has-chalice-alerts");
-    panel.hidden = true;
-    panel.setAttribute("aria-hidden", "true");
-    panel.classList.remove("is-error", "is-warning");
-    list.innerHTML = "";
-    if (panelIcon) panelIcon.removeAttribute("src");
+    panelWarn.hidden = true;
+    panelWarn.setAttribute("aria-hidden", "true");
+    listWarn.innerHTML = "";
+    panelErr.hidden = true;
+    panelErr.setAttribute("aria-hidden", "true");
+    listErr.innerHTML = "";
     if (iconStack) {
       iconStack.hidden = false;
       iconStack.setAttribute("aria-hidden", "false");
@@ -3789,20 +3795,6 @@ function renderChaliceAlerts(issues) {
   }
 
   if (layout) layout.classList.add("has-chalice-alerts");
-  const severity = hasErrors ? "error" : "warning";
-  const icon = alertIconUrl(severity);
-  const label = hasErrors ? "Errors present" : "Warnings present";
-
-  if (panelIcon) {
-    panelIcon.src = icon;
-    panelIcon.alt = label;
-  }
-
-  panel.hidden = false;
-  panel.setAttribute("aria-hidden", "false");
-  panel.classList.toggle("is-error", hasErrors);
-  panel.classList.toggle("is-warning", !hasErrors && hasWarnings);
-
   const showErrorIcon = hasErrors;
   const showWarningIcon = hasWarnings;
 
@@ -3833,23 +3825,89 @@ function renderChaliceAlerts(issues) {
     }
   }
 
-  const messages = [
-    ...errors.map(text => ({ text, kind: "error" })),
-    ...warnings.map(text => ({ text, kind: "warning" }))
-  ];
-
-  list.innerHTML = messages
-    .map(msg => `<li class="chalice-alert__item chalice-alert__item--${msg.kind}">${escapeHtml(msg.text)}</li>`)
-    .join("");
-
-  if (panelTitle) {
-    const both = hasErrors && hasWarnings;
-    panelTitle.textContent = both
-      ? "Errors and warnings detected"
-      : hasErrors
-        ? "Errors detected"
-        : "Warnings detected";
+  // warnings panel
+  if (hasWarnings) {
+    const warningMsg = warnings
+      .map(text => `<li class="chalice-alert__item chalice-alert__item--warning">${escapeHtml(text)}</li>`)
+      .join("");
+    listWarn.innerHTML = warningMsg;
+    panelWarn.hidden = false;
+    panelWarn.setAttribute("aria-hidden", "false");
+    if (panelWarnTitle) {
+      panelWarnTitle.textContent = warnings.length > 1 ? "Warnings detected" : "Warning detected";
+    }
+  } else {
+    listWarn.innerHTML = "";
+    panelWarn.hidden = true;
+    panelWarn.setAttribute("aria-hidden", "true");
   }
+
+  // errors panel
+  if (hasErrors) {
+    const errorMsg = errors
+      .map(text => `<li class="chalice-alert__item chalice-alert__item--error">${escapeHtml(text)}</li>`)
+      .join("");
+    listErr.innerHTML = errorMsg;
+    panelErr.hidden = false;
+    panelErr.setAttribute("aria-hidden", "false");
+    if (panelErrTitle) {
+      panelErrTitle.textContent = errors.length > 1 ? "Errors detected" : "Error detected";
+    }
+  } else {
+    listErr.innerHTML = "";
+    panelErr.hidden = true;
+    panelErr.setAttribute("aria-hidden", "true");
+  }
+
+  positionChaliceAlertIcons();
+}
+
+function positionChaliceAlertIcons() {
+  const rail = dom.chaliceAlertIconStack;
+  if (!rail || rail.hidden) return;
+
+  const details = dom.chaliceDetails;
+  const isCollapsed = details?.dataset?.detailsState === "collapsed";
+
+  const warnIcon = dom.chaliceAlertIconWarning;
+  const errIcon = dom.chaliceAlertIconError;
+
+  if (isCollapsed) {
+    positionCollapsedAlertIcons(warnIcon, errIcon, rail);
+    return;
+  }
+
+  const warnHeader = dom.chaliceAlertPanelWarning?.querySelector(".chalice-alert-panel__header");
+  const errHeader = dom.chaliceAlertPanelError?.querySelector(".chalice-alert-panel__header");
+
+  const railRect = rail.getBoundingClientRect();
+  if (!railRect || !railRect.height) return;
+
+  const placeIcon = (iconEl, headerEl, key) => {
+    if (!iconEl || iconEl.hidden || !headerEl) {
+      if (iconEl) iconEl.style.top = "";
+      lastChaliceIconOffsets[key] = null;
+      return;
+    }
+    const headerRect = headerEl.getBoundingClientRect();
+    const iconHeight = iconEl.getBoundingClientRect().height || 0;
+    const targetCenter = headerRect.top + headerRect.height * 0.5;
+    const offset = targetCenter - railRect.top - iconHeight * 0.5 - 4;
+    const clamped = Math.max(0, offset);
+    iconEl.style.top = `${clamped}px`;
+    lastChaliceIconOffsets[key] = clamped;
+  };
+
+  placeIcon(warnIcon, warnHeader, "warning");
+  placeIcon(errIcon, errHeader, "error");
+}
+
+function positionCollapsedAlertIcons(warnIcon, errIcon, rail) {
+  // Flex layout + CSS padding-top handles positioning; clear inline tops
+  if (rail) rail.style.paddingTop = "";
+  [warnIcon, errIcon].forEach(icon => {
+    if (icon) icon.style.top = "";
+  });
 }
 
 function renderChaliceResults() {
@@ -4194,8 +4252,8 @@ async function load() {
     dom.chaliceAddDepth.addEventListener("click", () => openQuickChalicePicker("depth", dom.chaliceAddDepth));
   }
 
-  if (dom.chaliceDetailsExpandBtn) {
-    dom.chaliceDetailsExpandBtn.addEventListener("click", expandChaliceDetailsToFull);
+  if (dom.chaliceDetailsCollapseBtn) {
+    dom.chaliceDetailsCollapseBtn.addEventListener("click", () => applyChaliceDetailsView(DETAILS_VIEW.COLLAPSED));
   }
 
   if (dom.chaliceResultsToggle) {

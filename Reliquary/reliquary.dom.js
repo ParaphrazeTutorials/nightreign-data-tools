@@ -92,9 +92,12 @@ export function getDom() {
     chaliceAlertIconStack: document.getElementById("chaliceAlertIconStack"),
     chaliceAlertIconError: document.getElementById("chaliceAlertIconError"),
     chaliceAlertIconWarning: document.getElementById("chaliceAlertIconWarning"),
-    chaliceAlertPanel: document.getElementById("chaliceAlertPanel"),
-    chaliceAlertPanelIcon: document.getElementById("chaliceAlertPanelIcon"),
-    chaliceAlertPanelTitle: document.getElementById("chaliceAlertPanelTitle"),
-    chaliceAlertList: document.getElementById("chaliceAlertList")
+    chaliceAlertPanelWarning: document.getElementById("chaliceAlertPanelWarning"),
+    chaliceAlertPanelTitleWarning: document.getElementById("chaliceAlertPanelTitleWarning"),
+    chaliceAlertListWarning: document.getElementById("chaliceAlertListWarning"),
+    chaliceAlertPanelError: document.getElementById("chaliceAlertPanelError"),
+    chaliceAlertPanelTitleError: document.getElementById("chaliceAlertPanelTitleError"),
+    chaliceAlertListError: document.getElementById("chaliceAlertListError"),
+    chaliceDetailsCollapseBtn: document.getElementById("chaliceDetailsCollapseBtn"),
   };
 }

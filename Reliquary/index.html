@@ -324,30 +324,36 @@
                         <div class="panel-header chalice-filter__header chalice-details__header">
                           <div class="chalice-filter__header-left">
                             <div class="chalice-filter__title-row chalice-details__title-row">
-                              <button
-                                id="chaliceDetailsExpandBtn"
-                                class="utility-ghost utility-ghost--small chalice-details__btn"
-                                type="button"
-                                aria-label="Expand details to full"
-                                aria-expanded="false"
-                                aria-controls="chaliceResultsContent"
-                              >
-                                <span class="sr-only">Expand details</span>
-                              </button>
                               <h4 class="chalice-details__title">
                                 <span class="chalice-details__title-text">Details</span>
                               </h4>
                             </div>
                           </div>
+                          <div class="chalice-details__actions">
+                            <button
+                              id="chaliceDetailsCollapseBtn"
+                              class="utility-ghost utility-ghost--small chalice-details__btn chalice-details__btn--collapse"
+                              type="button"
+                              aria-label="Collapse details"
+                              title="Collapse details"
+                            >
+                              <span class="sr-only">Collapse details</span>
+                            </button>
+                          </div>
                         </div>
 
                         <div class="chalice-results__content" id="chaliceResultsContent" aria-hidden="true">
-                          <div id="chaliceAlertPanel" class="chalice-alert-panel" role="status" hidden>
+                          <div id="chaliceAlertPanelWarning" class="chalice-alert-panel is-warning" role="status" hidden>
                             <div class="chalice-alert-panel__header">
-                              <img id="chaliceAlertPanelIcon" class="chalice-alert-panel__icon" alt="" />
-                              <div id="chaliceAlertPanelTitle" class="chalice-alert-panel__title">Issues detected</div>
+                              <div id="chaliceAlertPanelTitleWarning" class="chalice-alert-panel__title">Warnings detected</div>
                             </div>
-                            <ul id="chaliceAlertList" class="chalice-alert-panel__list"></ul>
+                            <ul id="chaliceAlertListWarning" class="chalice-alert-panel__list"></ul>
+                          </div>
+                          <div id="chaliceAlertPanelError" class="chalice-alert-panel is-error" role="status" hidden>
+                            <div class="chalice-alert-panel__header">
+                              <div id="chaliceAlertPanelTitleError" class="chalice-alert-panel__title">Errors detected</div>
+                            </div>
+                            <ul id="chaliceAlertListError" class="chalice-alert-panel__list"></ul>
                           </div>
                           <section class="stat-overview" id="statOverviewSection" aria-label="Stat overview">
                             <div class="stat-overview__header">
