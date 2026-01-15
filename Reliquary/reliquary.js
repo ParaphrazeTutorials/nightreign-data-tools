@@ -327,20 +327,33 @@ function updateCharacterNameLabel() {
 }
 
 function updateStatOverviewGlow() {
-  if (!dom.statOverviewSection) return;
+  const targets = [dom.statOverviewSection, dom.chaliceResultsShell].filter(Boolean);
+  if (!targets.length) return;
   const token = selectedClass ? characterColors(selectedClass) : null;
   const backdrop = selectedClass ? characterBackdrop(selectedClass) : null;
   const portrait = selectedClass ? characterPortrait(selectedClass) : null;
   const border = token?.border || "rgba(255, 255, 255, 0.4)";
   const glow = token?.border || "rgba(255, 255, 255, 0.4)";
-  dom.statOverviewSection.style.setProperty("--stat-border-color", border);
-  dom.statOverviewSection.style.setProperty("--stat-glow-color", glow);
-  dom.statOverviewSection.style.setProperty("--stat-bg-url", backdrop || "none");
-  dom.statOverviewSection.style.setProperty("--stat-bg-opacity", backdrop ? "0.16" : "0");
+  targets.forEach(node => {
+    node.style.setProperty("--stat-border-color", border);
+    node.style.setProperty("--stat-glow-color", glow);
+    node.style.setProperty("--stat-bg-url", backdrop || "none");
+    node.style.setProperty("--stat-bg-opacity", backdrop ? "0.16" : "0");
+  });
 
   if (dom.statOverviewPortrait) {
     dom.statOverviewPortrait.style.backgroundImage = portrait || "";
   }
+}
+
+/**
+ * Toggle the Coming Soon blur treatments for both the stat overview overlay
+ * and the full-view Coming Soon panel. Keep this wired so we can flip blurs
+ * off for demos or screenshots without digging through styles.
+ */
+function setComingSoonBlur(enabled = true) {
+  const value = enabled ? "on" : "off";
+  if (dom.chaliceResultsShell) dom.chaliceResultsShell.setAttribute("data-coming-soon-blur", value);
 }
 
 function resetVitalsPlaceholders() {
@@ -538,14 +551,15 @@ function updateDetailsToggleLabel(view) {
     dom.chaliceResultsToggle.setAttribute("aria-label", rightLabel);
   }
 
-  if (dom.chaliceDetailsCollapseBtn) {
+  const collapseButtons = [dom.chaliceDetailsCollapseBtn, dom.chaliceDetailsCollapseBtnFull].filter(Boolean);
+  collapseButtons.forEach(btn => {
     const showCollapse = state !== DETAILS_VIEW.COLLAPSED;
-    dom.chaliceDetailsCollapseBtn.hidden = !showCollapse;
-    dom.chaliceDetailsCollapseBtn.setAttribute("aria-hidden", showCollapse ? "false" : "true");
-    dom.chaliceDetailsCollapseBtn.setAttribute("aria-expanded", showCollapse ? "true" : "false");
-    dom.chaliceDetailsCollapseBtn.setAttribute("title", "Collapse details");
-    dom.chaliceDetailsCollapseBtn.setAttribute("aria-label", "Collapse details");
-  }
+    btn.hidden = !showCollapse;
+    btn.setAttribute("aria-hidden", showCollapse ? "false" : "true");
+    btn.setAttribute("aria-expanded", showCollapse ? "true" : "false");
+    btn.setAttribute("title", "Collapse details");
+    btn.setAttribute("aria-label", "Collapse details");
+  });
 }
 
 function applyChaliceDetailsView(view) {
@@ -3704,10 +3718,9 @@ function renderConditionalEffectLists(effectIds) {
 }
 
 function renderChaliceStatOverview() {
-  const isFull = chaliceDetailsView === DETAILS_VIEW.FULL;
-  if (dom.statOverviewSection) dom.statOverviewSection.hidden = isFull;
-  if (dom.chaliceResultsTakeoverNote) dom.chaliceResultsTakeoverNote.hidden = !isFull;
-  if (isFull) return;
+  // In State 3 we still show the stat overview; keep takeover note hidden.
+  if (dom.statOverviewSection) dom.statOverviewSection.hidden = false;
+  if (dom.chaliceResultsTakeoverNote) dom.chaliceResultsTakeoverNote.hidden = true;
 
   resetVitalsPlaceholders();
 
@@ -4256,9 +4269,16 @@ async function load() {
     dom.chaliceDetailsCollapseBtn.addEventListener("click", () => applyChaliceDetailsView(DETAILS_VIEW.COLLAPSED));
   }
 
+  if (dom.chaliceDetailsCollapseBtnFull) {
+    dom.chaliceDetailsCollapseBtnFull.addEventListener("click", () => applyChaliceDetailsView(DETAILS_VIEW.PARTIAL));
+  }
+
   if (dom.chaliceResultsToggle) {
     dom.chaliceResultsToggle.addEventListener("click", () => cycleChaliceDetailsView());
   }
+
+  // Keep coming-soon blur opt-in togglable for internal use (default on)
+  setComingSoonBlur(true);
 
   renderChaliceUI();
   applyChaliceDetailsView(chaliceDetailsView);

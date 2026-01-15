@@ -88,6 +88,7 @@ export function getDom() {
     chaliceDetailsExpandBtn: document.getElementById("chaliceDetailsExpandBtn"),
     chaliceResultsToggle: document.getElementById("chaliceResultsToggle"),
     chaliceResultsContent: document.getElementById("chaliceResultsContent"),
+    chaliceDetailsCollapseBtnFull: document.getElementById("chaliceDetailsCollapseBtnFull"),
     chaliceResultsTakeoverNote: document.getElementById("chaliceResultsTakeoverNote"),
     chaliceAlertIconStack: document.getElementById("chaliceAlertIconStack"),
     chaliceAlertIconError: document.getElementById("chaliceAlertIconError"),

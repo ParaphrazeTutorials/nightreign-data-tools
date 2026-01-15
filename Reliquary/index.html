@@ -320,6 +320,41 @@
                         </div>
                       </div>
 
+                      <div class="chalice-full__top chalice-results__toggle-slot">
+                        <button
+                          id="chaliceResultsToggle"
+                          class="utility-ghost utility-ghost--small chalice-results__toggle"
+                          type="button"
+                          aria-pressed="false"
+                          aria-expanded="false"
+                          aria-controls="chaliceResultsContent"
+                          aria-label="Toggle details panel"
+                        >
+                          <span class="sr-only">Toggle details panel</span>
+                        </button>
+                      </div>
+
+                      <div class="panel-header chalice-filter__header chalice-details__header chalice-results__header">
+                        <div class="chalice-results__header-left">
+                          <div class="chalice-filter__title-row chalice-details__title-row">
+                            <h4 class="chalice-details__title">
+                              <span class="chalice-details__title-text">Details</span>
+                            </h4>
+                          </div>
+                        </div>
+                        <div class="chalice-results__header-actions">
+                          <button
+                            id="chaliceDetailsCollapseBtnFull"
+                            class="utility-ghost utility-ghost--small chalice-details__btn chalice-details__btn--collapse"
+                            type="button"
+                            aria-label="Collapse details"
+                            title="Collapse details"
+                          >
+                            <span class="sr-only">Collapse details</span>
+                          </button>
+                        </div>
+                      </div>
+
                       <div class="details-shell" id="detailsShell">
                         <div class="panel-header chalice-filter__header chalice-details__header">
                           <div class="chalice-filter__header-left">
@@ -413,19 +448,11 @@
                       </div>
 
                       <div class="chalice-results__full" id="chaliceResultsFullCol" aria-hidden="false">
-                        <div class="chalice-full__top">
-                          <button
-                            id="chaliceResultsToggle"
-                            class="utility-ghost utility-ghost--small chalice-results__toggle"
-                            type="button"
-                            aria-pressed="false"
-                            aria-expanded="false"
-                            aria-controls="chaliceResultsContent"
-                            aria-label="Toggle details panel"
-                          >
-                            <span class="sr-only">Toggle details panel</span>
-                          </button>
-                        </div>
+                        <article class="chalice-full__panel" aria-labelledby="chaliceFullHeading">
+                          <div class="chalice-full__body" id="chaliceFullBody" role="status">
+                            <div class="chalice-full__coming-soon">Coming Soon</div>
+                          </div>
+                        </article>
                       </div>
                     </div>
                   </article>
