@@ -341,12 +341,14 @@
                 <aside class="chalice-layout__results" id="chaliceResultsPane" aria-label="Generated relics">
                   <article class="chalice-results" id="chaliceDetails" data-details-state="collapsed">
                     <div class="chalice-results__frame">
-                      <div class="details-rail" aria-hidden="true">
-                        <div id="chaliceAlertIconStack" class="chalice-alert-icon-stack" hidden aria-hidden="true">
-                          <img id="chaliceAlertIconWarning" class="chalice-alert-icon" alt="Warnings present" hidden />
-                          <img id="chaliceAlertIconError" class="chalice-alert-icon" alt="Errors present" hidden />
+                        <div class="details-rail" aria-hidden="true">
+                          <div id="chaliceAlertIconStack" class="chalice-alert-icon-stack" hidden aria-hidden="true">
+                            <img id="chaliceAlertIconWarning" class="chalice-alert-icon" alt="Warnings present" hidden />
+                            <div id="chaliceAlertCountsWarning" class="chalice-alert-counts" aria-hidden="true"></div>
+                            <img id="chaliceAlertIconError" class="chalice-alert-icon" alt="Errors present" hidden />
+                            <div id="chaliceAlertCountsError" class="chalice-alert-counts" aria-hidden="true"></div>
+                          </div>
                         </div>
-                      </div>
 
                       <div class="chalice-full__top chalice-results__toggle-slot">
                         <button

@@ -99,6 +99,10 @@ let conditionalEffectState = new Map();
 let conditionalEffectStacks = new Map();
 let lastChaliceIssues = { errors: [], warnings: [] };
 let lastChaliceIconOffsets = { warning: null, error: null };
+let lastChaliceIssueAssignments = {
+  rail: { errors: [], warnings: [] },
+  perSlot: new Map()
+};
 
 function normalizeChaliceColor(value) {
   if (!value) return "#ffffff";
@@ -609,6 +613,7 @@ function applyChaliceDetailsView(view) {
   renderChaliceAlerts(lastChaliceIssues);
   // Re-align alert icons when the view state changes so collapsed state picks up offsets
   positionChaliceAlertIcons();
+  positionChaliceAlertCounts();
 }
 
 function cycleChaliceDetailsView() {
@@ -2842,8 +2847,19 @@ function chaliceRow(effectId) {
 
 function computeChaliceStackingIssues() {
   const counts = new Map();
+  const slotsById = new Map();
   const ids = [...chaliceSelections.standard, ...chaliceSelections.depth].filter(Boolean);
-  ids.forEach(id => counts.set(id, (counts.get(id) || 0) + 1));
+
+  ["standard", "depth"].forEach(sideKey => {
+    (chaliceSelections[sideKey] || []).forEach((id, slot) => {
+      if (!id) return;
+      const key = String(id);
+      counts.set(key, (counts.get(key) || 0) + 1);
+      const slots = slotsById.get(key) || [];
+      slots.push({ side: sideKey, slot });
+      slotsById.set(key, slots);
+    });
+  });
 
   const errors = [];
   const warnings = [];
@@ -2854,14 +2870,26 @@ function computeChaliceStackingIssues() {
     const meta = selfStackingMeta(row?.SelfStacking);
     const name = row?.EffectDescription ?? `Effect ${id}`;
     const base = `${name} is selected ${count} times`;
+    const slots = slotsById.get(id) || [];
+    const idsInSlots = slots.map(s => String(chaliceSelections[s.side]?.[s.slot] || id));
 
     if (meta.modifier === "no") {
-      errors.push(`${base}, but it does not self-stack.`);
+      errors.push({
+        message: `${base}, but it does not self-stack.`,
+        slots,
+        ids: idsInSlots,
+        code: "stacking-disallow"
+      });
       return;
     }
 
     if (meta.modifier === "unknown") {
-      warnings.push(`${base}, and stacking for this effect is unknown.`);
+      warnings.push({
+        message: `${base}, and stacking for this effect is unknown.`,
+        slots,
+        ids: idsInSlots,
+        code: "stacking-unknown"
+      });
     }
   });
 
@@ -3157,6 +3185,9 @@ function renderChaliceSlot(sideKey, idx) {
                 title="${dupTitle}"
                 ${dupDisabled ? "disabled" : ""}
               >+</button>
+            </div>
+            <div class="chalice-slot__issue-col">
+              <div class="chalice-slot__issue-badges" data-ch-issue-badges></div>
             </div>
           </div>
 
@@ -3928,9 +3959,132 @@ function updateChaliceStatusFromResults(standard, depth) {
   setChaliceStatus(statusText);
 }
 
-function renderChaliceAlerts(issues) {
+function buildChaliceIssueAssignments(issues) {
+  const perSlot = new Map();
+  const rail = { errors: [], warnings: [] };
+  const counters = { error: 0, warning: 0 };
+
+  const process = (arr, severity) => {
+    const list = Array.isArray(arr) ? arr : [];
+    list.forEach(item => {
+      const isObj = typeof item === "object" && item !== null;
+      const message = isObj ? (item.message || String(item)) : String(item);
+      const slots = isObj && Array.isArray(item.slots) ? item.slots : [];
+      const badge = { num: ++counters[severity], message, severity };
+
+      if (severity === "error") {
+        rail.errors.push(badge);
+      } else {
+        rail.warnings.push(badge);
+      }
+
+      slots.forEach(slot => {
+        const side = slot?.side || "standard";
+        const idx = Number.parseInt(slot?.slot, 10);
+        if (!Number.isInteger(idx) || idx < 0) return;
+        const key = `${side}:${idx}`;
+        if (!perSlot.has(key)) perSlot.set(key, { errors: [], warnings: [] });
+        const bucket = severity === "error" ? perSlot.get(key).errors : perSlot.get(key).warnings;
+        bucket.push(badge);
+      });
+    });
+  };
+
+  process(issues?.errors, "error");
+  process(issues?.warnings, "warning");
+
+  return { rail, perSlot };
+}
+
+function renderChaliceAlertCounts(counts) {
+  const warnRoot = document.getElementById("chaliceAlertCountsWarning");
+  const errRoot = document.getElementById("chaliceAlertCountsError");
+
+  const renderList = (root, severity, badges) => {
+    if (!root) return;
+    const active = Array.isArray(badges) && badges.length > 0;
+    root.hidden = !active;
+    root.setAttribute("aria-hidden", active ? "false" : "true");
+    if (!active) {
+      root.innerHTML = "";
+      return;
+    }
+    root.innerHTML = `<ol class="chalice-alert-counts__list">${badges
+      .map(b => `<li><span class="chalice-alert-counts__badge is-${severity}" title="${escapeHtml(b.message)}">${b.num}</span></li>`)
+      .join("")}</ol>`;
+  };
+
+  renderList(warnRoot, "warning", counts?.warnings || []);
+  renderList(errRoot, "error", counts?.errors || []);
+}
+
+function validSlotSetFromCombos(standard, depth) {
+  const valid = new Set();
+
+  const collect = (result, sideKey) => {
+    const combos = Array.isArray(result?.combos) ? result.combos : [];
+    combos.forEach(combo => {
+      const indices = Array.isArray(combo?.indices) ? combo.indices : [];
+      indices.forEach(idx => {
+        if (Number.isInteger(idx) && idx >= 0) valid.add(`${sideKey}:${idx}`);
+      });
+    });
+  };
+
+  collect(standard, "standard");
+  collect(depth, "depth");
+  return valid;
+}
+
+function renderValidCheck() {
+  return `
+    <span class="chalice-slot__valid-check" aria-label="Valid effect" title="Valid effect">
+      <span class="check-box" aria-hidden="true"></span>
+    </span>
+  `;
+}
+
+function updateChaliceSlotIssues(assignments = lastChaliceIssueAssignments, validSlots = new Set()) {
+  const perSlot = assignments?.perSlot && typeof assignments.perSlot.get === "function"
+    ? assignments.perSlot
+    : new Map();
+
+  document.querySelectorAll(".chalice-slot").forEach(slot => {
+    slot.classList.remove("chalice-slot--warning", "chalice-slot--error", "chalice-slot--valid");
+    const badgeTarget = slot.querySelector("[data-ch-issue-badges]");
+    if (badgeTarget) badgeTarget.innerHTML = "";
+
+    const side = slot.getAttribute("data-side") || "standard";
+    const idx = Number.parseInt(slot.getAttribute("data-slot"), 10);
+    const key = Number.isInteger(idx) ? `${side}:${idx}` : null;
+    const entry = key && perSlot.has(key) ? (perSlot.get(key) || { errors: [], warnings: [] }) : { errors: [], warnings: [] };
+    const hasErrors = Array.isArray(entry.errors) && entry.errors.length > 0;
+    const hasWarnings = Array.isArray(entry.warnings) && entry.warnings.length > 0;
+    const slotHasEffect = !slot.classList.contains("chalice-slot--empty");
+    const isValid = slotHasEffect && !hasErrors && !hasWarnings && key && validSlots instanceof Set && validSlots.has(key);
+
+    if (hasErrors) slot.classList.add("chalice-slot--error");
+    else if (hasWarnings) slot.classList.add("chalice-slot--warning");
+    else if (isValid) slot.classList.add("chalice-slot--valid");
+
+    if (!badgeTarget) return;
+    const badges = [];
+    if (hasErrors) {
+      entry.errors.forEach(b => badges.push(`<span class="chalice-slot__issue-badge is-error" title="${escapeHtml(b.message)}">${b.num}</span>`));
+    }
+    if (hasWarnings) {
+      entry.warnings.forEach(b => badges.push(`<span class="chalice-slot__issue-badge is-warning" title="${escapeHtml(b.message)}">${b.num}</span>`));
+    }
+    if (!badges.length && isValid) badges.push(renderValidCheck());
+    badgeTarget.innerHTML = badges.join("");
+  });
+}
+
+function renderChaliceAlerts(issues, assignments = lastChaliceIssueAssignments) {
   // Cache latest issues so view changes can re-run alignment without recomputing
   lastChaliceIssues = issues || { errors: [], warnings: [] };
+  if (!assignments) assignments = buildChaliceIssueAssignments(issues);
+  lastChaliceIssueAssignments = assignments;
 
   const layout = dom.chaliceLayout;
   const iconStack = dom.chaliceAlertIconStack;
@@ -3947,6 +4101,7 @@ function renderChaliceAlerts(issues) {
 
   const errors = Array.isArray(issues?.errors) ? issues.errors : [];
   const warnings = Array.isArray(issues?.warnings) ? issues.warnings : [];
+  const msgText = (entry) => (typeof entry === "object" && entry !== null ? entry.message || String(entry) : String(entry));
 
   const hasErrors = errors.length > 0;
   const hasWarnings = warnings.length > 0;
@@ -3972,6 +4127,8 @@ function renderChaliceAlerts(issues) {
       iconWarning.hidden = true;
       iconWarning.removeAttribute("src");
     }
+    renderChaliceAlertCounts({ errors: [], warnings: [] });
+    positionChaliceAlertCounts();
     return;
   }
 
@@ -4009,7 +4166,7 @@ function renderChaliceAlerts(issues) {
   // warnings panel
   if (hasWarnings) {
     const warningMsg = warnings
-      .map(text => `<li class="chalice-alert__item chalice-alert__item--warning">${escapeHtml(text)}</li>`)
+      .map(entry => `<li class="chalice-alert__item chalice-alert__item--warning">${escapeHtml(msgText(entry))}</li>`)
       .join("");
     listWarn.innerHTML = warningMsg;
     panelWarn.hidden = false;
@@ -4026,7 +4183,7 @@ function renderChaliceAlerts(issues) {
   // errors panel
   if (hasErrors) {
     const errorMsg = errors
-      .map(text => `<li class="chalice-alert__item chalice-alert__item--error">${escapeHtml(text)}</li>`)
+      .map(entry => `<li class="chalice-alert__item chalice-alert__item--error">${escapeHtml(msgText(entry))}</li>`)
       .join("");
     listErr.innerHTML = errorMsg;
     panelErr.hidden = false;
@@ -4040,7 +4197,9 @@ function renderChaliceAlerts(issues) {
     panelErr.setAttribute("aria-hidden", "true");
   }
 
+  renderChaliceAlertCounts(assignments?.rail || { errors: [], warnings: [] });
   positionChaliceAlertIcons();
+  positionChaliceAlertCounts();
 }
 
 function positionChaliceAlertIcons() {
@@ -4091,6 +4250,96 @@ function positionCollapsedAlertIcons(warnIcon, errIcon, rail) {
   });
 }
 
+function positionChaliceAlertCounts() {
+  const rail = dom.chaliceAlertIconStack;
+  const warnRoot = document.getElementById("chaliceAlertCountsWarning");
+  const errRoot = document.getElementById("chaliceAlertCountsError");
+  const warnList = dom.chaliceAlertListWarning;
+  const errList = dom.chaliceAlertListError;
+  const detailsState = dom.chaliceResultsShell?.dataset?.detailsState || dom.chaliceLayout?.dataset?.detailsState || "";
+  const isCollapsed = detailsState === "collapsed";
+
+  const resetRoot = (root) => {
+    if (!root) return;
+    root.style.position = "";
+    root.style.top = "";
+    root.style.left = "";
+    root.style.transform = "";
+    root.style.height = "";
+    const ol = root.querySelector("ol");
+    if (ol) {
+      ol.style.position = "";
+      Array.from(ol.children).forEach(li => {
+        li.style.position = "";
+        li.style.top = "";
+        li.style.left = "";
+        li.style.transform = "";
+      });
+    }
+  };
+
+  if (!rail || rail.hidden || isCollapsed) {
+    resetRoot(warnRoot);
+    resetRoot(errRoot);
+    return;
+  }
+
+  const railRect = rail.getBoundingClientRect();
+  if (!railRect || !railRect.height) {
+    resetRoot(warnRoot);
+    resetRoot(errRoot);
+    return;
+  }
+
+  const placeCounts = (root, listEl) => {
+    if (!root || root.hidden) {
+      resetRoot(root);
+      return;
+    }
+    const ol = root.querySelector("ol");
+    if (!ol || !listEl) {
+      resetRoot(root);
+      return;
+    }
+    const items = Array.from(listEl.querySelectorAll(".chalice-alert__item"));
+    if (!items.length) {
+      resetRoot(root);
+      return;
+    }
+
+    const badgeItems = Array.from(ol.children);
+    const firstRect = items[0].getBoundingClientRect();
+    const badgeHeight = badgeItems[0]?.getBoundingClientRect()?.height || 0;
+    const baseTop = Math.max(0, firstRect.top - railRect.top);
+
+    root.style.position = "absolute";
+    root.style.left = "50%";
+    root.style.transform = "translateX(-50%)";
+    root.style.top = `${baseTop}px`;
+
+    ol.style.position = "relative";
+
+    let maxOffset = 0;
+    badgeItems.forEach((li, idx) => {
+      const target = items[idx];
+      if (!target) return;
+      const targetRect = target.getBoundingClientRect();
+      const offset = targetRect.top - firstRect.top;
+      maxOffset = Math.max(maxOffset, offset);
+      li.style.position = "absolute";
+      li.style.left = "50%";
+      li.style.transform = "translateX(-50%)";
+      li.style.top = `${offset}px`;
+    });
+
+    const totalHeight = maxOffset + badgeHeight;
+    if (totalHeight > 0) root.style.height = `${totalHeight}px`;
+  };
+
+  placeCounts(warnRoot, warnList);
+  placeCounts(errRoot, errList);
+}
+
 function renderChaliceResults() {
   const standardMeta = sideInfo("standard");
   const depthMeta = sideInfo("depth");
@@ -4116,10 +4365,24 @@ function renderChaliceResults() {
     if (lastChaliceRollIssues.standard?.length) sidesWithIssues.push("Standard");
     if (lastChaliceRollIssues.depth?.length) sidesWithIssues.push("Depth of Night");
     const sideText = sidesWithIssues.join(" / ") || "This side";
-    stackingIssues.errors.push(`${sideText} effects are out of roll order. Enable Auto-Sort or use the Auto-Sort button.`);
+    const rollIssueSlots = rollIssues.flatMap(issue => {
+      const indices = issue?.combo?.indices || [];
+      const sideKey = issue?.meta?.key || "standard";
+      return indices.map(idx => ({ side: sideKey, slot: idx }));
+    });
+    const rollIssueIds = rollIssueSlots.map(s => String(chaliceSelections[s.side]?.[s.slot] || ""));
+    stackingIssues.errors.push({
+      message: `${sideText} effects are out of roll order. Enable Auto-Sort or use the Auto-Sort button.`,
+      slots: rollIssueSlots,
+      ids: rollIssueIds,
+      code: "roll-order"
+    });
   }
 
-  renderChaliceAlerts(stackingIssues);
+  const validSlots = validSlotSetFromCombos(standard, depth);
+  lastChaliceIssueAssignments = buildChaliceIssueAssignments(stackingIssues);
+  renderChaliceAlerts(stackingIssues, lastChaliceIssueAssignments);
+  updateChaliceSlotIssues(lastChaliceIssueAssignments, validSlots);
 }
 
 function updateChaliceCounts() {
