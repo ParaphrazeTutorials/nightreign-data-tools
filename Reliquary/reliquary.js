@@ -612,8 +612,7 @@ function applyChaliceDetailsView(view) {
   renderChaliceStatOverview();
   renderChaliceAlerts(lastChaliceIssues);
   // Re-align alert icons when the view state changes so collapsed state picks up offsets
-  positionChaliceAlertIcons();
-  positionChaliceAlertCounts();
+  scheduleChaliceAlertLayout();
 }
 
 function cycleChaliceDetailsView() {
@@ -2896,6 +2895,33 @@ function computeChaliceStackingIssues() {
   return { errors, warnings };
 }
 
+function unplacedIssuesForSide(result, meta) {
+  const issues = [];
+  const totalSelected = Number.parseInt(result?.selectedCount, 10) || 0;
+  const unused = Array.isArray(result?.unused) ? result.unused : [];
+  const combos = Array.isArray(result?.combos) ? result.combos : [];
+
+  if (totalSelected !== 9 || !unused.length || combos.length >= 3) return issues;
+
+  const slots = [];
+  const ids = [];
+
+  unused.forEach(entry => {
+    const slotIdx = Number.parseInt(entry?.slotIdx, 10);
+    if (Number.isInteger(slotIdx)) slots.push({ side: meta.key, slot: slotIdx });
+    if (entry?.id) ids.push(String(entry.id));
+  });
+
+  issues.push({
+    message: `${meta.label}: One or more effects could not be placed into a valid relic because of compatibility conflicts. Try removing or replacing one of the conflicting effects.`,
+    slots,
+    ids,
+    code: "unplaced"
+  });
+
+  return issues;
+}
+
 function chaliceRollIssuesForSide(meta) {
   const result = generateCombosForSide(meta, { allowMissingCurse: true });
   const issues = [];
@@ -4198,8 +4224,7 @@ function renderChaliceAlerts(issues, assignments = lastChaliceIssueAssignments) 
   }
 
   renderChaliceAlertCounts(assignments?.rail || { errors: [], warnings: [] });
-  positionChaliceAlertIcons();
-  positionChaliceAlertCounts();
+  scheduleChaliceAlertLayout();
 }
 
 function positionChaliceAlertIcons() {
@@ -4340,6 +4365,46 @@ function positionChaliceAlertCounts() {
   placeCounts(errRoot, errList);
 }
 
+function scheduleChaliceAlertLayout() {
+  // Immediate pass for already-stable layouts
+  positionChaliceAlertIcons();
+  positionChaliceAlertCounts();
+
+  // Next frame handles freshly-updated DOM
+  requestAnimationFrame(() => {
+    positionChaliceAlertIcons();
+    positionChaliceAlertCounts();
+  });
+
+  // One more frame catches CSS transitions triggered by details state changes
+  requestAnimationFrame(() => {
+    positionChaliceAlertIcons();
+    positionChaliceAlertCounts();
+  });
+}
+
+function installChaliceAlertLayoutListeners() {
+  const targets = [dom.chaliceDetails, dom.chaliceResultsShell, dom.chaliceLayout].filter(Boolean);
+  const events = ["transitionend", "animationend"]; // re-run after CSS-driven layout shifts
+
+  targets.forEach(target => {
+    events.forEach(evt => {
+      target.addEventListener(evt, e => {
+        const prop = e?.propertyName || "";
+        if (prop && !/height|width|top|bottom|left|right|margin|padding|transform|gap/i.test(prop)) return;
+        scheduleChaliceAlertLayout();
+      });
+    });
+  });
+
+  // ResizeObserver catches content-driven height changes (e.g., alert text wrapping)
+  const observed = [dom.chaliceAlertListWarning, dom.chaliceAlertListError].filter(Boolean);
+  if (observed.length && typeof ResizeObserver !== "undefined") {
+    const ro = new ResizeObserver(() => scheduleChaliceAlertLayout());
+    observed.forEach(el => ro.observe(el));
+  }
+}
+
 function renderChaliceResults() {
   const standardMeta = sideInfo("standard");
   const depthMeta = sideInfo("depth");
@@ -4359,6 +4424,11 @@ function renderChaliceResults() {
   updateChaliceStatusFromResults(standard, depth);
   renderChaliceStatOverview();
   const stackingIssues = computeChaliceStackingIssues();
+  const unplacedIssues = [
+    ...unplacedIssuesForSide(standard, standardMeta),
+    ...unplacedIssuesForSide(depth, depthMeta)
+  ];
+  if (unplacedIssues.length) stackingIssues.errors.push(...unplacedIssues);
 
   if (hasRollIssue && !isAutoSortEnabled()) {
     const sidesWithIssues = [];
@@ -4745,6 +4815,8 @@ async function load() {
   if (dom.chaliceResultsToggle) {
     dom.chaliceResultsToggle.addEventListener("click", () => cycleChaliceDetailsView());
   }
+
+  installChaliceAlertLayoutListeners();
 
   // Keep coming-soon blur opt-in togglable for internal use (default on)
   setComingSoonBlur(true);
