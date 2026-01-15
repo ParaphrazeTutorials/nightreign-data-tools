@@ -67,6 +67,11 @@ const chaliceSelections = {
   depth: Array(9).fill("")
 };
 
+const chaliceGroupOrder = {
+  standard: [],
+  depth: []
+};
+
 const chaliceCurses = {
   standard: Array(9).fill(""),
   depth: Array(9).fill("")
@@ -4036,7 +4041,7 @@ function renderChaliceAlertCounts(counts) {
       return;
     }
     root.innerHTML = `<ol class="chalice-alert-counts__list">${badges
-      .map(b => `<li><span class="chalice-alert-counts__badge is-${severity}" title="${escapeHtml(b.message)}">${b.num}</span></li>`)
+      .map(b => `<li><span class="chalice-alert-counts__badge is-${severity}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span></li>`)
       .join("")}</ol>`;
   };
 
@@ -4095,14 +4100,31 @@ function updateChaliceSlotIssues(assignments = lastChaliceIssueAssignments, vali
 
     if (!badgeTarget) return;
     const badges = [];
+    const tooltipParts = [];
     if (hasErrors) {
-      entry.errors.forEach(b => badges.push(`<span class="chalice-slot__issue-badge is-error" title="${escapeHtml(b.message)}">${b.num}</span>`));
+      entry.errors.forEach(b => {
+        badges.push(`<span class="chalice-slot__issue-badge is-error" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
+        tooltipParts.push(b.message || "");
+      });
     }
     if (hasWarnings) {
-      entry.warnings.forEach(b => badges.push(`<span class="chalice-slot__issue-badge is-warning" title="${escapeHtml(b.message)}">${b.num}</span>`));
+      entry.warnings.forEach(b => {
+        badges.push(`<span class="chalice-slot__issue-badge is-warning" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
+        tooltipParts.push(b.message || "");
+      });
     }
     if (!badges.length && isValid) badges.push(renderValidCheck());
     badgeTarget.innerHTML = badges.join("");
+
+    // Mirror the first tooltip onto the issue column so hovering the icon column also reveals the message
+    const tooltipText = tooltipParts.join(" | ").trim();
+    if (tooltipText) {
+      badgeTarget.setAttribute("data-tooltip", tooltipText);
+      badgeTarget.setAttribute("aria-label", tooltipText);
+    } else {
+      badgeTarget.removeAttribute("data-tooltip");
+      badgeTarget.removeAttribute("aria-label");
+    }
   });
 }
 
@@ -4545,6 +4567,178 @@ function chaliceSideColor(meta, index = 0) {
   return chaliceColorCache[meta.key] || "#ffffff";
 }
 
+function comboKeyFromIndices(indices) {
+  const sorted = [...indices].sort((a, b) => a - b);
+  return sorted.join("-");
+}
+
+function orderedCombosWithSaved(meta, combos) {
+  const list = Array.isArray(combos) ? [...combos] : [];
+  if (!list.length) return list;
+
+  const saved = Array.isArray(chaliceGroupOrder[meta.key]) ? chaliceGroupOrder[meta.key] : [];
+  if (!saved.length) return list;
+
+  const byKey = new Map();
+  list.forEach(combo => {
+    const key = comboKeyFromIndices(combo.indices || []);
+    if (!byKey.has(key)) byKey.set(key, combo);
+  });
+
+  const ordered = [];
+  saved.forEach(key => {
+    if (byKey.has(key)) {
+      ordered.push(byKey.get(key));
+      byKey.delete(key);
+    }
+  });
+
+  // Append any new combos that weren't in the saved order
+  byKey.forEach(combo => ordered.push(combo));
+  return ordered;
+}
+
+function setSavedGroupOrder(meta, combos) {
+  const keys = (Array.isArray(combos) ? combos : []).map(c => comboKeyFromIndices(c.indices || []));
+  chaliceGroupOrder[meta.key] = keys;
+}
+
+function snapshotComboData(meta, indices) {
+  return {
+    effects: indices.map(i => chaliceSelections[meta.key][i] || ""),
+    cats: indices.map(i => chaliceCats[meta.key][i] || ""),
+    curses: indices.map(i => chaliceCurses[meta.key][i] || "")
+  };
+}
+
+function writeComboData(meta, indices, data) {
+  indices.forEach((slotIdx, offset) => {
+    chaliceSelections[meta.key][slotIdx] = data.effects[offset] || "";
+    chaliceCats[meta.key][slotIdx] = data.cats[offset] || "";
+    chaliceCurses[meta.key][slotIdx] = data.curses[offset] || "";
+  });
+}
+
+function reorderChaliceGroupsData(meta, keyOrder) {
+  const result = generateCombosForSide(meta, { allowMissingCurse: true });
+  const comboByKey = new Map();
+  (result.combos || []).forEach(combo => {
+    const key = comboKeyFromIndices(combo.indices || []);
+    comboByKey.set(key, combo.indices || []);
+  });
+
+  const buckets = [...comboByKey.entries()]
+    .map(([key, indices]) => ({ key, indices, min: Math.min(...indices) }))
+    .sort((a, b) => a.min - b.min);
+
+  if (!buckets.length) return;
+
+  // Normalize target order: start with requested, then append any missing keys in original bucket order
+  const requested = Array.isArray(keyOrder) ? keyOrder.filter(k => comboByKey.has(k)) : [];
+  const normalized = [...requested];
+  buckets.forEach(bucket => {
+    if (!normalized.includes(bucket.key)) normalized.push(bucket.key);
+  });
+  normalized.length = buckets.length;
+
+  // Snapshot source data per key
+  const dataByKey = new Map();
+  buckets.forEach(bucket => {
+    dataByKey.set(bucket.key, snapshotComboData(meta, bucket.indices));
+  });
+
+  // Write data into buckets following normalized order; colors stay on their buckets
+  buckets.forEach((bucket, idx) => {
+    const sourceKey = normalized[idx];
+    const payload = dataByKey.get(sourceKey);
+    if (payload) writeComboData(meta, bucket.indices, payload);
+  });
+}
+
+const chaliceGroupDrag = {
+  side: "",
+  key: ""
+};
+
+function clearChaliceGroupDragState() {
+  chaliceGroupDrag.side = "";
+  chaliceGroupDrag.key = "";
+}
+
+function installChaliceGroupDrag(listEl, meta) {
+  if (!listEl) return;
+  const groups = Array.from(listEl.querySelectorAll(".chalice-slot-group"));
+  const enableDrag = groups.length >= 2;
+
+  groups.forEach(group => {
+    if (!enableDrag) {
+      group.removeAttribute("draggable");
+      return;
+    }
+
+    group.setAttribute("draggable", "true");
+    group.dataset.side = meta.key;
+
+    group.addEventListener("dragstart", evt => {
+      const key = group.dataset.chGroupKey || "";
+      if (!key || !evt.dataTransfer) return;
+      chaliceGroupDrag.side = meta.key;
+      chaliceGroupDrag.key = key;
+      group.classList.add("is-dragging");
+      evt.dataTransfer.effectAllowed = "move";
+      evt.dataTransfer.setData("text/plain", key);
+    });
+
+    group.addEventListener("dragend", () => {
+      group.classList.remove("is-dragging");
+      groups.forEach(g => {
+        g.classList.remove("is-dragover");
+      });
+      clearChaliceGroupDragState();
+    });
+
+    group.addEventListener("dragover", evt => {
+      if (!chaliceGroupDrag.key || chaliceGroupDrag.side !== meta.key) return;
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = "move";
+      groups.forEach(g => {
+        g.classList.remove("is-dragover");
+      });
+      group.classList.add("is-dragover");
+    });
+
+    group.addEventListener("dragleave", () => {
+      group.classList.remove("is-dragover");
+    });
+
+    group.addEventListener("drop", evt => {
+      if (!chaliceGroupDrag.key || chaliceGroupDrag.side !== meta.key) return;
+      evt.preventDefault();
+      const targetKey = group.dataset.chGroupKey || "";
+      if (!targetKey || targetKey === chaliceGroupDrag.key) return;
+
+      const current = Array.isArray(chaliceGroupOrder[meta.key]) ? [...chaliceGroupOrder[meta.key]] : [];
+      const cleaned = current.filter(k => k);
+      if (!cleaned.length) {
+        const liveKeys = groups.map(g => g.dataset.chGroupKey || "").filter(Boolean);
+        cleaned.push(...liveKeys);
+      }
+
+      const sourceIdx = cleaned.indexOf(chaliceGroupDrag.key);
+      const targetIdx = cleaned.indexOf(targetKey);
+      if (sourceIdx === -1 || targetIdx === -1) return;
+
+      const next = [...cleaned];
+      [next[sourceIdx], next[targetIdx]] = [next[targetIdx], next[sourceIdx]];
+
+      chaliceGroupOrder[meta.key] = next;
+      reorderChaliceGroupsData(meta, next);
+      clearChaliceGroupDragState();
+      applyChaliceGrouping();
+    });
+  });
+}
+
 function applyChaliceGroupingForSide(meta) {
   const listEl = meta.key === "depth" ? dom.chaliceDepthList : dom.chaliceStandardList;
   if (!listEl) return;
@@ -4564,15 +4758,42 @@ function applyChaliceGroupingForSide(meta) {
   const result = generateCombosForSide(meta);
   if (!result.combos.length) return;
 
+  const orderedCombos = orderedCombosWithSaved(meta, result.combos);
+  setSavedGroupOrder(meta, orderedCombos);
+  const hasMultipleCombos = orderedCombos.length >= 2;
+
   const slotLiByIdx = new Map();
   listEl.querySelectorAll(".chalice-slot").forEach(slot => {
     const idx = Number(slot.getAttribute("data-slot"));
     if (Number.isInteger(idx)) slotLiByIdx.set(idx, slot.closest("li"));
   });
 
+  // Reorder list items to match desired group order so content moves between color buckets
+  const orderedLis = [];
+  const usedIdx = new Set();
+  orderedCombos.forEach(combo => {
+    const indices = [...(combo.indices || [])].sort((a, b) => a - b);
+    const members = indices.map(i => slotLiByIdx.get(i)).filter(Boolean);
+    if (members.length !== indices.length) return;
+    members.forEach(m => {
+      orderedLis.push(m);
+      usedIdx.add(Number(m.querySelector(".chalice-slot")?.getAttribute("data-slot")));
+    });
+  });
+
+  // Append any remaining slots that were not part of combos
+  slotLiByIdx.forEach((li, idx) => {
+    if (!usedIdx.has(idx)) orderedLis.push(li);
+  });
+
+  if (orderedLis.length) {
+    listEl.innerHTML = "";
+    orderedLis.forEach(li => listEl.appendChild(li));
+  }
+
   const used = new Set();
 
-  result.combos.forEach((combo, comboIdx) => {
+  orderedCombos.forEach((combo, comboIdx) => {
     const indices = [...combo.indices].sort((a, b) => a - b);
     const members = indices.map(i => slotLiByIdx.get(i)).filter(Boolean);
     if (members.length !== indices.length) return;
@@ -4580,9 +4801,16 @@ function applyChaliceGroupingForSide(meta) {
 
     const groupLi = document.createElement("li");
     groupLi.className = "chalice-slot-group";
-    const color = chaliceSideColor(meta, comboIdx) || "#ffffff";
-    groupLi.style.setProperty("--chalice-group-color", color);
-    groupLi.style.borderColor = color;
+    const groupKey = comboKeyFromIndices(combo.indices || []);
+    groupLi.dataset.chGroupKey = groupKey;
+    groupLi.dataset.side = meta.key;
+
+    if (hasMultipleCombos) {
+      const handle = document.createElement("div");
+      handle.className = "chalice-slot-group__handle";
+      handle.setAttribute("aria-hidden", "true");
+      groupLi.appendChild(handle);
+    }
 
     const innerList = document.createElement("ol");
     innerList.className = "chalice-slot-group__list";
@@ -4596,6 +4824,18 @@ function applyChaliceGroupingForSide(meta) {
       innerList.appendChild(node);
     });
   });
+
+  // Apply positional colors after grouping so colors stay with slots, not with the moved trio content
+  const groups = Array.from(listEl.querySelectorAll(".chalice-slot-group"));
+  groups.forEach((group, idx) => {
+    const color = chaliceSideColor(meta, idx) || "#ffffff";
+    group.style.setProperty("--chalice-group-color", color);
+    group.style.borderColor = color;
+    const handleDot = textColorFor(color);
+    group.style.setProperty("--chalice-handle-dot-color", handleDot);
+  });
+
+  installChaliceGroupDrag(listEl, meta);
 }
 
 function applyChaliceGrouping() {

@@ -1321,6 +1321,7 @@
 
 .chalice-slot-group {
   --chalice-group-color: var(--chalice-side-color, #ffffff);
+  --chalice-handle-dot-color: #f7f9ff;
   border: 2px solid var(--chalice-group-color);
   border-radius: 0.65rem;
   padding: 0.35rem 0.4rem;
@@ -1328,6 +1329,9 @@
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.35) inset,
     0 0 0 2px color-mix(in srgb, var(--chalice-group-color) 60%, transparent);
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
 }
 
 .chalice-slot-group__list {
@@ -1336,6 +1340,44 @@
   margin: 0;
   display: grid;
   gap: 0.35rem;
+  flex: 1;
+}
+
+.chalice-slot-group__handle {
+  width: 14px;
+  border-radius: 0.45rem;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--chalice-group-color) 90%, rgba(0, 0, 0, 0.1)),
+    color-mix(in srgb, var(--chalice-group-color) 70%, rgba(0, 0, 0, 0.2))
+  );
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  position: relative;
+  min-height: 100%;
+}
+
+.chalice-slot-group__handle::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--chalice-handle-dot-color);
+  box-shadow:
+    0 -7px 0 0 var(--chalice-handle-dot-color),
+    0 7px 0 0 var(--chalice-handle-dot-color);
+  opacity: 0.9;
+}
+
+.chalice-slot-group.is-dragging {
+  opacity: 0.7;
+}
+
+.chalice-slot-group.is-dragover {
+  outline: 2px dashed var(--chalice-group-color);
+  outline-offset: 3px;
 }
 
 .chalice-slot {
@@ -1439,10 +1481,26 @@
   pointer-events: none;
 }
 
+/* Normalize any UA decorations in the issue column (dotted underlines, etc.) */
+.chalice-slot__issue-col,
+.chalice-slot__issue-col *,
+[data-ch-issue-badges],
+[data-ch-issue-badges] * {
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+  text-decoration-style: none !important;
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
+  text-underline-offset: 0 !important;
+  border-bottom: 0 !important;
+  outline: 0 !important;
+}
+
 .chalice-slot__issue-badges {
   display: inline-flex;
   align-items: center;
   gap: 0.22rem;
+  pointer-events: auto; /* allow hover for tooltips despite parent being pointer-events none */
 }
 
 .chalice-slot__cell--effect .chalice-slot__controls {
@@ -1527,6 +1585,16 @@
   line-height: 1;
   color: #0b0d12;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  text-decoration: none !important; /* suppress UA dotted underline */
+  text-decoration-line: none !important;
+  text-decoration-style: none !important;
+  text-decoration-thickness: 0 !important;
+  text-decoration-color: transparent !important;
+  text-underline-offset: 0 !important;
+  border-bottom: none !important;
+  outline: none !important;
+  cursor: default;
+  pointer-events: auto;
 }
 
 .chalice-slot__issue-badge.is-warning {
