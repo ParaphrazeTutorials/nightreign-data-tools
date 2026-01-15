@@ -91,6 +91,8 @@ const chaliceColorListCache = {
   depth: []
 };
 
+let lastChaliceRollIssues = { standard: [], depth: [] };
+
 let effectStatsRows = [];
 let effectStatsByEffectId = new Map();
 let conditionalEffectState = new Map();
@@ -127,10 +129,16 @@ let currentRandomColor = "Red";
 let selectedColor = "Random";
 const COLOR_CHOICES = ["Random", ...COLORS];
 let showIllegalActive = false;
+let autoSortEnabled = true;
 
 function showIllegalButtons() {
   if (Array.isArray(dom.showIllegalButtons) && dom.showIllegalButtons.length) return dom.showIllegalButtons;
   return [dom.showIllegalBtn, dom.showIllegalBtnChalice].filter(Boolean);
+}
+
+function autoSortButtons() {
+  if (Array.isArray(dom.autoSortToggleButtons) && dom.autoSortToggleButtons.length) return dom.autoSortToggleButtons;
+  return [dom.autoSortToggle, dom.autoSortToggleChalice].filter(Boolean);
 }
 
 function installHoverTooltip(btn) {
@@ -174,6 +182,32 @@ function setShowIllegalActive(active) {
     btn.setAttribute("aria-label", ariaLabel);
     btn.setAttribute("title", "");
     setHoverTooltip(btn, tooltip);
+  });
+}
+
+function isAutoSortEnabled() {
+  return autoSortEnabled;
+}
+
+function setAutoSortEnabled(enabled) {
+  autoSortEnabled = !!enabled;
+
+  const tooltip = autoSortEnabled
+    ? "Auto-Sorting Roll Orders is On"
+    : "Auto-Sorting Roll Orders is Off";
+  const ariaLabel = autoSortEnabled
+    ? "Disable auto-sort (currently on)"
+    : "Enable auto-sort (currently off)";
+
+  autoSortButtons().forEach(btn => {
+    btn.classList.toggle("is-active", autoSortEnabled);
+    btn.setAttribute("aria-pressed", String(autoSortEnabled));
+    btn.setAttribute("aria-label", ariaLabel);
+    btn.setAttribute("title", "");
+    setHoverTooltip(btn, tooltip);
+
+    const sr = btn.querySelector(".sr-only");
+    if (sr) sr.textContent = autoSortEnabled ? "Auto-Sort Enabled" : "Auto-Sort Disabled";
   });
 }
 
@@ -852,6 +886,17 @@ function computePositionIssue(a, b, c) {
   }
 
   return { hasIssue: badSlots.length > 0, badSlots };
+}
+
+function shouldAutoSort(reason, rollInfo, positionInfo, selectedCount) {
+  if (!isAutoSortEnabled()) return false;
+  if (reason === "auto-sort") return false;
+  if (!rollInfo || !rollInfo.hasIssue) return false;
+  if (!positionInfo || positionInfo.hasIssue) return false;
+  if (!Number.isFinite(selectedCount) || selectedCount < 2) return false;
+
+  // Only auto-sort on direct effect changes so unrelated UI updates do not reorder unexpectedly.
+  return reason === "effect-change";
 }
 
 function selectionsCompatibleWithType(type) {
@@ -2498,7 +2543,9 @@ function updateDetails(a, b, c) {
   }
 
   const roll = (selected.length >= 2) ? computeRollOrderIssue(a, b, c) : { hasIssue: false };
-  if (roll.hasIssue) {
+  const orderIssueVisible = roll.hasIssue && !positionIssue.hasIssue && selected.length >= 2 && !isAutoSortEnabled();
+
+  if (orderIssueVisible) {
     blocks.push(`
       <div class="info-box is-alert" data-kind="rollorder">
         <div class="info-line">
@@ -2519,7 +2566,7 @@ function updateDetails(a, b, c) {
   dom.detailsBody.innerHTML = blocks.join("");
   installDetailsToggles();
 
-  if (roll.hasIssue && roll.sorted) {
+  if (orderIssueVisible && roll.sorted) {
     const list = dom.detailsBody.querySelector("#sortedChosenList");
     if (list) {
       let line1 = renderChosenLine("", roll.sorted[0], false);
@@ -2697,13 +2744,22 @@ function updateUI(reason = "") {
   }
 
   const roll = computeRollOrderIssue(cSelections[0], cSelections[1], cSelections[2]);
-  const hasOrderIssue = roll.hasIssue;
-  const moveDeltaBySlot = roll.moveDeltaBySlot || [0, 0, 0];
   const positionIssue = computePositionIssue(cSelections[0], cSelections[1], cSelections[2]);
   const hasPositionIssue = positionIssue.hasIssue;
 
+  // Only treat roll-order issues as actionable when the fill is sequential (no gaps) and at least two slots are filled.
+  const hasOrderIssueRaw = roll.hasIssue;
+  const orderIssueActive = hasOrderIssueRaw && !hasPositionIssue && selectedCount >= 2;
+  const orderIssueVisible = orderIssueActive && !isAutoSortEnabled();
+  const moveDeltaBySlot = orderIssueVisible ? (roll.moveDeltaBySlot || [0, 0, 0]) : [0, 0, 0];
+
+  if (shouldAutoSort(reason, roll, positionIssue, selectedCount)) {
+    applyAutoSort();
+    return;
+  }
+
   if (autoSortBtn) {
-    const showAutoSort = hasOrderIssue && selectedCount >= 2;
+    const showAutoSort = orderIssueActive && !isAutoSortEnabled();
     autoSortBtn.hidden = !showAutoSort;
     autoSortBtn.disabled = !showAutoSort;
   }
@@ -2718,7 +2774,7 @@ function updateUI(reason = "") {
     return false;
   })();
 
-  const state = anySelected && (hasCompatIssue || hasRelicTypeIssue || hasOrderIssue || hasCurseMissing || hasPositionIssue) ? "Invalid" : "Valid";
+  const state = anySelected && (hasCompatIssue || hasRelicTypeIssue || orderIssueVisible || hasCurseMissing || hasPositionIssue) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
 
   const okBySlot = [false, false, false];
@@ -2729,7 +2785,7 @@ function updateUI(reason = "") {
 
     const compatBad = compatConflictIds.has(String(row.EffectID));
     const relicTypeBad = hasRelicTypeIssue && relicTypeIssue.ids.has(String(row.EffectID));
-    const orderBad = hasOrderIssue && moveDeltaBySlot[i] !== 0;
+    const orderBad = orderIssueVisible && moveDeltaBySlot[i] !== 0;
     const curseReq = String(row?.CurseRequired ?? "0") === "1";
     const curseMissing = curseReq && !curseBySlot[i];
     const positionBad = hasPositionIssue && positionIssue.badSlots.includes(i);
@@ -2810,6 +2866,103 @@ function computeChaliceStackingIssues() {
   });
 
   return { errors, warnings };
+}
+
+function chaliceRollIssuesForSide(meta) {
+  const result = generateCombosForSide(meta, { allowMissingCurse: true });
+  const issues = [];
+
+  for (const combo of result.combos) {
+    if (!combo || !Array.isArray(combo.indices) || combo.indices.length !== 3) continue;
+    const slotRows = Array.isArray(combo.slotRows) && combo.slotRows.length === 3
+      ? combo.slotRows
+      : combo.indices.map(idx => chaliceRow(chaliceSelections[meta.key][idx]));
+    const roll = computeRollOrderIssue(slotRows[0], slotRows[1], slotRows[2]);
+    if (roll?.hasIssue) {
+      issues.push({ meta, combo, roll });
+    }
+  }
+
+  return { issues };
+}
+
+function applyChaliceRollOrder(meta, issue) {
+  if (!issue || !issue.roll || !issue.combo) return false;
+  const slots = [...issue.combo.indices].sort((a, b) => a - b);
+  const effects = chaliceSelections[meta.key];
+  const cats = chaliceCats[meta.key];
+  const curses = chaliceCurses[meta.key];
+
+  let changed = false;
+  const entries = slots.map(idx => ({
+    idx,
+    effect: effects[idx] || "",
+    cat: cats[idx] || "",
+    curse: curses[idx] || ""
+  }));
+
+  const used = new Set();
+  const sortedRows = issue.roll.sorted || [];
+
+  for (let i = 0; i < slots.length; i++) {
+    const row = sortedRows[i];
+    const targetSlot = slots[i];
+    if (!row) continue;
+
+    const entry = entries.find(e => !used.has(e.idx) && e.effect === String(row.EffectID));
+    if (entry) used.add(entry.idx);
+
+    const nextEffect = String(row.EffectID);
+    if (effects[targetSlot] !== nextEffect) {
+      effects[targetSlot] = nextEffect;
+      changed = true;
+    }
+
+    const nextCat = entry ? entry.cat : "";
+    if (cats[targetSlot] !== nextCat) {
+      cats[targetSlot] = nextCat;
+      changed = true;
+    }
+
+    const nextCurse = entry ? entry.curse : "";
+    if (curses[targetSlot] !== nextCurse) {
+      curses[targetSlot] = nextCurse;
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
+function maybeAutoSortChalice(force = false) {
+  function handleSide(meta) {
+    const first = chaliceRollIssuesForSide(meta);
+    const shouldSort = force || isAutoSortEnabled();
+    let changed = false;
+
+    if (shouldSort) {
+      for (const issue of first.issues) {
+        changed = applyChaliceRollOrder(meta, issue) || changed;
+      }
+    }
+
+    if (changed) {
+      const refreshed = chaliceRollIssuesForSide(meta);
+      return { issues: refreshed.issues, changed };
+    }
+
+    return { issues: first.issues, changed: false };
+  }
+
+  const std = handleSide(sideInfo("standard"));
+  const dep = handleSide(sideInfo("depth"));
+
+  lastChaliceRollIssues = {
+    standard: std.issues,
+    depth: dep.issues
+  };
+
+  return std.changed || dep.changed;
 }
 
 function computeChaliceBlockedCompat(slotIdx) {
@@ -2912,6 +3065,10 @@ function chaliceAttrPills(row) {
       ? "effect-chip--self-stack-no"
       : "effect-chip--self-stack-unknown";
   pills.push(chaliceEffectChip(`Self-Stacking: ${selfStack.label}`, ["effect-chip--self-stack", selfMod]));
+
+  const rollOrderRaw = (row?.RollOrder ?? "").toString().trim();
+  const rollOrderLabel = rollOrderRaw || "—";
+  pills.push(chaliceEffectChip(`Roll Order: ${rollOrderLabel}`, ["effect-chip--meta", "effect-chip--rollorder"]));
 
   return pills;
 }
@@ -3323,7 +3480,8 @@ function countMapTotal(map) {
   return total;
 }
 
-function generateCombosForSide(meta) {
+function generateCombosForSide(meta, options = {}) {
+  const allowMissingCurse = Boolean(options.allowMissingCurse);
   const slots = chaliceSelections[meta.key];
   const curseSlots = chaliceCurses[meta.key];
   const filledIdx = slots.map((id, idx) => ({ id, idx })).filter(x => x.id);
@@ -3362,6 +3520,8 @@ function generateCombosForSide(meta) {
         const rowsCombo = ids.map(id => chaliceRow(id));
         if (rowsCombo.some(r => !r)) continue;
 
+        const needsCurse = rowsCombo.some(r => String(r?.CurseRequired ?? "0") === "1");
+
         // type/class check
         if (!rowsCombo.every(r => isRowAllowedForSide(r, meta) && rowMatchesClass(r))) continue;
 
@@ -3383,6 +3543,7 @@ function generateCombosForSide(meta) {
         if (invalid) continue;
 
         const cursesForCombo = [];
+        const missingCurseSlots = [];
         if (meta.key === "depth") {
           for (const slot of triple) {
             const effectRow = chaliceRow(slot.id);
@@ -3390,8 +3551,12 @@ function generateCombosForSide(meta) {
             const curseId = curseSlots[slot.idx];
             const curseRow = curseId ? chaliceRow(curseId) : null;
             if (needsCurse && !curseRow) {
-              invalid = true;
-              break;
+              if (!allowMissingCurse) {
+                invalid = true;
+                break;
+              }
+              missingCurseSlots.push(slot.idx);
+              continue;
             }
             if (curseRow) {
               if (!rowMatchesClass(curseRow)) { invalid = true; break; }
@@ -3410,7 +3575,10 @@ function generateCombosForSide(meta) {
           ids,
           indices: triple.map(t => t.idx),
           rows: sorted,
-          curses: cursesForCombo
+          curses: cursesForCombo,
+          needsCurse,
+          missingCurse: missingCurseSlots.length > 0,
+          slotRows: triple.map(t => chaliceRow(t.id))
         });
       }
     }
@@ -3929,9 +4097,28 @@ function renderChaliceResults() {
   const standard = generateCombosForSide(standardMeta);
   const depth = generateCombosForSide(depthMeta);
 
+  // Roll-order UI affordances
+  const rollIssues = [...(lastChaliceRollIssues.standard || []), ...(lastChaliceRollIssues.depth || [])];
+  const hasRollIssue = rollIssues.length > 0;
+
+  if (dom.chaliceAutoSortBtn) {
+    const showAutoSort = hasRollIssue && !isAutoSortEnabled();
+    dom.chaliceAutoSortBtn.hidden = !showAutoSort;
+    dom.chaliceAutoSortBtn.disabled = !showAutoSort;
+  }
+
   updateChaliceStatusFromResults(standard, depth);
   renderChaliceStatOverview();
   const stackingIssues = computeChaliceStackingIssues();
+
+  if (hasRollIssue && !isAutoSortEnabled()) {
+    const sidesWithIssues = [];
+    if (lastChaliceRollIssues.standard?.length) sidesWithIssues.push("Standard");
+    if (lastChaliceRollIssues.depth?.length) sidesWithIssues.push("Depth of Night");
+    const sideText = sidesWithIssues.join(" / ") || "This side";
+    stackingIssues.errors.push(`${sideText} effects are out of roll order. Enable Auto-Sort or use the Auto-Sort button.`);
+  }
+
   renderChaliceAlerts(stackingIssues);
 }
 
@@ -3949,6 +4136,7 @@ function openQuickChalicePicker(sideKey, anchorBtn) {
 }
 
 function renderChaliceUI() {
+  maybeAutoSortChalice();
   renderChaliceLists();
   updateChaliceCounts();
   renderChaliceColors();
@@ -4215,6 +4403,8 @@ async function load() {
 
   // Default illegal toggle is off
   setShowIllegalActive(false);
+  // Default auto-sort is on
+  setAutoSortEnabled(true);
 
   if (dom.modeBtnIndividual) dom.modeBtnIndividual.addEventListener("click", () => setMode(MODES.INDIVIDUAL));
   if (dom.modeBtnChalice) dom.modeBtnChalice.addEventListener("click", () => setMode(MODES.CHALICE));
@@ -4237,6 +4427,15 @@ async function load() {
         const next = !isShowIllegalActive();
         setShowIllegalActive(next);
         resetAllPreserveIllegal(next);
+      });
+    });
+  }
+  const autoSortToggles = autoSortButtons();
+  if (autoSortToggles.length) {
+    autoSortToggles.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const next = !isAutoSortEnabled();
+        setAutoSortEnabled(next);
       });
     });
   }
@@ -4263,6 +4462,13 @@ async function load() {
 
   if (dom.chaliceAddDepth) {
     dom.chaliceAddDepth.addEventListener("click", () => openQuickChalicePicker("depth", dom.chaliceAddDepth));
+  }
+
+  if (dom.chaliceAutoSortBtn) {
+    dom.chaliceAutoSortBtn.addEventListener("click", () => {
+      maybeAutoSortChalice(true);
+      renderChaliceUI();
+    });
   }
 
   if (dom.chaliceDetailsCollapseBtn) {

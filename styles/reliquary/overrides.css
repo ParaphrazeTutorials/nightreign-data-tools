@@ -142,6 +142,25 @@ button#showIllegalBtn[aria-pressed="true"] .utility-toggle__svg {
   stroke: #b10000 !important;
   stroke-width: 2.4px !important;
 }
+
+button#autoSortToggle.is-active,
+button#autoSortToggle[aria-pressed="true"],
+button#autoSortToggleChalice.is-active,
+button#autoSortToggleChalice[aria-pressed="true"] {
+  background-color: #2c1a46 !important; /* dark purple from palette */
+  background-image: none !important;
+  border: 2px solid #3f2766 !important;
+  color: #eae3ff !important;
+  box-shadow: 0 0 0 1px rgba(63, 39, 102, 0.45) !important;
+}
+
+button#autoSortToggle.is-active .utility-toggle__svg,
+button#autoSortToggle[aria-pressed="true"] .utility-toggle__svg,
+button#autoSortToggleChalice.is-active .utility-toggle__svg,
+button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
+  stroke: #eae3ff !important;
+  stroke-width: 2.2px !important;
+}
 /* ------------------------------------------------------------
    Raw-mode layout: keep effect row simple; curse row stacks below via effect-line grid
    ------------------------------------------------------------ */

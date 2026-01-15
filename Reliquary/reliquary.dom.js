@@ -28,6 +28,9 @@ export function getDom() {
     showIllegalBtn: document.getElementById("showIllegalBtn"),
     showIllegalBtnChalice: document.getElementById("showIllegalBtnChalice"),
     showIllegalButtons: Array.from(document.querySelectorAll("[data-show-illegal]")),
+    autoSortToggle: document.getElementById("autoSortToggle"),
+    autoSortToggleChalice: document.getElementById("autoSortToggleChalice"),
+    autoSortToggleButtons: Array.from(document.querySelectorAll("[data-auto-sort-toggle]")),
     startOverBtn: document.getElementById("startOver"),
     instructionsBtn: document.getElementById("instructionsBtn") || null,
     instructionsBtnChalice: document.getElementById("instructionsBtnChalice") || null,
@@ -100,5 +103,6 @@ export function getDom() {
     chaliceAlertPanelTitleError: document.getElementById("chaliceAlertPanelTitleError"),
     chaliceAlertListError: document.getElementById("chaliceAlertListError"),
     chaliceDetailsCollapseBtn: document.getElementById("chaliceDetailsCollapseBtn"),
+    chaliceAutoSortBtn: document.getElementById("chaliceAutoSortBtn"),
   };
 }
