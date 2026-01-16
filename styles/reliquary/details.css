@@ -58,6 +58,19 @@
   min-height: 0;
 }
 
+#details .info-box.is-warning{
+  border-color: rgba(230, 180, 50, 0.9);
+  background: linear-gradient(
+    180deg,
+    rgba(180, 140, 32, 0.55),
+    rgba(110, 80, 18, 0.48)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 215, 120, 0.26),
+    inset 0 1px 0 rgba(255, 245, 200, 0.18),
+    0 0 18px rgba(180, 130, 30, 0.20);
+}
+
 /* red stays vibrant */
 #details .info-box.is-alert{
   border-color: rgba(220, 70, 70, 0.85);
