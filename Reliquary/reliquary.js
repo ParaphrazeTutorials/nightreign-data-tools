@@ -88,6 +88,9 @@ const chaliceCats = {
   depth: Array(9).fill("")
 };
 
+// Track which chalice badges have been hovered so pulse animations can stop
+const seenChaliceBadges = new Set();
+
 const selectedEffects = ["", "", ""];
 const selectedCats = ["", "", ""];
 const curseBySlot = [null, null, null];
@@ -114,6 +117,46 @@ let lastChaliceIssueAssignments = {
   rail: { errors: [], warnings: [] },
   perSlot: new Map()
 };
+
+// Tooltip portal (escapes stacking contexts)
+let tooltipPortal;
+function ensureTooltipPortal() {
+  if (tooltipPortal) return tooltipPortal;
+  const el = document.createElement("div");
+  el.id = "tooltipPortal";
+  el.className = "tooltip-portal";
+  document.body.appendChild(el);
+  tooltipPortal = el;
+  return el;
+}
+
+function showPortalTooltip(target) {
+  const el = ensureTooltipPortal();
+  const txt = target?.getAttribute("data-tooltip") || target?.dataset?.tooltipText;
+  if (!txt) return;
+  const rect = target.getBoundingClientRect();
+  const placeLeft = !!(target.closest(".chalice-slot__issue-col, .chalice-slot__issue-badges")
+    || target.closest('#chaliceDetails[data-details-state="collapsed"]'));
+  el.textContent = txt;
+  if (placeLeft) {
+    el.classList.add("tooltip-portal--left");
+    el.style.left = `${rect.left - 8}px`;
+    el.style.top = `${rect.top + rect.height / 2}px`;
+  } else {
+    el.classList.remove("tooltip-portal--left");
+    el.style.left = `${rect.left + rect.width / 2}px`;
+    el.style.top = `${rect.top - 8}px`;
+  }
+  document.body.classList.add("tooltip-portal-active");
+  el.classList.add("is-visible");
+}
+
+function hidePortalTooltip() {
+  if (!tooltipPortal) return;
+  tooltipPortal.classList.remove("is-visible");
+  tooltipPortal.textContent = "";
+  document.body.classList.remove("tooltip-portal-active");
+}
 
 function normalizeChaliceColor(value) {
   if (!value) return "#ffffff";
@@ -161,9 +204,11 @@ function installHoverTooltip(btn) {
   const apply = () => {
     const txt = btn.dataset.tooltipText || "";
     if (txt) btn.setAttribute("data-tooltip", txt);
+    showPortalTooltip(btn);
   };
   const clear = () => {
     btn.removeAttribute("data-tooltip");
+    hidePortalTooltip();
   };
   btn.addEventListener("pointerenter", apply);
   btn.addEventListener("pointerleave", clear);
@@ -177,6 +222,26 @@ function setHoverTooltip(btn, text) {
   btn.removeAttribute("data-tooltip");
   installHoverTooltip(btn);
 }
+
+// Global portal tooltip handlers (covers static data-tooltip elements too)
+document.addEventListener("pointerenter", e => {
+  const target = e.target;
+  if (!(target instanceof Element)) return;
+  const el = target.closest("[data-tooltip]");
+  if (!el) return;
+  showPortalTooltip(el);
+}, true);
+
+document.addEventListener("pointerleave", e => {
+  const target = e.target;
+  if (!(target instanceof Element)) return;
+  const el = target.closest("[data-tooltip]");
+  if (!el) return;
+  hidePortalTooltip();
+}, true);
+
+document.addEventListener("scroll", () => hidePortalTooltip(), true);
+window.addEventListener("resize", () => hidePortalTooltip());
 
 function isShowIllegalActive() {
   return showIllegalActive;
@@ -755,6 +820,8 @@ function setMode(next) {
 
 function handleStartOver() {
   if (isChaliceMode()) {
+    setShowIllegalActive(false);
+    setAutoSortEnabled(true);
     resetClassFilter();
     resetChaliceSelections();
   } else {
@@ -4158,6 +4225,43 @@ function buildChaliceIssueAssignments(issues) {
   return { rail, perSlot };
 }
 
+function chaliceBadgeKey(_scope, severity, badge, _side = "", _slotIdx = null) {
+  const numPart = Number.isFinite(badge?.num) ? `num:${badge.num}` : "";
+  const codePart = badge?.code ? `code:${badge.code}` : "";
+  const messagePart = badge?.message ? `msg:${badge.message}` : "";
+  // Use a shared key per severity/num so linked badges pulse/clear together across rail + slots
+  return ["badge", severity, numPart || codePart || messagePart].filter(Boolean).join(":");
+}
+
+function isChaliceBadgeSeen(key) {
+  return key ? seenChaliceBadges.has(key) : false;
+}
+
+function markChaliceBadgeSeen(key, el) {
+  if (!key) return;
+  if (!seenChaliceBadges.has(key)) {
+    seenChaliceBadges.add(key);
+  }
+  // Clear pulse on the triggering badge and any matching badges rendered elsewhere
+  const targets = el ? [el, ...document.querySelectorAll(`[data-badge-key="${CSS.escape(key)}"]`)] : [];
+  targets.forEach(node => node.classList.remove("chalice-badge--pulse"));
+}
+
+function installChaliceBadgeSeenHandlers(root) {
+  if (!root) return;
+  root.querySelectorAll("[data-badge-key]").forEach(el => {
+    const key = el.getAttribute("data-badge-key") || "";
+    if (!key) return;
+    if (isChaliceBadgeSeen(key)) {
+      el.classList.remove("chalice-badge--pulse");
+      return;
+    }
+    const stopPulse = () => markChaliceBadgeSeen(key, el);
+    el.addEventListener("pointerenter", stopPulse, { passive: true });
+    el.addEventListener("focus", stopPulse, { passive: true });
+  });
+}
+
 function renderChaliceAlertCounts(counts) {
   const warnRoot = document.getElementById("chaliceAlertCountsWarning");
   const errRoot = document.getElementById("chaliceAlertCountsError");
@@ -4172,8 +4276,13 @@ function renderChaliceAlertCounts(counts) {
       return;
     }
     root.innerHTML = `<ol class="chalice-alert-counts__list">${badges
-      .map(b => `<li><span class="chalice-alert-counts__badge is-${severity}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span></li>`)
+      .map(b => {
+        const badgeKey = chaliceBadgeKey("rail", severity, b);
+        const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
+        return `<li><span class="chalice-alert-counts__badge is-${severity}${pulseClass}" data-badge-key="${escapeHtml(badgeKey)}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span></li>`;
+      })
       .join("")}</ol>`;
+    installChaliceBadgeSeenHandlers(root);
   };
 
   renderList(warnRoot, "warning", counts?.warnings || []);
@@ -4197,12 +4306,17 @@ function renderIllegalErrorBadge(assignments) {
     return;
   }
 
+  const badgeKey = chaliceBadgeKey("rail", "error", badge);
+  const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
   const message = badge.message || "Showing illegal combinations; type filtering is ignored.";
   badgeEl.textContent = String(badge.num);
+  badgeEl.setAttribute("data-badge-key", badgeKey);
   badgeEl.hidden = false;
   badgeEl.setAttribute("aria-hidden", "false");
   badgeEl.setAttribute("data-tooltip", message);
   badgeEl.setAttribute("aria-label", message);
+  badgeEl.classList.toggle("chalice-badge--pulse", !!pulseClass.trim());
+  installChaliceBadgeSeenHandlers(badgeEl.parentElement || badgeEl);
 }
 
 function renderAutoSortWarningBadge(assignments) {
@@ -4222,12 +4336,17 @@ function renderAutoSortWarningBadge(assignments) {
     return;
   }
 
+  const badgeKey = chaliceBadgeKey("rail", "warning", badge);
+  const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
   const message = badge.message || "Auto-Sort is off. Effects will not be auto-reordered until you turn it back on.";
   badgeEl.textContent = String(badge.num);
+  badgeEl.setAttribute("data-badge-key", badgeKey);
   badgeEl.hidden = false;
   badgeEl.setAttribute("aria-hidden", "false");
   badgeEl.setAttribute("data-tooltip", message);
   badgeEl.setAttribute("aria-label", message);
+  badgeEl.classList.toggle("chalice-badge--pulse", !!pulseClass.trim());
+  installChaliceBadgeSeenHandlers(badgeEl.parentElement || badgeEl);
 }
 
 function validSlotSetFromCombos(standard, depth) {
@@ -4287,14 +4406,18 @@ function updateChaliceSlotIssues(assignments = lastChaliceIssueAssignments, vali
     if (hasErrors) {
       entry.errors.forEach(b => {
         if (hasRollIndicator && b?.code === "roll-order") return; // replace roll-order badge with arrows
-        badges.push(`<span class="chalice-slot__issue-badge is-error" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
+        const badgeKey = chaliceBadgeKey("slot", "error", b, side, idx);
+        const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
+        badges.push(`<span class="chalice-slot__issue-badge is-error${pulseClass}" data-badge-key="${escapeHtml(badgeKey)}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
         tooltipParts.push(b.message || "");
       });
     }
     if (hasWarnings) {
       entry.warnings.forEach(b => {
         if (hasRollIndicator && b?.code === "roll-order") return;
-        badges.push(`<span class="chalice-slot__issue-badge is-warning" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
+        const badgeKey = chaliceBadgeKey("slot", "warning", b, side, idx);
+        const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
+        badges.push(`<span class="chalice-slot__issue-badge is-warning${pulseClass}" data-badge-key="${escapeHtml(badgeKey)}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
         tooltipParts.push(b.message || "");
       });
     }
@@ -4305,6 +4428,7 @@ function updateChaliceSlotIssues(assignments = lastChaliceIssueAssignments, vali
 
     if (!badges.length && isValid) badges.push(renderValidCheck());
     badgeTarget.innerHTML = badges.join("");
+  installChaliceBadgeSeenHandlers(badgeTarget);
 
     // Mirror the first tooltip onto the issue column so hovering the icon column also reveals the message,
     // but don't attach it when roll-order arrows are present; those should not trigger the tooltip.
@@ -4894,19 +5018,51 @@ function canSwapChaliceEffects(meta, sourceIdx, targetIdx) {
   const max = effects.length;
   if (![sourceIdx, targetIdx].every(i => Number.isInteger(i) && i >= 0 && i < max)) return false;
 
+  const rowSource = chaliceRow(effects[sourceIdx]);
+  const rowTarget = chaliceRow(effects[targetIdx]);
+  const sourceCompat = compatId(rowSource);
+  const targetCompat = compatId(rowTarget);
+  const sourceCat = effectCategoryForRow(rowSource) || "";
+  const targetCat = effectCategoryForRow(rowTarget) || "";
+
   const before = generateCombosForSide(meta);
-  const hadCombos = Array.isArray(before?.combos) && before.combos.length > 0;
+  const targetCombo = Array.isArray(before?.combos)
+    ? before.combos.find(c => (c.indices || []).includes(targetIdx))
+    : null;
+  const sourceCombo = Array.isArray(before?.combos)
+    ? before.combos.find(c => (c.indices || []).includes(sourceIdx))
+    : null;
 
-  swapChaliceSlotData(meta, sourceIdx, targetIdx);
-  const after = generateCombosForSide(meta);
-  swapChaliceSlotData(meta, sourceIdx, targetIdx);
+  // Case: source is in a trio, target is not in that trio (or any trio)
+  if (sourceCombo && !targetCombo) {
+    const comboCompats = new Set((sourceCombo.slotRows || []).map(r => compatId(r)).filter(Boolean));
 
-  const afterCombos = Array.isArray(after?.combos) && after.combos.length > 0;
-  const selectionCount = Number(after?.selectedCount || 0);
+    const sharesCompat = sourceCompat && targetCompat && sourceCompat === targetCompat;
+    const sharesCategory = sourceCat && targetCat && sourceCat === targetCat;
+    const targetIsOutsideCompat = !targetCompat || !comboCompats.has(targetCompat);
 
-  if (selectionCount < 3) return true; // not enough picks to form a trio; allow swapping freely
-  if (hadCombos && !afterCombos) return false; // don't break previously valid grouping
-  return afterCombos; // allow when a valid grouping still exists post-swap
+    if (sharesCompat || sharesCategory || targetIsOutsideCompat) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // If the target slot is in a trio, enforce compatibility-based rules.
+  if (targetCombo) {
+    const comboCompats = new Set((targetCombo.slotRows || []).map(r => compatId(r)).filter(Boolean));
+
+    if (sourceCompat && comboCompats.has(sourceCompat)) {
+      // Source shares a compat with the trio: only allow swap with the matching compat member.
+      return targetCompat === sourceCompat;
+    }
+
+    // Source has no compat overlap with the trio: allow the swap.
+    return true;
+  }
+
+  // No trio involved: allow swap.
+  return true;
 }
 
 function performChaliceSwap(meta, sourceIdx, targetIdx) {
@@ -5072,15 +5228,55 @@ function installChaliceEffectDrag(listEl, meta) {
         return;
       }
 
+      const autoSortWasEnabled = isAutoSortEnabled();
+      const beforeEffects = Array.isArray(chaliceSelections[meta.key]) ? [...chaliceSelections[meta.key]] : [];
+      const beforeCats = Array.isArray(chaliceCats[meta.key]) ? [...chaliceCats[meta.key]] : [];
+      const beforeCurses = Array.isArray(chaliceCurses[meta.key]) ? [...chaliceCurses[meta.key]] : [];
+
+      const logSwap = (label, payload) => {
+        // Lightweight tracing to debug auto-sort toggling on refused swaps
+        try {
+          console.log(`[chalice-swap] ${label}`, payload);
+        } catch (e) {
+          /* noop */
+        }
+      };
+
+      logSwap("drop", { side: meta.key, sourceIdx, destIdx, autoSortWasEnabled, beforeEffects });
+
       if (performChaliceSwap(meta, sourceIdx, destIdx)) {
-        setAutoSortEnabled(false); // manual per-effect move disables auto-sort until re-enabled
-        clearChaliceEffectDragState();
+        logSwap("swap-accepted", { afterSwap: chaliceSelections[meta.key] });
+
+        // Disable auto-sort immediately on a successful swap so render won't reorder it away
+        setAutoSortEnabled(false);
         renderChaliceUI();
+
+        const afterEffects = Array.isArray(chaliceSelections[meta.key]) ? chaliceSelections[meta.key] : [];
+        const swapped = beforeEffects.some((val, i) => val !== afterEffects[i]);
+
+        logSwap("post-render", { afterEffects, swapped, autoSortNow: isAutoSortEnabled() });
+
+        if (!swapped) {
+          // Swap was effectively rejected downstream; restore state and auto-sort, show error
+          chaliceSelections[meta.key] = beforeEffects;
+          chaliceCats[meta.key] = beforeCats;
+          chaliceCurses[meta.key] = beforeCurses;
+          setAutoSortEnabled(autoSortWasEnabled);
+          const sourceSlot = listEl.querySelector(`.chalice-slot[data-slot="${sourceIdx}"]`);
+          flashChaliceSwapError(sourceSlot);
+          flashChaliceSwapError(slot);
+          renderChaliceUI();
+          logSwap("swap-reverted", { restored: chaliceSelections[meta.key], autoSortRestored: isAutoSortEnabled() });
+        }
+
+        clearChaliceEffectDragState();
       } else {
+        setAutoSortEnabled(autoSortWasEnabled);
         const sourceSlot = listEl.querySelector(`.chalice-slot[data-slot="${sourceIdx}"]`);
         flashChaliceSwapError(sourceSlot);
         flashChaliceSwapError(slot);
         clearChaliceEffectDragState();
+        logSwap("swap-refused", { reason: "canSwap returned false", autoSortRestored: isAutoSortEnabled() });
       }
     });
   });

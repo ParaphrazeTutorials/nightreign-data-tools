@@ -24,7 +24,7 @@
   --tooltip-max-width: min(420px, 90vw);
   --tooltip-arrow: rgba(10, 16, 28, 0.96);
   --tooltip-offset: 4px;
-  --tooltip-z: 40;
+  --tooltip-z: 999999;
 
   --overlay-strong: rgba(0,0,0,0.30);
   --overlay-light: rgba(0,0,0,0.18);
@@ -82,6 +82,43 @@ body {
 
 [data-tooltip]:hover::before {
   content: none;
+}
+
+/* Portal-based tooltip for cases where stacking contexts clip pseudo-elements */
+body.tooltip-portal-active [data-tooltip]:hover::after {
+  display: none !important;
+}
+
+.tooltip-portal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -8px);
+  padding: var(--tooltip-padding);
+  border-radius: var(--tooltip-radius);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-color);
+  border: 1px solid var(--tooltip-border);
+  box-shadow: var(--tooltip-shadow);
+  white-space: normal;
+  font-size: var(--tooltip-font-size);
+  line-height: var(--tooltip-line-height);
+  z-index: 2147483600;
+  pointer-events: none;
+  min-width: var(--tooltip-min-width);
+  max-width: var(--tooltip-max-width);
+  width: max-content;
+  text-align: center;
+  display: none;
+}
+
+.tooltip-portal.is-visible {
+  display: block;
+}
+
+.tooltip-portal.tooltip-portal--left {
+  transform: translate(-100%, -50%);
+  text-align: left;
 }
 
 

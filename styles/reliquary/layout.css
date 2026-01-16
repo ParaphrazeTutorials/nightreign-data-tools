@@ -540,6 +540,8 @@
   border-radius: 0;
   box-shadow: none;
   align-items: stretch;
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -715,6 +717,8 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: relative;
+  z-index: 1; /* keep above page background without eclipsing overlays */
 }
 
 .chalice-layout {
@@ -725,27 +729,54 @@
   gap: 1rem;
   align-items: stretch;
   transition: grid-template-columns 220ms ease, gap 220ms ease;
+  position: relative;
+  z-index: 0;
 }
 
 .chalice-layout__main {
   transition: opacity 200ms ease, transform 200ms ease;
+  position: relative;
+  z-index: 10; /* lift main column above details so its tooltips overlay warning panels */
 }
 
 .chalice-layout__results {
   position: relative;
+  min-width: 0;
   transition: max-width 220ms ease, min-width 220ms ease, transform 220ms ease, opacity 220ms ease;
+  z-index: 1; /* align with details article; main/tooltips sit above */
+}
+
+/* Keep all tooltips inside the chalice layout above adjacent panels */
+.chalice-layout [data-tooltip] {
+  position: relative;
+  z-index: 2147483000;
+}
+
+.chalice-layout [data-tooltip]:hover::after {
+  z-index: 2147483600 !important;
+}
+
+/* Fixed-position override so chalice tooltips can escape local stacking contexts */
+.chalice-layout [data-tooltip].is-fixed-tooltip:hover::after {
+  position: fixed;
+  left: var(--tooltip-fixed-left);
+  top: var(--tooltip-fixed-top);
+  bottom: auto;
+  right: auto;
+  transform: translate(-50%, -8px);
 }
 
 .chalice-layout[data-details-state="collapsed"] {
-  --chalice-layout-cols: minmax(640px, 1fr) 48px;
-  padding-right: 10px;
+  --chalice-layout-cols: minmax(640px, 1fr) 62px;
+  padding-right: 0;
+  overflow-x: hidden;
 }
 
 .chalice-layout[data-details-state="collapsed"] .chalice-layout__results {
-  max-width: 54px;
-  min-width: 46px;
+  max-width: 62px;
+  min-width: 62px;
   overflow: visible;
-  margin-right: 12px;
+  margin-right: 0;
 }
 
 .chalice-layout[data-details-state="collapsed"] .chalice-results__content {
@@ -758,6 +789,18 @@
 
 .chalice-layout[data-details-state="collapsed"] .details-rail {
   display: flex;
+}
+
+/* In collapsed state, slide tooltips out to the left so they do not cover the narrow rail */
+.chalice-layout[data-details-state="collapsed"] #chaliceDetails [data-tooltip]:hover::after {
+  bottom: auto;
+  left: auto;
+  top: 50%;
+  right: calc(100% + var(--tooltip-offset));
+  transform: translateY(-50%);
+  min-width: auto;
+  width: max-content;
+  text-align: left;
 }
 
 .chalice-layout[data-details-state="full"] {
@@ -784,20 +827,20 @@
 }
 
 .chalice-layout__main {
-  display: grid;
+    z-index: 0;
   grid-template-rows: auto 1fr;
   gap: 1rem;
   min-width: 0;
 }
 
-.chalice-layout__results {
+    z-index: 20;
   align-self: stretch;
   height: 100%;
   display: flex;
 }
 
 .chalice-layout > * {
-  margin-top: 0 !important;
+    z-index: 5; /* keep results behind main tooltips in partial view */
   align-self: start;
 }
 
@@ -815,6 +858,9 @@
   flex-direction: column;
   gap: 0.4rem;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+  position: relative;
+  overflow: visible;
+  z-index: 999900;
 }
 
 .chalice-filter__body {
@@ -863,6 +909,8 @@
   gap: 0.75rem;
   align-items: center;
   min-height: var(--chalice-header-height, 52px);
+  position: relative;
+  z-index: 999901;
 }
 
 .chalice-details__header {
@@ -911,11 +959,22 @@
   gap: 0.45rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+  position: relative;
+  z-index: 999901;
 }
 
 .chalice-filter__controls .chalice-filter__selectors {
   flex: 1 1 260px;
   min-width: 0;
+}
+
+/* Keep filter tooltips readable even under the tabs by dropping them below the controls */
+.chalice-filter__header [data-tooltip]:hover::after,
+.chalice-filter__controls [data-tooltip]:hover::after {
+  top: calc(100% + var(--tooltip-offset));
+  bottom: auto;
+  transform: translate(-50%, 0);
+  z-index: 2147483000 !important;
 }
 
 .individual-filter__controls--chalice {
@@ -1285,6 +1344,7 @@
     rgba(255, 255, 255, 0.6) 70%,
     rgba(255, 255, 255, 0.0) 90%);
   border-radius: 999px;
+  z-index: -1; /* keep tooltips above the divider line */
 }
 
 .pill {
@@ -1846,6 +1906,37 @@
   border: 1px solid rgba(200, 70, 70, 0.9);
 }
 
+@keyframes chalice-badge-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 220, 0.28); opacity: 1; }
+  40% { box-shadow: 0 0 14px 8px rgba(255, 255, 210, 0.55); opacity: 1; }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 220, 0); opacity: 0.98; }
+}
+
+.chalice-badge--pulse {
+  animation: chalice-badge-pulse 1.6s ease-in-out infinite;
+  will-change: box-shadow, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chalice-badge--pulse { animation: none; }
+}
+
+/* Effect row issue badges: show tooltips to the left (avoid overlapping row content) */
+.chalice-slot__issue-col [data-tooltip]:hover::after,
+.chalice-slot__issue-badges [data-tooltip]:hover::after,
+.chalice-slot__issue-badge[data-tooltip]:hover::after {
+  bottom: auto !important;
+  left: auto !important;
+  top: 50% !important;
+  right: calc(100% + 4px) !important;
+  transform: translateY(-50%) !important;
+  text-align: left !important;
+  min-width: max-content !important;
+  width: max-content !important;
+  max-width: min(320px, 70vw) !important;
+  white-space: normal !important;
+}
+
 .chalice-slot__valid-check {
   display: inline-flex;
   align-items: center;
@@ -2138,6 +2229,7 @@
   height: 100%;
   margin-top: 0 !important;
   position: relative;
+  z-index: 1; /* keep visible but allow other overlays above */
 }
 
 .chalice-results__frame {
@@ -2228,6 +2320,7 @@
   min-height: 0;
   padding: 0.35rem 0 0;
   gap: 0.25rem;
+  z-index: 0;
 }
 
 .chalice-results[data-details-state="collapsed"] .chalice-results__frame {
@@ -2296,6 +2389,7 @@
   grid-column: 1;
   grid-row: 1 / span 2;
   position: relative;
+  z-index: 0;
 }
 
 .chalice-layout.has-chalice-alerts .details-rail {
@@ -2351,6 +2445,8 @@
   flex-direction: column;
   gap: 0.75rem;
   min-width: 0;
+  position: relative;
+  z-index: 7;
 }
 
 .chalice-results[data-details-state="full"] .details-shell {
@@ -2361,6 +2457,11 @@
 .chalice-details__header {
   margin: 0 0 0.15rem;
   padding: 0;
+}
+
+/* Hide the default panel divider line on the details header to remove the stray bottom border */
+.chalice-details__header.panel-header::after {
+  display: none;
 }
 
 .chalice-details__title-row {
@@ -2467,6 +2568,7 @@
   width: 100%;
   height: 100%;
   margin: 0;
+  z-index: 0;
 }
 
 .chalice-alert-divider {
@@ -2498,6 +2600,7 @@
   gap: 0.15rem;
   width: 100%;
   margin: 0;
+  z-index: 0;
 }
 
 .chalice-alert-counts__group {
@@ -2662,6 +2765,8 @@
   border-radius: 0.65rem;
   padding: 0.6rem 0.7rem;
   margin-bottom: 0.45rem;
+  position: relative;
+  z-index: 0;
 }
 
 .chalice-alert-panel.is-warning {

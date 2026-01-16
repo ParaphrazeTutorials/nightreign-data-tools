@@ -119,6 +119,19 @@ button#startOver:active {
   transform: translateY(1px);
 }
 
+/* Collapsed details rail: move tooltips to the left of the trigger so they stay near the rail */
+.chalice-layout[data-details-state="collapsed"] #chaliceDetails .details-rail [data-tooltip]:hover::after,
+.chalice-layout[data-details-state="collapsed"] #chaliceDetails .chalice-alert-counts__badge[data-tooltip]:hover::after {
+  bottom: auto !important;
+  left: auto !important;
+  top: 50% !important;
+  right: calc(100% + var(--tooltip-offset)) !important;
+  transform: translateY(-50%) !important;
+  min-width: max-content !important;
+  width: max-content !important;
+  text-align: left !important;
+}
+
 button#startOver:focus-visible {
   outline: 2px solid var(--btn-startover-focus-outline) !important;
   outline-offset: 2px;
