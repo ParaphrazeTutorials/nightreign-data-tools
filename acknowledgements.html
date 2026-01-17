@@ -1,0 +1,190 @@
+<!doctype html>
+<html data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <title>Acknowledgements | The Round Table Codex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="./styles/site.css">
+
+    <style>
+      .ack-shell { width: 100%; max-width: var(--shell-max, 1500px); margin: 0 auto; padding: clamp(1.25rem, 2vw, 1.85rem) clamp(0.85rem, 2vw, 1.6rem) clamp(2rem, 3vw, 2.75rem); display: grid; gap: 1.5rem; }
+      .ack-card { --ack-scale: 0.7; background: linear-gradient(180deg, rgba(20, 14, 26, 0.9), rgba(10, 8, 14, 0.9)); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 0.85rem; padding: clamp(1.35rem, 2.5vw, 1.95rem); box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34); display: grid; gap: 1.15rem; }
+      .ack-head { position: relative; padding: 1.05rem 1.1rem 1rem; border-radius: 0.65rem; background: linear-gradient(135deg, #3e1d59 0%, #6a2c7d 55%, #8d3ca0 100%); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35); display: grid; gap: 0.3rem; }
+      .ack-head h3 { margin: 0; letter-spacing: 0.01em; font-size: 1.35rem; }
+      .ack-head h3::after { content: ""; display: block; margin-top: 0.5rem; height: 2px; border-radius: 999px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 55%, rgba(255, 255, 255, 0.0) 100%); opacity: 0.9; }
+      .ack-subtext { margin: 0; color: rgba(255, 255, 255, 0.9); line-height: 1.5; font-size: calc(1rem * var(--ack-scale)); }
+      .ack-grid { display: grid; gap: 1.1rem; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: start; }
+      .ack-section { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.35rem 0.2rem; font-size: calc(1rem * var(--ack-scale)); }
+      .ack-section h3 { margin: 0; letter-spacing: 0.01em; line-height: 1.1; font-size: calc(1rem * var(--ack-scale) + 0.08rem); }
+      .ack-divider { height: 2px; border-radius: 999px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.55) 55%, rgba(255, 255, 255, 0.0) 100%); margin: 0; }
+      .ack-entries { display: grid; gap: 0.4rem; font-weight: 640; letter-spacing: 0.01em; font-size: calc(1rem * var(--ack-scale)); }
+      .ack-entry { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.55rem 0.5rem 0.5rem; border-radius: 0.65rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04); }
+      .ack-avatar { flex: 0 0 31px; width: 31px; aspect-ratio: 1 / 1; height: auto; border-radius: 999px; background: linear-gradient(135deg, #2b1b3a 0%, #6a2c7d 100%); display: grid; place-items: center; color: #fff; font-weight: 750; font-size: calc(1rem * var(--ack-scale)); letter-spacing: 0.01em; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08); overflow: hidden; }
+      .ack-avatar--img { object-fit: cover; background: none; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32); }
+      .ack-avatar--mask { background-color: var(--ack-icon-color, #fff); mask: var(--ack-icon) center/78% 78% no-repeat; -webkit-mask: var(--ack-icon) center/78% 78% no-repeat; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32); }
+      .ack-copy { display: grid; gap: 0.35rem; align-content: flex-start; }
+      .ack-name { font-weight: 760; letter-spacing: 0.01em; color: rgba(255, 255, 255, 0.94); line-height: 1.1; font-size: calc(1rem * var(--ack-scale) + 0.08rem); }
+      .ack-spacer { height: 0.2rem; }
+      .ack-contrib { color: rgba(255, 255, 255, 0.75); font-weight: 560; line-height: 1.4; font-size: calc(1rem * var(--ack-scale)); }
+      .ack-ai { grid-column: 1 / -1; padding: 0.9rem 1rem; border-radius: 0.7rem; border: 1px solid rgba(255, 255, 255, 0.08); background: linear-gradient(135deg, rgba(108, 78, 150, 0.18), rgba(58, 42, 86, 0.42)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04); display: grid; gap: 0.4rem; }
+      .ack-ai h4 { margin: 0; font-size: calc(1rem * var(--ack-scale) + 0.12rem); letter-spacing: 0.01em; }
+      .ack-ai p { margin: 0; color: rgba(255, 255, 255, 0.82); font-size: calc(1rem * var(--ack-scale)); line-height: 1.5; }
+      @media (max-width: 1100px) {
+        .ack-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      }
+    </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT87FT9EYB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      const isProd = location.hostname === 'paraphrazetutorials.github.io' && location.pathname.startsWith('/nightreign-data-tools');
+      if (isProd) {
+        gtag('config', 'G-WT87FT9EYB');
+      }
+    </script>
+  </head>
+
+  <body>
+    <main class="app-shell app-grid">
+
+      <!-- HERO (global renderer) -->
+      <header
+        id="globalHero"
+        class="hero"
+        data-hero-image="./Assets/home/Home.png"
+        data-hero-h1="The Round Table Codex"
+        data-hero-h2="Acknowledgements"
+        data-hero-build="true"
+      ></header>
+
+      <!-- NAV (global) -->
+      <nav id="globalNav" class="tool-nav" aria-label="Primary navigation"></nav>
+
+      <section class="tool-shell">
+        <div class="ack-shell">
+          <article class="ack-card">
+            <header class="ack-head">
+              <h3>Acknowledgements & Statements</h3>
+              <p class="ack-subtext">Thanks to those who have contributed to the project.</p>
+            </header>
+
+            <div class="ack-grid" aria-label="Credits by contribution type">
+              <section class="ack-ai" aria-label="AI usage statement">
+                <h4>AI Statement</h4>
+                <p>
+                  Portions of these tools are assisted by GitHub Copilot (GPT-5.1-Codex-Max). Humans own final review, testing, and data validation before anything ships.
+                </p>
+                <p>
+                  Art assets on the site are either extracted directly from the game, donated by community artists, or are paid commissions. AI is only used to upscale icons that would otherwise be too poor of a resolution to use.
+                </p>
+              </section>
+              <section class="ack-section" aria-label="Development contributors">
+                <h3>Development</h3>
+                <div class="ack-divider" aria-hidden="true"></div>
+                <div class="ack-entries">
+                  <div class="ack-entry">
+                    <img class="ack-avatar ack-avatar--img" src="./Assets/acknowledgements/paraphraze.jpg" alt="Paraphraze" loading="lazy">
+                    <div class="ack-copy">
+                      <div class="ack-name">Paraphraze</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">Core developer and app designer.</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="ack-section" aria-label="Support contributors">
+                <h3>Support</h3>
+                <div class="ack-divider" aria-hidden="true"></div>
+                <div class="ack-entries">
+                  <div class="ack-entry">
+                    <div class="ack-avatar" aria-hidden="true">A</div>
+                    <div class="ack-copy">
+                      <div class="ack-name">Acarii</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">Relic Effect data exports, feedback, and error validation.</div>
+                    </div>
+                  </div>
+                  <div class="ack-entry">
+                    <div class="ack-avatar" aria-hidden="true">G</div>
+                    <div class="ack-copy">
+                      <div class="ack-name">gazer500</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">Testing, feedback, and advanced mathematics.</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="ack-section" aria-label="Artwork contributors">
+                <h3>Artwork</h3>
+                <div class="ack-divider" aria-hidden="true"></div>
+                <div class="ack-entries">
+                  <div class="ack-entry">
+                    <div class="ack-avatar" aria-hidden="true">S</div>
+                    <div class="ack-copy">
+                      <div class="ack-name">Smile</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">Creating incredible illustrations for the project.</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="ack-section" aria-label="Tooling contributors">
+                <h3>Tooling</h3>
+                <div class="ack-divider" aria-hidden="true"></div>
+                <div class="ack-entries">
+                  <div class="ack-entry">
+                    <div class="ack-avatar ack-avatar--mask" style="--ack-icon: url('./Assets/acknowledgements/vscode.svg'); --ack-icon-color: #007ACC;" aria-hidden="true"></div>
+                    <div class="ack-copy">
+                      <div class="ack-name">Visual Studio Code</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">Editor backbone for the project.</div>
+                    </div>
+                  </div>
+                  <div class="ack-entry">
+                    <div class="ack-avatar ack-avatar--mask" style="--ack-icon: url('./Assets/acknowledgements/github.svg'); --ack-icon-color: #f6f8fa;" aria-hidden="true"></div>
+                    <div class="ack-copy">
+                      <div class="ack-name">GitHub &amp; GitHub Copilot</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">Versioning, collaboration, and AI pair work.</div>
+                    </div>
+                  </div>
+                  <div class="ack-entry">
+                    <img class="ack-avatar ack-avatar--img" src="./Assets/acknowledgements/smithbox.png" alt="SmithBox" loading="lazy">
+                    <div class="ack-copy">
+                      <div class="ack-name">SmithBox</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">Testing ground for data exports.</div>
+                    </div>
+                  </div>
+                  <div class="ack-entry">
+                    <div class="ack-avatar ack-avatar--mask" style="--ack-icon: url('./Assets/acknowledgements/ssms.svg'); --ack-icon-color: #cc2927;" aria-hidden="true"></div>
+                    <div class="ack-copy">
+                      <div class="ack-name">SSMS</div>
+                      <div class="ack-spacer" aria-hidden="true"></div>
+                      <div class="ack-contrib">SQL authoring and SmithBox data pipeline.</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- FOOTER (global) -->
+      <footer id="globalFooter" class="site-footer"></footer>
+
+    </main>
+
+    <script type="module" src="./scripts/hero.js"></script>
+    <script type="module" src="./scripts/chrome.js"></script>
+  </body>
+</html>

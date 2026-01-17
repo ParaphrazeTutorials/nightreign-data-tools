@@ -3,6 +3,28 @@
    Purpose: safety rails only.
    ------------------------------------------------------------ */
 
+/* Force bright text on this page (Pico cards tint text gray by default) */
+.app-shell,
+.app-shell article,
+.app-shell section {
+  color: var(--color-text-main);
+}
+
+.app-shell :where(p, li, label, select, input, small, td, th, span, div, strong) {
+  color: inherit;
+}
+
+/* Links should match body text unless specifically styled elsewhere */
+.app-shell a {
+  color: rgba(255,255,255,0.95);
+  text-decoration-color: rgba(255,255,255,0.45);
+}
+
+.app-shell a:hover {
+  color: #ffffff;
+  text-decoration-color: rgba(255,255,255,0.75);
+}
+
 .hero--reliquary {
   --hero-art-zoom: 1;
   --hero-art-x: 50%;

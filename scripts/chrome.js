@@ -17,6 +17,7 @@ function inFolder(folderName) {
 function buildNavHrefs() {
   const inReliquary = inFolder("Reliquary");
   const inLexicon = inFolder("Lexicon");
+  const inAcknowledgements = !inReliquary && !inLexicon && (window.location.pathname || "").toLowerCase().includes("acknowledgements");
 
   // Base routing: root, /Reliquary/, /Lexicon/
   const isRoot = !inReliquary && !inLexicon;
@@ -24,16 +25,18 @@ function buildNavHrefs() {
   const home = isRoot ? "./index.html" : "../index.html";
   const reliquary = inReliquary ? "./index.html" : (isRoot ? "./Reliquary/index.html" : "../Reliquary/index.html");
   const lexicon = inLexicon ? "./index.html" : (isRoot ? "./Lexicon/index.html" : "../Lexicon/index.html");
+  const acknowledgements = isRoot ? "./acknowledgements.html" : "../acknowledgements.html";
 
   return {
     home,
     reliquary,
     lexicon,
+    acknowledgements,
     // placeholders
     menagerie: "#",
     armory: "#",
     grimoire: "#",
-    activeKey: inReliquary ? "reliquary" : (inLexicon ? "lexicon" : "home")
+    activeKey: inReliquary ? "reliquary" : (inLexicon ? "lexicon" : (inAcknowledgements ? "acknowledgements" : "home"))
   };
 }
 
@@ -59,13 +62,15 @@ function renderFooter() {
   const el = document.getElementById("globalFooter");
   if (!el) return;
 
+  const hrefs = buildNavHrefs();
+
   el.innerHTML = `
     <div class="footer-inner">
       <p class="footer-disclaimer">
         Unofficial community tools for Elden Ring: Nightreign. This project does not modify your game, connect to your account, or guarantee online safety. You are responsible for how you use the information provided.
       </p>
       <p class="footer-credits">
-        Created by <strong>Paraphraze</strong> — with assistance from <strong>gazer500</strong> and <strong>Acarii</strong>.
+        <a href="${hrefs.acknowledgements}">Acknowledgements</a>
       </p>
     </div>
   `;

@@ -81,14 +81,15 @@
 .home-updates {
   display: grid;
   gap: 0.35rem;
-  margin: -0.55rem 0 0;
+  margin: 0.75rem 0 0;
 }
 
 .home-intro h4 + .home-updates {
-  margin-top: -0.68rem;
+  margin-top: 0.6rem;
 }
 
 .update-card {
+  position: relative;
   border: 1px solid rgba(255,255,255,0.16);
   background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.18));
   border-radius: 0.65rem;
@@ -96,6 +97,41 @@
   box-shadow: 0 10px 26px rgba(0,0,0,0.28);
   overflow: hidden;
   margin: 0;
+  color: var(--color-text-main);
+}
+
+.update-card :where(p, li, strong, span, div) {
+  color: inherit;
+}
+
+.update-card summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.update-card summary::marker {
+  content: "";
+}
+
+.update-card summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Disable Pico's default caret so only our chevron shows */
+.update-card summary::after {
+  content: none !important;
+}
+
+.update-card__summary {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.update-card__summary:focus-visible header {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 4px;
+  border-radius: 0.45rem;
 }
 
 .update-card__head {
@@ -129,6 +165,7 @@
   letter-spacing: 0.02em;
   font-size: 0.84rem;
   line-height: 1;
+  color: var(--color-text-main);
 }
 
 .update-card__name {
@@ -136,13 +173,51 @@
   align-items: center;
   font-weight: 700;
   letter-spacing: 0.01em;
-  opacity: 0.9;
+  opacity: 1;
+  color: var(--color-text-main);
   line-height: 1;
 }
 
 .update-card__lede {
   margin: 0.35rem 0 0.6rem;
   line-height: 1.5;
+}
+
+.update-card__chevron {
+  margin-left: auto;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: rotate(0deg);
+  transition: transform 140ms ease;
+}
+
+.update-card__chevron::before,
+.update-card__chevron::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 1.5px;
+  background: rgba(255,255,255,0.78);
+  border-radius: 999px;
+  transition: transform 140ms ease;
+}
+
+.update-card__chevron::before { transform: translateY(-1px) rotate(45deg); }
+.update-card__chevron::after { transform: translateY(1px) rotate(-45deg); }
+
+.update-card[open] .update-card__chevron {
+  transform: rotate(90deg);
+}
+
+.update-card__body {
+  padding-top: 0.25rem;
 }
 
 .update-card__group + .update-card__group {
