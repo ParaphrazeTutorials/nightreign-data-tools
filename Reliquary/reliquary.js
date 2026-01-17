@@ -250,7 +250,7 @@ function isShowIllegalActive() {
 function setShowIllegalActive(active) {
   showIllegalActive = !!active;
   const tooltip = showIllegalActive
-    ? "Showing illegal effect combinations. Type filtering is ignored and incompatible effects will appear."
+    ? "Showing illegal effect combinations. Use with caution"
     : "Show Illegal Effect Combinations";
   const ariaLabel = showIllegalActive
     ? "Hide illegal effect combinations (currently showing all effects, including illegal)"
@@ -273,8 +273,8 @@ function setAutoSortEnabled(enabled) {
   autoSortEnabled = !!enabled;
 
   const tooltip = autoSortEnabled
-    ? "Auto-Sorting Roll Orders is On"
-    : "Auto-Sorting Roll Orders is Off";
+    ? "Auto-Sorting is On"
+    : "Auto-Sorting is Off";
   const ariaLabel = autoSortEnabled
     ? "Disable auto-sort (currently on)"
     : "Enable auto-sort (currently off)";
@@ -2095,7 +2095,7 @@ function installUtilityPopoverButtons() {
   const pairs = [
     [dom.instructionsBtn, dom.instructionsPopover],
     [dom.disclaimerBtn, dom.disclaimerPopover],
-    [dom.instructionsBtnChalice, dom.instructionsPopover]
+    [dom.instructionsBtnChalice, dom.instructionsPopoverChalice]
   ];
 
   pairs.forEach(([btn, pop]) => {
@@ -2577,16 +2577,14 @@ function updateDetails(a, b, c) {
     blocks.push(`
       <div class="info-box is-warning" data-kind="auto-sort-off">
         <div class="info-line">
-          <span>Auto-Sort is currently off;</span>
-          <button type="button" class="term-link" data-popover-toggle="autoSortPopover">roll order won't auto-fix</button>
-          <span>until you turn it back on.</span>
+          <span><button type="button" class="term-link" data-popover-toggle="autoSortPopover">Auto-Sort</button> is currently off.</span>
         </div>
 
         <div id="autoSortPopover" class="popover" hidden>
           <h4 class="popover-title">Auto-Sort</h4>
           <div class="popover-body">
             <p>Auto-Sort reorders your effects into correct roll order automatically when a valid ordering exists.</p>
-            <p>You can turn it back on to keep roll order correct, or leave it off if you prefer to arrange manually. You can also tap the Auto-Sort action in the header when roll issues appear.</p>
+            <p>Any relics created out of order may cause a warning or a ban. You can also re-enable Auto-Sort to reorder effects automatically.</p>
           </div>
         </div>
       </div>
@@ -2597,16 +2595,15 @@ function updateDetails(a, b, c) {
     blocks.push(`
       <div class="info-box is-alert" data-kind="show-illegal-on">
         <div class="info-line">
-          <span>Showing illegal combinations;</span>
-          <button type="button" class="term-link" data-popover-toggle="illegalPopover">type filtering is ignored</button>
-          <span>while this is on.</span>
+          <span>Showing <button type="button" class="term-link" data-popover-toggle="illegalPopover">illegal combinations</button>;</span>
+          <span>Use with caution.</span>
         </div>
 
         <div id="illegalPopover" class="popover" hidden>
-          <h4 class="popover-title">Illegal combinations</h4>
+          <h4 class="popover-title">Illegal Combinations</h4>
           <div class="popover-body">
             <p>When enabled, all effects are shown even if they violate compatibility or type rules. Roll order and validity checks may be invalid while this is on.</p>
-            <p>Turn it off to filter to legal combinations again.</p>
+            <p>If you use combinations from this mode in your game, it may result in a warning or a ban.</p>
           </div>
         </div>
       </div>
@@ -4308,7 +4305,7 @@ function renderIllegalErrorBadge(assignments) {
 
   const badgeKey = chaliceBadgeKey("rail", "error", badge);
   const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
-  const message = badge.message || "Showing illegal combinations; type filtering is ignored.";
+  const message = badge.message || "Showing illegal combinations; Use with caution.";
   badgeEl.textContent = String(badge.num);
   badgeEl.setAttribute("data-badge-key", badgeKey);
   badgeEl.hidden = false;
@@ -4338,7 +4335,7 @@ function renderAutoSortWarningBadge(assignments) {
 
   const badgeKey = chaliceBadgeKey("rail", "warning", badge);
   const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
-  const message = badge.message || "Auto-Sort is off. Effects will not be auto-reordered until you turn it back on.";
+  const message = badge.message || "Auto-Sort is off. Use with caution.";
   badgeEl.textContent = String(badge.num);
   badgeEl.setAttribute("data-badge-key", badgeKey);
   badgeEl.hidden = false;
@@ -4781,15 +4778,15 @@ function renderChaliceResults() {
   if (unplacedIssues.length) stackingIssues.errors.push(...unplacedIssues);
 
   if (!isAutoSortEnabled()) {
-    stackingIssues.warnings.unshift({
-      message: "Auto-Sort is off. Effects will not be auto-reordered until you turn it back on.",
+      stackingIssues.warnings.unshift({
+        message: "Auto-Sort is off. Use with caution.",
       code: "auto-sort-off"
     });
   }
 
   if (showIllegalActive) {
     stackingIssues.errors.unshift({
-      message: "Showing illegal combinations; type filtering is ignored.",
+      message: "Showing illegal combinations; Use with caution.",
       code: "show-illegal-on"
     });
   }
@@ -4937,7 +4934,7 @@ function orderedCombosWithSaved(meta, combos) {
     }
   });
 
-  // Append any new combos that weren't in the saved order
+  // Append any new combos that weren't    the saved order
   byKey.forEach(combo => ordered.push(combo));
   return ordered;
 }

@@ -245,16 +245,7 @@
 
 /* Dark overlay so text reads on top of the image */
 .app-tile::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(0,0,0,0.70) 0%,
-    rgba(0,0,0,0.42) 55%,
-    rgba(0,0,0,0.18) 100%
-  );
-  z-index: 0;
+  content: none;
 }
 
 .app-tile:hover {

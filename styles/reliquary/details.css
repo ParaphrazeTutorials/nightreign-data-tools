@@ -302,7 +302,7 @@
 
 .details-modal__card {
   position: relative;
-  width: min(90vw, 640px);
+  width: min(90vw, 1000px);
   max-height: min(88vh, 840px);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -320,12 +320,12 @@
   justify-content: space-between;
   gap: 0.65rem;
   padding: 0.7rem 0.9rem;
-  border-bottom: 1px solid rgba(220, 70, 70, 0.55);
+  border-bottom: 1px solid rgba(168, 120, 230, 0.62);
   background: linear-gradient(
     90deg,
-    rgba(92, 22, 22, 0.78) 0%,
-    rgba(92, 22, 22, 0.62) 48%,
-    rgba(0, 0, 0, 0.40) 100%
+    rgba(70, 42, 120, 0.82) 0%,
+    rgba(110, 70, 168, 0.72) 52%,
+    rgba(0, 0, 0, 0.42) 100%
   );
 }
 

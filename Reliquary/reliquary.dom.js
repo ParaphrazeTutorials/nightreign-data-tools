@@ -39,6 +39,7 @@ export function getDom() {
     instructionsBtnChalice: document.getElementById("instructionsBtnChalice") || null,
     disclaimerBtn: document.getElementById("disclaimerBtn") || null,
     instructionsPopover: document.getElementById("instructionsPopover") || null,
+    instructionsPopoverChalice: document.getElementById("instructionsPopoverChalice") || null,
     disclaimerPopover: document.getElementById("disclaimerPopover") || null,
 
     // Counts

@@ -80,11 +80,287 @@
 
         <!-- Hidden popover sources for Instructions / Disclaimer -->
         <div class="utility-popover-source" id="instructionsPopover" hidden>
-          <div class="popover-title">Instructions</div>
+          <div class="popover-title">Relic Builder Instructions</div>
           <div class="popover-body">
-            <p>
-              Select the effects you want on your relic, and the reliquary will tell you how to make it a legal combination&mdash;if it's possible.
-            </p>
+            <p>Pick your class and relic type, add effects in the Relic Preview, and the tool will live-check legality, ordering, required curses, and show probability plus row indicators as you go.</p>
+
+            <div class="legend-section">
+              <h5>Relic Types</h5>
+              <ul class="legend-list">
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Standard Relics:</strong> Only shows effects that can appear on Standard relics.</div>
+                </li>
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Depth of Night Relics:</strong> Only shows effects that can appear on Depth of Night relics.</div>
+                </li>
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Shared Effects:</strong> Some effects can live on either type of relic. These effects won't be filtered out of either relic type.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Curses</h5>
+              <ul class="legend-list">
+                <li class="legend-item legend-item--pillline">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="curse-btn legend-curse-btn" aria-label="Select a Curse" title="Select a Curse" disabled aria-disabled="true" tabindex="-1">Select Curse</button>
+                  </span>
+                  <div class="legend-text"><strong>Curse required:</strong> Some Depth of Night effects require a curse to be valid. Select a curse from the list to make a valid effect.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Buttons</h5>
+              <ul class="legend-list">
+                <li class="legend-item">
+                  <span class="legend-icon" aria-hidden="true">
+                    <span class="legend-toggle-btn legend-toggle-btn--illegal-on">
+                      <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                        <path d="M5.75 5.75L18.25 18.25M12 21C7.029 21 3 16.971 3 12S7.029 3 12 3s9 4.029 9 9-4.029 9-9 9Z" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                  </span>
+                  <div class="legend-text"><strong>Show Illegal Combinations:</strong> Removes the safeties put in place to ensure your combinations are valid. Use with caution.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon" aria-hidden="true">
+                    <span class="legend-toggle-btn legend-toggle-btn--autosort-on">
+                      <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                        <path d="M8 5l-3 3 3 3M8 8h8M16 19l3-3-3-3M16 16H8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                  </span>
+                  <div class="legend-text"><strong>Auto-Sort:</strong> Reorders effects to ensure they are in their proper Roll Order. Turning this off may cause invalid combinations; use with caution.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Effect Icons</h5>
+              <ul class="legend-list">
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--indicator legend-icon--bare" aria-hidden="true">
+                    <span class="move-indicator move-up legend-move" style="--icon-size: 1.2rem;"><span class="carrot"></span></span>
+                    <span class="move-indicator move-down legend-move" style="--icon-size: 1.2rem;"><span class="carrot"></span></span>
+                  </span>
+                  <div class="legend-text"><strong>Red arrows:</strong> Only appearing when Auto-Sort is tunred off, these arrows indicate the direction the effect must be moved to be a valid Roll Order.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--indicator legend-icon--bare" aria-hidden="true">
+                    <span class="move-indicator move-ok legend-move" style="--icon-size: 1.2rem;"><span class="check-box"></span></span>
+                  </span>
+                  <div class="legend-text"><strong>Green check:</strong> Indicates the effect is good to go; no change needed.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn swap-btn legend-row-btn" aria-label="Change Effect" title="Change Effect">⇄</button>
+                  </span>
+                  <div class="legend-text"><strong>Change Effect</strong> Change the effect or curse in the selected row.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn info-btn legend-row-btn" aria-label="Show Effect Info" title="Show Effect Info">i</button>
+                  </span>
+                  <div class="legend-text"><strong>Information:</strong> Open detailed information about the effect or curse.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn clear-btn legend-row-btn" aria-label="Clear Effect" title="Clear Effect">×</button>
+                  </span>
+                  <div class="legend-text"><strong>Clear Effect:</strong> Remove the effect from this slot.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn copy-id-btn legend-row-btn" aria-label="Copy Effect ID" title="Copy Effect ID">
+                      <span class="effect-copy-icon" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <div class="legend-text"><strong>Copy EffectID:</strong> Copy the EffectID to your clipboard.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Relic Status</h5>
+              <ul class="legend-list">
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <span class="relic-probability legend-probability"><span class="relic-probability__value">%</span></span>
+                  </span>
+                  <div class="legend-text"><strong>Probability Calculator:</strong> Estimated chance to roll this exact relic layout.</div>
+                </li>
+                <li class="legend-item legend-item--pillline">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <span class="validity-badge is-valid legend-validity">Valid</span>
+                  </span>
+                  <div class="legend-text"><strong>Valid Relic:</strong> Indicates that this combination of effects and curses is valid for Online Play.</div>
+                </li>
+                <li class="legend-item legend-item--pillline">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <span class="validity-badge is-invalid legend-validity">Invalid</span>
+                  </span>
+                  <div class="legend-text"><strong>Invalid Relic:</strong> Indicates that this combination of effects and curses is not valid for Online Play, and may result in a Warning or Ban.</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="utility-popover-source" id="instructionsPopoverChalice" hidden>
+          <div class="popover-title">Chalice Builder Instructions</div>
+          <div class="popover-body">
+            <p>Add your desired effects, and the Chalice Builder will do its best to create valid combinations of relics. If it can't, it will do its best to explain why, and how to fix it.</p>
+
+            <div class="legend-section">
+              <h5>Chalice Basics</h5>
+              <ul class="legend-list">
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Add Standard Effects:</strong> Adds an effect from the Standard Relic Type list to the left side of the Chalice Builder.</div>
+                </li>
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Add Depth Effects:</strong> Adds an effect from the Depth of Night Relic Type list to the right side of the Chalice Builder.</div>
+                </li>
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Auto-Grouping:</strong> When three effects are added to a side, they Chalice Builder will combine them into a valid Relic if one can be made. Continue to add effects until you have 9 on a given side to see if your combination is valid.</div>
+                </li>
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Select a Class:</strong> Filters the list of available effects to the currently selected class.</div>
+                </li>
+                <li class="legend-item legend-item--full">
+                  <div class="legend-text"><strong>Select a Chalice:</strong> Shows the colors associated with the selected chalice when making valid relics.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Drag & Drop</h5>
+              <ul class="legend-list">
+                <li class="legend-item legend-item--handle-tall">
+                  <span class="legend-icon legend-icon--bare legend-icon--handle-tall" aria-hidden="true">
+                    <span class="legend-handle" aria-hidden="true"></span>
+                  </span>
+                  <div class="legend-text">
+                    <div><strong>Swapping Relics:</strong> Grab the colored handle to swap the positioning of two Relics.</div>
+                    <div><strong>Swapping Effects:</strong> Grab the colored handle to attempt to swap two effects. If they can be swapped, they will be, and Auto-Sort will be turned off. If not, you'll see a red flash, and they won't swap.</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Curses</h5>
+              <ul class="legend-list">
+                <li class="legend-item legend-item--pillline">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="curse-btn legend-curse-btn" aria-label="Select a Curse" title="Select a Curse" disabled aria-disabled="true" tabindex="-1">Select Curse</button>
+                  </span>
+                  <div class="legend-text"><strong>Curse required:</strong> Depth effects that need a curse must have one selected for their slot before the trio is valid.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Buttons</h5>
+              <ul class="legend-list">
+                <li class="legend-item">
+                  <span class="legend-icon" aria-hidden="true">
+                    <span class="legend-toggle-btn legend-toggle-btn--illegal-on">
+                      <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                        <path d="M5.75 5.75L18.25 18.25M12 21C7.029 21 3 16.971 3 12S7.029 3 12 3s9 4.029 9 9-4.029 9-9 9Z" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                  </span>
+                  <div class="legend-text"><strong>Show Illegal Combinations:</strong> Removes the safeties put in place to ensure your combinations are valid. Use with caution.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon" aria-hidden="true">
+                    <span class="legend-toggle-btn legend-toggle-btn--autosort-on">
+                      <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                        <path d="M8 5l-3 3 3 3M8 8h8M16 19l3-3-3-3M16 16H8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                  </span>
+                  <div class="legend-text"><strong>Auto-Sort:</strong> Reorders effects to ensure they are in their proper Roll Order. Turning this off may cause invalid combinations; use with caution.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Effect Icons</h5>
+              <ul class="legend-list">
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--indicator legend-icon--bare" aria-hidden="true">
+                    <span class="move-indicator move-up legend-move" style="--icon-size: 1.2rem;"><span class="carrot"></span></span>
+                    <span class="move-indicator move-down legend-move" style="--icon-size: 1.2rem;"><span class="carrot"></span></span>
+                  </span>
+                  <div class="legend-text"><strong>Red arrows:</strong> When Auto-Sort is off, arrows show the direction to move effects to reach a valid Roll Order.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--indicator legend-icon--bare" aria-hidden="true">
+                    <span class="move-indicator move-ok legend-move" style="--icon-size: 1.2rem;"><span class="check-box"></span></span>
+                  </span>
+                  <div class="legend-text"><strong>Green check:</strong> Indicates the effect is good to go; no change needed.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn swap-btn legend-row-btn" aria-label="Change Effect" title="Change Effect">⇄</button>
+                  </span>
+                  <div class="legend-text"><strong>Change Effect</strong> Change the effect in the selected slot.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn info-btn legend-row-btn" aria-label="Show Effect Info" title="Show Effect Info">i</button>
+                  </span>
+                  <div class="legend-text"><strong>Information:</strong> Open detailed information about the effect or curse.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn clear-btn legend-row-btn" aria-label="Clear Effect" title="Clear Effect">×</button>
+                  </span>
+                  <div class="legend-text"><strong>Clear Effect:</strong> Remove the effect from this slot.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare chalice-slot" aria-hidden="true">
+                    <button type="button" class="icon-btn dup-btn legend-row-btn" aria-label="Duplicate Effect" title="Duplicate Effect">+</button>
+                  </span>
+                  <div class="legend-text"><strong>Duplicate Effect:</strong> If the effect is stackable, creates a copy. Up to 3 per side</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <button type="button" class="icon-btn copy-id-btn legend-row-btn" aria-label="Copy Effect ID" title="Copy Effect ID">
+                      <span class="effect-copy-icon" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <div class="legend-text"><strong>Copy EffectID:</strong> Copy the EffectID to your clipboard.</div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="legend-section">
+              <h5>Alerts & Status</h5>
+              <ul class="legend-list">
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <span class="legend-alert-icon-wrap">
+                      <img src="../Assets/icons/reliquary/chalice-warning.svg" alt="" loading="lazy" />
+                      <span class="chalice-alert-counts__badge is-warning chalice-badge--pulse legend-alert-badge">1</span>
+                    </span>
+                  </span>
+                  <div class="legend-text"><strong>Warning Message:</strong> Indicates that there may be a problem with the relic or effect combination.</div>
+                </li>
+                <li class="legend-item">
+                  <span class="legend-icon legend-icon--bare" aria-hidden="true">
+                    <span class="legend-alert-icon-wrap">
+                      <img src="../Assets/icons/reliquary/chalice-error.svg" alt="" loading="lazy" />
+                      <span class="chalice-alert-counts__badge is-error chalice-badge--pulse legend-alert-badge">1</span>
+                    </span>
+                  </span>
+                  <div class="legend-text"><strong>Error Message:</strong> Indicates there is a problem with the relic that would make it illegal.</div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
