@@ -228,7 +228,8 @@
   border-radius: 0.9rem;
   overflow: hidden;
 
-  min-height: 170px;
+  aspect-ratio: 2624 / 1472;
+  min-height: 180px;
   padding: 0.85rem 0.95rem;
 
   color: white;
@@ -269,12 +270,52 @@
   font-weight: 800;
   line-height: 1.1;
   font-size: 1.05rem;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
+}
+
+.app-tile__title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.6) 70%,
+    rgba(255, 255, 255, 0.0) 90%);
+  pointer-events: none;
 }
 
 .app-tile__meta {
   margin-top: 0.2rem;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   opacity: 0.85;
+}
+
+.app-tile__credit {
+  position: absolute;
+  inset: auto auto 0.75rem 0.95rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.82);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  display: none;
+  z-index: 1;
+}
+
+.app-tile--reliquary .app-tile__credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 /* ------------------------------------------------------------
@@ -282,7 +323,26 @@
    home.css lives in /styles, so assets are ../Assets/...
    ------------------------------------------------------------ */
 
-.app-tile--reliquary { background-image: url("../Assets/home/Reliquary.png"); }
+.app-tile--reliquary {
+  background-image: url("../Assets/home/Reliquary_2.png");
+  background-position: center;
+}
+
+.app-tile--reliquary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(16,18,24,0.70) 0%,
+    rgba(16,18,24,0.0) 18%,
+    rgba(16,18,24,0.0) 82%,
+    rgba(16,18,24,0.70) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+  display: none;
+}
 .app-tile--lexicon   { background-image: url("../Assets/home/Lexicon.png"); }
 .app-tile--menagerie { background-image: url("../Assets/home/Menagerie.png"); }
 .app-tile--armory    { background-image: url("../Assets/home/Armory.png"); }

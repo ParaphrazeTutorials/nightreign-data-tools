@@ -3,6 +3,33 @@
    Purpose: safety rails only.
    ------------------------------------------------------------ */
 
+.hero--reliquary {
+  --hero-art-zoom: 1;
+  --hero-art-x: 50%;
+  --hero-art-y: 300%;
+}
+
+.hero--reliquary::after {
+  content: "Artwork by Smile";
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.85rem;
+  padding: 0.62rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.91rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  z-index: 2;
+  pointer-events: none;
+  transform: scale(0.56);
+  transform-origin: bottom right;
+}
+
 
 #results,
 #results.is-raw {
