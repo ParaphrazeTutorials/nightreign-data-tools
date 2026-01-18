@@ -3,45 +3,96 @@
    Purpose: safety rails only.
    ------------------------------------------------------------ */
 
+/* Force bright text on this page (Pico cards tint text gray by default) */
+.app-shell,
+.app-shell article,
+.app-shell section {
+  color: var(--color-text-main);
+}
+
+.app-shell :where(p, li, label, select, input, small, td, th, span, div, strong) {
+  color: inherit;
+}
+
+/* Links should match body text unless specifically styled elsewhere */
+.app-shell a {
+  color: rgba(255,255,255,0.95);
+  text-decoration-color: rgba(255,255,255,0.45);
+}
+
+.app-shell a:hover {
+  color: #ffffff;
+  text-decoration-color: rgba(255,255,255,0.75);
+}
+
+.hero--reliquary {
+  --hero-art-zoom: 1;
+  --hero-art-x: 50%;
+  --hero-art-y: 300%;
+}
+
+.hero--reliquary::after {
+  content: "Artwork by Smile";
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.85rem;
+  padding: 0.62rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.91rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  z-index: 2;
+  pointer-events: none;
+  transform: scale(0.56);
+  transform-origin: bottom right;
+}
+
 
 #results,
 #results.is-raw {
   height: auto !important;
   min-height: 0 !important;
 }
+    0 -0.45rem 0 0 var(--chalice-handle-dot-color, #f7f9ff),
+    0 0.45rem 0 0 var(--chalice-handle-dot-color, #f7f9ff);
+  opacity: 0.9;
 
-/* Force curse-required label to match selected curse styling */
-#results .curse-line .curse-required {
-  color: #b58cff !important;
-  font-style: italic;
-  font-weight: 800;
-  margin-right: 0.6rem;
-  font-size: 0.75em;
+.legend-handle {
+  --legend-handle-color: #9ac5ff;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.62rem;
+  height: 3.6rem;
+  border-radius: 0.65rem;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--legend-handle-color) 90%, rgba(0, 0, 0, 0.1)),
+    color-mix(in srgb, var(--legend-handle-color) 70%, rgba(0, 0, 0, 0.2))
+  );
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-#results .curse-line .curse-sub {
-  margin-right: 0.6rem;
+.legend-handle::after {
+  content: "";
+  width: 0.22rem;
+  height: 0.22rem;
+  border-radius: 999px;
+  background: var(--chalice-handle-dot-color, #f7f9ff);
+  box-shadow:
+    0 -1.2rem 0 0 var(--chalice-handle-dot-color, #f7f9ff),
+    0 1.2rem 0 0 var(--chalice-handle-dot-color, #f7f9ff);
+  opacity: 0.9;
 }
-
-/* Keep curse text centered with its button in all modes */
-#results .curse-line .curse-sub {
-  margin-top: 0;
-  align-self: center;
-  line-height: 1.1;
 }
-
-#results.is-raw .effect-main--row .curse-sub {
-  align-self: center !important;
-}
-
-/* ------------------------------------------------------------
-   Relic Preview (use base layout styles; no overrides here)
-   ------------------------------------------------------------ */
-
-/* ------------------------------------------------------------
-   Start Over button spacing + tan gradient (LEFT → RIGHT)
-   (Overrides layout.css which uses !important)
-   ------------------------------------------------------------ */
+  Start Over button spacing + deep red gradient
+  (Overrides layout.css which uses !important)
+  ------------------------------------------------------------ */
 
 /* Keep the utility-bar row vertically centered */
 .utility-bar button#startOver {
@@ -59,66 +110,81 @@
   padding-left: 0.85rem;
 }
 
-/* Purple gradients for Instructions / Disclaimer */
+/* Purple gradients for Instructions / Disclaimer (palette tokens) */
 button#instructionsBtn,
-button#disclaimerBtn {
-  background: linear-gradient(135deg, #5b3c9f 0%, #8f6bd8 55%, #2b1a4f 100%) !important;
-  color: #f5f0ff !important;
-  border: 1px solid rgba(180, 150, 255, 0.55) !important;
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+button#disclaimerBtn,
+button#instructionsBtnChalice {
+  background: var(--btn-instructions-bg) !important;
+  color: var(--btn-instructions-text) !important;
+  border: 1px solid var(--btn-instructions-border) !important;
+  box-shadow: var(--btn-instructions-shadow) !important;
 }
 
 button#instructionsBtn:hover,
-button#disclaimerBtn:hover {
-  filter: brightness(1.06);
-  border-color: rgba(200, 175, 255, 0.8) !important;
+button#disclaimerBtn:hover,
+button#instructionsBtnChalice:hover {
+  filter: var(--btn-instructions-hover-filter);
+  border-color: var(--btn-instructions-hover-border) !important;
 }
 
 button#instructionsBtn:active,
-button#disclaimerBtn:active {
-  filter: brightness(0.98);
+button#disclaimerBtn:active,
+button#instructionsBtnChalice:active {
+  filter: var(--btn-instructions-active-filter);
+}
+
+button#autoSortBtn {
+  background: var(--btn-auto-sort-bg) !important;
+  color: var(--btn-auto-sort-text) !important;
+  border: 1px solid var(--btn-auto-sort-border) !important;
+  box-shadow: var(--btn-auto-sort-shadow) !important;
+}
+
+button#autoSortBtn:hover {
+  filter: var(--btn-auto-sort-hover-filter);
+  border-color: var(--btn-auto-sort-hover-border) !important;
+}
+
+button#autoSortBtn:active {
+  filter: var(--btn-auto-sort-active-filter);
 }
 
 button#startOver {
   margin-top: 0.85rem !important;
   margin-bottom: 0.35rem !important;
 
-  background: linear-gradient(
-    90deg,
-    #d6c29a 0%,
-    #b9a47a 45%,
-    #1a1a1a 100%
-  ) !important;
-  color: #111 !important;
-  border: 1px solid rgba(0, 0, 0, 0.55) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 6px 16px rgba(0, 0, 0, 0.45) !important;
+  background: var(--btn-startover-bg) !important;
+  color: var(--btn-startover-color) !important;
+  border: 1px solid var(--btn-startover-border) !important;
+  box-shadow: var(--btn-startover-shadow) !important;
 }
 
 button#startOver:hover {
-  background: linear-gradient(
-    90deg,
-    #cdb88f 0%,
-    #a79267 45%,
-    #111 100%
-  ) !important;
+  background: var(--btn-startover-hover-bg) !important;
+  border-color: var(--btn-startover-hover-border) !important;
+  filter: var(--btn-startover-hover-filter);
 }
 
 button#startOver:active {
-  background: linear-gradient(
-    90deg,
-    #bca577 0%,
-    #8f7b55 45%,
-    #000 100%
-  ) !important;
+  background: var(--btn-startover-active-bg) !important;
   transform: translateY(1px);
 }
 
+/* Collapsed details rail: move tooltips to the left of the trigger so they stay near the rail */
+.chalice-layout[data-details-state="collapsed"] #chaliceDetails .details-rail [data-tooltip]:hover::after,
+.chalice-layout[data-details-state="collapsed"] #chaliceDetails .chalice-alert-counts__badge[data-tooltip]:hover::after {
+  bottom: auto !important;
+  left: auto !important;
+  top: 50% !important;
+  right: calc(100% + var(--tooltip-offset)) !important;
+  transform: translateY(-50%) !important;
+  min-width: max-content !important;
+  width: max-content !important;
+  text-align: left !important;
+}
+
 button#startOver:focus-visible {
-  outline: 2px solid rgba(214, 194, 154, 0.9) !important;
+  outline: 2px solid var(--btn-startover-focus-outline) !important;
   outline-offset: 2px;
 }
 
@@ -139,6 +205,373 @@ button#showIllegalBtn.is-active .utility-toggle__svg,
 button#showIllegalBtn[aria-pressed="true"] .utility-toggle__svg {
   stroke: #b10000 !important;
   stroke-width: 2.4px !important;
+}
+
+button#autoSortToggle.is-active,
+button#autoSortToggle[aria-pressed="true"],
+button#autoSortToggleChalice.is-active,
+button#autoSortToggleChalice[aria-pressed="true"] {
+  background-color: #2c1a46 !important; /* dark purple from palette */
+  background-image: none !important;
+  border: 2px solid #3f2766 !important;
+  color: #eae3ff !important;
+  box-shadow: 0 0 0 1px rgba(63, 39, 102, 0.45) !important;
+}
+
+button#autoSortToggle.is-active .utility-toggle__svg,
+button#autoSortToggle[aria-pressed="true"] .utility-toggle__svg,
+button#autoSortToggleChalice.is-active .utility-toggle__svg,
+button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
+  stroke: #eae3ff !important;
+  stroke-width: 2.2px !important;
+}
+
+/* Legend styling: match chalice duplicate button size/appearance inside instructions */
+#instructionsPopoverChalice .legend-row-btn.dup-btn,
+.details-modal__body .legend-row-btn.dup-btn {
+  width: 1.35rem;
+  height: 1.35rem;
+  font-size: 0.88rem;
+  line-height: 1;
+  color: #ffb36b;
+  border-width: 1px;
+  border-color: rgba(255, 179, 107, 0.7);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.16) 0%, rgba(60, 36, 20, 0.85) 60%, rgba(36, 22, 12, 0.88) 100%);
+}
+
+#instructionsPopoverChalice .legend-row-btn.dup-btn:hover,
+.details-modal__body .legend-row-btn.dup-btn:hover {
+  border-color: rgba(255, 193, 133, 0.85);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.22) 0%, rgba(76, 46, 26, 0.92) 60%, rgba(46, 28, 16, 0.94) 100%);
+}
+
+/* ------------------------------------------------------------
+   Instructions legend (inline visuals)
+   ------------------------------------------------------------ */
+
+.legend-section {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.legend-section h5 {
+  margin: 0;
+  font-size: 0.66rem !important;
+  line-height: 1.2;
+  padding-bottom: 0.18rem;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgba(181, 140, 255, 0.75), rgba(181, 140, 255, 0)) 1;
+}
+
+
+.legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.45rem;
+  justify-items: start;
+}
+
+.legend-handle {
+  --legend-handle-color: #f6f6f6;
+  --chalice-handle-dot-color: #0b0b0b;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.62rem;
+  height: 3.6rem;
+  border-radius: 0.65rem;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--legend-handle-color) 98%, rgba(0, 0, 0, 0.08)),
+    color-mix(in srgb, var(--legend-handle-color) 90%, rgba(0, 0, 0, 0.12))
+  );
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.legend-handle::after {
+  content: "";
+  width: 0.22rem;
+  height: 0.22rem;
+  border-radius: 999px;
+  background: var(--chalice-handle-dot-color, #0b0b0b);
+  box-shadow:
+    0 -1.15rem 0 0 var(--chalice-handle-dot-color, #0b0b0b),
+    0 1.15rem 0 0 var(--chalice-handle-dot-color, #0b0b0b);
+  opacity: 0.9;
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.legend-item--handle-tall {
+  min-height: 3.6rem;
+}
+
+.legend-item--handle-tall .legend-icon {
+  align-self: stretch;
+  height: auto;
+  min-height: 3.8rem;
+  min-width: 2.1rem;
+  width: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-icon--handle-tall {
+  width: 2.2rem;
+  min-width: 2.2rem;
+  height: 4.0rem;
+  min-height: 4.0rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0;
+}
+
+.legend-item--handle-tall .legend-text {
+  align-self: flex-start;
+  padding-top: 0.1rem;
+}
+
+.legend-subtext {
+  margin-top: 0.15rem;
+  font-size: 0.66rem;
+  line-height: 1.25;
+  opacity: 0.9;
+}
+
+.legend-item--full {
+  grid-template-columns: 1fr;
+}
+
+.legend-item--pillline .legend-text {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  grid-column: 2;
+}
+
+.legend-item--pillline {
+  grid-template-columns: 2.6rem 1fr;
+  column-gap: 0.9rem;
+}
+
+.legend-item--pillline .legend-icon {
+  width: 2.6rem;
+  min-width: 2.6rem;
+  justify-content: flex-start;
+}
+
+.legend-icon {
+  width: 1.95rem;
+  min-width: 1.95rem;
+  height: 1.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  gap: 0.25rem;
+}
+
+.legend-icon--indicator {
+  gap: 0.3rem;
+  min-height: 1.95rem;
+}
+
+.legend-text {
+  text-align: left;
+}
+
+.legend-icon--bare {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.legend-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  font-weight: 800;
+  font-size: 0.78rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.legend-row-icon--swap {
+  font-size: 0.85rem;
+}
+
+.legend-row-btn {
+  transform: scale(1);
+  transform-origin: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+.legend-curse-wrap {
+  transform: scale(0.9);
+}
+
+.legend-curse-btn {
+  padding: 0.1rem 0.34rem;
+  font-size: 0.4rem;
+  border-radius: 999px;
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.82;
+}
+
+.legend-validity-stack {
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-toggle-icon .utility-toggle__svg {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+}
+
+.legend-toggle-btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.45rem;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.legend-toggle-btn svg {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+  stroke-width: 2.0;
+}
+
+.legend-toggle-btn--illegal-on {
+  background: #ffffff;
+  color: #b10000;
+  border-color: #b10000;
+  box-shadow: 0 0 0 1px rgba(177, 0, 0, 0.35);
+}
+
+.legend-toggle-btn--autosort-on {
+  background: #2c1a46;
+  color: #eae3ff;
+  border-color: #3f2766;
+  box-shadow: 0 0 0 1px rgba(63, 39, 102, 0.45);
+}
+
+.legend-move {
+  --icon-size: 1rem;
+  transform: scale(0.75);
+}
+
+.legend-alert-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-width: 2.35rem;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
+}
+
+.legend-alert-icon-wrap img {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.legend-alert-badge {
+  position: static;
+  transform: scale(0.9);
+}
+
+.legend-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  font-weight: 820;
+  font-size: 0.70rem;
+  letter-spacing: 0.01em;
+  padding: 0 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.legend-pill--warn {
+  background: linear-gradient(135deg, rgba(255, 210, 120, 0.95), rgba(180, 90, 40, 0.85));
+  color: #1b0f08;
+  border-color: rgba(255, 210, 120, 0.8);
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+}
+
+.legend-probability {
+  min-width: 26px;
+  height: 26px;
+  font-size: 0.75rem;
+  transform: scale(0.85);
+}
+
+.legend-validity {
+  padding: 0.14rem 0.45rem;
+  font-size: 0.60rem;
+  line-height: 1.1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Reduce modal header size and add bottom gradient rule */
+.details-modal__title {
+  font-size: 0.75em !important;
+}
+
+.details-modal__header {
+  border-bottom: 1px solid transparent !important;
+  border-image: linear-gradient(90deg, rgba(181, 140, 255, 0.85), rgba(18, 18, 24, 0.2)) 1;
+}
+
+/* Normalize instruction text sizing (body unified, 15% smaller) */
+.details-modal__body {
+  font-size: 0.70rem !important;
+  line-height: 1.45;
+}
+
+.details-modal__body p,
+.details-modal__body li,
+.details-modal__body .legend-text {
+  font-size: 0.70rem !important;
+  line-height: 1.45;
+}
+
+.details-modal__body .legend-section h5 {
+  font-size: 0.9rem !important;
+  line-height: 1.3;
 }
 /* ------------------------------------------------------------
    Raw-mode layout: keep effect row simple; curse row stacks below via effect-line grid

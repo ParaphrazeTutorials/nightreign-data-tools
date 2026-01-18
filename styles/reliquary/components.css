@@ -311,7 +311,7 @@
 
 .effect-menu {
   position: fixed;
-  z-index: 1200;
+  z-index: 2147483600; /* ensure effect picker sits above all chalice overlays/tooltips */
   width: min(900px, 90vw);
   min-width: 300px;
   max-height: 360px;

@@ -1,3 +1,9 @@
+import { textColorFor } from "../Reliquary/reliquary.logic.js";
+import { gradientFromTheme, buildCategoryThemeMap } from "../scripts/ui/theme.js";
+import { applyPaletteCssVars } from "../scripts/ui/palette.js";
+
+applyPaletteCssVars();
+
 // The Lexicon — table + tile theater mode + module picker
 // Session-only: sort + text zoom. No persistence across refresh.
 
@@ -12,23 +18,24 @@ const DATASETS = {
 // Optional column definitions per module. Add entries as needed.
 const COLUMN_DEFINITIONS = {
   reliquary: {
-    EffectID: { description: "", source: "AttachEffectParam.csv" },
-    OverrideBaseEffectID: { description: "", source: "AttachEffectParam.csv" },
-    RawRollOrder: { description: "", source: "Calculated (See Query)" },
-    CompatibilityID: { description: "", source: "AttachEffectParam.csv" },
-    EffectCategory: { description: "", source: "Compatibility.csv" },
-    EffectDescription: { description: "", source: "AttachEffectName.csv" },
-    ChanceWeight_110: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_210: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_310: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_2000000: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_2200000: { description: "", source: "AttachEffectTableParam.csv" },
-    ChanceWeight_3000000: { description: "", source: "AttachEffectTableParam.csv" },
-    StatusIconID: { description: "", source: "AttachEffectParam.csv" },
-    CurseRequired: { description: "", source: "Calculated (See Query)" },
-    Curse: { description: "", source: "Calculated (See Query)" },
-    RelicType: { description: "", source: "Calculated (See Query)" },
-    RollOrder: { description: "Calculated (See Query)", source: "" }
+    EffectID: { description: "A unique identifier that represents an individual effect.", source: "AttachEffectParam.csv" },
+    OverrideBaseEffectID: { description: "Used for calculating Roll Order, this an ID that works in conjunction with the EffectID.", source: "AttachEffectParam.csv" },
+    RawRollOrder: { description: "A concatenation of OverrideBaseEffectID and EffectID to determine the truly unique order of effect rolls.", source: "Calculated (See Query)" },
+    CompatibilityID: { description: "Determines which effects share compatibility with one another, excluding them from rolling on the same relic at the same time.", source: "AttachEffectParam.csv" },
+    EffectCategory: { description: "Created by manually matching up the EffectID with the categories used on the in-game Relic Effect filters.", source: "Compatibility.csv" },
+    EffectDescription: { description: "Contains the in-game description of the effect.", source: "AttachEffectName.csv" },
+    EffectExtendedDescription: { description: "Contains a community written version of the effect with more detail.", source: "AttachEffectName.csv" },
+    ChanceWeight_110: { description: "Standard Relic Effects Only. Used for calculating the likilihood of rolling the third roll of a large relic, second roll of a medium relic, and only roll of a small relic.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_210: { description: "Standard Relic Effects Only. Used for calculating the likilihood of rolling the second roll of a large relic, or the first roll of a medium relic.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_310: { description: "Standard Relic Effects Only. Used for calculating the likilihood of rolling the first roll of a large relic.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_2000000: { description: "Depth of Night Effects Only. Used for calculating the likilihood of rolling an effect that requires a curse effect.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_2200000: { description: "Depth of Night Effects Only. Used for calculating the likilihood of rolling an effect that does not require a curse effect.", source: "AttachEffectTableParam.csv" },
+    ChanceWeight_3000000: { description: "Depth of Night Curses Only. Used for calculating the likilihood of rolling a curse effect.", source: "AttachEffectTableParam.csv" },
+    StatusIconID: { description: "The unique identifier for the Status Icon of the effect.", source: "AttachEffectParam.csv" },
+    CurseRequired: { description: "Indicates if the effect requires a curse.", source: "Calculated (See Query)" },
+    Curse: { description: "Indicates if the effect is a curse.", source: "Calculated (See Query)" },
+    RelicType: { description: "Indicates if the effect can be found on Standard, Depth of Night, or both types of relics.", source: "Calculated (See Query)" },
+    RollOrder: { description: "Determines the order that effects must be presented on a relic to be valid for online play.", source: "Calculated (See Query)" }
   }
 };
 
@@ -41,12 +48,13 @@ const COLUMN_DISPLAY_NAMES = {
     CompatibilityID: "CompatibilityID",
     EffectCategory: "Category",
     EffectDescription: "Description",
-    ChanceWeight_110: "Weight 1",
-    ChanceWeight_210: "Weight 2",
-    ChanceWeight_310: "Weight 3",
-    ChanceWeight_2000000: "Weight 4",
-    ChanceWeight_2200000: "Weight 5",
-    ChanceWeight_3000000: "Weight 6",
+    EffectExtendedDescription: "Extended Description",
+    ChanceWeight_110: "Weight 110",
+    ChanceWeight_210: "Weight 210",
+    ChanceWeight_310: "Weight 310",
+    ChanceWeight_2000000: "Weight 2000000",
+    ChanceWeight_2200000: "Weight 2200000",
+    ChanceWeight_3000000: "Weight 3000000",
     StatusIconID: "StatusIconID",
     CurseRequired: "CurseRequired",
     Curse: "Curse",
@@ -103,6 +111,9 @@ const state = {
   zoom: "small", // "small" | "medium" | "large"
   filters: new Map(),
   searchTerm: "",
+
+  // styling helpers
+  categoryThemes: new Map(),
 
   // downloads
   downloadsManifest: null,
@@ -256,6 +267,25 @@ function escapeHtml(str) {
     .replaceAll("'", "&#39;");
 }
 
+function categoryThemeFor(value) {
+  if (state.module !== "reliquary") return null;
+  const key = (value ?? "").toString().trim() || "Uncategorized";
+  return state.categoryThemes.get(key) || state.categoryThemes.get("__default") || null;
+}
+
+function categoryCellHtml(rawValue, isSorted = false) {
+  const label = (rawValue == null || String(rawValue).trim() === "") ? "Uncategorized" : String(rawValue);
+  const theme = categoryThemeFor(label);
+  const bg = gradientFromTheme(theme);
+  const base = theme?.base || "#2b2f38";
+  const borderColor = theme?.border || "rgba(255, 255, 255, 0.14)";
+  const textColor = textColorFor(base);
+
+  const cls = isSorted ? "lex-cat-cell lexicon-td--sorted" : "lex-cat-cell";
+
+  return `<td class="${cls}"><span class="lex-cat-pill" style="--lex-cat-base:${base}; background:${bg}; border-color:${borderColor}; color:${textColor};"><span class="lex-cat-pill__label">${escapeHtml(label)}</span></span></td>`;
+}
+
 function inferColumns(rows) {
   const cols = [];
   const seen = new Set();
@@ -277,7 +307,7 @@ function getDisplayLabel(col) {
   return map[col] || col;
 }
 
-const PRIORITY_COLUMNS = ["EffectID", "EffectDescription","EffectCategory","RelicType","ChanceWeight_110","ChanceWeight_210","ChanceWeight_310","ChanceWeight_2000000","ChanceWeight_2200000","ChanceWeight_3000000"];
+const PRIORITY_COLUMNS = ["EffectID", "EffectDescription", "EffectExtendedDescription", "EffectCategory", "RelicType", "ChanceWeight_110", "ChanceWeight_210", "ChanceWeight_310", "ChanceWeight_2000000", "ChanceWeight_2200000", "ChanceWeight_3000000"];
 
 function reorderColumns(columns) {
   const priLower = new Set(PRIORITY_COLUMNS.map(c => c.toLowerCase()));
@@ -531,11 +561,41 @@ function openInfoModal(col) {
   if (dom.infoModalTitle) dom.infoModalTitle.textContent = label;
 
   if (dom.infoModalBody) {
+    const typeLabel = escapeHtml(type);
     dom.infoModalBody.innerHTML = `
-      <div class="lex-info__row"><strong>Data Type:</strong> <code>${escapeHtml(type)}</code></div>
-      <div class="lex-info__row"><strong>Raw Column Name:</strong> ${rawNameHtml}</div>
-      <div class="lex-info__row"><strong>Data Source:</strong> ${sourceHtml}</div>
-      <div class="lex-info__row"><strong>Description:</strong> ${defHtml}</div>
+      <div class="effect-info-grid lex-info-grid" role="list">
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Data Type</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <span class="effect-chip effect-chip--datatype">${typeLabel}</span>
+          </div>
+        </div>
+
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Raw Column Name</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <span class="lex-info-plain">${rawNameHtml}</span>
+          </div>
+        </div>
+
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Data Source</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <span class="lex-info-plain">${sourceHtml}</span>
+          </div>
+        </div>
+
+        <div class="effect-info-section" role="listitem">
+          <div class="effect-info-label">Description</div>
+          <div class="effect-info-divider" aria-hidden="true"></div>
+          <div class="effect-info-value">
+            <p class="lex-info-description">${defHtml}</p>
+          </div>
+        </div>
+      </div>
     `;
   }
 
@@ -594,9 +654,11 @@ function thHtml(key) {
   const isActive = state.sortKey === key && state.sortDir !== 0;
   const glyph = !isActive ? "" : (state.sortDir === 1 ? "▲" : "▼");
   const label = getDisplayLabel(key);
+  const isLongText = key.toLowerCase().includes("description");
+  const thClass = ["lexicon-th", isActive ? "is-sorted" : "", isLongText ? "lexicon-th--description" : ""].filter(Boolean).join(" ");
 
   return `
-    <th scope="col" class="lexicon-th ${isActive ? "is-sorted" : ""}"
+    <th scope="col" class="${thClass}"
         role="button" tabindex="0"
         data-col="${escapeHtml(key)}"
         title="${escapeHtml(key)}"
@@ -617,13 +679,20 @@ function thHtml(key) {
 
 function tdHtml(key, value) {
   const v = value == null ? "" : String(value);
+  const isEffectCategory = state.module === "reliquary" && key === "EffectCategory";
+
+  if (isEffectCategory) {
+    const isSortedCol = state.sortKey === key && state.sortDir !== 0;
+    return categoryCellHtml(v, isSortedCol);
+  }
+
   const isLongText = key.toLowerCase().includes("description");
   const isIdish = key.toLowerCase().endsWith("id") || /^[0-9]+$/.test(v);
   const isNumeric = state.typeByCol.get(key) === "number";
   const isSortedCol = state.sortKey === key && state.sortDir !== 0;
 
   const cls = [
-    isLongText ? "lexicon-cell--text" : "",
+    isLongText ? "lexicon-cell--text lexicon-cell--description" : "",
     isIdish ? "lexicon-cell--mono" : "",
     isNumeric ? "lexicon-cell--number" : "",
     isSortedCol ? "lexicon-td--sorted" : ""
@@ -925,6 +994,11 @@ async function loadData() {
   state.searchTerm = "";
   if (dom.searchInput) dom.searchInput.value = "";
   computeTypeMap(state.rawRows, state.columns);
+
+  // Precompute category colors so EffectCategory cells mirror Reliquary dropdowns
+  state.categoryThemes = state.module === "reliquary"
+    ? buildCategoryThemeMap(state.rawRows)
+    : new Map();
 
   render();
   loadDownloadsManifest(state.module).catch(console.error);

@@ -9,7 +9,7 @@
   --row-pad-top: 0.38rem;
   --row-pad-x: 0.52rem;
   --row-gap: 0.4rem;
-  --icon-size: 24px;
+  --icon-size: 36px;
   --row-min-height-compact: 90px;
   --row-min-height-raw: 140px;
 }
@@ -42,6 +42,7 @@
   border-radius: 0.65rem;
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: visible;
   margin-bottom: 0.75rem;
   transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
@@ -53,6 +54,7 @@
     rgba(0, 0, 0, 0.22) 62%,
     rgba(0, 0, 0, 0.55) 100%
   );
+    overflow: visible;
   border-color: rgba(18, 74, 44, 0.35);
   box-shadow: inset 0 0 0 1px rgba(18, 74, 44, 0.18);
 }
@@ -61,7 +63,8 @@
   background: linear-gradient(
     90deg,
     rgba(92, 22, 22, 0.58) 0%,
-    rgba(0, 0, 0, 0.22) 62%,
+    overflow: visible;
+    position: relative;
     rgba(0, 0, 0, 0.55) 100%
   );
   border-color: rgba(92, 22, 22, 0.38);
@@ -75,50 +78,47 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.35rem;
-  flex-wrap: wrap;
+    z-index: 3;
   white-space: nowrap;
 }
 
-.auto-sort-btn {
+.relic-probability {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  align-self: center;
-  min-height: 0;
-  height: 33.72px;
-  margin: 0;
-  border-radius: 999px;
-  border: 1px solid rgba(200, 165, 255, 0.45);
-  background:
-    radial-gradient(120% 140% at 10% 15%, rgba(230, 200, 255, 0.25), rgba(0, 0, 0, 0) 62%),
-    linear-gradient(135deg,
-      rgba(120, 80, 200, 0.90) 0%,
-      rgba(170, 110, 255, 0.78) 55%,
-      rgba(30, 18, 48, 0.82) 100%
-    );
-  color: #f4f7ff;
-  padding: 0 12px;
-  font-weight: 800;
-  font-size: 14.82px;
-  letter-spacing: 0.01em;
-  line-height: 22.23px;
-  transform: none;
-  transition: background 140ms ease, border-color 140ms ease, transform 120ms ease;
+  gap: 0.1rem;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: transparent;
+  color: #ffffff;
+  font-weight: 760;
+  font-size: 1rem;
+  letter-spacing: 0;
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+  position: relative;
+  overflow: visible;
+  z-index: 3;
+  cursor: default;
 }
 
-.auto-sort-btn:hover:not(:disabled) {
-  background: rgba(80, 110, 150, 0.38);
-  border-color: rgba(255, 255, 255, 0.24);
+.relic-probability__value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  font-weight: 860;
+  font-size: 1rem;
+  line-height: 1;
+  color: #ffffff;
 }
 
-.auto-sort-btn:active:not(:disabled) {
-  transform: translateY(1px);
-}
 
-.auto-sort-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 .validity-badge {
   display: inline-flex;
@@ -151,6 +151,7 @@
   isolation: isolate;
   /* avoid scaling so the layout height matches the visible content */
   width: 100%;
+  border-bottom: none;
 }
 
 /* Raw + curse only: give the image column a sane size so it can't collapse to 2px */
@@ -474,7 +475,7 @@
   gap: 0.75rem;
   padding: var(--row-pad-top) var(--row-pad-x) var(--row-pad-y) var(--row-pad-x);
   border-radius: var(--row-radius);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.10));
+  background: linear-gradient(270deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.10));
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   align-items: start;
@@ -504,7 +505,7 @@
 .chosen-effects li:has(.move-indicator.move-up),
 .chosen-effects li:has(.move-indicator.move-down) {
   background: linear-gradient(
-    90deg,
+    270deg,
     rgba(92, 22, 22, 0.58) 0%,
     rgba(0, 0, 0, 0.22) 62%,
     rgba(0, 0, 0, 0.55) 100%
@@ -520,7 +521,7 @@
 
 .chosen-effects li:has(.curse-btn):not(:has(.curse-sub)) {
   background: linear-gradient(
-    90deg,
+    270deg,
     rgba(92, 22, 22, 0.58) 0%,
     rgba(0, 0, 0, 0.22) 62%,
     rgba(0, 0, 0, 0.55) 100%
@@ -533,7 +534,7 @@
 /* ✅ Correct selector (your previous one was malformed) */
 .chosen-effects li:has(.move-indicator.move-ok):not(:has(.move-indicator.move-up)):not(:has(.move-indicator.move-down)):not(:has(.validity-badge--row.is-invalid)) {
   background: linear-gradient(
-    90deg,
+    270deg,
     rgba(18, 74, 44, 0.50) 0%,
     rgba(0, 0, 0, 0.22) 62%,
     rgba(0, 0, 0, 0.55) 100%
@@ -545,9 +546,9 @@
 .chosen-effects li .effect-icon {
   width: var(--icon-size);
   height: var(--icon-size);
-  border-radius: 0.55rem;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0;
+  border: none;
+  background: none;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -824,8 +825,23 @@
    ------------------------------------------------------------ */
 
 .validity-badge.validity-badge--row {
-  font-size: 0.72rem;
-  padding: 0.18rem 0.5rem;
+  display: inline-flex;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  padding: 0.18rem 0.55rem;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  white-space: nowrap;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  box-sizing: border-box;
   opacity: 0.95;
 }
 
@@ -845,8 +861,8 @@
 }
 
 #results .chosen-effects li .effect-line {
-  /* reserve space so text/buttons never collide with the right rail */
-  padding-right: 3.5rem;
+  /* reserve space so text/buttons never collide with the right rail; keep wide enough for text badges */
+  padding-right: max(3.5rem, 12ch);
 }
 
 #results .chosen-effects li .row-indicators {

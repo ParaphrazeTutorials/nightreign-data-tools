@@ -67,7 +67,7 @@ function rowBadgeHtml(text, kind = "invalid") {
   return `<span class="validity-badge validity-badge--row ${cls}">${text}</span>`;
 }
 
-function moveIndicatorHtml(moveDelta, showOk = false) {
+export function moveIndicatorHtml(moveDelta, showOk = false) {
   const delta = Number(moveDelta || 0);
 
   // Only show green check for the special 3-effect case (controlled by caller)

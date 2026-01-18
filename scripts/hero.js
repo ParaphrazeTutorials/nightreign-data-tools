@@ -45,7 +45,7 @@ function detectBuildStatus() {
 
 const GLOBAL_BUILD_STATUS = detectBuildStatus(); // "BETA" | "LIVE" (auto from host)
 const GLOBAL_BUILD_VERSION = "v0.0.0";  // app version (update as needed)
-const GLOBAL_GAME_VERSION = "1.03.1.0025"; // game version (sourced from Reliquary baseline)
+const GLOBAL_GAME_VERSION = "1.03.1.0029"; // game version (sourced from Reliquary baseline)
 
 
 

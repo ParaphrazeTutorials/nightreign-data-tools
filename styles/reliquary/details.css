@@ -44,13 +44,31 @@
 #details .details-body{
   display: grid;
   gap: 0.75rem;
+  align-content: start;
+  justify-content: stretch;
+  align-items: stretch;
+  width: 100%;
 }
 
 #details .info-box{
   border: 1px solid rgba(255,255,255,0.10);
   background: rgba(0,0,0,0.14);
-  border-radius: 0.85rem;
-  padding: 0.85rem 0.95rem;
+  border-radius: 0.7rem;
+  padding: 0.45rem 0.65rem;
+  min-height: 0;
+}
+
+#details .info-box.is-warning{
+  border-color: rgba(230, 180, 50, 0.9);
+  background: linear-gradient(
+    180deg,
+    rgba(180, 140, 32, 0.55),
+    rgba(110, 80, 18, 0.48)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 215, 120, 0.26),
+    inset 0 1px 0 rgba(255, 245, 200, 0.18),
+    0 0 18px rgba(180, 130, 30, 0.20);
 }
 
 /* red stays vibrant */
@@ -284,7 +302,7 @@
 
 .details-modal__card {
   position: relative;
-  width: min(90vw, 640px);
+  width: min(90vw, 1000px);
   max-height: min(88vh, 840px);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -302,12 +320,12 @@
   justify-content: space-between;
   gap: 0.65rem;
   padding: 0.7rem 0.9rem;
-  border-bottom: 1px solid rgba(220, 70, 70, 0.55);
+  border-bottom: 1px solid rgba(168, 120, 230, 0.62);
   background: linear-gradient(
     90deg,
-    rgba(92, 22, 22, 0.78) 0%,
-    rgba(92, 22, 22, 0.62) 48%,
-    rgba(0, 0, 0, 0.40) 100%
+    rgba(70, 42, 120, 0.82) 0%,
+    rgba(110, 70, 168, 0.72) 52%,
+    rgba(0, 0, 0, 0.42) 100%
   );
 }
 
@@ -522,21 +540,105 @@
 }
 
 .effect-chip--curse-yes {
-  background: linear-gradient(135deg, #4c2a80, #8b5fd4);
-  border-color: rgba(168, 120, 230, 0.7);
-  color: #f7f1ff;
+  background: var(--chip-curse-yes-bg, linear-gradient(135deg, #4c2a80, #8b5fd4));
+  border-color: var(--chip-curse-yes-border, rgba(168, 120, 230, 0.7));
+  color: var(--chip-curse-yes-text, #f7f1ff);
 }
 
 .effect-chip--curse-no {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.14);
-  color: rgba(245, 245, 245, 0.92);
+  background: var(--chip-curse-no-bg, rgba(255, 255, 255, 0.08));
+  border-color: var(--chip-curse-no-border, rgba(255, 255, 255, 0.14));
+  color: var(--chip-curse-no-text, rgba(245, 245, 245, 0.92));
+}
+
+.effect-chip--self-stack.effect-chip--self-stack-yes {
+  background: var(--chip-self-stack-yes-bg, linear-gradient(135deg, #103828, #27a06a));
+  border-color: var(--chip-self-stack-yes-border, rgba(120, 230, 170, 0.8));
+  color: var(--chip-self-stack-yes-text, #e9fff5);
+}
+
+.effect-chip--self-stack.effect-chip--self-stack-no {
+  background: var(--chip-self-stack-no-bg, linear-gradient(135deg, #3d1318, #9b2f35));
+  border-color: var(--chip-self-stack-no-border, rgba(255, 130, 150, 0.8));
+  color: var(--chip-self-stack-no-text, #ffeef2);
+}
+
+.effect-chip--self-stack.effect-chip--self-stack-unknown {
+  background: var(--chip-self-stack-unknown-bg, linear-gradient(135deg, #2e2f36, #4b4e57));
+  border-color: var(--chip-self-stack-unknown-border, rgba(255, 255, 255, 0.18));
+  color: var(--chip-self-stack-unknown-text, rgba(245, 245, 245, 0.92));
+}
+
+.effect-chip--character {
+  background: var(--chip-character-bg, rgba(255, 255, 255, 0.08));
+  border-color: var(--chip-character-border, rgba(255, 255, 255, 0.16));
+  color: var(--chip-character-text, rgba(245, 245, 245, 0.92));
+}
+
+.effect-chip--character.effect-chip--character-all {
+  background: var(--chip-character-all-bg, linear-gradient(135deg, #4c2a80, #8b5fd4));
+  border-color: var(--chip-character-all-border, rgba(168, 120, 230, 0.7));
+  color: var(--chip-character-all-text, #f7f1ff);
+}
+
+.effect-chip--character.effect-chip--character-duchess {
+  background: var(--chip-character-duchess-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-duchess-border, var(--chip-character-border));
+  color: var(--chip-character-duchess-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-executor {
+  background: var(--chip-character-executor-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-executor-border, var(--chip-character-border));
+  color: var(--chip-character-executor-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-guardian {
+  background: var(--chip-character-guardian-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-guardian-border, var(--chip-character-border));
+  color: var(--chip-character-guardian-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-ironeye {
+  background: var(--chip-character-ironeye-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-ironeye-border, var(--chip-character-border));
+  color: var(--chip-character-ironeye-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-raider {
+  background: var(--chip-character-raider-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-raider-border, var(--chip-character-border));
+  color: var(--chip-character-raider-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-revenant {
+  background: var(--chip-character-revenant-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-revenant-border, var(--chip-character-border));
+  color: var(--chip-character-revenant-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-scholar {
+  background: var(--chip-character-scholar-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-scholar-border, var(--chip-character-border));
+  color: var(--chip-character-scholar-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-undertaker {
+  background: var(--chip-character-undertaker-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-undertaker-border, var(--chip-character-border));
+  color: var(--chip-character-undertaker-text, var(--chip-character-text));
+}
+
+.effect-chip--character.effect-chip--character-wylder {
+  background: var(--chip-character-wylder-bg, var(--chip-character-bg));
+  border-color: var(--chip-character-wylder-border, var(--chip-character-border));
+  color: var(--chip-character-wylder-text, var(--chip-character-text));
 }
 
 .effect-chip--placeholder {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--chip-placeholder-bg, rgba(255, 255, 255, 0.08));
+  border-color: var(--chip-placeholder-border, rgba(255, 255, 255, 0.12));
+  color: var(--chip-placeholder-text, rgba(255, 255, 255, 0.9));
 }
 
 .effect-toggle {

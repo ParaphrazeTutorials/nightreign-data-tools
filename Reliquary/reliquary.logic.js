@@ -1,25 +1,12 @@
 // Pure logic helpers (no DOM)
 
-export const COLORS = ["Red", "Blue", "Yellow", "Green"];
+import { COLORS as PALETTE_COLORS, EFFECT_COLOR_BASES, effectCategoryBase } from "../scripts/ui/palette.js";
 
-// Category color configuration (non-purple palette by default; purple reserved for curses)
-// Wide-gamut palette to keep adjacent categories visually distinct
-export const SEQ_CATEGORY_BASES = [
-  "#e23e57", // crimson
-  "#12c1d9", // electric cyan
-  "#8bc926", // chartreuse
-  "#ff6f3c", // coral
-  "#1f7ad8", // cobalt
-  "#5cd1a3", // mint
-  "#ff9f1a", // amber
-  "#1fb5b5", // teal
-  "#f45ba3", // hot pink
-  "#ffd93b", // bright yellow
-  "#4fb548", // leaf green
-  "#3c5cff"  // royal blue
-];
+export const COLORS = PALETTE_COLORS;
+export const SEQ_CATEGORY_BASES = EFFECT_COLOR_BASES.sequence;
 
-const CURSE_COLOR_BASE = "#7a4bc6"; // reserved purple for curse-related categories
+const CURSE_COLOR_BASE = EFFECT_COLOR_BASES.curseBase; // reserved purple for curse-related categories
+const DEFAULT_EFFECT_BASE = EFFECT_COLOR_BASES.defaultBase;
 
 function clamp01(v) {
   return Math.min(1, Math.max(0, v));
@@ -108,8 +95,8 @@ export function textColorFor(base) {
 }
 
 export function themeFromBase(base) {
-  const shades = [adjustLightness(base, -0.2), base, adjustLightness(base, 0.16)];
-  return { base, shades, border: adjustLightness(base, -0.22), text: textColorFor(base) };
+  const shades = [adjustLightness(base, -0.26), base, adjustLightness(base, 0.08)];
+  return { base, shades, border: adjustLightness(base, -0.3), text: textColorFor(base) };
 }
 
 export function baseFromSequence(idx) {
@@ -149,8 +136,13 @@ export function categoryColorFor(category) {
     return { base, shades, border: adjustLightness(base, -0.25) };
   }
 
+  const mappedBase = effectCategoryBase(cat);
+  if (mappedBase) {
+    return themeFromBase(mappedBase);
+  }
+
   if (!cat) {
-    const base = "#2b2f38";
+    const base = DEFAULT_EFFECT_BASE;
     const shades = [adjustLightness(base, -0.16), base, adjustLightness(base, 0.14)];
     return { base, shades, border: adjustLightness(base, -0.22) };
   }
