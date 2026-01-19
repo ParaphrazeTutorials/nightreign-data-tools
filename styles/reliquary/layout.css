@@ -9,18 +9,44 @@
 
 .tool-shell {
   width: 100%;
-  max-width: clamp(980px, 92vw, 2200px);
+  max-width: clamp(1200px, 96vw, 3600px);
   margin-inline: auto;
+}
+
+@media (min-width: 1920px) {
+  .tool-shell {
+    max-width: clamp(1700px, 97vw, 4000px);
+  }
+}
+
+@media (min-width: 2560px) {
+  .tool-shell {
+    max-width: clamp(2000px, 98vw, 4400px);
+  }
 }
 
 .tool-shell,
 .tool-shell :where(p, li, label, select, input, small) {
-  font-size: 0.94rem;
+  font-size: 0.96rem;
 }
 
 .tool-shell :where(h3) {
   font-size: 1.05rem;
   margin-bottom: 0.6rem;
+}
+
+@media (min-width: 1600px) {
+  .tool-shell,
+  .tool-shell :where(p, li, label, select, input, small) {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 2400px) {
+  .tool-shell,
+  .tool-shell :where(p, li, label, select, input, small) {
+    font-size: 1.05rem;
+  }
 }
 
 .tool-shell section,
@@ -1098,9 +1124,17 @@
 .individual-layout {
   align-items: stretch;
   height: 100%;
-  /* Match Chalice Builder column sizing */
-  grid-template-columns: minmax(640px, 1.8fr) minmax(280px, 1fr);
+  /* Stack details below preview and let main span full width */
+  --chalice-layout-cols: 1fr;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
   width: 100%;
+}
+
+@media (max-width: 1366px) {
+  .individual-layout {
+    gap: 0.4rem;
+  }
 }
 
 .individual-layout > * {
@@ -1115,6 +1149,13 @@
   gap: 0.45rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.individual-filter__header-right .individual-filter__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .individual-filter__controls {
@@ -1133,9 +1174,29 @@
   padding: 0.1rem 0.05rem 0.25rem;
 }
 
-.individual-filter__hint {
-  margin: 0.05rem 0 0;
-  color: rgba(220, 224, 234, 0.78);
+.individual-filter__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.individual-filter__actions .utility-field-slot--inline {
+  display: inline-flex;
+  align-items: center;
+}
+
+.individual-filter__actions #instructionsBtn,
+.individual-filter__actions #startOver {
+  height: 32px;
+  min-width: auto;
+  padding: 0 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
 }
 
 .individual-preview #results {
@@ -1191,6 +1252,7 @@
   min-width: 0;
   width: 100%;
   flex: 1 1 auto;
+  max-width: none;
 }
 
 .individual-panel .chalice-layout__results {
@@ -1224,6 +1286,33 @@
 .individual-preview .panel-header,
 .individual-details .panel-header {
   margin-bottom: 0.35rem;
+}
+
+/* Partial details state: keep header row from overflowing on small laptops */
+.chalice-layout[data-details-state="partial"] .chalice-filter__title-row h4,
+.chalice-results[data-details-state="partial"] .chalice-filter__title-row h4,
+.individual-panel [data-details-state="partial"] .chalice-filter__title-row h4 {
+  display: none !important;
+}
+
+.chalice-layout[data-details-state="partial"] .individual-filter__header-right {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.chalice-layout[data-details-state="partial"] .individual-filter__controls {
+  gap: 0.22rem;
+}
+
+.chalice-layout[data-details-state="partial"] .individual-filter__selectors {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chalice-layout[data-details-state="partial"] .individual-filter__selectors select {
+  min-width: 7.5rem;
+  max-width: 10.75rem;
+  width: min(40vw, 10.75rem);
 }
 
 .individual-filter .utility-toggle {

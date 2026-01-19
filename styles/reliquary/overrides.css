@@ -170,6 +170,11 @@ button#startOver:active {
   transform: translateY(1px);
 }
 
+/* Individual view: align Start Over with Instructions row (no extra margins) */
+.individual-filter__actions #startOver {
+  margin: 0 !important;
+}
+
 /* Collapsed details rail: move tooltips to the left of the trigger so they stay near the rail */
 .chalice-layout[data-details-state="collapsed"] #chaliceDetails .details-rail [data-tooltip]:hover::after,
 .chalice-layout[data-details-state="collapsed"] #chaliceDetails .chalice-alert-counts__badge[data-tooltip]:hover::after {

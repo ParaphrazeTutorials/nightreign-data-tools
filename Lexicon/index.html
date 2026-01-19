@@ -42,8 +42,14 @@
       <!-- LEXICON SHELL -->
       <section class="tool-shell lexicon-shell">
 
+        <!-- Mobile dataset toggle -->
+        <button id="lexDatasetToggle" class="lex-dataset-toggle" type="button" aria-expanded="false" aria-controls="lexDatasetPanel">
+          <span class="lex-dataset-toggle__label">Data Set</span>
+          <span class="lex-dataset-toggle__chevron" aria-hidden="true"></span>
+        </button>
+
         <!-- LEFT: APP TILES (no header; cards speak for themselves) -->
-        <aside class="lexicon-sidebar" aria-label="Apps">
+        <aside id="lexDatasetPanel" class="lexicon-sidebar" aria-label="Apps">
           <div class="lexicon-apps" role="list">
 
             <button

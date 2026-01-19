@@ -382,22 +382,41 @@ table.lexicon-table td:not(.lexicon-cell--text) {
 }
 
 .lex-tile--full {
-  height: calc(100vh - 180px);
-  min-height: calc(100vh - 180px);
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 @media (max-width: 920px) {
   .lex-tile--full {
     height: auto;
     min-height: 0;
+    max-height: none;
   }
 }
 
 @media (max-width: 920px) {
   .tool-shell.lexicon-shell {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lex-tile[data-tile="table"] .lexicon-wrap,
+  .lex-tile[data-tile="table"] .lexicon-table-wrap {
+    max-height: calc(100vh - 360px);
+  }
+
+  .lex-tile[data-tile="table"] .lexicon-table-wrap {
+    padding-bottom: 0.4rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1180px) {
+  /* Classic iPad: keep table above bottom edge */
+  .lex-tile[data-tile="table"] .lexicon-wrap,
+  .lex-tile[data-tile="table"] .lexicon-table-wrap {
+    max-height: calc(100vh - 420px);
   }
 }
 
@@ -408,6 +427,70 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   border-radius: 0.75rem;
   padding: 0.9rem;
 }
+
+.lex-dataset-toggle {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.6rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(181, 140, 255, 0.32);
+  background: linear-gradient(135deg,
+    rgba(112, 70, 168, 0.42) 0%,
+    rgba(72, 36, 112, 0.38) 45%,
+    rgba(0, 0, 0, 0.24) 100%);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.lex-dataset-toggle__chevron {
+  width: 1rem;
+  height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.lex-dataset-toggle__chevron::before,
+.lex-dataset-toggle__chevron::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 999px;
+  transition: transform 120ms ease;
+}
+
+.lex-dataset-toggle:hover {
+  border-color: rgba(181, 140, 255, 0.5);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.lex-dataset-toggle:focus-visible {
+  outline: 2px solid rgba(181, 140, 255, 0.65);
+  outline-offset: 3px;
+}
+
+.lex-dataset-toggle.is-open {
+  border-color: rgba(181, 140, 255, 0.6);
+  background: linear-gradient(135deg,
+    rgba(132, 90, 188, 0.52) 0%,
+    rgba(92, 48, 132, 0.45) 45%,
+    rgba(12, 12, 18, 0.26) 100%);
+}
+
+.lex-dataset-toggle__chevron::before { transform: translateY(-2px) rotate(45deg); }
+.lex-dataset-toggle__chevron::after { transform: translateY(2px) rotate(-45deg); }
+
+.lex-dataset-toggle.is-open .lex-dataset-toggle__chevron::before { transform: translateY(0) rotate(-45deg); }
+.lex-dataset-toggle.is-open .lex-dataset-toggle__chevron::after { transform: translateY(0) rotate(45deg); }
 
 .lexicon-apps {
   display: grid;
@@ -527,6 +610,18 @@ table.lexicon-table td:not(.lexicon-cell--text) {
     grid-template-columns: 1fr;
     height: auto;
   }
+
+  .lex-dataset-toggle {
+    display: inline-flex;
+  }
+
+  .lexicon-sidebar {
+    display: none;
+  }
+
+  .lexicon-sidebar.is-open {
+    display: block;
+  }
 }
 
 .lex-tile {
@@ -582,6 +677,17 @@ table.lexicon-table td:not(.lexicon-cell--text) {
   gap: 0.55rem;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+@media (max-width: 1040px) {
+  /* Classic iPad: hide heading to left-align search */
+  .lex-tile[data-tile="table"] .lex-table-title h3 {
+    display: none;
+  }
+
+  .lex-tile[data-tile="table"] .lex-table-title {
+    gap: 0.35rem;
+  }
 }
 
 .lex-tile[data-tile="table"] .lex-tile__actions {
@@ -911,7 +1017,8 @@ table.lexicon-table td.lexicon-td--sorted:nth-child(2) {
   max-inline-size: none;
   margin-inline: 0;
   width: 100%;
-  display: block;
+  display: flex;
+  flex-direction: column;
   overflow-x: auto !important;
   overflow-y: hidden;
   flex: 1 1 auto;
@@ -933,8 +1040,6 @@ table.lexicon-table td.lexicon-td--sorted:nth-child(2) {
 
 /* Override the old vh-based max-height: table should fill the tile body */
 .lex-tile[data-tile="table"] .lexicon-table-wrap {
-  height: 100%;
-  max-height: 100%;
   overflow-x: auto !important;
   overflow-y: auto;
   flex: 1 1 auto;

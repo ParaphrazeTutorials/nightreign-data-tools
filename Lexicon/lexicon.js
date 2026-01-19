@@ -66,6 +66,8 @@ const COLUMN_DISPLAY_NAMES = {
 const dom = {
   // layout
   moduleButtons: Array.from(document.querySelectorAll(".lexicon-module-card[data-module]")),
+  datasetToggle: document.getElementById("lexDatasetToggle"),
+  datasetPanel: document.getElementById("lexDatasetPanel"),
 
   // table
   wrap: document.querySelector(".lexicon-wrap"),
@@ -972,8 +974,34 @@ function bindModulePicker() {
     b.addEventListener("click", () => {
       const key = b.getAttribute("data-module") || "";
       setActiveModule(key);
+      closeDatasetPanel();
     });
   }
+}
+
+function setDatasetPanel(open) {
+  if (!dom.datasetPanel || !dom.datasetToggle) return;
+  dom.datasetPanel.classList.toggle("is-open", open);
+  dom.datasetToggle.classList.toggle("is-open", open);
+  dom.datasetToggle.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+function closeDatasetPanel() {
+  setDatasetPanel(false);
+}
+
+function bindDatasetToggle() {
+  if (!dom.datasetToggle || !dom.datasetPanel) return;
+
+  dom.datasetToggle.addEventListener("click", () => {
+    const isOpen = dom.datasetPanel.classList.contains("is-open");
+    setDatasetPanel(!isOpen);
+  });
+
+  const mq = window.matchMedia("(min-width: 921px)");
+  mq.addEventListener("change", e => {
+    if (e.matches) closeDatasetPanel();
+  });
 }
 
 /* -------------------------
@@ -1008,6 +1036,7 @@ async function init() {
   bindZoomButtons();
   bindSearch();
   bindModulePicker();
+  bindDatasetToggle();
   bindExportButton();
   bindDownloadsModal();
   bindInfoModal();
