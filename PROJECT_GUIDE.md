@@ -32,3 +32,8 @@ Project URL: https://github.com/users/ParaphrazeTutorials/projects/1
 - New issues land in Backlog. Triage sets Type, Priority, Area, Size.
 - Move to Ready when scoped; In Progress when picked up; In Review on PR; Done on merge/close.
 - If blocked, set Status=Blocked and add label status:blocked.
+
+## Responsive test presets (DevTools custom devices)
+- Phones: Galaxy S22 360x780 DPR3; iPhone 14/15 390x844 DPR3; Large phone 414x896 DPR3.
+- Tablets: iPad Air/11" 820x1180 DPR2; iPad classic 768x1024 DPR2.
+- Laptops/Desktops: 1366x768; 1440x900; 1920x1080; 2560x1440; 3840x2160.

@@ -7,15 +7,14 @@
    ------------------------------------------------------------ */
 
 .tool-shell {
-  width: 100%;
-  max-width: clamp(980px, 92vw, 2200px);
+  width: min(100%, var(--shell-max));
   margin-inline: auto;
 }
 
 /* Typography density BELOW hero only */
 .tool-shell,
 .tool-shell :where(p, li, a, small, button, label) {
-  font-size: 0.94rem;
+  font-size: var(--body-size);
 }
 
 .tool-shell :where(h3) {
@@ -35,14 +34,22 @@
 
 .home-intro-grid {
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr 1.05fr;
+  gap: clamp(0.85rem, 2vw, 1.35rem);
   align-items: start;
+  max-width: none;
+  margin-inline: 0;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1180px) {
   .home-intro-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-intro-grid {
+    gap: 0.75rem;
   }
 }
 
@@ -51,7 +58,7 @@
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(0,0,0,0.22);
   border-radius: 0.75rem;
-  padding: 1rem;
+  padding: clamp(0.9rem, 1vw + 0.6rem, 1.25rem);
 }
 
 .home-intro p {
@@ -61,22 +68,22 @@
 
 /* Compact typography for the left intro/updates column (about 30% smaller) */
 .home-intro {
-  font-size: 0.7rem;
+  font-size: clamp(0.82rem, 0.78rem + 0.12vw, 0.9rem);
 }
 
 .home-intro :where(p, li, a, small, code, span, strong) {
-  font-size: 0.7rem;
+  font-size: clamp(0.82rem, 0.78rem + 0.12vw, 0.9rem);
 }
 
-.home-intro :where(h3) { font-size: 0.85rem; margin-bottom: 0.35rem; }
-.home-intro :where(h4) { font-size: 0.80rem; margin: 0 0 0.08rem; }
+.home-intro :where(h3) { font-size: clamp(0.95rem, 0.9rem + 0.18vw, 1.05rem); margin-bottom: 0.35rem; }
+.home-intro :where(h4) { font-size: clamp(0.88rem, 0.84rem + 0.12vw, 0.98rem); margin: 0 0 0.08rem; }
 
-.home-intro .update-card__version { font-size: 0.74rem; padding: 0.07rem 0.42rem; }
-.home-intro .update-card__sep { font-size: 0.72rem; }
-.home-intro .update-card__name { font-size: 0.86rem; }
-.home-intro .update-card__lede { font-size: 0.68rem; }
-.home-intro .update-card__group-title { font-size: 0.62rem; }
-.home-intro .update-card__list li { font-size: 0.68rem; }
+.home-intro .update-card__version { font-size: clamp(0.8rem, 0.76rem + 0.12vw, 0.9rem); padding: 0.07rem 0.42rem; }
+.home-intro .update-card__sep { font-size: clamp(0.78rem, 0.74rem + 0.12vw, 0.88rem); }
+.home-intro .update-card__name { font-size: clamp(0.9rem, 0.86rem + 0.12vw, 1.0rem); }
+.home-intro .update-card__lede { font-size: clamp(0.8rem, 0.76rem + 0.12vw, 0.9rem); }
+.home-intro .update-card__group-title { font-size: clamp(0.78rem, 0.74rem + 0.12vw, 0.9rem); }
+.home-intro .update-card__list li { font-size: clamp(0.8rem, 0.76rem + 0.12vw, 0.9rem); }
 
 .home-updates {
   display: grid;
@@ -286,13 +293,26 @@
 
 .home-apps {
   display: grid;
-  grid-template-columns: repeat(2, minmax(260px, 1fr));
-  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: clamp(0.9rem, 1.4vw, 1.35rem);
   align-content: start;
+  width: 100%;
+  max-width: 1400px;
+  margin-inline: auto;
 }
 
-@media (max-width: 720px) {
-  .home-apps { grid-template-columns: 1fr; }
+@media (max-width: 480px) {
+  .home-apps {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    gap: clamp(0.8rem, 3vw, 1rem);
+  }
+}
+
+@media (max-width: 1100px) {
+  .home-apps {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* The tile is the link */
@@ -303,9 +323,9 @@
   border-radius: 0.9rem;
   overflow: hidden;
 
-  aspect-ratio: 2624 / 1472;
-  min-height: 180px;
-  padding: 0.85rem 0.95rem;
+  aspect-ratio: 16 / 10;
+  min-height: clamp(190px, 18vw, 320px);
+  padding: clamp(0.78rem, 1vw, 1.15rem);
 
   color: white;
   text-decoration: none;
@@ -320,7 +340,16 @@
 
 /* Dark overlay so text reads on top of the image */
 .app-tile::before {
-  content: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.70) 0%,
+    rgba(0,0,0,0.42) 55%,
+    rgba(0,0,0,0.18) 100%
+  );
+  z-index: 0;
 }
 
 .app-tile:hover {
@@ -335,7 +364,7 @@
 .app-tile__title {
   font-weight: 800;
   line-height: 1.1;
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
   position: relative;
   display: inline-block;
   padding-bottom: 0.3rem;
@@ -358,24 +387,92 @@
 
 .app-tile__meta {
   margin-top: 0.2rem;
-  font-size: 0.72rem;
+  font-size: clamp(0.76rem, 0.72rem + 0.12vw, 0.88rem);
   opacity: 0.85;
 }
 
 .app-tile__credit {
   position: absolute;
-  inset: auto auto 0.75rem 0.95rem;
+  inset: auto auto clamp(0.55rem, 1vw, 0.9rem) clamp(0.65rem, 1vw, 1rem);
   padding: 0.25rem 0.45rem;
   border-radius: 999px;
   background: rgba(0,0,0,0.55);
   color: rgba(255,255,255,0.82);
-  font-size: 0.72rem;
+  font-size: clamp(0.7rem, 0.66rem + 0.12vw, 0.82rem);
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   box-shadow: 0 4px 18px rgba(0,0,0,0.35);
   display: none;
   z-index: 1;
+}
+
+/* Scale cards down for 1080p and below (~40% smaller) */
+@media (max-width: 1920px) {
+  .home-apps {
+    max-width: 1160px;
+    gap: clamp(0.9rem, 1.2vw, 1.2rem);
+    grid-auto-rows: auto;
+  }
+
+  .app-tile {
+    min-height: clamp(150px, 18vw, 220px);
+    padding: clamp(0.72rem, 0.95vw, 1.05rem);
+    height: auto;
+  }
+
+  .app-tile__title {
+    font-size: clamp(0.98rem, 0.9rem + 0.32vw, 1.18rem);
+  }
+
+  .app-tile__meta,
+  .app-tile__credit {
+    font-size: clamp(0.7rem, 0.64rem + 0.12vw, 0.84rem);
+  }
+}
+
+/* Tighter layout for small laptop widths (e.g., 1366x768) */
+@media (max-width: 1440px) {
+  .home-apps {
+    max-width: 1040px;
+    gap: clamp(0.75rem, 1vw, 1rem);
+  }
+
+  .app-tile {
+    min-height: clamp(140px, 18vw, 200px);
+    padding: clamp(0.66rem, 0.9vw, 0.95rem);
+  }
+
+  .app-tile__title {
+    font-size: clamp(0.94rem, 0.88rem + 0.28vw, 1.1rem);
+  }
+
+  .app-tile__meta,
+  .app-tile__credit {
+    font-size: clamp(0.66rem, 0.62rem + 0.1vw, 0.8rem);
+  }
+}
+
+/* Upscale for large/4K screens */
+@media (min-width: 1921px) {
+  .home-apps {
+    max-width: 1800px;
+    gap: clamp(1rem, 1.1vw, 1.4rem);
+  }
+
+  .app-tile {
+    min-height: clamp(220px, 14vw, 360px);
+    padding: clamp(0.9rem, 1.1vw, 1.25rem);
+  }
+
+  .app-tile__title {
+    font-size: clamp(1.1rem, 1.0rem + 0.35vw, 1.35rem);
+  }
+
+  .app-tile__meta,
+  .app-tile__credit {
+    font-size: clamp(0.8rem, 0.74rem + 0.12vw, 0.95rem);
+  }
 }
 
 .app-tile--reliquary .app-tile__credit {
