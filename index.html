@@ -32,6 +32,7 @@
         data-hero-h1="The Round Table Codex"
         data-hero-h2="Home"
         data-hero-build="true"
+        data-hero-credit-hide="true"
       ></header>
 
       <!-- NAV (global) -->
@@ -139,7 +140,8 @@
 
           <!-- RIGHT: APP TILES -->
           <section class="home-apps" aria-label="Apps">
-            <a class="app-tile app-tile--reliquary" href="./Reliquary/index.html">
+            <article class="app-tile app-tile--reliquary">
+              <a class="app-tile__body" href="./Reliquary/index.html" aria-label="Open Reliquary"></a>
               <div class="app-tile__meta">
                 <div class="app-tile__text">
                   <div class="app-tile__title">Reliquary</div>
@@ -147,48 +149,49 @@
                   <div>Create Full Relic Builds</div>
                 </div>
               </div>
-              <div class="app-tile__credit" aria-label="Artwork credit">Artwork by Smile</div>
-            </a>
+              <a class="app-tile__credit" aria-label="Artwork credit" href="https://example.com/artist-credit" target="_blank" rel="noopener">Artwork by Smile</a>
+            </article>
 
-            <a class="app-tile app-tile--lexicon" href="./Lexicon/index.html">
+            <article class="app-tile app-tile--lexicon">
+              <a class="app-tile__body" href="./Lexicon/index.html" aria-label="Open Lexicon"></a>
               <div class="app-tile__meta">
                 <div class="app-tile__text">
                   <div class="app-tile__title">Lexicon</div>
                   <div>Data explorer</div>
                 </div>
               </div>
-              <div class="app-tile__credit" aria-label="Artwork credit">Artwork by Smile</div>
-            </a>
+              <a class="app-tile__credit" aria-label="Artwork credit" href="https://example.com/artist-credit" target="_blank" rel="noopener">Artwork by Smile</a>
+            </article>
 
-            <a class="app-tile app-tile--menagerie is-disabled" href="#" aria-disabled="true">
+            <article class="app-tile app-tile--menagerie is-disabled" aria-disabled="true">
+              <a class="app-tile__body" href="#" aria-label="Menagerie coming soon"></a>
               <div class="app-tile__meta">
                 <div class="app-tile__text">
                   <div class="app-tile__title">Menagerie</div>
                   <div>Coming soon</div>
                 </div>
               </div>
-              <div class="app-tile__credit" aria-label="Artwork credit">Artwork by Smile</div>
-            </a>
+            </article>
 
-            <a class="app-tile app-tile--armory is-disabled" href="#" aria-disabled="true">
+            <article class="app-tile app-tile--armory is-disabled" aria-disabled="true">
+              <a class="app-tile__body" href="#" aria-label="Armory coming soon"></a>
               <div class="app-tile__meta">
                 <div class="app-tile__text">
                   <div class="app-tile__title">Armory</div>
                   <div>Coming soon</div>
                 </div>
               </div>
-              <div class="app-tile__credit" aria-label="Artwork credit">Artwork by Smile</div>
-            </a>
+            </article>
 
-            <a class="app-tile app-tile--grimoire is-disabled" href="#" aria-disabled="true">
+            <article class="app-tile app-tile--grimoire is-disabled" aria-disabled="true">
+              <a class="app-tile__body" href="#" aria-label="Grimoire coming soon"></a>
               <div class="app-tile__meta">
                 <div class="app-tile__text">
                   <div class="app-tile__title">Grimoire</div>
                   <div>Coming soon</div>
                 </div>
               </div>
-              <div class="app-tile__credit" aria-label="Artwork credit">Artwork by Smile</div>
-            </a>
+            </article>
           </section>
         </div>
       </section>

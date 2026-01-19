@@ -352,6 +352,12 @@
   z-index: 0;
 }
 
+/* Remove dark overlays on specific cards */
+.app-tile--reliquary::before,
+.app-tile--lexicon::before {
+  background: none;
+}
+
 .app-tile:hover {
   transform: translateY(-2px);
 }
@@ -475,10 +481,37 @@
   }
 }
 
-.app-tile--reliquary .app-tile__credit {
+.app-tile__credit {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  position: absolute;
+  inset: auto auto clamp(0.55rem, 1vw, 0.9rem) clamp(0.65rem, 1vw, 1rem);
+  padding: 0.25rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.82);
+  font-size: clamp(0.7rem, 0.66rem + 0.12vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  z-index: 2;
+  text-decoration: none;
+}
+
+.app-tile__credit:hover,
+.app-tile__credit:focus-visible {
+  color: #fff;
+  outline: 1px solid rgba(255,255,255,0.35);
+  outline-offset: 2px;
+}
+
+.app-tile__body {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  text-decoration: none;
 }
 
 /* ------------------------------------------------------------
@@ -506,7 +539,7 @@
   z-index: 0;
   display: none;
 }
-.app-tile--lexicon   { background-image: url("../Assets/home/Lexicon.png"); }
+.app-tile--lexicon   { background-image: url("../Assets/home/Lexicon_2.png"); }
 .app-tile--menagerie { background-image: url("../Assets/home/Menagerie.png"); }
 .app-tile--armory    { background-image: url("../Assets/home/Armory.png"); }
 .app-tile--grimoire  { background-image: url("../Assets/home/Grimoire.png"); }

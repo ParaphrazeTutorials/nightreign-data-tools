@@ -4,6 +4,16 @@
    Default density: Small (headers 0.55rem, values 0.50rem)
    ------------------------------------------------------------ */
 
+/* ------------------------------------------------------------
+   Hero (match Reliquary art positioning + credit pill)
+   ------------------------------------------------------------ */
+
+.hero--lexicon {
+  --hero-art-zoom: 1;
+  --hero-art-x: 50%;
+  --hero-art-y: -200%;
+}
+
 /* Single-column shell safety */
 .tool-shell.tool-shell--single {
   display: grid;

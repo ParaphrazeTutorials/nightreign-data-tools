@@ -46,6 +46,7 @@ function detectBuildStatus() {
 const GLOBAL_BUILD_STATUS = detectBuildStatus(); // "BETA" | "LIVE" (auto from host)
 const GLOBAL_BUILD_VERSION = "v0.0.0";  // app version (update as needed)
 const GLOBAL_GAME_VERSION = "1.03.1.0029"; // game version (sourced from Reliquary baseline)
+const ART_CREDIT_URL = "https://cl.pinterest.com/smile_409/"; // single source of truth for art credit link
 
 
 
@@ -62,6 +63,9 @@ function renderHero() {
   const h1 = el.getAttribute("data-hero-h1") || "The Round Table Codex";
   const h2 = el.getAttribute("data-hero-h2") || "";
   const showBuild = toBool(el.getAttribute("data-hero-build"));
+  const hideCredit = toBool(el.getAttribute("data-hero-credit-hide"));
+  const creditLabel = el.getAttribute("data-hero-credit") || "Artwork by Smile";
+  const creditUrl = el.getAttribute("data-hero-credit-url") || ART_CREDIT_URL;
 
   el.innerHTML = `
     ${imgSrc ? `
@@ -95,7 +99,19 @@ function renderHero() {
         </div>
       `;
     })() : ""}
+    ${hideCredit ? "" : `<a class="hero-credit" href="${creditUrl}" target="_blank" rel="noopener" aria-label="Artwork credit link">${creditLabel}</a>`}
   `;
 }
 
+function applyGlobalCreditLinks() {
+  const href = ART_CREDIT_URL;
+  document.querySelectorAll(".app-tile__credit").forEach((el) => {
+    if (!(el instanceof HTMLAnchorElement)) return;
+    el.href = href;
+    el.target = "_blank";
+    el.rel = "noopener";
+  });
+}
+
 renderHero();
+applyGlobalCreditLinks();

@@ -310,6 +310,34 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   letter-spacing: 0.06em;
 }
 
+/* Hero credit pill (clickable) */
+.hero-credit {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.85rem;
+  padding: 0.62rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.91rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  z-index: 2;
+  text-decoration: none;
+  transform: scale(0.56);
+  transform-origin: bottom right;
+}
+
+.hero-credit:hover,
+.hero-credit:focus-visible {
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #ffffff;
+  outline: none;
+}
+
 /* Small devices: scale hero headings down ~35% */
 @media (max-width: 640px) {
   .hero h1 {
