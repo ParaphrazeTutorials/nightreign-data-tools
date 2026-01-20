@@ -1,4 +1,5 @@
 import { textColorFor } from "../Reliquary/reliquary.logic.js";
+import { openEffectMenu, closeEffectMenu } from "../Reliquary/reliquary.menus.js";
 import { gradientFromTheme, buildCategoryThemeMap } from "../scripts/ui/theme.js";
 import { applyPaletteCssVars } from "../scripts/ui/palette.js";
 
@@ -69,13 +70,16 @@ const dom = {
   datasetToggle: document.getElementById("lexDatasetToggle"),
   datasetPanel: document.getElementById("lexDatasetPanel"),
 
-  // table
-  wrap: document.querySelector(".lexicon-wrap"),
-  table: document.querySelector(".lexicon-table"),
-  tableHead: document.getElementById("lexiconHead"),
-  tableBody: document.getElementById("lexiconBody"),
+  // detail + table
   meta: document.getElementById("lexiconMeta"),
-  searchInput: document.getElementById("lexiconSearch"),
+  searchInput: document.getElementById("lexSearchInput"),
+  table: document.getElementById("lexTable"),
+  tableHead: document.getElementById("lexTableHead"),
+  tableBody: document.getElementById("lexTableBody"),
+  tableWrap: document.querySelector(".lexicon-table-wrap"),
+  effectSelectBtn: document.getElementById("lexEffectSelect"),
+  detail: document.getElementById("lexDetail"),
+  detailContent: document.getElementById("lexDetailContent"),
 
   // downloads button + modal
   exportButton: document.getElementById("lexExportButton"),
@@ -92,9 +96,6 @@ const dom = {
   infoModalClose: document.querySelector("#lexInfoModal .lex-modal__close"),
   infoModalBackdrop: document.querySelector("#lexInfoModal .lex-modal__backdrop"),
 
-  // zoom
-  zoomButtons: Array.from(document.querySelectorAll(".lexicon-zoom-btn[data-zoom]")),
-
   // insights
   insights: document.getElementById("lexiconInsights")
 };
@@ -110,12 +111,15 @@ const state = {
   sortKey: "",
   sortDir: 0, // 0 none, 1 asc, -1 desc
   typeByCol: new Map(), // col -> "number" | "string"
-  zoom: "small", // "small" | "medium" | "large"
   filters: new Map(),
   searchTerm: "",
 
   // styling helpers
   categoryThemes: new Map(),
+
+  // selection
+  selectedEffectId: "",
+  userPickedEffect: false,
 
   // downloads
   downloadsManifest: null,
@@ -381,33 +385,7 @@ function stableSort(rows, col, dir) {
   return decorated.map(d => d.r);
 }
 
-function applyZoomClass() {
-  if (!dom.wrap) return;
-
-  dom.wrap.classList.remove("zoom-small", "zoom-medium", "zoom-large");
-  dom.wrap.classList.add(`zoom-${state.zoom}`);
-
-  for (const b of dom.zoomButtons) {
-    const z = b.getAttribute("data-zoom");
-    const pressed = z === state.zoom;
-    b.setAttribute("aria-pressed", pressed ? "true" : "false");
-    if (pressed) b.classList.add("is-active");
-    else b.classList.remove("is-active");
-  }
-}
-
-function bindZoomButtons() {
-  state.zoom = "small";
-  applyZoomClass();
-
-  for (const b of dom.zoomButtons) {
-    b.addEventListener("click", () => {
-      const z = String(b.getAttribute("data-zoom") || "small");
-      state.zoom = (z === "medium" || z === "large") ? z : "small";
-      applyZoomClass();
-    });
-  }
-}
+function noop() {}
 
 function getManifestUrl(moduleKey) {
   const key = String(moduleKey || "").toLowerCase();
@@ -833,13 +811,14 @@ function updateMeta() {
 }
 
 /* -------------------------
-   Search
+   Global search
 ------------------------- */
 
 function bindSearch() {
   if (!dom.searchInput) return;
-  dom.searchInput.addEventListener("input", () => {
-    state.searchTerm = String(dom.searchInput.value || "");
+
+  dom.searchInput.addEventListener("input", (e) => {
+    state.searchTerm = (e.target.value || "").trim();
     render();
   });
 }
@@ -905,15 +884,24 @@ function renderInsights() {
   `;
 }
 
-function render() {
+function renderTable() {
+  if (!dom.tableHead || !dom.tableBody) return;
+
   const columns = state.columns;
-  const sorted = getCurrentViewRows();
+  const rows = getCurrentViewRows();
+
   renderHead(columns);
-  renderBody(columns, sorted);
+  renderBody(columns, rows);
+
+  requestAnimationFrame(updateFrozenOffsets);
+}
+
+function render() {
   updateMeta();
+  renderTable();
+  renderDetail();
   renderInsights();
   renderDownloadsModal();
-  updateFrozenOffsets();
 }
 
 function toggleSort(col) {
@@ -932,6 +920,111 @@ function toggleSort(col) {
 /* -------------------------
   Filters (per-column buttons)
 ------------------------- */
+
+/* -------------------------
+   Effect picker + detail view
+------------------------- */
+
+function categoriesFromRows(rows) {
+  const set = new Set();
+  rows.forEach(r => {
+    const c = (r?.EffectCategory ?? "").toString().trim();
+    if (c) set.add(c);
+  });
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+function currentEffectRow() {
+  if (!state.selectedEffectId) return null;
+  const target = String(state.selectedEffectId);
+  return state.rawRows.find(r => String(r?.EffectID) === target) || null;
+}
+
+function setSelectedEffect(id) {
+  state.selectedEffectId = id ? String(id) : "";
+  state.userPickedEffect = true;
+  render();
+}
+
+function openLexEffectMenu() {
+  if (!dom.effectSelectBtn || !state.rawRows.length) return;
+
+  const categories = categoriesFromRows(state.rawRows);
+  openEffectMenu({
+    slotIdx: 0,
+    anchorBtn: dom.effectSelectBtn,
+    eligible: state.rawRows,
+    categories,
+    currentId: state.selectedEffectId,
+    selectedCategory: "__all",
+    onPick: (id) => {
+      setSelectedEffect(id);
+      closeEffectMenu();
+    }
+  });
+}
+
+function bindEffectSelect() {
+  if (dom.effectSelectBtn) dom.effectSelectBtn.addEventListener("click", openLexEffectMenu);
+
+  window.addEventListener("resize", () => closeEffectMenu());
+  window.addEventListener("scroll", () => closeEffectMenu(), true);
+}
+
+function bindDetailInfo() {
+  if (!dom.detailContent) return;
+
+  dom.detailContent.addEventListener("click", (e) => {
+    const btn = e.target.closest(".lex-detail__info");
+    if (!btn) return;
+    const col = btn.getAttribute("data-col") || "";
+    if (col) openInfoModal(col);
+  });
+}
+
+function renderDetail() {
+  if (!dom.detailContent) return;
+
+  const row = currentEffectRow();
+
+  if (!row) {
+    dom.detailContent.innerHTML = `<div class="lex-detail__placeholder">Select an effect to view all fields.</div>`;
+    if (dom.effectSelectBtn) dom.effectSelectBtn.textContent = "-- Select Effect --";
+    return;
+  }
+
+  const title = row.EffectDescription || `Effect ${row.EffectID}`;
+  if (dom.effectSelectBtn) {
+    const hasSelection = state.userPickedEffect && !!row;
+    const label = hasSelection ? title : "-- Select Effect --";
+    dom.effectSelectBtn.innerHTML = `<span class="lex-effect-select__label">${escapeHtml(label)}</span>`;
+    dom.effectSelectBtn.classList.toggle("has-selection", hasSelection);
+  }
+
+  const fields = state.columns.map(col => {
+    const label = getDisplayLabel(col);
+    const val = row?.[col];
+    const display = (val == null || String(val).trim() === "")
+      ? `<span class="lexicon-empty">∅</span>`
+      : escapeHtml(String(val));
+    return `
+      <div class="lex-detail__row">
+        <div class="lex-detail__label">
+          <span class="lex-detail__label-text">${escapeHtml(label)}</span>
+          <button class="lexicon-col-info lex-detail__info" type="button" data-col="${escapeHtml(col)}" aria-label="Column info">i</button>
+        </div>
+        <div class="lex-detail__value">${display}</div>
+      </div>
+    `;
+  }).join("");
+
+  dom.detailContent.innerHTML = `
+    <div class="lex-detail__header">
+      <div class="lex-detail__title">${escapeHtml(title)}</div>
+    </div>
+    <div class="lex-detail__grid">${fields}</div>
+  `;
+}
 
 /* -------------------------
    Module picker
@@ -958,9 +1051,11 @@ function setActiveModule(moduleKey) {
   state.sortDir = 0;
   state.downloadsManifest = null;
   state.downloadsLoading = false;
+  state.selectedEffectId = "";
 
   closeDownloadsModal();
   closeInfoModal();
+  closeEffectMenu();
 
   loadData().catch(console.error);
   loadDownloadsManifest(key).catch(console.error);
@@ -1020,8 +1115,11 @@ async function loadData() {
   state.columns = reorderColumns(inferColumns(state.rawRows));
   state.filters.clear();
   state.searchTerm = "";
-  if (dom.searchInput) dom.searchInput.value = "";
   computeTypeMap(state.rawRows, state.columns);
+
+  // Default to the first effect so detail view is populated immediately
+  state.selectedEffectId = state.rawRows[0]?.EffectID ? String(state.rawRows[0].EffectID) : "";
+  state.userPickedEffect = false;
 
   // Precompute category colors so EffectCategory cells mirror Reliquary dropdowns
   state.categoryThemes = state.module === "reliquary"
@@ -1033,13 +1131,14 @@ async function loadData() {
 }
 
 async function init() {
-  bindZoomButtons();
   bindSearch();
   bindModulePicker();
   bindDatasetToggle();
   bindExportButton();
   bindDownloadsModal();
   bindInfoModal();
+  bindEffectSelect();
+  bindDetailInfo();
 
   await loadData();
 }

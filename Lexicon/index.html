@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="../styles/site.css">
+    <link rel="stylesheet" href="../styles/reliquary/components.css">
     <link rel="stylesheet" href="../styles/lexicon.css">
     <!-- Reuse Home card visuals for the left app tiles -->
     <link rel="stylesheet" href="../styles/home.css">
@@ -121,39 +122,42 @@
           </div>
         </aside>
 
-        <!-- RIGHT: Single dominant Data Table -->
+        <!-- RIGHT: Effect detail viewer -->
         <section class="lexicon-main" aria-label="Lexicon data">
           <article class="lex-tile lex-tile--full" data-tile="table">
             <header class="lex-tile__header">
               <div class="lex-tile__header-main">
                 <div class="lex-table-title">
-                  <h3>Data Table</h3>
-                  <input id="lexiconSearch" class="lexicon-search" type="search" placeholder="Search all columns" aria-label="Search all columns" />
+                  <h3>Effect Details</h3>
+                </div>
+                <div class="lex-tile__search lex-tile__search--desktop">
+                  <input id="lexSearchInput" class="lexicon-search" type="search" placeholder="Search all columns…" aria-label="Search all columns">
                 </div>
                 <div class="lex-tile__actions">
+                  <button id="lexEffectSelect" class="chalice-filter__btn" type="button">Select Effect</button>
                   <button id="lexExportButton" class="lexicon-export-btn secondary" type="button">Export Table</button>
                   <button id="lexDownloadsButton" class="lexicon-export-btn secondary" type="button">Download Files</button>
-                  <div aria-label="Text size" class="lexicon-zoom-buttons" role="group">
-                    <button aria-pressed="true" class="lexicon-zoom-btn is-active" data-zoom="small" title="Small" type="button">S</button>
-                    <button aria-pressed="false" class="lexicon-zoom-btn" data-zoom="medium" title="Medium" type="button">M</button>
-                    <button aria-pressed="false" class="lexicon-zoom-btn" data-zoom="large" title="Large" type="button">L</button>
-                  </div>
                 </div>
               </div>
-              <div class="lex-tile__header-sub">
-                <div class="lex-tile__subtext">Explore columns and values, then export what you need.</div>
+              <div class="lex-tile__header-sub lex-tile__header-sub--desktop">
                 <div id="lexiconMeta" class="lexicon-meta"></div>
               </div>
             </header>
 
             <div class="lex-tile__body">
-              <section class="lexicon-wrap zoom-small">
-                <div class="lexicon-table-wrap">
-                  <table class="lexicon-table">
-                    <thead id="lexiconHead"></thead>
-                    <tbody id="lexiconBody"></tbody>
-                  </table>
+              <div class="lex-table-area" aria-label="Lexicon table">
+                <div class="lexicon-wrap">
+                  <div class="lexicon-table-wrap">
+                    <table id="lexTable" class="lexicon-table">
+                      <thead id="lexTableHead"></thead>
+                      <tbody id="lexTableBody"></tbody>
+                    </table>
+                  </div>
                 </div>
+              </div>
+
+              <section id="lexDetail" class="lex-detail">
+                <div id="lexDetailContent" class="lex-detail__content" aria-live="polite"></div>
               </section>
             </div>
 
