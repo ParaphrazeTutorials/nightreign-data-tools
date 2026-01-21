@@ -927,6 +927,13 @@ input.lexicon-search,
   gap: 0.18rem;
 }
 
+.lex-detail__header--themed {
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f5f7fb;
+}
+
 .lex-detail__title {
   font-weight: 820;
   font-size: 1.05rem;
@@ -973,6 +980,41 @@ input.lexicon-search,
 .lex-detail__value {
   font-size: 0.9rem;
   line-height: 1.35;
+}
+
+.lex-detail__value-primary {
+  display: inline;
+}
+
+.lex-detail__value-plain {
+  display: inline;
+  margin-left: 0.35rem;
+  opacity: 0.82;
+  font-size: 0.85em;
+}
+
+.lex-cat-pill--inline {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  white-space: nowrap;
+  gap: 0.35rem;
+  font-size: 0.9em;
+}
+
+.lex-char-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: linear-gradient(135deg, rgba(120, 170, 255, 0.18), rgba(90, 110, 190, 0.12));
+  color: #e9ecf7;
+  white-space: nowrap;
+  font-size: 0.9em;
 }
 
 .lex-detail__placeholder {
@@ -1765,6 +1807,23 @@ table.lexicon-table td.lexicon-td--sorted:nth-child(2) {
 
   .lex-detail__placeholder {
     font-size: 0.8rem;
+  }
+
+  /* Gradient underline beneath each field label on mobile */
+  .lex-detail__label {
+    position: relative;
+    padding-bottom: 0.28rem;
+  }
+
+  .lex-detail__label::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.2rem;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(180,140,255,0.15), rgba(120,190,255,0.25), rgba(180,140,255,0.15));
   }
 }
 

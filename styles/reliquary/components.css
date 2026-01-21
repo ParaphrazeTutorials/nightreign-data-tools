@@ -736,3 +736,436 @@
     max-height: 180px;
   }
 }
+
+/* ------------------------------------------------------------
+   Mobile Overlay Picker (<=768w or <=1024h)
+   ------------------------------------------------------------ */
+
+.effect-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483601;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: min(24px, 4vw);
+  box-sizing: border-box;
+}
+
+.effect-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 10, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.effect-overlay__panel {
+  position: relative;
+  margin: auto;
+  width: min(720px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(150deg, rgba(14, 18, 28, 0.98), rgba(10, 12, 18, 0.96));
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.effect-overlay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 0 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.effect-overlay__title {
+  font-size: 1rem;
+  font-weight: 740;
+  letter-spacing: 0.01em;
+  color: rgba(243, 246, 252, 0.96);
+}
+
+.effect-overlay__close {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(245, 247, 251, 0.95);
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  transition: transform 120ms ease, border-color 120ms ease, filter 120ms ease;
+}
+
+.effect-overlay__close:hover,
+.effect-overlay__close:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.32);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.effect-overlay__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0 0.35rem;
+}
+
+.effect-overlay__control-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.effect-overlay__cat-toggle {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, rgba(110, 150, 235, 0.16), rgba(150, 115, 235, 0.14));
+  color: rgba(243, 246, 252, 0.96);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 720;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 22px rgba(0, 0, 0, 0.18);
+  transition: transform 120ms ease, filter 120ms ease, border-color 120ms ease;
+}
+
+.effect-overlay__cat-toggle:hover,
+.effect-overlay__cat-toggle:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.32);
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.effect-overlay__cat-toggle-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.effect-cat-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483602;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.effect-cat-dialog.is-visible {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.effect-cat-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 10, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.effect-cat-dialog__panel {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: 75vh;
+  margin: 0.5rem;
+  border-radius: 16px 16px 14px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(150deg, rgba(14, 18, 28, 0.98), rgba(10, 12, 18, 0.96));
+  box-shadow:
+    0 -4px 20px rgba(0, 0, 0, 0.32),
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transform: translateY(24px);
+  transition: transform 200ms ease;
+  overflow: hidden;
+}
+
+.effect-cat-dialog.is-visible .effect-cat-dialog__panel {
+  transform: translateY(0);
+}
+
+.effect-cat-dialog__header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.effect-cat-dialog__title {
+  text-align: center;
+  font-weight: 760;
+  letter-spacing: 0.01em;
+  color: rgba(243, 246, 252, 0.96);
+}
+
+.effect-cat-dialog__back,
+.effect-cat-dialog__close {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(245, 247, 251, 0.95);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  transition: transform 120ms ease, border-color 120ms ease, filter 120ms ease;
+}
+
+.effect-cat-dialog__back:hover,
+.effect-cat-dialog__back:focus-visible,
+.effect-cat-dialog__close:hover,
+.effect-cat-dialog__close:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.32);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.effect-cat-dialog__body {
+  padding: 0.85rem;
+  overflow: auto;
+  max-height: calc(75vh - 3.5rem);
+}
+
+.effect-cat-dialog__pill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+@media (max-width: 520px) {
+  .effect-cat-dialog__pill-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .effect-cat-dialog {
+    align-items: stretch;
+  }
+
+  .effect-cat-dialog__panel {
+    width: 100%;
+    max-height: 90vh;
+    height: auto;
+    margin: 0.25rem;
+    border-radius: 14px;
+  }
+
+  .effect-cat-dialog__body {
+    max-height: calc(90vh - 3.5rem);
+  }
+}
+
+.effect-overlay__cat-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  border-radius: 999px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(30, 34, 44, 0.92);
+  color: rgba(243, 246, 252, 0.96);
+  font-weight: 740;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.16), 0 10px 22px rgba(0, 0, 0, 0.22);
+  transition: transform 110ms ease, border-color 110ms ease, filter 110ms ease;
+}
+
+.effect-overlay__cat-pill:hover,
+.effect-overlay__cat-pill:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.24);
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.effect-overlay__cat-pill.is-active {
+  box-shadow: 0 0 0 2px rgba(200, 170, 255, 0.22), 0 12px 24px rgba(0, 0, 0, 0.26);
+}
+
+.effect-overlay__cat-pill-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.effect-overlay__cat-pill-count {
+  flex: 0 0 auto;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 0.78rem;
+}
+
+.effect-overlay__search,
+.effect-overlay__select {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(243, 246, 252, 0.96);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 22px rgba(0, 0, 0, 0.26);
+  text-align: center;
+  font-weight: 640;
+  letter-spacing: 0.01em;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.effect-overlay__search::placeholder {
+  color: rgba(225, 230, 238, 0.75);
+}
+
+.effect-overlay__filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  color: rgba(220, 225, 235, 0.86);
+  font-size: 0.84rem;
+}
+
+.effect-overlay__filter-text {
+  flex: 0 0 auto;
+}
+
+.effect-overlay__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.1rem 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow-y: auto;
+}
+
+.effect-overlay__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(16, 18, 26, 0.9);
+  color: rgba(243, 246, 252, 0.96);
+  padding: 0.75rem 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  transition: transform 110ms ease, border-color 110ms ease, filter 110ms ease;
+}
+
+.effect-overlay__row:hover,
+.effect-overlay__row:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.24);
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.effect-overlay__row-title {
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  flex: 1 1 auto;
+  word-break: break-word;
+}
+
+.effect-overlay__row-cat {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.58rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(230, 234, 242, 0.9);
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  /* Large phones and below: stack effect rows into two lines with a divider before the pill */
+  .effect-overlay__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .effect-overlay__row-title {
+    width: 100%;
+  }
+
+  .effect-overlay__row-cat {
+    align-self: flex-start;
+    width: 100%;
+    justify-content: flex-start;
+    white-space: nowrap;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding-top: 0.38rem;
+    margin-top: 0.05rem;
+  }
+}
+
+.effect-overlay__empty {
+  padding: 1rem 0.5rem;
+  text-align: center;
+  color: rgba(230, 234, 242, 0.85);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.9rem;
+}

@@ -1,7 +1,7 @@
 import { textColorFor } from "../Reliquary/reliquary.logic.js";
-import { openEffectMenu, closeEffectMenu } from "../Reliquary/reliquary.menus.js";
+import { openEffectMenu, closeEffectMenu, isEffectMenuOverlayOpen } from "../Reliquary/reliquary.menus.js";
 import { gradientFromTheme, buildCategoryThemeMap } from "../scripts/ui/theme.js";
-import { applyPaletteCssVars } from "../scripts/ui/palette.js";
+import { applyPaletteCssVars, CHARACTER_COLORS, CHIP_COLORS } from "../scripts/ui/palette.js";
 
 applyPaletteCssVars();
 
@@ -313,7 +313,22 @@ function getDisplayLabel(col) {
   return map[col] || col;
 }
 
-const PRIORITY_COLUMNS = ["EffectID", "EffectDescription", "EffectExtendedDescription", "EffectCategory", "RelicType", "ChanceWeight_110", "ChanceWeight_210", "ChanceWeight_310", "ChanceWeight_2000000", "ChanceWeight_2200000", "ChanceWeight_3000000"];
+const PRIORITY_COLUMNS = [
+  "EffectID",
+  "RollOrder",
+  "EffectDescription",
+  "EffectExtendedDescription",
+  "EffectCategory",
+  "Characters",
+  "RelicType",
+  "SelfStacking",
+  "ChanceWeight_110",
+  "ChanceWeight_210",
+  "ChanceWeight_310",
+  "ChanceWeight_2000000",
+  "ChanceWeight_2200000",
+  "ChanceWeight_3000000"
+];
 
 function reorderColumns(columns) {
   const priLower = new Set(PRIORITY_COLUMNS.map(c => c.toLowerCase()));
@@ -967,8 +982,13 @@ function openLexEffectMenu() {
 function bindEffectSelect() {
   if (dom.effectSelectBtn) dom.effectSelectBtn.addEventListener("click", openLexEffectMenu);
 
-  window.addEventListener("resize", () => closeEffectMenu());
-  window.addEventListener("scroll", () => closeEffectMenu(), true);
+  const safeClose = () => {
+    if (isEffectMenuOverlayOpen && isEffectMenuOverlayOpen()) return;
+    closeEffectMenu();
+  };
+
+  window.addEventListener("resize", safeClose);
+  window.addEventListener("scroll", safeClose, true);
 }
 
 function bindDetailInfo() {
@@ -994,6 +1014,10 @@ function renderDetail() {
   }
 
   const title = row.EffectDescription || `Effect ${row.EffectID}`;
+  const theme = categoryThemeFor(row.EffectCategory);
+  const headerStyle = theme
+    ? `style="background:${gradientFromTheme(theme)}; border-color:${theme?.border || 'rgba(255,255,255,0.16)'}; color:${textColorFor(theme?.base || '#2b2f38')}"`
+    : "";
   if (dom.effectSelectBtn) {
     const hasSelection = state.userPickedEffect && !!row;
     const label = hasSelection ? title : "-- Select Effect --";
@@ -1007,19 +1031,69 @@ function renderDetail() {
     const display = (val == null || String(val).trim() === "")
       ? `<span class="lexicon-empty">∅</span>`
       : escapeHtml(String(val));
+
+    const colLower = col.toLowerCase();
+
+    let decoratedValue = display;
+
+    // Category pill styling
+    if (colLower === "effectcategory" || colLower === "category") {
+      const catLabel = String(val ?? "Uncategorized");
+      const catTheme = categoryThemeFor(catLabel);
+      const bg = gradientFromTheme(catTheme);
+      const base = catTheme?.base || "#2b2f38";
+      const border = catTheme?.border || "rgba(255,255,255,0.14)";
+      const text = textColorFor(base);
+      decoratedValue = `
+        <span class="lex-cat-pill lex-cat-pill--inline" style="--lex-cat-base:${base}; background:${bg}; border-color:${border}; color:${text};">
+          <span class="lex-cat-pill__label">${escapeHtml(catLabel || "Uncategorized")}</span>
+        </span>
+      `;
+    }
+
+    // Characters pill styling (palette-driven)
+    if (colLower === "characters" || colLower === "character") {
+      const charLabel = (val == null ? "" : String(val)).trim();
+      const key = charLabel.toLowerCase();
+      const theme = key === "all"
+        ? CHIP_COLORS.characterAll
+        : (CHARACTER_COLORS[key] || CHIP_COLORS.character || CHIP_COLORS.placeholder);
+
+      const bg = theme?.bg || "rgba(255,255,255,0.08)";
+      const border = theme?.border || "rgba(255,255,255,0.14)";
+      const text = theme?.text || "rgba(245,245,245,0.92)";
+
+      decoratedValue = `
+        <span class="lex-char-pill" style="background:${bg}; border-color:${border}; color:${text};">
+          ${escapeHtml(charLabel || "Unknown")}
+        </span>
+      `;
+    }
+
+    // Add human-readable booleans next to raw values for curse flags
+    if (["curse", "curseRequired", "curserequired", "selfstacking"].includes(colLower) && val != null) {
+      const raw = String(val).trim().toLowerCase();
+      const isTrue = ["1", "true", "yes", "y"].includes(raw);
+      const isFalse = ["0", "false", "no", "n"].includes(raw);
+      const labelText = isTrue ? "Yes" : (isFalse ? "No" : String(val));
+      decoratedValue = `
+        <span class="lex-detail__value-primary">${display}</span>
+        <span class="lex-detail__value-plain">(${escapeHtml(labelText)})</span>
+      `;
+    }
     return `
       <div class="lex-detail__row">
         <div class="lex-detail__label">
           <span class="lex-detail__label-text">${escapeHtml(label)}</span>
           <button class="lexicon-col-info lex-detail__info" type="button" data-col="${escapeHtml(col)}" aria-label="Column info">i</button>
         </div>
-        <div class="lex-detail__value">${display}</div>
+        <div class="lex-detail__value">${decoratedValue}</div>
       </div>
     `;
   }).join("");
 
   dom.detailContent.innerHTML = `
-    <div class="lex-detail__header">
+    <div class="lex-detail__header lex-detail__header--themed" ${headerStyle}>
       <div class="lex-detail__title">${escapeHtml(title)}</div>
     </div>
     <div class="lex-detail__grid">${fields}</div>
