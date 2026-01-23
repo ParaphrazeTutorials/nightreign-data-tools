@@ -18,6 +18,12 @@ export function getDom() {
     classFilterControl: document.getElementById("classFilterControl"),
     classFilterSlotIndividual: document.getElementById("classFilterSlotIndividual"),
     classFilterSlotChalice: document.getElementById("classFilterSlotChalice"),
+    classPortraitBtn: document.getElementById("classPortraitBtn"),
+    classPortraitMenu: document.getElementById("classPortraitMenu"),
+    relicThumb: document.getElementById("relicThumb"),
+    relicTypeMenu: document.getElementById("relicTypeMenu"),
+    relicTypePopover: document.getElementById("relicTypePopover"),
+    toggleSlotIndividual: document.getElementById("toggleSlotIndividual"),
 
     chalicePickerControl: document.getElementById("chalicePickerControl"),
     chalicePickerSlot: document.getElementById("chalicePickerSlot"),
@@ -37,10 +43,11 @@ export function getDom() {
     startOverBtn: document.getElementById("startOver"),
     instructionsBtn: document.getElementById("instructionsBtn") || null,
     instructionsBtnChalice: document.getElementById("instructionsBtnChalice") || null,
-    disclaimerBtn: document.getElementById("disclaimerBtn") || null,
     instructionsPopover: document.getElementById("instructionsPopover") || null,
     instructionsPopoverChalice: document.getElementById("instructionsPopoverChalice") || null,
-    disclaimerPopover: document.getElementById("disclaimerPopover") || null,
+    modeToggleMobile: document.getElementById("reliqModeToggle") || null,
+    detailsToggleMobile: document.getElementById("detailsToggleMobile") || null,
+    detailsIssueBadge: document.getElementById("detailsIssueBadge") || null,
 
     // Counts
     count1: document.getElementById("count1"),
@@ -55,6 +62,7 @@ export function getDom() {
     relicColorChip: document.getElementById("relicColorChip"),
     relicColorMenu: document.getElementById("relicColorMenu"),
     chosenList: document.getElementById("chosenList"),
+    detailsPanel: document.getElementById("details"),
     detailsBody: document.getElementById("detailsBody"),
 
     // Optional (safe if missing)

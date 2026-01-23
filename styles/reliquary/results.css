@@ -154,6 +154,25 @@
   border-bottom: none;
 }
 
+@media (max-width: 900px) {
+  /* Individual mobile: collapse to effects-only list */
+  #individualMode .relic-preview {
+    grid-template-columns: 1fr;
+    grid-template-areas: "relic-effects";
+    gap: 0.4rem;
+  }
+
+  #individualMode .relic-frame,
+  #individualMode .relic-color-control {
+    display: none !important;
+  }
+
+  #individualMode .relic-effects {
+    grid-column: 1;
+    min-width: 0;
+  }
+}
+
 /* Raw + curse only: give the image column a sane size so it can't collapse to 2px */
 #results.raw-has-curse .relic-preview {
   grid-template-columns: clamp(240px, 26vw, 340px) minmax(460px, 1fr) !important;

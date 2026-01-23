@@ -7,11 +7,38 @@ import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
 // ---------- shared helpers ----------
 function mobileOverlayPreferred() {
   if (typeof window === "undefined") return false;
-  const w = Number(window.innerWidth || 0);
-  const h = Number(window.innerHeight || 0);
-  const widthIsMobile = Number.isFinite(w) && w > 0 && w <= 768;
-  const heightIsMobile = Number.isFinite(h) && h > 0 && h <= 1024;
-  return widthIsMobile || heightIsMobile;
+  const sw = Math.round(Number(window.screen?.width || 0));
+  const sh = Math.round(Number(window.screen?.height || 0));
+  const vw = Math.round(Number(window.innerWidth || 0));
+  const vh = Math.round(Number(window.innerHeight || 0));
+
+  if (![sw, sh, vw, vh].every(Number.isFinite)) return false;
+
+  const maxView = Math.max(vw, vh);
+  const minView = Math.min(vw, vh);
+  const maxScreen = Math.max(sw, sh);
+  const minScreen = Math.min(sw, sh);
+
+  // Hard overrides
+  const forceMobile = (vw === 768 && vh === 1024) || (vw === 1024 && vh === 768);
+  const forceDesktop = (vw === 1366 && vh === 768) || (vw === 768 && vh === 1366);
+
+  // Treat compact phone viewports as mobile regardless of reported screen size.
+  if (vw <= 480 && vh <= 950) return true;
+
+  // Hard overrides
+  if (forceMobile) return true;
+  if (forceDesktop) return false;
+
+  const desktopViewport = vw >= 1366 && vh >= 768;
+  const desktopScreen = maxScreen >= 1366 && minScreen >= 768;
+
+  // Treat as mobile when the viewport is tablet/phone-sized, unless it meets desktop thresholds.
+  const smallViewport = minView <= 1024 && maxView <= 1280;
+  const smallScreen = maxScreen < 1366 && minScreen < 1200;
+
+  if (desktopViewport || desktopScreen) return false;
+  return smallViewport || smallScreen;
 }
 
 let bodyScrollLockState = null;
@@ -47,9 +74,10 @@ function positionMenu(menuEl, anchorRect) {
     return;
   }
   const margin = 8;
-  const top = anchorRect.bottom + margin + window.scrollY;
+  // Flyout uses position: fixed, so work in viewport coords (do not add page scroll).
+  const top = anchorRect.bottom + margin;
   const left = Math.min(
-    Math.max(anchorRect.left + window.scrollX, margin),
+    Math.max(anchorRect.left, margin),
     Math.max(margin, window.innerWidth - menuEl.offsetWidth - margin)
   );
   menuEl.style.top = `${top}px`;
@@ -65,7 +93,7 @@ function renderMenuList(listEl, rows, activeCategory, currentId, onPick, categor
   })();
 
   if (!list.length) {
-    listEl.innerHTML = `<div class="effect-overlay__empty">No ${isEffectMenu ? "effects" : "curses"} match your filters.</div>`;
+    listEl.innerHTML = `<div class="effect-menu__empty">No ${isEffectMenu ? "effects" : "curses"} match your filters.</div>`;
     return;
   }
 
@@ -74,14 +102,38 @@ function renderMenuList(listEl, rows, activeCategory, currentId, onPick, categor
     const title = r.EffectDescription ?? (isEffectMenu ? `(Effect ${id})` : `(Curse ${id})`);
     const cat = effectCategoryForRow(r) || "Uncategorized";
     const theme = categoryThemes.get(cat) || categoryThemes.get("__default");
-    const rowBg = gradientFromTheme(theme);
-    const borderColor = theme?.border || "rgba(255, 255, 255, 0.08)";
+    const curseRequired = isEffectMenu && String(r?.CurseRequired ?? "0") === "1";
+    // Base category gradient.
+    const baseBg = gradientFromTheme(theme);
+    // For effect rows, put a strong right-side darkening overlay on top of the category gradient.
+    const rowBg = isEffectMenu
+      ? `linear-gradient(90deg,
+          rgba(0,0,0,0) 0%,
+          rgba(0,0,0,0) 35%,
+          rgba(0,0,0,0.35) 55%,
+          rgba(0,0,0,0.7) 65%,
+          rgba(0,0,0,1) 75%,
+          rgba(0,0,0,1) 100%), ${baseBg}`
+      : baseBg;
+    const borderColor = theme?.border || "rgba(255, 255, 255, 0.12)";
     const txt = textColorFor(theme?.base || rowBg || "#2b2f38");
     const isSelected = String(r.EffectID) === String(currentId);
+
     return `
-      <button type="button" class="effect-overlay__row ${isSelected ? "is-selected" : ""}" data-effect-id="${r.EffectID}" role="listitem" style="border-color:${borderColor}; color:${txt};">
-        <span class="effect-overlay__row-title">${title}</span>
-        <span class="effect-overlay__row-cat">${cat}</span>
+      <button
+        type="button"
+        class="effect-menu__effect ${isSelected ? "is-current" : ""}"
+        data-effect-id="${r.EffectID}"
+        role="listitem"
+        style="background:${rowBg}; border-color:${borderColor}; color:${txt};"
+      >
+        <div class="effect-menu__effect-main">
+          <div class="effect-menu__effect-title">${title}</div>
+        </div>
+        <div class="effect-menu__effect-trailing">
+          ${curseRequired ? `<span class="curse-indicator-wrap" aria-label="Curse Required" title="Curse Required"><span class="curse-indicator" aria-hidden="true"></span></span>` : ""}
+          <span class="effect-menu__tag" style="border-color:${borderColor}; color:${txt}; background:${baseBg};">${cat}</span>
+        </div>
       </button>
     `;
   }).join("");
@@ -241,9 +293,13 @@ export function openEffectMenu({ slotIdx, anchorBtn, eligible, categories, curre
         const borderColor = base;
         const borderGlow = "rgba(255, 255, 255, 0.08)";
         const txt = textColorFor(base || rowBg || "#2b2f38");
+        const curseRequired = String(r?.CurseRequired ?? "0") === "1";
+        const curseBadge = curseRequired
+          ? '<span class="curse-indicator-wrap effect-overlay__row-curse" aria-label="Curse Required" title="Curse Required"><span class="curse-indicator" aria-hidden="true"></span></span>'
+          : "";
         return `
           <button type="button" class="effect-overlay__row" data-effect-id="${r.EffectID}" role="listitem" style="border:2px solid ${borderColor}; box-shadow: 0 0 0 1px ${borderGlow};">
-            <span class="effect-overlay__row-title">${title}</span>
+            <span class="effect-overlay__row-title">${title}${curseBadge}</span>
             <span class="effect-overlay__row-cat" style="background:${rowBg}; border-color:${borderColor}; color:${txt};">${cat}</span>
           </button>
         `;

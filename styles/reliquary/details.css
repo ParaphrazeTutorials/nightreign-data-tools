@@ -50,6 +50,120 @@
   width: 100%;
 }
 
+/* Mobile collapse affordance */
+.individual-details__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.individual-details__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+}
+
+.individual-filter__toggle-slot--details {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.individual-details__actions .details-toggle-btn {
+  order: 3;
+}
+
+.individual-details__actions .individual-filter__toggle-slot--details {
+  order: 1;
+}
+
+.individual-details__actions .details-issue-badge {
+  order: 2;
+}
+
+.details-toggle-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: rgba(245,247,251,0.95);
+  font-weight: 760;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 120ms ease;
+  position: relative;
+  padding-right: 0.9rem;
+}
+
+.details-toggle-btn::after {
+  content: "";
+  position: absolute;
+  right: 0.45rem;
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 120ms ease;
+}
+
+.details-toggle-btn[aria-expanded="true"]::after {
+  transform: rotate(135deg);
+}
+
+.details-toggle-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.24);
+  transform: translateY(-1px);
+}
+
+.details-toggle-btn:active {
+  transform: translateY(0);
+}
+
+.details-issue-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  padding: 0.22rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 140, 140, 0.55);
+  background: rgba(110, 30, 30, 0.85);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+#details[data-collapsed="true"] .details-body {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .details-toggle-btn {
+    display: none;
+  }
+
+  .individual-details__actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .individual-details__header h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
 #details .info-box{
   border: 1px solid rgba(255,255,255,0.10);
   background: rgba(0,0,0,0.14);

@@ -542,6 +542,8 @@
   overflow: visible;
   white-space: normal;
   text-overflow: unset;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Tri-color striping for effect rows */
@@ -553,6 +555,8 @@
   gap: 0.15rem;
   flex: 1 1 auto;
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .effect-menu__effect-trailing {
@@ -561,6 +565,8 @@
   gap: 0.28rem;
   margin-left: auto;
   flex: 0 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .effect-menu__effect:hover,
@@ -586,6 +592,19 @@
   word-break: break-word;
 }
 
+.effect-menu__column--effects .effect-menu__effect::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(4, 6, 12, 0.35) 55%,
+    rgba(4, 6, 12, 0.6) 100%);
+  mix-blend-mode: multiply;
+}
+
 .curse-indicator {
   width: 21px;
   height: 21px;
@@ -598,6 +617,26 @@
   max-width: 21px;
   max-height: 21px;
   line-height: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 220, 255, 0.65);
+  background: #3d1664;
+  position: relative;
+  overflow: hidden;
+}
+
+.curse-indicator::before {
+  content: "C";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: -0.02em;
+  color: #fdfdff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
 }
 
 .curse-indicator-wrap {
@@ -1120,6 +1159,9 @@
   letter-spacing: 0.005em;
   flex: 1 1 auto;
   word-break: break-word;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .effect-overlay__row-cat {
@@ -1147,6 +1189,8 @@
 
   .effect-overlay__row-title {
     width: 100%;
+    justify-content: flex-start;
+    font-size: 0.75em;
   }
 
   .effect-overlay__row-cat {

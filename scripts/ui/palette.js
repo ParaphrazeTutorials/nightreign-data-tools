@@ -65,6 +65,7 @@ export const CHARACTERS = [
   "Guardian",
   "Ironeye",
   "Raider",
+  "Recluse",
   "Revenant",
   "Scholar",
   "Undertaker",
@@ -78,6 +79,7 @@ export const CHARACTER_COLORS = {
   guardian: { bg: "linear-gradient(135deg, #1f3b2f, #35644e)", border: "rgba(140, 210, 175, 0.65)", text: "#e8fff4" },
   ironeye: { bg: "linear-gradient(135deg, #20303c, #355269)", border: "rgba(140, 180, 210, 0.65)", text: "#e9f4ff" },
   raider: { bg: "linear-gradient(135deg, #3a231c, #6a3a2a)", border: "rgba(230, 170, 135, 0.7)", text: "#fff3e9" },
+  recluse: { bg: "linear-gradient(135deg, #1f1f32, #3d3c61)", border: "rgba(170, 160, 220, 0.7)", text: "#f2f3ff" },
   revenant: { bg: "linear-gradient(135deg, #2d2a3a, #4b4760)", border: "rgba(190, 170, 230, 0.65)", text: "#f3f0ff" },
   scholar: { bg: "linear-gradient(135deg, #1f323d, #345468)", border: "rgba(150, 195, 225, 0.68)", text: "#e9f6ff" },
   undertaker: { bg: "linear-gradient(135deg, #2d1f1f, #4e3534)", border: "rgba(215, 150, 150, 0.65)", text: "#fff0f0" },
@@ -194,6 +196,11 @@ export function characterPortrait(name) {
   const slug = characterSlug(name);
   if (!slug || slug === "unknown") return null;
   const url = characterAssetUrl(`${slug}_portrait.png`);
+  return url ? `url("${url}")` : null;
+}
+
+export function randomPortrait() {
+  const url = characterAssetUrl("random_portrait.png");
   return url ? `url("${url}")` : null;
 }
 

@@ -46,6 +46,18 @@
 
       <section class="tool-shell">
 
+        <!-- Mobile mode toggle (mirrors Lexicon dataset toggle) -->
+        <button
+          id="reliqModeToggle"
+          class="reliq-mode-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="individualMode"
+        >
+          <span class="reliq-mode-toggle__label">Individual Relics</span>
+          <span class="reliq-mode-toggle__chevron" aria-hidden="true"></span>
+        </button>
+
         <!-- UTILITY BAR (Filters + Actions) -->
         <section id="utilityBar" class="utility-bar" aria-label="Reliquary controls">
           <div class="utility-bar__col utility-bar__col--left">
@@ -364,25 +376,6 @@
           </div>
         </div>
 
-        <div class="utility-popover-source" id="disclaimerPopover" hidden>
-          <div class="popover-title">Disclaimer</div>
-          <div class="popover-body">
-            <p>
-              This tool is an <strong>unofficial</strong> community helper for planning effect combinations. It does <strong>not</strong> modify your game, connect to your account,
-              or guarantee anything about online safety. You are responsible for how you use the information provided here and for any changes you make to your save/data.
-            </p>
-            <p>
-              Compatibility rules and outcomes can change with patches, anticheat updates, and server-side checks.
-              If you're not sure whether a change is safe, assume it isn't and keep your relics unedited for online play.
-            </p>
-            <p class="disclaimer-warning">
-              <span style="color: rgba(255, 115, 115, 0.95); font-weight: 800; text-decoration: underline;">
-                Please do not play online with illegal relics.
-              </span>
-            </p>
-          </div>
-        </div>
-
         <!-- MAIN GRID -->
         <section class="main-grid">
           <section id="individualMode" class="mode-panel is-active" aria-label="Individual relic builder">
@@ -393,8 +386,8 @@
                   <aside class="chalice-filter individual-filter" aria-label="Select effects">
                     <div class="panel-header chalice-filter__header">
                       <div class="chalice-filter__header-left">
-                        <div class="chalice-filter__title-row">
-                          <h4>Select Effects</h4>
+                          <div class="chalice-filter__title-row" aria-hidden="true">
+                            <h4>Select Effects</h4>
                           <div class="chalice-filter__controls individual-filter__controls">
                             <button
                               id="showIllegalBtn"
@@ -431,7 +424,7 @@
                         <span class="pill pill--ghost individual-filter__count" aria-live="polite" hidden></span>
                         <div class="chalice-filter__selectors chalice-filter__selectors--inline individual-filter__selectors">
                           <div id="classFilterSlotIndividual" class="utility-field-slot">
-                            <label id="classFilterControl" class="utility-field">
+                            <label id="classFilterControl" class="utility-field" aria-label="Class">
                               <select id="classFilter">
                                 <option value="" selected>-- Class / All --</option>
                               </select>
@@ -447,7 +440,25 @@
                             </label>
                           </div>
                         </div>
-                        <div class="individual-filter__actions">
+                        <div class="individual-quick-row" aria-label="Quick controls">
+                          <div class="quick-tile">
+                            <button id="classPortraitBtn" class="mini-tile mini-tile--portrait" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="classPortraitMenu">
+                              <span class="mini-tile__hint">Select Character</span>
+                              <span class="sr-only">Select Class</span>
+                            </button>
+                            <div id="classPortraitMenu" class="mini-tile-menu" hidden role="menu" aria-label="Select Class"></div>
+                          </div>
+                          <div class="quick-tile">
+                            <button id="relicThumb" class="mini-tile mini-tile--relic" type="button" aria-label="Relic preview" aria-haspopup="menu" aria-expanded="false" aria-controls="relicTypeMenu" disabled>
+                              <span class="mini-tile__hint">Relic Type</span>
+                              <span class="mini-tile__selection" id="relicThumbSelection" aria-live="polite"></span>
+                              <span class="mini-tile__color-chip" aria-hidden="true"></span>
+                            </button>
+                            <div id="relicTypeMenu" class="mini-tile-menu" hidden role="menu" aria-label="Select Relic Type"></div>
+                            <div id="relicTypePopover" class="relic-type-popover" hidden></div>
+                          </div>
+                        </div>
+                        <div class="individual-filter__actions individual-filter__actions--split">
                           <button id="instructionsBtn" class="utility-ghost utility-ghost--small" type="button">Instructions</button>
                           <div id="startOverSlotIndividual" class="utility-field-slot utility-field-slot--inline">
                             <button id="startOver" class="secondary" type="button">Start Over</button>
@@ -459,60 +470,75 @@
                     <div class="chalice-filter__body individual-filter__body"></div>
                   </aside>
 
-                  <section class="chalice-layout__middle individual-preview" aria-label="Relic preview">
-                    <div class="chalice-grid individual-preview-grid">
-                      <article id="results" class="chalice-column individual-preview__panel">
-                        <div class="panel-header">
-                          <h3>Relic Preview</h3>
-                          <div class="panel-header__right">
-                            <div id="relicProbability" class="relic-probability" role="status" aria-live="polite" hidden>
-                              <span id="relicProbabilityValue" class="relic-probability__value">%</span>
-                            </div>
-                            <span id="relicValidity" class="validity-badge" hidden>Valid</span>
-                            <button id="autoSortBtn" class="auto-sort-btn utility-ghost utility-ghost--small" type="button" hidden>Auto-Sort</button>
+                  <div class="individual-view">
+                    <aside class="chalice-layout__results individual-details" aria-label="Relic details">
+                      <article id="details" class="chalice-results individual-details__panel">
+                        <div class="panel-header individual-details__header">
+                          <h3>Details</h3>
+                          <div class="individual-details__actions">
+                            <div id="toggleSlotIndividual" class="individual-filter__toggle-slot individual-filter__toggle-slot--details"></div>
+                            <span id="detailsIssueBadge" class="details-issue-badge" hidden aria-live="polite"></span>
+                            <button
+                              id="detailsToggleMobile"
+                              class="details-toggle-btn"
+                              type="button"
+                              aria-expanded="false"
+                              aria-controls="detailsBody"
+                            >
+                              Show details
+                            </button>
                           </div>
                         </div>
 
-                        <div class="relic-preview">
-                          <div class="relic-frame">
-                            <img id="relicImg" alt="Relic preview" />
-                            <div id="relicColorControl" class="relic-color-control" hidden>
-                              <button
-                                id="relicColorChip"
-                                class="relic-color-chip"
-                                type="button"
-                                aria-haspopup="listbox"
-                                aria-expanded="false"
-                              >
-                                <span class="sr-only">Relic color</span>
-                              </button>
-                              <div id="relicColorMenu" class="relic-color-menu" role="listbox" aria-label="Choose relic color"></div>
-                            </div>
-                          </div>
-
-                          <div class="relic-effects">
-                            <div class="slot-counts">
-                              <small class="subtext" id="count1"></small>
-                              <small class="subtext" id="count2"></small>
-                              <small class="subtext" id="count3"></small>
-                            </div>
-                            <ul class="chosen-effects" id="chosenList"></ul>
-                          </div>
-                        </div>
+                        <div id="detailsBody" class="details-body"></div>
                       </article>
-                    </div>
-                  </section>
+                    </aside>
+
+                    <section class="chalice-layout__middle individual-preview" aria-label="Relic preview">
+                      <div class="chalice-grid individual-preview-grid">
+                        <article id="results" class="chalice-column individual-preview__panel">
+                          <div class="panel-header">
+                            <h3>Relic Preview</h3>
+                            <div class="panel-header__right">
+                              <div id="relicProbability" class="relic-probability" role="status" aria-live="polite" hidden>
+                                <span id="relicProbabilityValue" class="relic-probability__value">%</span>
+                              </div>
+                              <span id="relicValidity" class="validity-badge" hidden>Valid</span>
+                              <button id="autoSortBtn" class="auto-sort-btn utility-ghost utility-ghost--small" type="button" hidden>Auto-Sort</button>
+                            </div>
+                          </div>
+
+                          <div class="relic-preview">
+                            <div class="relic-frame">
+                              <img id="relicImg" alt="Relic preview" />
+                              <div id="relicColorControl" class="relic-color-control" hidden>
+                                <button
+                                  id="relicColorChip"
+                                  class="relic-color-chip"
+                                  type="button"
+                                  aria-haspopup="listbox"
+                                  aria-expanded="false"
+                                >
+                                  <span class="sr-only">Relic color</span>
+                                </button>
+                                <div id="relicColorMenu" class="relic-color-menu" role="listbox" aria-label="Choose relic color"></div>
+                              </div>
+                            </div>
+
+                            <div class="relic-effects">
+                              <div class="slot-counts">
+                                <small class="subtext" id="count1"></small>
+                                <small class="subtext" id="count2"></small>
+                                <small class="subtext" id="count3"></small>
+                              </div>
+                              <ul class="chosen-effects" id="chosenList"></ul>
+                            </div>
+                          </div>
+                        </article>
+                      </div>
+                    </section>
+                  </div>
                 </div>
-
-                <aside class="chalice-layout__results individual-details" aria-label="Relic details">
-                  <article id="details" class="chalice-results individual-details__panel">
-                    <div class="panel-header">
-                      <h3>Details</h3>
-                    </div>
-
-                    <div id="detailsBody" class="details-body"></div>
-                  </article>
-                </aside>
               </div>
             </article>
           </section>

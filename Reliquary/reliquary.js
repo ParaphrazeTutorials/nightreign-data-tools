@@ -24,7 +24,7 @@ import {
 } from "./reliquary.ui.js";
 import { getDom } from "./reliquary.dom.js";
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
-import { applyPaletteCssVars, COLOR_SWATCHES, RANDOM_SWATCH, CHARACTERS, characterColors, characterBackdrop, characterPortrait } from "../scripts/ui/palette.js";
+import { applyPaletteCssVars, COLOR_SWATCHES, RANDOM_SWATCH, CHARACTERS, characterColors, characterBackdrop, characterPortrait, randomPortrait } from "../scripts/ui/palette.js";
 import { openEffectMenu, closeEffectMenu, openCurseMenu, closeCurseMenu } from "./reliquary.menus.js";
 
 const dom = getDom();
@@ -36,8 +36,15 @@ const resultsHeader = document.querySelector("#results .panel-header");
 const validityBadge = document.getElementById("relicValidity");
 const autoSortBtn = document.getElementById("autoSortBtn");
 
+const RELIC_TYPES = [
+  { value: "", label: "Any Type" },
+  { value: "Standard", label: "Standard" },
+  { value: "Depth Of Night", label: "Depth of Night" }
+];
+
 const MODES = { INDIVIDUAL: "individual", CHALICE: "chalice" };
 let activeMode = MODES.INDIVIDUAL;
+let individualDetailsCollapsed = false;
 
 // Chalice details states: collapsed (header only), partial (default), full (takeover).
 const DETAILS_VIEW = { COLLAPSED: "collapsed", PARTIAL: "partial", FULL: "full" };
@@ -49,6 +56,16 @@ let rowsAll = [];
 let byIdAll = new Map();
 let curses = [];
 let selectedClass = "";
+let classPortraitMenuOpen = false;
+let relicTypeMenuOpen = false;
+let relicTypePopoverOpen = false;
+let pendingRelicType = "";
+let pendingRelicColor = "Random";
+
+function isDesktopWide() {
+  if (typeof window === "undefined") return true;
+  return (window.innerWidth || 0) >= 1366 && (window.innerHeight || 0) >= 768;
+}
 
 let chaliceData = [];
 let chalicesByCharacter = new Map();
@@ -380,6 +397,12 @@ function colorChipLabel(value) {
   return `Color: ${v}`;
 }
 
+function swatchForColorName(name) {
+  const normalized = name || "Random";
+  if (normalized === "Random") return RANDOM_SWATCH;
+  return COLOR_SWATCH[normalized] || "#b9c2d0";
+}
+
 function twoDecimal(value) {
   if (!Number.isFinite(value)) return "0.00";
   return (Math.round(value * 100) / 100).toFixed(2);
@@ -601,6 +624,10 @@ function updateColorChipLabel() {
   dom.relicColorChip.style.setProperty("--chip-swatch", swatch);
   dom.relicColorChip.setAttribute("data-swatch", swatch);
 
+  // Mirror into the mini tile chip if present
+  const relicTileChip = dom.relicThumb?.querySelector?.(".mini-tile__color-chip");
+  if (relicTileChip) relicTileChip.style.setProperty("--chip-swatch", swatch);
+
   if (!dom.relicColorMenu) return;
   const buttons = dom.relicColorMenu.querySelectorAll("[data-color-option]");
   buttons.forEach(btn => {
@@ -608,6 +635,16 @@ function updateColorChipLabel() {
     btn.classList.toggle("is-active", isActive);
     btn.setAttribute("aria-selected", String(isActive));
   });
+}
+
+function updateRelicThumb(_stage) {
+  if (!dom.relicThumb || !dom.relicImg) return;
+  const src = dom.relicImg.src || "";
+  const hasPreview = !!src;
+  dom.relicThumb.disabled = false;
+  dom.relicThumb.style.backgroundImage = hasPreview ? `url("${src}")` : "";
+  const typeLabel = dom.selType?.value ? dom.selType.value : "Any Type";
+  dom.relicThumb.setAttribute("aria-label", hasPreview ? `Relic preview — ${typeLabel}` : `Select relic type (${typeLabel})`);
 }
 
 function openColorMenu() {
@@ -637,6 +674,8 @@ function toggleColorMenu() {
 function handleColorMenuOutsideClick(evt) {
   if (!dom.relicColorControl) return;
   if (dom.relicColorControl.contains(evt.target)) return;
+  const relicTileChip = dom.relicThumb?.querySelector?.(".mini-tile__color-chip");
+  if (relicTileChip && relicTileChip.contains(evt.target)) return;
   closeColorMenu();
 }
 
@@ -655,6 +694,13 @@ function installColorChipMenu() {
   dom.relicColorMenu.innerHTML = COLOR_CHOICES.map(colorOptionHtml).join("");
   dom.relicColorControl.hidden = false;
   dom.relicColorMenu.hidden = true;
+
+  const relicTileChip = dom.relicThumb?.querySelector?.(".mini-tile__color-chip");
+  if (relicTileChip) {
+    relicTileChip.removeAttribute("role");
+    relicTileChip.removeAttribute("tabindex");
+    relicTileChip.removeAttribute("aria-label");
+  }
 
   dom.relicColorChip.addEventListener("click", evt => {
     evt.stopPropagation();
@@ -692,6 +738,35 @@ function sideInfo(side) {
 function setChaliceStatus(text) {
   if (!dom.chaliceStatus) return;
   dom.chaliceStatus.textContent = text || "";
+}
+
+function isMobileLayout() {
+  return window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+}
+
+function applyIndividualDetailsCollapse() {
+  // Individual mode should stay expanded on mobile; ignore collapse requests.
+  individualDetailsCollapsed = false;
+  const panel = dom.detailsPanel || document.getElementById("details");
+  if (panel) panel.dataset.collapsed = "false";
+
+  if (dom.detailsToggleMobile) {
+    dom.detailsToggleMobile.hidden = true;
+    dom.detailsToggleMobile.setAttribute("aria-expanded", "true");
+    dom.detailsToggleMobile.textContent = "Details";
+  }
+}
+
+function updateMobileModeToggle() {
+  if (!dom.modeToggleMobile) return;
+  const isChalice = isChaliceMode();
+  const label = isChalice ? "Chalice Builder" : "Individual Relics";
+  const labelEl = dom.modeToggleMobile.querySelector(".reliq-mode-toggle__label");
+  if (labelEl) {
+    labelEl.setAttribute("aria-label", label);
+    labelEl.textContent = label;
+  }
+  dom.modeToggleMobile.setAttribute("aria-expanded", isChalice ? "true" : "false");
 }
 
 function updateDetailsToggleLabel(view) {
@@ -754,6 +829,8 @@ function expandChaliceDetailsToFull() {
 function syncModeUI() {
   const isChalice = isChaliceMode();
 
+  updateMobileModeToggle();
+
   const moveNode = (node, target) => {
     if (!node || !target) return;
     if (node.parentElement === target) return;
@@ -791,6 +868,12 @@ function syncModeUI() {
   // Relocate class filter between utility bar (individual) and effect pool (chalice)
   const classSlot = isChalice ? dom.classFilterSlotChalice : dom.classFilterSlotIndividual;
   moveNode(dom.classFilterControl, classSlot);
+  setClassPortraitMenu(false);
+
+  if (!isChalice && dom.toggleSlotIndividual) {
+    moveNode(dom.showIllegalBtn, dom.toggleSlotIndividual);
+    moveNode(dom.autoSortToggle, dom.toggleSlotIndividual);
+  }
 
   // Keep chalice picker inside the effect pool
   moveNode(dom.chalicePickerControl, dom.chalicePickerSlot);
@@ -804,6 +887,12 @@ function syncModeUI() {
   } else {
     if (dom.chaliceLayout) dom.chaliceLayout.removeAttribute("data-details-state");
     if (dom.chaliceResultsShell) dom.chaliceResultsShell.removeAttribute("data-details-state");
+  }
+
+  // Details collapse defaults to collapsed on mobile for individual mode only
+  if (!isChalice) {
+    const shouldCollapse = isMobileLayout();
+    applyIndividualDetailsCollapse(shouldCollapse ? true : individualDetailsCollapsed);
   }
 }
 
@@ -843,6 +932,179 @@ function populateClassOptions() {
   dom.selClass.innerHTML = options.join("");
 }
 
+function renderClassPortraitMenu() {
+  if (!dom.classPortraitMenu) return;
+  const chars = Array.isArray(CHARACTERS) ? [...new Set(CHARACTERS)] : [];
+  const buttons = chars.map(name => {
+    const norm = name || "";
+    const portrait = characterPortrait(norm) || "";
+    const attrPortrait = portrait ? portrait.replace(/\"/g, "'") : "";
+    const active = normalizeLower(norm) === normalizeLower(selectedClass);
+    const bg = attrPortrait ? ` style="background-image: ${attrPortrait};"` : "";
+    const cls = active ? " class=\"is-active\"" : "";
+    const label = escapeHtml(norm);
+    return `<button type="button" role="menuitemradio" aria-checked="${active}" data-class="${label}" aria-label="${label}"${bg}${cls}></button>`;
+  });
+  dom.classPortraitMenu.innerHTML = buttons.join("");
+}
+
+function renderRelicTypeMenu() {
+  if (!dom.relicTypeMenu) return;
+  const current = (dom.selType?.value ?? "").trim();
+  const buttons = RELIC_TYPES.map(entry => {
+    const isActive = normalizeLower(entry.value) === normalizeLower(current);
+    const cls = isActive ? " class=\"is-active\"" : "";
+    return `<button type=\"button\" role=\"menuitemradio\" aria-checked=\"${isActive}\" data-relic-type=\"${escapeHtml(entry.value)}\" aria-label=\"${escapeHtml(entry.label)}\"${cls}>${escapeHtml(entry.label)}</button>`;
+  });
+  dom.relicTypeMenu.innerHTML = buttons.join("");
+}
+
+function setRelicTypeMenu(open) {
+  if (!dom.relicThumb || !dom.relicTypeMenu) return;
+  relicTypeMenuOpen = !!open;
+  dom.relicThumb.setAttribute("aria-expanded", relicTypeMenuOpen ? "true" : "false");
+  dom.relicTypeMenu.hidden = !relicTypeMenuOpen;
+}
+
+function setSelectedRelicType(next) {
+  const normalized = (next ?? "").toString().trim();
+  if (dom.selType) dom.selType.value = normalized;
+  clearSelectionsIncompatibleWithType(normalized);
+  updateUI("type-change");
+  renderRelicTypeMenu();
+  updateRelicTypeUI();
+  setRelicTypeMenu(false);
+}
+
+function updateRelicTypeUI() {
+  if (dom.relicThumb) {
+    const typeLabel = dom.selType?.value ? dom.selType.value : "Any Type";
+    dom.relicThumb.setAttribute("aria-label", `Relic type: ${typeLabel}`);
+    const selectionLabel = document.getElementById("relicThumbSelection");
+    if (selectionLabel) {
+      selectionLabel.textContent = dom.selType?.value ? dom.selType.value : "";
+      selectionLabel.hidden = !dom.selType?.value;
+    }
+    const colorChip = dom.relicThumb.querySelector(".mini-tile__color-chip");
+    if (colorChip && dom.relicColorChip) {
+      const swatch = dom.relicColorChip.style.getPropertyValue("--chip-swatch") || "";
+      colorChip.style.setProperty("--chip-swatch", swatch || "rgba(255,255,255,0.12)");
+    }
+  }
+
+  if (dom.relicTypeMenu) {
+    const current = normalizeLower(dom.selType?.value || "");
+    dom.relicTypeMenu.querySelectorAll("[data-relic-type]").forEach(btn => {
+      const isActive = normalizeLower(btn.dataset.relicType || "") === current;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-checked", isActive ? "true" : "false");
+    });
+  }
+
+  renderRelicTypePopover();
+}
+
+function renderRelicTypePopover() {
+  if (!dom.relicTypePopover) return;
+  const currentType = (pendingRelicType || dom.selType?.value || "").trim();
+  const currentColor = (pendingRelicColor || selectedColor || "Random").trim() || "Random";
+
+  const types = [
+    { value: "Standard", label: "Standard", img: "../Assets/relics/default/standard.png" },
+    { value: "Depth Of Night", label: "Depth of Night", img: "../Assets/relics/default/depth_of_night.png" }
+  ];
+
+  const typeButtons = types.map(entry => {
+    const isActive = normalizeLower(entry.value) === normalizeLower(currentType);
+    return `
+      <button type="button" class="relic-type-popover__type-btn${isActive ? " is-active" : ""}" data-relic-type-choice="${escapeHtml(entry.value)}" style="background-image: url('${entry.img}')">
+        <span class="relic-type-popover__type-label">${escapeHtml(entry.label)}</span>
+      </button>
+    `;
+  }).join("");
+
+  const colorButtons = COLOR_CHOICES.map(color => {
+    const swatch = swatchForColorName(color);
+    const isActive = normalizeLower(color) === normalizeLower(currentColor);
+    return `
+      <button type="button" class="relic-type-popover__color${isActive ? " is-active" : ""}" data-relic-color-choice="${escapeHtml(color)}" style="--swatch: ${swatch};">
+        <span class="sr-only">${escapeHtml(color)}</span>
+      </button>
+    `;
+  }).join("");
+
+  dom.relicTypePopover.innerHTML = `
+    <div class="relic-type-popover__types">${typeButtons}</div>
+    <div class="relic-type-popover__colors">${colorButtons}</div>
+    <div class="relic-type-popover__actions">
+      <button type="button" class="secondary" data-relic-popover-cancel>Cancel</button>
+      <button type="button" class="primary" data-relic-popover-save>Save</button>
+    </div>
+  `;
+}
+
+function openRelicTypePopover() {
+  pendingRelicType = dom.selType?.value || "";
+  pendingRelicColor = selectedColor || "Random";
+  renderRelicTypePopover();
+  if (dom.relicTypePopover) dom.relicTypePopover.hidden = false;
+  relicTypePopoverOpen = true;
+}
+
+function closeRelicTypePopover() {
+  if (dom.relicTypePopover) dom.relicTypePopover.hidden = true;
+  relicTypePopoverOpen = false;
+}
+
+function applyRelicTypePopoverSelection() {
+  setSelectedRelicType(pendingRelicType || "");
+  selectedColor = pendingRelicColor || "Random";
+  updateColorChipLabel();
+  updateUI("color-change");
+  closeRelicTypePopover();
+}
+
+function toggleRelicTypePopover(force) {
+  const nextOpen = typeof force === "boolean" ? force : !relicTypePopoverOpen;
+  if (nextOpen) {
+    openRelicTypePopover();
+  } else {
+    closeRelicTypePopover();
+  }
+}
+
+function setClassPortraitMenu(open) {
+  if (!dom.classPortraitBtn || !dom.classPortraitMenu) return;
+  classPortraitMenuOpen = !!open;
+  dom.classPortraitBtn.setAttribute("aria-expanded", classPortraitMenuOpen ? "true" : "false");
+  dom.classPortraitMenu.hidden = !classPortraitMenuOpen;
+}
+
+function classPortraitBg(name) {
+  const portrait = characterPortrait(name) || randomPortrait();
+  return portrait || "";
+}
+
+function updateClassPortraitUI() {
+  if (dom.classPortraitBtn) {
+    const portrait = classPortraitBg(selectedClass);
+    dom.classPortraitBtn.style.backgroundImage = portrait || "";
+    const isEmpty = !portrait;
+    dom.classPortraitBtn.classList.toggle("is-empty", isEmpty);
+    dom.classPortraitBtn.setAttribute("aria-label", selectedClass ? `Class: ${selectedClass}` : "All classes");
+  }
+
+  if (dom.classPortraitMenu) {
+    const normSel = normalizeLower(selectedClass);
+    dom.classPortraitMenu.querySelectorAll("[data-class]").forEach(btn => {
+      const isActive = normalizeLower(btn.dataset.class || "") === normSel;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+      btn.setAttribute("aria-checked", isActive ? "true" : "false");
+    });
+  }
+}
+
 function resolveCharacterOption(normChar) {
   return (CHARACTERS || []).find(c => normalizeLower(c) === normalizeLower(normChar)) || "";
 }
@@ -851,6 +1113,7 @@ function setSelectedClass(next, triggerUI = true) {
   const normalized = (next ?? "").toString().trim();
   if (normalized === selectedClass) {
     if (dom.selClass) dom.selClass.value = normalized;
+    updateClassPortraitUI();
     return;
   }
 
@@ -860,6 +1123,8 @@ function setSelectedClass(next, triggerUI = true) {
     populateClassOptions();
     dom.selClass.value = normalized;
   }
+
+  updateClassPortraitUI();
 
   updateCharacterNameLabel();
 
@@ -2094,7 +2359,6 @@ function openInfoPopoverForButton(btn) {
 function installUtilityPopoverButtons() {
   const pairs = [
     [dom.instructionsBtn, dom.instructionsPopover],
-    [dom.disclaimerBtn, dom.disclaimerPopover],
     [dom.instructionsBtnChalice, dom.instructionsPopoverChalice]
   ];
 
@@ -2877,6 +3141,8 @@ function updateUI(reason = "") {
     randomColor: currentRandomColor,
     stage
   });
+  updateRelicThumb(stage);
+  updateRelicTypeUI();
 
   updateColorChipLabel();
 
@@ -2944,6 +3210,12 @@ function updateUI(reason = "") {
 
   const state = anySelected && (hasCompatIssue || hasRelicTypeIssue || orderIssueVisible || hasCurseMissing || hasPositionIssue) ? "Invalid" : "Valid";
   setValidityBadge(state, anySelected);
+
+  if (dom.detailsIssueBadge) {
+    const hasIssues = hasCompatIssue || hasRelicTypeIssue || orderIssueVisible || hasCurseMissing || hasPositionIssue;
+    dom.detailsIssueBadge.hidden = !hasIssues;
+    if (hasIssues) dom.detailsIssueBadge.textContent = "!";
+  }
 
   const okBySlot = [false, false, false];
 
@@ -5431,6 +5703,10 @@ function resetAllPreserveIllegal(desiredIllegal) {
   selectedClass = "";
   updateCharacterNameLabel();
   resetVitalsPlaceholders();
+  updateClassPortraitUI();
+  setClassPortraitMenu(false);
+  setRelicTypeMenu(false);
+  updateRelicTypeUI();
 
   setShowIllegalActive(Boolean(desiredIllegal));
 
@@ -5451,6 +5727,10 @@ function resetClassFilter() {
   }
   updateCharacterNameLabel();
   resetVitalsPlaceholders();
+  updateClassPortraitUI();
+  setClassPortraitMenu(false);
+  setRelicTypeMenu(false);
+  updateRelicTypeUI();
 }
 
 function resetAll() {
@@ -5463,6 +5743,10 @@ function resetAll() {
   selectedClass = "";
   updateCharacterNameLabel();
   resetVitalsPlaceholders();
+  updateClassPortraitUI();
+  setClassPortraitMenu(false);
+  setRelicTypeMenu(false);
+  updateRelicTypeUI();
 
   for (let i = 0; i < selectedEffects.length; i++) setSelectedId(i, "");
   for (let i = 0; i < selectedCats.length; i++) selectedCats[i] = "";
@@ -5533,10 +5817,14 @@ async function load() {
   if (dom.selClass) {
     populateClassOptions();
     updateCharacterNameLabel();
+    renderClassPortraitMenu();
+    updateClassPortraitUI();
     dom.selClass.addEventListener("change", evt => {
       setSelectedClass(evt.target.value || "", true);
     });
   }
+  renderRelicTypeMenu();
+  updateRelicTypeUI();
   const illegalButtons = showIllegalButtons();
   if (illegalButtons.length) {
     illegalButtons.forEach(btn => {
@@ -5557,6 +5845,106 @@ async function load() {
     });
   }
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", handleStartOver);
+
+  if (dom.classPortraitBtn) {
+    dom.classPortraitBtn.addEventListener("click", () => {
+      setClassPortraitMenu(!classPortraitMenuOpen);
+    });
+  }
+
+  if (dom.classPortraitMenu) {
+    dom.classPortraitMenu.addEventListener("click", evt => {
+      const btn = evt.target.closest("button[data-class]");
+      if (!btn) return;
+      const next = btn.dataset.class || "";
+      setSelectedClass(next, true);
+      setClassPortraitMenu(false);
+    });
+  }
+
+  if (dom.relicThumb) {
+    dom.relicThumb.addEventListener("click", evt => {
+      evt.preventDefault();
+      if (isDesktopWide()) {
+        toggleRelicTypePopover(false);
+        setRelicTypeMenu(!relicTypeMenuOpen);
+      } else {
+        setRelicTypeMenu(false);
+        toggleRelicTypePopover();
+      }
+    });
+  }
+
+  // Relic type menu left in place for fallback; popover handles selection.
+
+  if (dom.relicTypePopover) {
+    dom.relicTypePopover.addEventListener("click", evt => {
+      const typeBtn = evt.target.closest("[data-relic-type-choice]");
+      if (typeBtn) {
+        pendingRelicType = typeBtn.dataset.relicTypeChoice || "";
+        setSelectedRelicType(pendingRelicType);
+        renderRelicTypePopover();
+        return;
+      }
+
+      const colorBtn = evt.target.closest("[data-relic-color-choice]");
+      if (colorBtn) {
+        pendingRelicColor = colorBtn.dataset.relicColorChoice || "Random";
+        selectedColor = pendingRelicColor;
+        updateColorChipLabel();
+        updateUI("color-change");
+        renderRelicTypePopover();
+        return;
+      }
+
+      if (evt.target.closest("[data-relic-popover-save]")) {
+        applyRelicTypePopoverSelection();
+        return;
+      }
+
+      if (evt.target.closest("[data-relic-popover-cancel]")) {
+        closeRelicTypePopover();
+      }
+    });
+  }
+
+  if (dom.relicTypeMenu) {
+    dom.relicTypeMenu.addEventListener("click", evt => {
+      const btn = evt.target.closest("[data-relic-type]");
+      if (!btn) return;
+      const next = btn.dataset.relicType || "";
+      setSelectedRelicType(next);
+    });
+  }
+
+  document.addEventListener("pointerdown", evt => {
+    const target = evt.target;
+
+    if (classPortraitMenuOpen) {
+      if (dom.classPortraitBtn && dom.classPortraitBtn.contains(target)) return;
+      if (dom.classPortraitMenu && dom.classPortraitMenu.contains(target)) return;
+      setClassPortraitMenu(false);
+    }
+
+    if (relicTypeMenuOpen) {
+      if (dom.relicThumb && dom.relicThumb.contains(target)) return;
+      if (dom.relicTypeMenu && dom.relicTypeMenu.contains(target)) return;
+      setRelicTypeMenu(false);
+    }
+
+    if (relicTypePopoverOpen) {
+      if (dom.relicThumb && dom.relicThumb.contains(target)) return;
+      if (dom.relicTypePopover && dom.relicTypePopover.contains(target)) return;
+      closeRelicTypePopover();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (isDesktopWide()) {
+      closeRelicTypePopover();
+      setRelicTypeMenu(false);
+    }
+  });
 
   if (dom.chaliceCharacter) {
     dom.chaliceCharacter.addEventListener("change", evt => {
@@ -5579,6 +5967,27 @@ async function load() {
 
   if (dom.chaliceAddDepth) {
     dom.chaliceAddDepth.addEventListener("click", () => openQuickChalicePicker("depth", dom.chaliceAddDepth));
+  }
+
+  if (dom.modeToggleMobile) {
+    dom.modeToggleMobile.addEventListener("click", () => {
+      const next = isChaliceMode() ? MODES.INDIVIDUAL : MODES.CHALICE;
+      setMode(next);
+    });
+  }
+
+  const mobileDetailsMedia = window.matchMedia("(max-width: 900px)");
+  applyIndividualDetailsCollapse(mobileDetailsMedia.matches);
+  if (mobileDetailsMedia.addEventListener) {
+    mobileDetailsMedia.addEventListener("change", evt => {
+      applyIndividualDetailsCollapse(evt.matches);
+    });
+  }
+
+  if (dom.detailsToggleMobile) {
+    dom.detailsToggleMobile.addEventListener("click", () => {
+      applyIndividualDetailsCollapse(!individualDetailsCollapsed);
+    });
   }
 
   if (dom.chaliceAutoSortBtn) {

@@ -91,7 +91,6 @@
 
 /* Purple gradients for Instructions / Disclaimer (palette tokens) */
 button#instructionsBtn,
-button#disclaimerBtn,
 button#instructionsBtnChalice {
   background: var(--btn-instructions-bg) !important;
   color: var(--btn-instructions-text) !important;
@@ -100,14 +99,12 @@ button#instructionsBtnChalice {
 }
 
 button#instructionsBtn:hover,
-button#disclaimerBtn:hover,
 button#instructionsBtnChalice:hover {
   filter: var(--btn-instructions-hover-filter);
   border-color: var(--btn-instructions-hover-border) !important;
 }
 
 button#instructionsBtn:active,
-button#disclaimerBtn:active,
 button#instructionsBtnChalice:active {
   filter: var(--btn-instructions-active-filter);
 }
