@@ -2052,8 +2052,40 @@
     overflow: hidden;
   }
 
+  /* Keep preview and details the same width on mobile */
+  .individual-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
   .individual-preview #results {
     padding-inline: 0.75rem;
+    box-sizing: border-box;
+  }
+}
+
+/* Extra-small mobile: clamp preview column width to container */
+@media (max-width: 720px) {
+  .individual-preview-grid {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .individual-preview-grid > * {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  .individual-preview .chalice-column,
+  .individual-preview__panel {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 0.65rem;
+    box-sizing: border-box;
   }
 }
 
@@ -2201,6 +2233,27 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 1fr));
   gap: 1rem;
+}
+
+/* Mobile override: keep the individual preview grid to one column and boxed width */
+@media (max-width: 720px) {
+  .chalice-grid.individual-preview-grid,
+  .individual-preview-grid {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .individual-preview__panel.chalice-column,
+  .individual-preview .chalice-column {
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-inline: 0.65rem !important;
+  }
 }
 
 .chalice-column {

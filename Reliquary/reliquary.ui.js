@@ -146,30 +146,13 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
   if (!row) {
     const title = slotLabel ? slotLabel : "";
 
-    if (!showRaw) {
-      return `
-        <li>
-          <div class="effect-row">
-          <div class="effect-icon" aria-hidden="true"></div>
-          <div class="effect-line">
-            <div class="effect-main">
-              <div class="title">${title}</div>
-              ${effectBtn}
-            </div>
-          </div>
-        </li>
-      `;
-    }
-
     return `
       <li>
         <div class="effect-row">
           <div class="effect-icon" aria-hidden="true"></div>
           <div class="effect-line">
-            <div class="effect-main effect-main--row">
-              <div class="effect-text">
-                <div class="title">${title}</div>
-              </div>
+            <div class="effect-main">
+              <div class="title">${title}</div>
               ${effectBtn}
             </div>
           </div>

@@ -30,10 +30,7 @@
   --hero-art-x: 50%;
   --hero-art-y: 300%;
 }
-
-
-#results,
-#results.is-raw {
+#results {
   height: auto !important;
   min-height: 0 !important;
 }
@@ -553,62 +550,6 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
 .details-modal__body .legend-section h5 {
   font-size: 0.9rem !important;
   line-height: 1.3;
-}
-/* ------------------------------------------------------------
-   Raw-mode layout: keep effect row simple; curse row stacks below via effect-line grid
-   ------------------------------------------------------------ */
-
-/* Keep the effect title/controls on one row; curse-line now lives outside effect-main */
-#results.is-raw .effect-main--row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas: "text controls";
-  column-gap: 0.75rem;
-  row-gap: 0.35rem;
-  align-items: center;
-}
-
-#results.is-raw .effect-main--row .effect-text {
-  grid-area: text;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-#results.is-raw .effect-main--row .effect-btn,
-#results.is-raw .effect-main--row .control-cluster.effect-controls {
-  grid-area: controls;
-  justify-self: end;
-  align-self: center;
-}
-  /* Let main tokens sit on line 1; allow a controlled wrap for curse tokens */
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  flex-wrap: wrap;
-  white-space: normal;
-  gap: 0.35rem 0.65rem;
-  align-items: center;
-}
-
-#results.is-raw .effect-main--row .meta code {
-  padding: 0.16rem 0.40rem;
-}
-
-/* Force a clean break before curse tokens without extra gap */
-#results.is-raw .effect-main--row .meta .meta-break {
-  flex-basis: 100%;
-  height: 0;
-  padding: 0;
-  margin: 0;
-  line-height: 0;
-}
-
-#results.is-raw .effect-main--row .meta .meta-curse {
-  color: #b58cff;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
 }
 /* ------------------------------------------------------------
    Curse dialog sizing (compact centered modal)

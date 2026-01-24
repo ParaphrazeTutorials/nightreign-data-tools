@@ -4,15 +4,6 @@
   gap: 0.75rem;
 }
 
-/* Raw mode: force the original grid layout so content can't stretch into the image column */
-#results.is-raw .chosen-effects > li {
-  display: grid;
-  grid-template-columns: var(--icon-size) minmax(0, 1fr);
-  gap: 0.75rem;
-  align-items: start;
-  min-width: 0;
-}
-
 
 /* ============================================================
    Reliquary – Effect Line + Curse Button Alignment (FINAL)
@@ -251,59 +242,6 @@
   align-items: center;
 }
 
-/* ------------------------------------------------------------
-   RAW DATA mode: true multi-row grid so the curse button aligns
-   to the TITLE line (row 1) while the curse subtitle is row 2.
-   Markup stays the same via display: contents on .effect-text.
-   ------------------------------------------------------------ */
-
-#results.is-raw .effect-main--row {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  grid-template-areas:
-    "title effectbtn btn indicators"
-    "curse curse curse indicators"
-    "meta  meta  meta  indicators";
-  /* Center items within each grid row so the button stays locked to the title line */
-  align-items: center;
-  column-gap: 0.75rem;
-  row-gap: 0.35rem;
-}
-
-/* Split the text block into its children as grid items */
-#results.is-raw .effect-main--row .effect-text {
-  display: contents;
-}
-
-/* Place each piece on its intended grid row */
-#results.is-raw .effect-main--row .title     { grid-area: title; min-width: 0; align-self: center; }
-#results.is-raw .effect-main--row .curse-sub { grid-area: curse; align-self: start; }
-#results.is-raw .effect-main--row .meta      { grid-area: meta; align-self: start; }
-#results.is-raw .effect-main--row .effect-btn { grid-area: effectbtn; align-self: center; justify-self: end; }
-#results.is-raw .effect-main--row .row-indicators { grid-area: indicators; align-self: center; justify-self: end; }
-
-/* Button sits on the title row */
-#results.is-raw .effect-main--row .curse-btn {
-  grid-area: btn;
-  align-self: center;
-  justify-self: end;
-  margin-top: 0; /* no drift */
-}
-
-/* ------------------------------------------------------------
-   RAW DATA mode: pin icon + content to the same top baseline.
-   Without this, the <li> flex alignment will center the icon
-   against the full height of the (title+curse+meta) block.
-   ------------------------------------------------------------ */
-
-#results.is-raw .chosen-effects > li {
-  align-items: flex-start;
-}
-
-#results.is-raw .chosen-effects > li .effect-icon {
-  margin-top: 0.15rem; /* optical nudge to match title cap-height */
-  flex: 0 0 auto;
-}
 
 /* ------------------------------------------------------------
    Effect Picker (dual-column popover)

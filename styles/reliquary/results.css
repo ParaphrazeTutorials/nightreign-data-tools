@@ -171,42 +171,7 @@
     grid-column: 1;
     min-width: 0;
   }
-}
 
-/* Raw + curse only: give the image column a sane size so it can't collapse to 2px */
-#results.raw-has-curse .relic-preview {
-  grid-template-columns: clamp(240px, 26vw, 340px) minmax(460px, 1fr) !important;
-}
-
-/* Raw inherits the same column sizing; raw-has-curse keeps its wider override above */
-
-/* Raw mode baseline: keep the effects column wide enough that text can wrap without vertical stacking */
-#results.is-raw .relic-effects {
-  min-width: 420px;
-}
-
-/* Raw + curse: enforce list items grid so rows don't collapse */
-#results.raw-has-curse .relic-preview .chosen-effects > li {
-  display: grid;
-  grid-template-columns: var(--icon-size) minmax(0, 1fr);
-  gap: 0.75rem;
-  align-items: start;
-  min-width: 0;
-}
-
-/* Raw + curse: keep the row layout from collapsing into a narrow column */
-#results.raw-has-curse .relic-preview .effect-row {
-  display: grid;
-  grid-template-columns: var(--icon-size) minmax(0, 1fr);
-  gap: 0.75rem;
-  align-items: start;
-  width: 100%;
-  min-width: 0;
-}
-
-/* Raw mode: match the standard clamp/min sizing so the image scales with effects */
-#results.is-raw .relic-preview {
-  grid-template-columns: clamp(200px, 22vw, 300px) minmax(420px, 1fr);
 }
 
 .relic-frame {
@@ -360,32 +325,6 @@
 .relic-color-option[data-color-option="Yellow"] .color-dot { background: linear-gradient(135deg, #645019, #b28d2c); }
 .relic-color-option[data-color-option="Green"] .color-dot { background: linear-gradient(135deg, #10482a, #2f8a52); }
 
-/* Raw + curse: frame fills its bounded column and can contribute size */
-#results.raw-has-curse .relic-preview .relic-frame {
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  align-self: start;
-  justify-self: start;
-  contain: none;
-}
-
-/* Raw + curse: keep effects from collapsing */
-#results.raw-has-curse .relic-preview .relic-effects {
-  min-width: 380px;
-}
-
-/* Raw + curse: keep frame within the bounded column */
-#results.raw-has-curse .relic-frame {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  align-self: start;
-  justify-self: start;
-}
-
 .relic-frame img {
   width: 100%;
   height: 100%;
@@ -411,11 +350,6 @@
   overflow: hidden;
 }
 
-/* Raw mode: keep natural width; rely on wrapping to avoid bleed */
-#results.is-raw .relic-effects {
-  overflow: hidden;
-}
-
 /* Keep preview columns isolated so raw data rows never bleed over the image column */
 .relic-preview > * {
   min-width: 0;
@@ -426,50 +360,7 @@
   z-index: 2;
 }
 
-#results.is-raw .relic-effects,
-#results.is-raw .relic-effects .chosen-effects,
-#results.is-raw .relic-effects .chosen-effects li,
-#results.is-raw .relic-effects .chosen-effects li .effect-line,
-#results.is-raw .relic-effects .chosen-effects li .effect-main {
-  min-width: 0;
-  max-width: 100%;
-}
-
-#results.is-raw .relic-effects .chosen-effects li {
-  overflow: hidden;
-}
-
-#results.is-raw .effect-main,
-#results.is-raw .effect-main.effect-main--row {
-  width: 100%;
-  min-width: 0;
-}
-
-/* (reverted raw text wrapping experiment) */
-
-#results.is-raw .effect-main.effect-main--row .effect-text,
-#results.is-raw .effect-main.effect-main--row .title,
-#results.is-raw .effect-main.effect-main--row .title .title-text {
-  min-width: 0;
-  max-width: 100%;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-#results.is-raw .chosen-effects li .effect-main.effect-main--row,
-#results.is-raw .chosen-effects li .effect-main.effect-main--row .effect-text,
-#results.is-raw .chosen-effects li .effect-main.effect-main--row .title,
-#results.is-raw .chosen-effects li .effect-main.effect-main--row .title .title-text {
-  min-width: 0;
-  max-width: 100%;
-}
-
-#results.is-raw .chosen-effects li .effect-main.effect-main--row .title .title-text {
-  overflow-wrap: anywhere;
-}
-
-.chosen-effects {
+ .chosen-effects {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -501,20 +392,6 @@
   min-height: var(--row-min-height-compact);
   height: auto;
   align-self: stretch;
-}
-
-/* Raw mode: allow taller rows/panel to fit curse content */
-#results.is-raw .relic-effects {
-  min-height: calc(var(--row-min-height-raw) * 3 + var(--row-gap) * 2);
-}
-
-#results.is-raw .chosen-effects {
-  grid-template-rows: repeat(3, minmax(var(--row-min-height-raw), auto));
-  grid-auto-rows: minmax(var(--row-min-height-raw), auto);
-}
-
-#results.is-raw .chosen-effects li {
-  min-height: var(--row-min-height-raw);
 }
 
 /* ------------------------------------------------------------
@@ -599,7 +476,7 @@
   min-width: 0;
 }
 
-#results:not(.is-raw) .effect-main.effect-main--row {
+#results .effect-main.effect-main--row {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas: "text controls";
@@ -610,7 +487,7 @@
   width: 100%;
 }
 
-#results:not(.is-raw) .effect-main.effect-main--row .effect-text {
+#results .effect-main.effect-main--row .effect-text {
   grid-area: text;
   display: flex;
   flex-direction: column;
@@ -618,14 +495,14 @@
   min-width: 0;
 }
 
-#results:not(.is-raw) .effect-main.effect-main--row .title {
+#results .effect-main.effect-main--row .title {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   margin: 0;
 }
 
-#results:not(.is-raw) .effect-line .curse-line {
+#results .effect-line .curse-line {
   grid-column: 1 / -1;
   display: inline-flex;
   align-items: center;
@@ -633,16 +510,16 @@
   margin: 0;
 }
 
-#results:not(.is-raw) .effect-main.effect-main--row .effect-btn,
-#results:not(.is-raw) .effect-main.effect-main--row .control-cluster.effect-controls,
-#results:not(.is-raw) .effect-main.effect-main--row .curse-btn,
-#results:not(.is-raw) .effect-main.effect-main--row .control-cluster.curse-controls,
-#results:not(.is-raw) .effect-main.effect-main--row .row-indicators {
+#results .effect-main.effect-main--row .effect-btn,
+#results .effect-main.effect-main--row .control-cluster.effect-controls,
+#results .effect-main.effect-main--row .curse-btn,
+#results .effect-main.effect-main--row .control-cluster.curse-controls,
+#results .effect-main.effect-main--row .row-indicators {
   align-self: center;
 }
 
-#results:not(.is-raw) .effect-main.effect-main--row .control-cluster.effect-controls,
-#results:not(.is-raw) .effect-main.effect-main--row .effect-btn {
+#results .effect-main.effect-main--row .control-cluster.effect-controls,
+#results .effect-main.effect-main--row .effect-btn {
   grid-area: controls;
   justify-self: end;
   align-self: start;
@@ -655,54 +532,21 @@
   min-width: 0;
 }
 
-#results.is-raw .chosen-effects li .effect-line {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 0.55rem;
-  row-gap: 0.35rem;
-  width: 100%;
-  min-width: 0;
-  align-items: start;
-}
-
-/* Raw mode: let the main content own the space; indicators stay absolute via existing rules */
-#results.is-raw .effect-line .effect-main {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-/* Raw: use the base grid layout; wrapping handled by min-width:0 rules below */
-#results.is-raw .effect-main.effect-main--row {
-  display: grid !important;
-}
-
-/* Raw mode: force a simple flex row so the text column can use full width */
-#results.is-raw .effect-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-}
-
-#results.is-raw .effect-line {
-  width: 100%;
-  min-width: 0;
-}
-
-#results:not(.is-raw) .chosen-effects li .effect-main:not(.effect-main--row) {
+#results .chosen-effects li .effect-main:not(.effect-main--row) {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
 }
 
-#results:not(.is-raw) .chosen-effects li .effect-main:not(.effect-main--row):has(.curse-line) {
+#results .chosen-effects li .effect-main:not(.effect-main--row):has(.curse-line) {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.35rem;
   align-items: start;
 }
 
-#results:not(.is-raw) .chosen-effects li .effect-main .title {
+#results .chosen-effects li .effect-main .title {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
@@ -727,6 +571,7 @@
   gap: 0.45rem;
   margin-top: 0;
   position: relative;
+  min-width: 0;
 }
 
 /* Keep curse text level with the button; remove the negative lift from the shared style */
@@ -738,12 +583,251 @@
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 0.75em;
+  display: inline-block;
+  max-width: 100%;
 }
 
 .curse-line .curse-required,
 .curse-line .curse-btn,
 .curse-line .curse-sub {
   align-self: center;
+}
+
+/* ------------------------------------------------------------
+   Mobile layout (<=900px): two-column stack with validation on the right
+   ------------------------------------------------------------ */
+@media (max-width: 900px) {
+  /* Force curse buttons visible for selected effects on mobile (override layout.css hide) */
+  #individualMode .effect-row:has(.curse-line) .curse-btn,
+  #individualMode .effect-row:has(.title-text) .curse-btn,
+  #individualMode .curse-line .curse-btn {
+    display: inline-flex !important;
+  }
+
+  /* Two-column mobile stack: content left, validation right */
+  #individualMode .chosen-effects {
+    display: grid;
+    grid-template-rows: repeat(3, minmax(var(--row-min-height-compact), auto));
+    grid-auto-rows: minmax(var(--row-min-height-compact), auto);
+    gap: var(--row-gap);
+  }
+
+  #individualMode .chosen-effects li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-auto-rows: auto;
+    column-gap: 0.6rem;
+    row-gap: 0.45rem;
+    padding: 0.65rem 0.75rem;
+    align-items: start;
+  }
+
+  /* Keep row structure but drive grid from the <li> */
+  #individualMode .effect-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 0.6rem;
+    row-gap: 0.4rem;
+    width: 100%;
+    align-items: start;
+  }
+
+  #individualMode .effect-line {
+    grid-column: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    grid-auto-rows: auto;
+    row-gap: 0.35rem;
+    width: 100%;
+    padding: 0 !important;
+  }
+
+  /* Primary content column */
+  #individualMode .effect-main,
+  #individualMode .effect-main.effect-main--row,
+  #individualMode .effect-main .effect-text,
+  #individualMode .effect-main .title,
+  #individualMode .effect-btn,
+  #individualMode .control-cluster,
+  #individualMode .curse-line,
+  #individualMode .curse-line .curse-sub,
+  #individualMode .curse-line .curse-required {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #individualMode .effect-main {
+    display: grid;
+    grid-auto-rows: auto;
+    row-gap: 0.35rem;
+    padding-right: 0;
+  }
+
+  /* Collapse effect-main--row to single column so title and actions stack */
+  #individualMode .effect-main.effect-main--row {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "text"
+      "controls";
+    align-items: start;
+  }
+
+  #individualMode .effect-main.effect-main--row .effect-text { grid-area: text; width: 100%; }
+  #individualMode .effect-main.effect-main--row .title { width: 100%; }
+  #individualMode .effect-main.effect-main--row .effect-btn,
+  #individualMode .effect-main.effect-main--row .control-cluster.effect-controls { grid-area: controls; justify-self: start; }
+
+  /* Stack title + curse text tightly; keep actions on their own row */
+  #individualMode .effect-main .effect-text,
+  #individualMode .effect-main .title {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #individualMode .effect-main .title,
+  #individualMode .effect-main .effect-text {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  #individualMode .effect-btn,
+  #individualMode .curse-btn {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  /* Action row takes place of desktop icon column */
+  #individualMode .control-cluster {
+    display: inline-flex;
+    gap: 0.45rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  /* Curse line row */
+  /* Default: inline row for missing-curse prompt */
+  #individualMode .curse-line {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Selected curse: stack text over controls, left aligned */
+  #individualMode .curse-line:has(.curse-controls) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  /* Unselected: lock text + button on one line */
+  #individualMode .curse-line:not(:has(.curse-controls)) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start;
+    gap: 0.35rem;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #individualMode .curse-line:not(:has(.curse-controls)) .curse-btn {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  #individualMode .curse-line:not(:has(.curse-controls)) .curse-required,
+  #individualMode .curse-line:not(:has(.curse-controls)) .curse-btn {
+    white-space: nowrap !important;
+  }
+
+  #individualMode .curse-line:not(:has(.curse-controls)) .curse-required {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    max-width: calc(100% - 110px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: auto !important;
+  }
+
+  #individualMode .curse-line .curse-sub {
+    flex: 0 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #individualMode .curse-line .curse-btn {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
+    display: inline-flex !important;
+  }
+
+  #individualMode .curse-line .curse-required {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 70%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+  }
+
+  /* Hide placeholder titles for empty slots; show only Select Effect */
+  #individualMode .effect-main:has(.effect-btn[data-effect-slot]) .title,
+  #individualMode .effect-main:has(.effect-btn[data-effect-slot]) .effect-text {
+    display: none;
+  }
+
+  /* Validation column: pin to right, spanning all logical rows */
+  #individualMode .row-indicators {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: start;
+    justify-self: end;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    position: static;
+    right: auto;
+    top: auto;
+    transform: none;
+  }
+
+  /* Hide effect icons entirely on mobile */
+  #individualMode .chosen-effects li .effect-icon {
+    display: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Remove right-rail padding on mobile; validation is in its own column */
+  #individualMode #results .chosen-effects li .effect-line,
+  #individualMode .chosen-effects li .effect-line {
+    padding-right: 0 !important;
+  }
+
+  /* Reset absolute positioning from desktop right rail */
+  #individualMode #results .chosen-effects li .row-indicators,
+  #individualMode .chosen-effects li .row-indicators {
+    position: static !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+  }
 }
 
 .curse-line .curse-btn {
@@ -760,13 +844,19 @@
   color: #b58cff !important;
   font-style: italic;
   font-weight: 700;
-  margin-right: 0.6rem;
+  margin-right: 0.35rem;
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+  max-width: 60%;
+  flex: 0 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-#results:not(.is-raw) .chosen-effects li,
-#results:not(.is-raw) .chosen-effects li .effect-line { align-items: center; }
+#results .chosen-effects li,
+#results .chosen-effects li .effect-line { align-items: center; }
 
 /* ------------------------------------------------------------
    Indicators
@@ -829,12 +919,39 @@
 
 @media (max-width: 720px) {
   :root { --results-img-col: 150px; }
+
+  /* Clamp all preview children to container width on small mobile */
+  #individualMode #results .relic-preview,
+  #individualMode #results .relic-effects,
+  #individualMode #results .chosen-effects,
+  #individualMode #results .chosen-effects li,
+  #individualMode #results .effect-row,
+  #individualMode #results .effect-main,
+  #individualMode #results .effect-main .title,
+  #individualMode #results .effect-main .effect-text,
+  #individualMode #results .effect-btn {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  #individualMode #results .effect-main .effect-text {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }
 
 @media (max-width: 520px) {
   .relic-preview {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  /* Tighten padding to avoid horizontal bleed on very small screens */
+  #individualMode #results {
+    padding-inline: 0.5rem;
   }
 }
 
