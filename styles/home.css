@@ -368,6 +368,7 @@
 }
 
 .app-tile__title {
+  font-family: "Mantinia", "Times New Roman", serif;
   font-weight: 800;
   line-height: 1.1;
   font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
@@ -375,6 +376,8 @@
   display: inline-block;
   padding-bottom: 0.3rem;
   margin-bottom: 0.35rem;
+  color: #caa95a;
+  text-transform: uppercase;
 }
 
 .app-tile__title::after {
@@ -392,9 +395,11 @@
 }
 
 .app-tile__meta {
+  font-family: "Agmena Pro", "Georgia", serif;
   margin-top: 0.2rem;
   font-size: clamp(0.76rem, 0.72rem + 0.12vw, 0.88rem);
   opacity: 0.85;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .app-tile__credit {
