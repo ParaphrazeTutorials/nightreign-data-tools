@@ -52,6 +52,27 @@
   --body-size: clamp(0.98rem, 0.92rem + 0.25vw, 1.18rem);
 }
 
+/* ------------------------------------------------------------
+   Font faces (drop files into Assets/fonts/ and update URLs)
+   ------------------------------------------------------------ */
+@font-face {
+  font-family: "Mantinia";
+  src: url("../Assets/fonts/Mantinia.woff2") format("woff2"),
+       url("../Assets/fonts/Mantinia.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Agmena Pro";
+  src: url("../Assets/fonts/Agmena Pro Regular.woff2") format("woff2"),
+       url("../Assets/fonts/Agmena Pro Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -71,6 +92,19 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+}
+
+/* Accessibility helpers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ------------------------------------------------------------
@@ -204,8 +238,8 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   position: relative; /* anchor for pill */
   overflow: hidden;
 
-  /* reduced vertical real estate */
-  padding: 1.05rem 1.25rem 0.85rem;
+  /* reduced vertical real estate (slightly trimmed to offset larger logo) */
+  padding: 0.82rem 1.25rem 0.72rem;
 
   border-radius: 0.5rem;
   color: white;
@@ -279,6 +313,82 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   pointer-events: none;
 }
 
+/* ------------------------------------------------------------
+   Hero art breakpoint hooks (defaults duplicated for editing)
+   ------------------------------------------------------------ */
+
+/* 1920px and up */
+@media (min-width: 1920px) {
+  .hero {
+    --hero-art-zoom: 0.2;
+    --hero-art-x: 65%;
+    --hero-art-y: 90%;
+  }
+}
+
+/* 1440–1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 1280–1439px */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 1024–1279px */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 900–1023px */
+@media (min-width: 900px) and (max-width: 1023px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 768–899px */
+@media (min-width: 768px) and (max-width: 899px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 640–767px */
+@media (min-width: 640px) and (max-width: 767px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 0–639px */
+@media (max-width: 639px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
 
 /* ------------------------------------------------------------
    Hero Text
@@ -287,8 +397,16 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
 .hero-content {
   position: relative;
   z-index: 1;
-  display: grid;
-  gap: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.8vw, 1.35rem);
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  text-align: left;
 }
 
 .hero h1,
@@ -297,17 +415,109 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
 }
 
 .hero h1 {
-  font-size: var(--h1-size);
+  font-family: "Mantinia", "Times New Roman", serif;
+  font-size: calc(var(--h1-size) * 0.75);
   line-height: 1.1;
   letter-spacing: 0.01em;
+  color: #caa95a;
+  text-transform: uppercase;
 }
 
 .hero h2 {
-  font-size: var(--h2-size);
+  font-family: "Agmena Pro", "Georgia", serif;
+  font-size: calc(var(--h2-size) * 0.9);
   font-weight: 600;
   opacity: 0.9;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-logo {
+  display: flex;
+  align-items: center;
+  height: clamp(72px, 10vw, 118px);
+}
+
+.hero-logo__img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: min(520px, 75vw);
+  object-fit: contain;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.8vw, 1.35rem);
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.65rem;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+
+.hero-logo__img--square {
+  display: none;
+}
+
+.hero-logo__img--square-colored {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding: 0.18rem 0.8rem 0.18rem;
+  }
+
+  .hero-content.hero-badge {
+    gap: 0.65rem;
+    padding: 0.38rem 0.65rem;
+    background: none;
+    border: none;
+    box-shadow: none;
+  }
+
+  .hero-logo {
+    height: clamp(96px, 19vw, 136px);
+  }
+
+  .hero-text {
+    display: none !important;
+  }
+
+  .hero-logo__img--rectangle {
+    display: none !important;
+  }
+
+  .hero-logo__img--square {
+    display: none !important;
+  }
+
+  .hero-logo__img--square-colored {
+    display: block !important;
+    height: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-logo {
+    justify-content: flex-start;
+  }
+
+  .hero-logo__img {
+    max-width: min(360px, 82vw);
+  }
+
+  .hero-logo__img--rectangle {
+    display: none;
+  }
+
+  .hero-logo__img--square {
+    display: block;
+    height: clamp(54px, 16vw, 92px);
+  }
 }
 
 /* Hero credit pill (clickable) */

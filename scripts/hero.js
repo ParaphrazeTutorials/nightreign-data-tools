@@ -47,6 +47,9 @@ const GLOBAL_BUILD_STATUS = detectBuildStatus(); // "BETA" | "LIVE" (auto from h
 const GLOBAL_BUILD_VERSION = "v0.0.0";  // app version (update as needed)
 const GLOBAL_GAME_VERSION = "1.03.1.0029"; // game version (sourced from Reliquary baseline)
 const ART_CREDIT_URL = "https://cl.pinterest.com/smile_409/"; // single source of truth for art credit link
+const HERO_LOGO_RECT = new URL("../Assets/logo_square_plain.png", import.meta.url).href;
+const HERO_LOGO_SQUARE = new URL("../Assets/logo_square_plain.png", import.meta.url).href;
+const HERO_LOGO_SQUARE_COLOR = new URL("../Assets/logo_square.png", import.meta.url).href;
 
 
 
@@ -80,9 +83,35 @@ function renderHero() {
       />
     ` : ""}
 
-    <div class="hero-content">
-      <h1>${h1}</h1>
-      ${h2 ? `<h2>${h2}</h2>` : ""}
+    <div class="hero-content hero-badge">
+      <div class="hero-logo" aria-hidden="true">
+        <img
+          class="hero-logo__img hero-logo__img--rectangle"
+          src="${HERO_LOGO_RECT}"
+          alt=""
+          loading="eager"
+          decoding="async"
+        />
+        <img
+          class="hero-logo__img hero-logo__img--square"
+          src="${HERO_LOGO_SQUARE}"
+          alt=""
+          loading="eager"
+          decoding="async"
+        />
+        <img
+          class="hero-logo__img hero-logo__img--square-colored"
+          src="${HERO_LOGO_SQUARE_COLOR}"
+          alt=""
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      <div class="hero-text">
+        <h1>${h1}</h1>
+        ${h2 ? `<h2>${h2}</h2>` : ""}
+      </div>
     </div>
 
     ${showBuild ? (() => {

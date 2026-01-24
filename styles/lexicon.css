@@ -14,6 +14,72 @@
   --hero-art-y: -200%;
 }
 
+/* Hero art breakpoint hooks (Lexicon) — current values duplicated */
+
+@media (min-width: 1920px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -275%;
+  }
+}
+
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -130%;
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -125%;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -100%;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1023px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -100%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 899px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -90%;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -50%;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero--lexicon {
+    --hero-art-zoom: 1;
+    --hero-art-x: 50%;
+    --hero-art-y: -50%;
+  }
+}
+
 /* Single-column shell safety */
 .tool-shell.tool-shell--single {
   display: grid;
