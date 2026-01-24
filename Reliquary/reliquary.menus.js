@@ -12,6 +12,9 @@ function mobileOverlayPreferred() {
   const vw = Math.round(Number(window.innerWidth || 0));
   const vh = Math.round(Number(window.innerHeight || 0));
 
+  // Honor the same breakpoint the CSS uses for the mobile stack; rely on viewport so resized desktop windows also get the overlay.
+  if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) return true;
+
   if (![sw, sh, vw, vh].every(Number.isFinite)) return false;
 
   const maxView = Math.max(vw, vh);
