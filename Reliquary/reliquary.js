@@ -1,4 +1,4 @@
-import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, relicDefaultPath, visualRelicType, iconPath } from "./reliquary.assets.js";
+import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, alertIconUrl, relicDefaultPath, visualRelicType, iconPath } from "./reliquary.assets.js";
 import {
   clamp01,
   normalize,
@@ -358,11 +358,6 @@ function handleAutoSortToggle() {
 }
 
 const defaultCategoryTheme = categoryColorFor("");
-
-function alertIconUrl(kind) {
-  const file = kind === "error" ? "chalice-error.svg" : "chalice-warning.svg";
-  return new URL(`../Assets/icons/reliquary/${file}`, window.location.href).toString();
-}
 
 function chaliceIconHtml(statusIconId, fallbackText = "") {
   const src = iconPath(statusIconId);
