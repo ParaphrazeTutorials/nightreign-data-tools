@@ -1,4 +1,4 @@
-import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, relicDefaultPath, visualRelicType } from "./reliquary.assets.js";
+import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, relicDefaultPath, visualRelicType, iconPath } from "./reliquary.assets.js";
 import {
   COLORS,
   compatId,
@@ -372,19 +372,13 @@ function escapeHtml(value) {
   });
 }
 
-function statusIconPath(statusIconId) {
-  const id = (statusIconId ?? "").toString().trim();
-  if (!id) return "";
-  return new URL(`../Assets/icons/reliquary/${id}.png`, window.location.href).toString();
-}
-
 function alertIconUrl(kind) {
   const file = kind === "error" ? "chalice-error.svg" : "chalice-warning.svg";
   return new URL(`../Assets/icons/reliquary/${file}`, window.location.href).toString();
 }
 
 function chaliceIconHtml(statusIconId, fallbackText = "") {
-  const src = statusIconPath(statusIconId);
+  const src = iconPath(statusIconId);
   const fallback = (fallbackText || "").trim().slice(0, 2);
   const fallbackHtml = fallback ? `<span class="chalice-slot__icon-fallback">${escapeHtml(fallback)}</span>` : "";
   const imgHtml = src ? `<img src="${src}" alt="" onerror="this.remove()">` : fallbackHtml;

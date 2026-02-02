@@ -1,4 +1,4 @@
-import { relicDefaultPath, relicPath, visualRelicType } from "./reliquary.assets.js";
+import { relicDefaultPath, relicPath, visualRelicType, iconPath } from "./reliquary.assets.js";
 
 export function fillSelect(selectEl, options, placeholderText) {
   const first = `<option value="">${placeholderText}</option>`;
@@ -45,12 +45,6 @@ export function setRelicImageForStage({
   const color = (selectedColor === "Random") ? randomColor : selectedColor;
   const size = stage === 1 ? "Small" : stage === 2 ? "Medium" : "Large";
   relicImg.src = relicPath(typeForImages, color, size);
-}
-
-// Icon folder: Assets/icons/reliquary/{StatusIconID}.png
-function iconPath(statusIconId) {
-  if (!statusIconId) return "";
-  return new URL(`../Assets/icons/reliquary/${statusIconId}.png`, window.location.href).toString();
 }
 
 function okIndicatorHtml() {
