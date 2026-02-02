@@ -33,7 +33,7 @@
 
 /* Hero art breakpoint hooks (Reliquary) — current values duplicated */
 
-@media (min-width: 1920px) {
+@media (--bp-ultra) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -41,7 +41,7 @@
   }
 }
 
-@media (min-width: 1440px) and (max-width: 1919px) {
+@media (--bp-xxl) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -49,7 +49,7 @@
   }
 }
 
-@media (min-width: 1280px) and (max-width: 1439px) {
+@media (--bp-xl) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -57,15 +57,7 @@
   }
 }
 
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .hero--reliquary {
-    --hero-art-zoom: 1;
-    --hero-art-x: 50%;
-    --hero-art-y: 160%;
-  }
-}
-
-@media (min-width: 900px) and (max-width: 1023px) {
+@media (--bp-lg) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -73,15 +65,7 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 899px) {
-  .hero--reliquary {
-    --hero-art-zoom: 1;
-    --hero-art-x: 50%;
-    --hero-art-y: 140%;
-  }
-}
-
-@media (min-width: 640px) and (max-width: 767px) {
+@media (--bp-md) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -89,7 +73,7 @@
   }
 }
 
-@media (max-width: 639px) {
+@media (--bp-sm-down) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;

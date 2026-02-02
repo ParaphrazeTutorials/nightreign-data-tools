@@ -3,6 +3,7 @@
 // ==================== Menus ====================
 
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
+import { breakpoints, mqAtMost } from "../scripts/breakpoints.js";
 
 import { compatId } from "./modules/logic.js";
 import { textColorFor } from "./modules/theme.js";
@@ -46,41 +47,13 @@ const menuState = {
 // ---------- shared helpers ----------
 function mobileOverlayPreferred() {
   if (typeof window === "undefined") return false;
-  const sw = Math.round(Number(window.screen?.width || 0));
-  const sh = Math.round(Number(window.screen?.height || 0));
   const vw = Math.round(Number(window.innerWidth || 0));
-  const vh = Math.round(Number(window.innerHeight || 0));
 
-  // Honor the same breakpoint the CSS uses for the mobile stack; rely on viewport so resized desktop windows also get the overlay.
-  if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) return true;
+  // Honor the same breakpoint the CSS uses for the mobile stack; width-only.
+  if (mqAtMost(breakpoints.mdMax).matches) return true;
 
-  if (![sw, sh, vw, vh].every(Number.isFinite)) return false;
-
-  const maxView = Math.max(vw, vh);
-  const minView = Math.min(vw, vh);
-  const maxScreen = Math.max(sw, sh);
-  const minScreen = Math.min(sw, sh);
-
-  // Hard overrides
-  const forceMobile = (vw === 768 && vh === 1024) || (vw === 1024 && vh === 768);
-  const forceDesktop = (vw === 1366 && vh === 768) || (vw === 768 && vh === 1366);
-
-  // Treat compact phone viewports as mobile regardless of reported screen size.
-  if (vw <= 480 && vh <= 950) return true;
-
-  // Hard overrides
-  if (forceMobile) return true;
-  if (forceDesktop) return false;
-
-  const desktopViewport = vw >= 1366 && vh >= 768;
-  const desktopScreen = maxScreen >= 1366 && minScreen >= 768;
-
-  // Treat as mobile when the viewport is tablet/phone-sized, unless it meets desktop thresholds.
-  const smallViewport = minView <= 1024 && maxView <= 1280;
-  const smallScreen = maxScreen < 1366 && minScreen < 1200;
-
-  if (desktopViewport || desktopScreen) return false;
-  return smallViewport || smallScreen;
+  // Fallback when matchMedia is unavailable.
+  return Number.isFinite(vw) && vw <= breakpoints.mdMax;
 }
 
 let bodyScrollLockState = null;

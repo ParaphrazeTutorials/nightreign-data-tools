@@ -57,6 +57,61 @@ function toBool(v) {
   return s === "true" || s === "1" || s === "yes";
 }
 
+function cssEscapeSafe(v) {
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") return CSS.escape(v);
+  return String(v || "").replace(/[^a-zA-Z0-9_-]/g, "");
+}
+
+function applyHeroFocus(el) {
+  const id = el.id || "globalHero";
+  const selector = `#${cssEscapeSafe(id)}`;
+  const styleId = `${id}-hero-focus`;
+
+  const base = {
+    x: el.getAttribute("data-hero-x"),
+    y: el.getAttribute("data-hero-y"),
+    zoom: el.getAttribute("data-hero-zoom"),
+  };
+
+  Object.entries(base).forEach(([key, val]) => {
+    if (!val) return;
+    el.style.setProperty(`--hero-art-${key}`, val);
+  });
+
+  const slots = [
+    { key: "xs", mq: "--bp-xs" },
+    { key: "sm", mq: "--bp-sm-down" },
+    { key: "md", mq: "--bp-md" },
+    { key: "lg", mq: "--bp-lg" },
+    { key: "xl", mq: "--bp-xl" },
+    { key: "xxl", mq: "--bp-xxl" },
+    { key: "ultra", mq: "--bp-ultra" },
+  ];
+
+  let css = "";
+  for (const slot of slots) {
+    const x = el.getAttribute(`data-hero-x-${slot.key}`);
+    const y = el.getAttribute(`data-hero-y-${slot.key}`);
+    const zoom = el.getAttribute(`data-hero-zoom-${slot.key}`);
+    if (!x && !y && !zoom) continue;
+    css += `@media (${slot.mq}) { ${selector} {`;
+    if (x) css += ` --hero-art-x: ${x};`;
+    if (y) css += ` --hero-art-y: ${y};`;
+    if (zoom) css += ` --hero-art-zoom: ${zoom};`;
+    css += " } }\n";
+  }
+
+  const prev = document.getElementById(styleId);
+  if (prev?.parentNode) prev.parentNode.removeChild(prev);
+
+  if (css.trim()) {
+    const styleEl = document.createElement("style");
+    styleEl.id = styleId;
+    styleEl.textContent = css;
+    document.head.appendChild(styleEl);
+  }
+}
+
 function renderHero() {
   const el = document.getElementById("globalHero");
   if (!el) return;
@@ -128,6 +183,8 @@ function renderHero() {
     })() : ""}
     ${hideCredit ? "" : `<a class="hero-credit" href="${creditUrl}" target="_blank" rel="noopener" aria-label="Artwork credit link">${creditLabel}</a>`}
   `;
+
+  applyHeroFocus(el);
 }
 
 function applyGlobalCreditLinks() {

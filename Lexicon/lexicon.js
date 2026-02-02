@@ -10,6 +10,7 @@ import {
   createFloatingFilterPortal,
   exportCsvFile
 } from "./tableUtils.js";
+import { breakpoints, mqAtLeast } from "../scripts/breakpoints.js";
 
 applyPaletteCssVars();
 
@@ -957,7 +958,7 @@ function bindDatasetToggle() {
     setDatasetPanel(!isOpen);
   });
 
-  const mq = window.matchMedia("(min-width: 921px)");
+  const mq = mqAtLeast(breakpoints.lgMin);
   mq.addEventListener("change", e => {
     if (e.matches) closeDatasetPanel();
   });

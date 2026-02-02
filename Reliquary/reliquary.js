@@ -33,6 +33,7 @@ import { applyPaletteCssVars, COLOR_SWATCHES, COLORS, RANDOM_SWATCH, CHARACTERS,
 import { escapeHtml, colorChipLabel } from "./modules/uiHelpers.js";
 import { showPortalTooltip, hidePortalTooltip, installHoverTooltip, setHoverTooltip } from "./modules/tooltipPortal.js";
 import { openEffectMenu, closeEffectMenu, openCurseMenu, closeCurseMenu } from "./reliquary.menus.js";
+import { breakpoints, mqAtMost } from "../scripts/breakpoints.js";
 import {
   ingestEffectStats,
   statRowsForEffect,
@@ -641,7 +642,7 @@ function setChaliceStatus(text) {
 }
 
 function isMobileLayout() {
-  return window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+  return mqAtMost(breakpoints.mdMax).matches;
 }
 
 function applyIndividualDetailsCollapse() {
@@ -4815,7 +4816,7 @@ async function load() {
     });
   }
 
-  const mobileDetailsMedia = window.matchMedia("(max-width: 900px)");
+  const mobileDetailsMedia = mqAtMost(breakpoints.mdMax);
   applyIndividualDetailsCollapse(mobileDetailsMedia.matches);
   if (mobileDetailsMedia.addEventListener) {
     mobileDetailsMedia.addEventListener("change", evt => {

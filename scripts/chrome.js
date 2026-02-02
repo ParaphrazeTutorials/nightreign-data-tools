@@ -1,3 +1,5 @@
+import { breakpoints, mqAtMost } from "./breakpoints.js";
+
 // Global Chrome (Navigation + Footer)
 // Single source of truth to prevent drift across pages.
 //
@@ -74,7 +76,7 @@ function renderNav() {
   const list = el.querySelector('.nav-list');
   const heroBuild = document.querySelector('.hero-build');
   const statusSlot = el.querySelector('[data-hero-build-slot]');
-  const mq = window.matchMedia('(max-width: 640px)');
+  const mq = mqAtMost(breakpoints.mdMax);
 
   if (toggle && list) {
     toggle.addEventListener('click', () => {

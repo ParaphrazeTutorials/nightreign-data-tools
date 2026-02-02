@@ -210,7 +210,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   box-sizing: border-box;
 }
 
-@media (max-width: 520px) {
+@media (--bp-xs) {
   :root {
     --shell-pad: var(--shell-pad-mobile);
   }
@@ -258,13 +258,13 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   );
 }
 
-@media (max-width: 720px) {
+@media (--bp-sm-down) {
   .hero {
     padding: 0.9rem 1rem 0.75rem;
   }
 }
 
-@media (max-width: 640px) {
+@media (--bp-sm-down) {
   .hero h1 {
     font-size: clamp(1.2rem, 0.95rem + 0.68vw, 1.65rem);
   }
@@ -274,7 +274,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   }
 }
 
-@media (min-width: 1920px) {
+@media (--bp-ultra) {
   body {
     font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.24rem);
   }
@@ -318,7 +318,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
    ------------------------------------------------------------ */
 
 /* 1920px and up */
-@media (min-width: 1920px) {
+@media (--bp-ultra) {
   .hero {
     --hero-art-zoom: 0.2;
     --hero-art-x: 65%;
@@ -327,7 +327,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
 }
 
 /* 1440–1919px */
-@media (min-width: 1440px) and (max-width: 1919px) {
+@media (--bp-xxl) {
   .hero {
     --hero-art-zoom: 0.4;
     --hero-art-x: 65%;
@@ -336,7 +336,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
 }
 
 /* 1280–1439px */
-@media (min-width: 1280px) and (max-width: 1439px) {
+@media (--bp-xl) {
   .hero {
     --hero-art-zoom: 0.4;
     --hero-art-x: 65%;
@@ -344,8 +344,8 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   }
 }
 
-/* 1024–1279px */
-@media (min-width: 1024px) and (max-width: 1279px) {
+/* 900–1279px */
+@media (--bp-lg) {
   .hero {
     --hero-art-zoom: 0.4;
     --hero-art-x: 65%;
@@ -353,26 +353,8 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   }
 }
 
-/* 900–1023px */
-@media (min-width: 900px) and (max-width: 1023px) {
-  .hero {
-    --hero-art-zoom: 0.4;
-    --hero-art-x: 65%;
-    --hero-art-y: 100%;
-  }
-}
-
-/* 768–899px */
-@media (min-width: 768px) and (max-width: 899px) {
-  .hero {
-    --hero-art-zoom: 0.4;
-    --hero-art-x: 65%;
-    --hero-art-y: 100%;
-  }
-}
-
-/* 640–767px */
-@media (min-width: 640px) and (max-width: 767px) {
+/* 640–899px */
+@media (--bp-md) {
   .hero {
     --hero-art-zoom: 0.4;
     --hero-art-x: 65%;
@@ -381,7 +363,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
 }
 
 /* 0–639px */
-@media (max-width: 639px) {
+@media (--bp-sm-down) {
   .hero {
     --hero-art-zoom: 0.4;
     --hero-art-x: 65%;
@@ -466,7 +448,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   display: none;
 }
 
-@media (max-width: 900px) {
+@media (--bp-md-down) {
   .hero {
     padding: 0.18rem 0.8rem 0.18rem;
   }
@@ -501,7 +483,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   }
 }
 
-@media (max-width: 720px) {
+@media (--bp-sm-down) {
   .hero-logo {
     justify-content: flex-start;
   }
@@ -549,7 +531,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
 }
 
 /* Small devices: scale hero headings down ~35% */
-@media (max-width: 640px) {
+@media (--bp-sm-down) {
   .hero h1 {
     font-size: clamp(1.2rem, 0.95rem + 0.68vw, 1.65rem);
   }
@@ -682,7 +664,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   grid-row: 1;
 }
 
-@media (max-width: 960px) {
+@media (--bp-md-down) {
   .tool-nav__inner {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -848,7 +830,7 @@ footer {
   white-space: nowrap;
 }
 
-@media (max-width: 520px) {
+@media (--bp-sm-down) {
   .hero-build.hero-build--in-nav {
     max-width: min(70vw, 220px);
     transform: scale(0.68);

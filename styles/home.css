@@ -41,13 +41,13 @@
   margin-inline: 0;
 }
 
-@media (max-width: 1180px) {
+@media (--bp-lg-down) {
   .home-intro-grid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 720px) {
+@media (--bp-sm-down) {
   .home-intro-grid {
     gap: 0.75rem;
   }
@@ -301,7 +301,7 @@
   margin-inline: auto;
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   .home-apps {
     grid-template-columns: 1fr;
     max-width: 100%;
@@ -309,7 +309,7 @@
   }
 }
 
-@media (max-width: 1100px) {
+@media (--bp-md-down) {
   .home-apps {
     grid-template-columns: 1fr;
   }
@@ -419,7 +419,7 @@
 }
 
 /* Scale cards down for 1080p and below (~40% smaller) */
-@media (max-width: 1920px) {
+@media (--bp-xxl-down) {
   .home-apps {
     max-width: 1160px;
     gap: clamp(0.9rem, 1.2vw, 1.2rem);
@@ -443,7 +443,7 @@
 }
 
 /* Tighter layout for small laptop widths (e.g., 1366x768) */
-@media (max-width: 1440px) {
+@media (--bp-xl-down) {
   .home-apps {
     max-width: 1040px;
     gap: clamp(0.75rem, 1vw, 1rem);
@@ -465,7 +465,7 @@
 }
 
 /* Upscale for large/4K screens */
-@media (min-width: 1921px) {
+@media (--bp-ultra) {
   .home-apps {
     max-width: 1800px;
     gap: clamp(1rem, 1.1vw, 1.4rem);

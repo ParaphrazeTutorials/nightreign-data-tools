@@ -148,7 +148,7 @@
   display: none;
 }
 
-@media (max-width: 900px) {
+@media (--bp-md-down) {
   .details-toggle-btn {
     display: none;
   }

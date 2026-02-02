@@ -154,7 +154,7 @@
   border-bottom: none;
 }
 
-@media (max-width: 900px) {
+@media (--bp-md-down) {
   /* Individual mobile: collapse to effects-only list */
   #individualMode .relic-preview {
     grid-template-columns: 1fr;
@@ -596,7 +596,7 @@
 /* ------------------------------------------------------------
    Mobile layout (<=900px): two-column stack with validation on the right
    ------------------------------------------------------------ */
-@media (max-width: 900px) {
+@media (--bp-md-down) {
   /* Force curse buttons visible for selected effects on mobile (override layout.css hide) */
   #individualMode .effect-row:has(.curse-line) .curse-btn,
   #individualMode .effect-row:has(.title-text) .curse-btn,
@@ -813,7 +813,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (--bp-md-down) {
   /* Remove right-rail padding on mobile; validation is in its own column */
   #individualMode #results .chosen-effects li .effect-line,
   #individualMode .chosen-effects li .effect-line {
@@ -917,7 +917,7 @@
   opacity: 0.95;
 }
 
-@media (max-width: 720px) {
+@media (--bp-sm-down) {
   :root { --results-img-col: 150px; }
 
   /* Clamp all preview children to container width on small mobile */
@@ -943,7 +943,7 @@
   }
 }
 
-@media (max-width: 520px) {
+@media (--bp-xs) {
   .relic-preview {
     grid-template-columns: 1fr;
     align-items: start;

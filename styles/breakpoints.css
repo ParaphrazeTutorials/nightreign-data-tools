@@ -1,0 +1,32 @@
+:root {
+  /* Canonical width-only breakpoints (shared across pages) */
+  --bp-xs-max: 520px;
+  --bp-sm-min: 521px;
+  --bp-sm-max: 639px;
+  --bp-md-min: 640px;
+  --bp-md-max: 899px;
+  --bp-lg-min: 900px;
+  --bp-lg-max: 1279px;
+  --bp-xl-min: 1280px;
+  --bp-xl-max: 1439px;
+  --bp-xxl-min: 1440px;
+  --bp-xxl-max: 1919px;
+  --bp-ultra-min: 1920px;
+}
+
+/* Optional custom-media aliases (best-effort; browsers may ignore) */
+@custom-media --bp-xs (max-width: 520px);
+@custom-media --bp-sm (min-width: 521px) and (max-width: 639px);
+@custom-media --bp-sm-down (max-width: 639px);
+@custom-media --bp-md (min-width: 640px) and (max-width: 899px);
+@custom-media --bp-md-down (max-width: 899px);
+@custom-media --bp-md-up (min-width: 640px);
+@custom-media --bp-lg (min-width: 900px) and (max-width: 1279px);
+@custom-media --bp-lg-down (max-width: 1279px);
+@custom-media --bp-lg-up (min-width: 900px);
+@custom-media --bp-xl (min-width: 1280px) and (max-width: 1439px);
+@custom-media --bp-xl-down (max-width: 1439px);
+@custom-media --bp-xxl-up (min-width: 1440px);
+@custom-media --bp-xxl (min-width: 1440px) and (max-width: 1919px);
+@custom-media --bp-xxl-down (max-width: 1919px);
+@custom-media --bp-ultra (min-width: 1920px);

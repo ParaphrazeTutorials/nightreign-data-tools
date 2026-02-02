@@ -700,7 +700,7 @@
   display: none;
 }
 
-@media (max-width: 900px) {
+@media (--bp-md-down) {
   .effect-menu {
     width: min(740px, calc(100vw - 1.25rem));
   }
@@ -715,8 +715,8 @@
 }
 
 /* ------------------------------------------------------------
-   Mobile Overlay Picker (<=768w or <=1024h)
-   ------------------------------------------------------------ */
+  Mobile Overlay Picker (<=900w)
+  ------------------------------------------------------------ */
 
 .effect-overlay {
   position: fixed;
@@ -949,7 +949,7 @@
   gap: 0.55rem;
 }
 
-@media (max-width: 520px) {
+@media (--bp-xs) {
   .effect-cat-dialog__pill-grid {
     grid-template-columns: 1fr;
   }
@@ -1116,7 +1116,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 640px) {
+@media (--bp-sm-down) {
   /* Large phones and below: stack effect rows into two lines with a divider before the pill */
   .effect-overlay__row {
     flex-direction: column;
