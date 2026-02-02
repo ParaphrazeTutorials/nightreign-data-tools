@@ -1,0 +1,11 @@
+{
+  "name": "nightreign-data-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:reliquary": "rollup -c"
+  },
+  "devDependencies": {
+    "rollup": "^4.17.2"
+  }
+}

@@ -1,19 +1,24 @@
 import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, relicDefaultPath, visualRelicType, iconPath } from "./reliquary.assets.js";
 import {
-  COLORS,
+  clamp01,
+  normalize,
+  normalizeLower,
   compatId,
+  computeCompatDupGroups,
+  relicTypeForRow,
+  effectCategoryForRow,
   categoriesFor,
   applyCategory,
-  eligibleList,
   baseFilteredByRelicType,
-  autoRelicTypeFromEffect1,
+  eligibleList,
+  autoRelicTypeFromEffect1
+} from "./modules/logic.js";
+import {
+  COLORS,
   categoryColorFor,
   themeFromBase,
   ALL_THEME,
-  textColorFor,
-  relicTypeForRow,
-  computeCompatDupGroups,
-  effectCategoryForRow
+  textColorFor
 } from "./reliquary.logic.js";
 import {
   renderChosenLine,
@@ -25,7 +30,89 @@ import {
 import { getDom } from "./reliquary.dom.js";
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
 import { applyPaletteCssVars, COLOR_SWATCHES, RANDOM_SWATCH, CHARACTERS, characterColors, characterBackdrop, characterPortrait, randomPortrait } from "../scripts/ui/palette.js";
+import { escapeHtml, colorChipLabel } from "./modules/uiHelpers.js";
+import { showPortalTooltip, hidePortalTooltip, installHoverTooltip, setHoverTooltip } from "./modules/tooltipPortal.js";
 import { openEffectMenu, closeEffectMenu, openCurseMenu, closeCurseMenu } from "./reliquary.menus.js";
+import {
+  ingestEffectStats,
+  statRowsForEffect,
+  maxStacksForEffect,
+  stackCountForEffect,
+  setStackCountForEffect,
+  isConditionalEffectEnabled,
+  setConditionalEffectEnabled,
+  pruneConditionalEffectState
+} from "./modules/effectStats.js";
+import { filteredChalices, indexChaliceData } from "./modules/chaliceData.js";
+import {
+  MODES,
+  DETAILS_VIEW,
+  activeMode,
+  setActiveMode,
+  individualDetailsCollapsed,
+  setIndividualDetailsCollapsed,
+  chaliceDetailsView,
+  setChaliceDetailsView,
+  showIllegalActive,
+  setShowIllegalActive as setShowIllegalActiveState,
+  autoSortEnabled,
+  setAutoSortEnabled as setAutoSortEnabledState,
+  selectedColor,
+  setSelectedColor,
+  currentRandomColor,
+  setCurrentRandomColor,
+  rows,
+  setRows,
+  byId,
+  setById,
+  rowsAll,
+  setRowsAll,
+  byIdAll,
+  setByIdAll,
+  curses,
+  setCurses,
+  chaliceData,
+  setChaliceData,
+  chalicesByCharacter,
+  setChalicesByCharacter,
+  selectedChaliceId,
+  setSelectedChaliceId,
+  chaliceSelections,
+  chaliceGroupOrder,
+  chaliceEffectDrag,
+  chaliceCurses,
+  chaliceCats,
+  chaliceColorCache,
+  chaliceColorListCache,
+  effectStatsRows,
+  setEffectStatsRows,
+  effectStatsByEffectId,
+  setEffectStatsByEffectId,
+  conditionalEffectState,
+  setConditionalEffectState,
+  conditionalEffectStacks,
+  setConditionalEffectStacks,
+  lastChaliceRollIssues,
+  setLastChaliceRollIssues,
+  lastChaliceIssues,
+  setLastChaliceIssues,
+  lastChaliceIconOffsets,
+  lastChaliceIssueAssignments,
+  setLastChaliceIssueAssignments,
+  selectedEffects,
+  selectedCats,
+  curseBySlot,
+  curseCatBySlot,
+  selectedClass,
+  setSelectedClass as setSelectedClassState,
+  classPortraitMenuOpen,
+  setClassPortraitMenuOpen
+} from "./modules/state.js";
+import { createRelicTypeController } from "./modules/relicType.js";
+import { createClassPortraitController } from "./modules/classPortrait.js";
+import { createChaliceAlertController } from "./modules/chaliceAlerts.js";
+import { createChaliceColorController } from "./modules/chaliceColors.js";
+import { createChaliceGroupingController } from "./modules/chaliceGrouping.js";
 
 const dom = getDom();
 
@@ -42,169 +129,106 @@ const RELIC_TYPES = [
   { value: "Depth Of Night", label: "Depth of Night" }
 ];
 
-const MODES = { INDIVIDUAL: "individual", CHALICE: "chalice" };
-let activeMode = MODES.INDIVIDUAL;
-let individualDetailsCollapsed = false;
-
-// Chalice details states: collapsed (header only), partial (default), full (takeover).
-const DETAILS_VIEW = { COLLAPSED: "collapsed", PARTIAL: "partial", FULL: "full" };
-let chaliceDetailsView = DETAILS_VIEW.COLLAPSED;
-
-let rows = [];
-let byId = new Map();
-let rowsAll = [];
-let byIdAll = new Map();
-let curses = [];
-let selectedClass = "";
-let classPortraitMenuOpen = false;
-let relicTypeMenuOpen = false;
-let relicTypePopoverOpen = false;
-let pendingRelicType = "";
-let pendingRelicColor = "Random";
+const COLOR_CHOICES = ["Random", ...COLORS];
+const COLOR_SWATCH = COLOR_SWATCHES;
 
 function isDesktopWide() {
   if (typeof window === "undefined") return true;
   return (window.innerWidth || 0) >= 1366 && (window.innerHeight || 0) >= 768;
 }
 
-let chaliceData = [];
-let chalicesByCharacter = new Map();
-let selectedChaliceId = "";
+// Relic type menu/popover handling lives in a dedicated controller to keep the main file lean.
+const relicTypeController = createRelicTypeController(dom, {
+  relicTypes: RELIC_TYPES,
+  colorChoices: COLOR_CHOICES,
+  clearSelectionsIncompatibleWithType,
+  updateUI,
+  updateColorChipLabel,
+  isDesktopWide
+});
 
-function moveNode(node, target, before = null) {
-  if (!node || !target) return;
-  if (before) {
-    target.insertBefore(node, before);
-  } else {
-    target.appendChild(node);
-  }
-}
+const {
+  renderRelicTypeMenu,
+  setRelicTypeMenu,
+  setSelectedRelicType,
+  updateRelicTypeUI,
+  closeRelicTypePopover,
+  installRelicTypeHandlers,
+  handleOutsidePointer: handleRelicTypePointerDown
+} = relicTypeController;
 
-const chaliceSelections = {
-  standard: Array(9).fill(""),
-  depth: Array(9).fill("")
-};
+const classPortraitController = createClassPortraitController(dom, {
+  characters: CHARACTERS,
+  getSelectedClass: () => selectedClass,
+  setSelectedClass: value => setSelectedClass(value, true),
+  getMenuOpen: () => classPortraitMenuOpen,
+  setClassPortraitMenuOpen,
+  characterPortrait,
+  randomPortrait,
+  normalizeLower,
+  escapeHtml
+});
 
-const chaliceGroupOrder = {
-  standard: [],
-  depth: []
-};
+const {
+  renderClassPortraitMenu,
+  setClassPortraitMenu,
+  updateClassPortraitUI,
+  installClassPortraitHandlers,
+  handleOutsidePointer: handleClassPortraitPointerDown
+} = classPortraitController;
 
-const chaliceEffectDrag = {
-  side: "",
-  slot: -1
-};
+const chaliceColorController = createChaliceColorController(dom, {
+  COLOR_SWATCH,
+  chaliceColorCache,
+  chaliceColorListCache,
+  getSelectedChalice,
+  getSelectedChaliceId: () => selectedChaliceId,
+  sideInfo
+});
 
-const chaliceCurses = {
-  standard: Array(9).fill(""),
-  depth: Array(9).fill("")
-};
+const {
+  renderChaliceColors,
+  chaliceSideColor
+} = chaliceColorController;
 
-const chaliceCats = {
-  standard: Array(9).fill(""),
-  depth: Array(9).fill("")
-};
+const chaliceGroupingController = createChaliceGroupingController(dom, {
+  sideInfo,
+  generateCombosForSide,
+  chaliceGroupOrder,
+  chaliceSideColor,
+  textColorFor,
+  installChaliceGroupDrag,
+  installChaliceEffectDrag
+});
 
-// Track which chalice badges have been hovered so pulse animations can stop
-const seenChaliceBadges = new Set();
+const {
+  comboKeyFromIndices,
+  applyChaliceGrouping
+} = chaliceGroupingController;
 
-const selectedEffects = ["", "", ""];
-const selectedCats = ["", "", ""];
-const curseBySlot = [null, null, null];
-const curseCatBySlot = ["", "", ""];
+const chaliceAlertController = createChaliceAlertController(dom, {
+  alertIconUrl,
+  moveIndicatorHtml,
+  isAutoSortEnabled,
+  getShowIllegalActive: () => showIllegalActive,
+  lastChaliceIconOffsets,
+  setLastChaliceIssues,
+  setLastChaliceIssueAssignments,
+  lastChaliceIssueAssignments
+});
 
-const chaliceColorCache = {
-  standard: "#ffffff",
-  depth: "#ffffff"
-};
-const chaliceColorListCache = {
-  standard: [],
-  depth: []
-};
+const {
+  buildChaliceIssueAssignments,
+  renderChaliceAlerts,
+  renderIllegalErrorBadge,
+  renderAutoSortWarningBadge,
+  updateChaliceSlotIssues,
+  scheduleChaliceAlertLayout,
+  positionChaliceAlertCounts,
+  installChaliceAlertLayoutListeners
+} = chaliceAlertController;
 
-let lastChaliceRollIssues = { standard: [], depth: [] };
-
-let effectStatsRows = [];
-let effectStatsByEffectId = new Map();
-let conditionalEffectState = new Map();
-let conditionalEffectStacks = new Map();
-let lastChaliceIssues = { errors: [], warnings: [] };
-let lastChaliceIconOffsets = { warning: null, error: null };
-let lastChaliceIssueAssignments = {
-  rail: { errors: [], warnings: [] },
-  perSlot: new Map()
-};
-
-// Tooltip portal (escapes stacking contexts)
-let tooltipPortal;
-function ensureTooltipPortal() {
-  if (tooltipPortal) return tooltipPortal;
-  const el = document.createElement("div");
-  el.id = "tooltipPortal";
-  el.className = "tooltip-portal";
-  document.body.appendChild(el);
-  tooltipPortal = el;
-  return el;
-}
-
-function showPortalTooltip(target) {
-  const el = ensureTooltipPortal();
-  const txt = target?.getAttribute("data-tooltip") || target?.dataset?.tooltipText;
-  if (!txt) return;
-  const rect = target.getBoundingClientRect();
-  const placeLeft = !!(target.closest(".chalice-slot__issue-col, .chalice-slot__issue-badges")
-    || target.closest('#chaliceDetails[data-details-state="collapsed"]'));
-  el.textContent = txt;
-  if (placeLeft) {
-    el.classList.add("tooltip-portal--left");
-    el.style.left = `${rect.left - 8}px`;
-    el.style.top = `${rect.top + rect.height / 2}px`;
-  } else {
-    el.classList.remove("tooltip-portal--left");
-    el.style.left = `${rect.left + rect.width / 2}px`;
-    el.style.top = `${rect.top - 8}px`;
-  }
-  document.body.classList.add("tooltip-portal-active");
-  el.classList.add("is-visible");
-}
-
-function hidePortalTooltip() {
-  if (!tooltipPortal) return;
-  tooltipPortal.classList.remove("is-visible");
-  tooltipPortal.textContent = "";
-  document.body.classList.remove("tooltip-portal-active");
-}
-
-function normalizeChaliceColor(value) {
-  if (!value) return "#ffffff";
-  const trimmed = String(value).trim();
-  if (trimmed.startsWith("#")) return trimmed;
-  const rgbMatch = trimmed.match(/rgba?\([^\)]+\)/i);
-  if (rgbMatch) return rgbMatch[0];
-  if (trimmed.includes("gradient")) {
-    const hexMatch = trimmed.match(/#([0-9a-fA-F]{3,8})/);
-    if (hexMatch) return `#${hexMatch[1]}`;
-  }
-  // Attempt to resolve named colors
-  const probe = document.createElement("div");
-  probe.style.display = "none";
-  probe.style.color = trimmed;
-  document.body.appendChild(probe);
-  const resolved = window.getComputedStyle(probe).color;
-  probe.remove();
-  return resolved || "#ffffff";
-}
-
-function setChaliceSideColorVar(meta, color) {
-  const colEl = document.querySelector(`article.chalice-column[data-side="${meta.key}"]`);
-  if (colEl) colEl.style.setProperty("--chalice-side-color", color);
-}
-
-let currentRandomColor = "Red";
-let selectedColor = "Random";
-const COLOR_CHOICES = ["Random", ...COLORS];
-let showIllegalActive = false;
-let autoSortEnabled = true;
+// showIllegalActive and autoSortEnabled now live in modules/state.js
 
 function showIllegalButtons() {
   if (Array.isArray(dom.showIllegalButtons) && dom.showIllegalButtons.length) return dom.showIllegalButtons;
@@ -214,30 +238,6 @@ function showIllegalButtons() {
 function autoSortButtons() {
   if (Array.isArray(dom.autoSortToggleButtons) && dom.autoSortToggleButtons.length) return dom.autoSortToggleButtons;
   return [dom.autoSortToggle, dom.autoSortToggleChalice].filter(Boolean);
-}
-
-function installHoverTooltip(btn) {
-  if (!btn || btn.dataset.tooltipHoverInstalled) return;
-  const apply = () => {
-    const txt = btn.dataset.tooltipText || "";
-    if (txt) btn.setAttribute("data-tooltip", txt);
-    showPortalTooltip(btn);
-  };
-  const clear = () => {
-    btn.removeAttribute("data-tooltip");
-    hidePortalTooltip();
-  };
-  btn.addEventListener("pointerenter", apply);
-  btn.addEventListener("pointerleave", clear);
-  btn.addEventListener("blur", clear);
-  btn.dataset.tooltipHoverInstalled = "true";
-}
-
-function setHoverTooltip(btn, text) {
-  if (!btn) return;
-  btn.dataset.tooltipText = text || "";
-  btn.removeAttribute("data-tooltip");
-  installHoverTooltip(btn);
 }
 
 // Global portal tooltip handlers (covers static data-tooltip elements too)
@@ -265,17 +265,18 @@ function isShowIllegalActive() {
 }
 
 function setShowIllegalActive(active) {
-  showIllegalActive = !!active;
-  const tooltip = showIllegalActive
+  const next = !!active;
+  setShowIllegalActiveState(next);
+  const tooltip = next
     ? "Showing illegal effect combinations. Use with caution"
     : "Show Illegal Effect Combinations";
-  const ariaLabel = showIllegalActive
+  const ariaLabel = next
     ? "Hide illegal effect combinations (currently showing all effects, including illegal)"
     : "Show illegal effect combinations";
 
   showIllegalButtons().forEach(btn => {
-    btn.classList.toggle("is-active", showIllegalActive);
-    btn.setAttribute("aria-pressed", String(showIllegalActive));
+    btn.classList.toggle("is-active", next);
+    btn.setAttribute("aria-pressed", String(next));
     btn.setAttribute("aria-label", ariaLabel);
     btn.setAttribute("title", "");
     setHoverTooltip(btn, tooltip);
@@ -287,24 +288,25 @@ function isAutoSortEnabled() {
 }
 
 function setAutoSortEnabled(enabled) {
-  autoSortEnabled = !!enabled;
+  const next = !!enabled;
+  setAutoSortEnabledState(next);
 
-  const tooltip = autoSortEnabled
+  const tooltip = next
     ? "Auto-Sorting is On"
     : "Auto-Sorting is Off";
-  const ariaLabel = autoSortEnabled
+  const ariaLabel = next
     ? "Disable auto-sort (currently on)"
     : "Enable auto-sort (currently off)";
 
   autoSortButtons().forEach(btn => {
-    btn.classList.toggle("is-active", autoSortEnabled);
-    btn.setAttribute("aria-pressed", String(autoSortEnabled));
+    btn.classList.toggle("is-active", next);
+    btn.setAttribute("aria-pressed", String(next));
     btn.setAttribute("aria-label", ariaLabel);
     btn.setAttribute("title", "");
     setHoverTooltip(btn, tooltip);
 
     const sr = btn.querySelector(".sr-only");
-    if (sr) sr.textContent = autoSortEnabled ? "Auto-Sort Enabled" : "Auto-Sort Disabled";
+    if (sr) sr.textContent = next ? "Auto-Sort Enabled" : "Auto-Sort Disabled";
   });
 
   if (Array.isArray(dom.autoSortPills)) {
@@ -355,22 +357,7 @@ function handleAutoSortToggle() {
   }
 }
 
-const COLOR_SWATCH = COLOR_SWATCHES;
-
 const defaultCategoryTheme = categoryColorFor("");
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, ch => {
-    const map = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    };
-    return map[ch] || ch;
-  });
-}
 
 function alertIconUrl(kind) {
   const file = kind === "error" ? "chalice-error.svg" : "chalice-warning.svg";
@@ -383,18 +370,6 @@ function chaliceIconHtml(statusIconId, fallbackText = "") {
   const fallbackHtml = fallback ? `<span class="chalice-slot__icon-fallback">${escapeHtml(fallback)}</span>` : "";
   const imgHtml = src ? `<img src="${src}" alt="" onerror="this.remove()">` : fallbackHtml;
   return `<span class="chalice-slot__icon">${imgHtml}</span>`;
-}
-
-function colorChipLabel(value) {
-  const v = value || "Random";
-  if (v === "Random") return `Color: Random (${currentRandomColor})`;
-  return `Color: ${v}`;
-}
-
-function swatchForColorName(name) {
-  const normalized = name || "Random";
-  if (normalized === "Random") return RANDOM_SWATCH;
-  return COLOR_SWATCH[normalized] || "#b9c2d0";
 }
 
 function twoDecimal(value) {
@@ -540,76 +515,12 @@ function resetVitalsPlaceholders() {
   if (dom.statOverviewST) dom.statOverviewST.textContent = "-";
 }
 
-function ingestEffectStats(list) {
-  effectStatsRows = Array.isArray(list) ? list : [];
-  effectStatsByEffectId = new Map();
-  for (const row of effectStatsRows) {
-    const id = String(row?.EffectID ?? "").trim();
-    if (!id) continue;
-    if (!effectStatsByEffectId.has(id)) effectStatsByEffectId.set(id, []);
-    effectStatsByEffectId.get(id).push(row);
-  }
-}
-
-function statRowsForEffect(effectId) {
-  if (!effectId) return [];
-  return effectStatsByEffectId.get(String(effectId)) || [];
-}
-
-function maxStacksForEffect(effectId) {
-  const rows = statRowsForEffect(effectId);
-  let max = 1;
-  for (const row of rows) {
-    if (String(row?.Stackable ?? "0") !== "1") continue;
-    const m = Number.parseInt(row?.MaxStacks ?? "0", 10);
-    if (Number.isFinite(m) && m > max) max = m;
-  }
-  return max;
-}
-
-function stackCountForEffect(effectId) {
-  const key = String(effectId || "").trim();
-  const max = maxStacksForEffect(effectId);
-  const current = conditionalEffectStacks.has(key) ? conditionalEffectStacks.get(key) : (max > 1 ? 1 : 1);
-  return Math.min(Math.max(1, current), Math.max(1, max));
-}
-
-function setStackCountForEffect(effectId, count) {
-  const key = String(effectId || "").trim();
-  const max = maxStacksForEffect(effectId);
-  const clamped = Math.min(Math.max(1, Number(count) || 1), Math.max(1, max));
-  conditionalEffectStacks.set(key, clamped);
-}
-
-function isConditionalEffectEnabled(effectId) {
-  const key = String(effectId || "").trim();
-  if (!conditionalEffectState.has(key)) conditionalEffectState.set(key, true);
-  return conditionalEffectState.get(key);
-}
-
-function setConditionalEffectEnabled(effectId, enabled) {
-  const key = String(effectId || "").trim();
-  conditionalEffectState.set(key, Boolean(enabled));
-  if (enabled && !conditionalEffectStacks.has(key)) {
-    setStackCountForEffect(key, 1);
-  }
-}
-
-function pruneConditionalEffectState(activeEffectIds) {
-  const allowed = new Set((activeEffectIds || []).map(id => String(id)));
-  for (const key of conditionalEffectState.keys()) {
-    if (!allowed.has(key)) conditionalEffectState.delete(key);
-  }
-  for (const key of conditionalEffectStacks.keys()) {
-    if (!allowed.has(key)) conditionalEffectStacks.delete(key);
-  }
-}
 
 function updateColorChipLabel() {
   if (!dom.relicColorChip) return;
   const selected = selectedColor || "Random";
   const resolved = selected === "Random" ? currentRandomColor : selected;
-  const label = colorChipLabel(selected);
+  const label = colorChipLabel(selected, currentRandomColor);
 
   dom.relicColorChip.setAttribute("data-color", selected);
   dom.relicColorChip.setAttribute("aria-label", label);
@@ -706,7 +617,7 @@ function installColorChipMenu() {
     if (!btn) return;
     const next = btn.getAttribute("data-color-option");
     if (!next) return;
-    selectedColor = next;
+    setSelectedColor(next);
     updateUI("color-change");
     closeColorMenu();
   });
@@ -740,7 +651,7 @@ function isMobileLayout() {
 
 function applyIndividualDetailsCollapse() {
   // Individual mode should stay expanded on mobile; ignore collapse requests.
-  individualDetailsCollapsed = false;
+  setIndividualDetailsCollapsed(false);
   const panel = dom.detailsPanel || document.getElementById("details");
   if (panel) panel.dataset.collapsed = "false";
 
@@ -794,7 +705,7 @@ function updateDetailsToggleLabel(view) {
 
 function applyChaliceDetailsView(view) {
   const normalized = Object.values(DETAILS_VIEW).includes(view) ? view : DETAILS_VIEW.PARTIAL;
-  chaliceDetailsView = normalized;
+  setChaliceDetailsView(normalized);
 
   if (dom.chaliceLayout) dom.chaliceLayout.dataset.detailsState = normalized;
   if (dom.chaliceResultsShell) dom.chaliceResultsShell.dataset.detailsState = normalized;
@@ -893,7 +804,7 @@ function syncModeUI() {
 function setMode(next) {
   const normalized = next === MODES.CHALICE ? MODES.CHALICE : MODES.INDIVIDUAL;
   if (normalized === activeMode) return;
-  activeMode = normalized;
+  setActiveMode(normalized);
   syncModeUI();
   if (isChaliceMode()) {
     setChaliceStatus("");
@@ -926,179 +837,6 @@ function populateClassOptions() {
   dom.selClass.innerHTML = options.join("");
 }
 
-function renderClassPortraitMenu() {
-  if (!dom.classPortraitMenu) return;
-  const chars = Array.isArray(CHARACTERS) ? [...new Set(CHARACTERS)] : [];
-  const buttons = chars.map(name => {
-    const norm = name || "";
-    const portrait = characterPortrait(norm) || "";
-    const attrPortrait = portrait ? portrait.replace(/\"/g, "'") : "";
-    const active = normalizeLower(norm) === normalizeLower(selectedClass);
-    const bg = attrPortrait ? ` style="background-image: ${attrPortrait};"` : "";
-    const cls = active ? " class=\"is-active\"" : "";
-    const label = escapeHtml(norm);
-    return `<button type="button" role="menuitemradio" aria-checked="${active}" data-class="${label}" aria-label="${label}"${bg}${cls}></button>`;
-  });
-  dom.classPortraitMenu.innerHTML = buttons.join("");
-}
-
-function renderRelicTypeMenu() {
-  if (!dom.relicTypeMenu) return;
-  const current = (dom.selType?.value ?? "").trim();
-  const buttons = RELIC_TYPES.map(entry => {
-    const isActive = normalizeLower(entry.value) === normalizeLower(current);
-    const cls = isActive ? " class=\"is-active\"" : "";
-    return `<button type=\"button\" role=\"menuitemradio\" aria-checked=\"${isActive}\" data-relic-type=\"${escapeHtml(entry.value)}\" aria-label=\"${escapeHtml(entry.label)}\"${cls}>${escapeHtml(entry.label)}</button>`;
-  });
-  dom.relicTypeMenu.innerHTML = buttons.join("");
-}
-
-function setRelicTypeMenu(open) {
-  if (!dom.relicThumb || !dom.relicTypeMenu) return;
-  relicTypeMenuOpen = !!open;
-  dom.relicThumb.setAttribute("aria-expanded", relicTypeMenuOpen ? "true" : "false");
-  dom.relicTypeMenu.hidden = !relicTypeMenuOpen;
-}
-
-function setSelectedRelicType(next) {
-  const normalized = (next ?? "").toString().trim();
-  if (dom.selType) dom.selType.value = normalized;
-  clearSelectionsIncompatibleWithType(normalized);
-  updateUI("type-change");
-  renderRelicTypeMenu();
-  updateRelicTypeUI();
-  setRelicTypeMenu(false);
-}
-
-function updateRelicTypeUI() {
-  if (dom.relicThumb) {
-    const typeLabel = dom.selType?.value ? dom.selType.value : "Any Type";
-    dom.relicThumb.setAttribute("aria-label", `Relic type: ${typeLabel}`);
-    const selectionLabel = document.getElementById("relicThumbSelection");
-    if (selectionLabel) {
-      selectionLabel.textContent = dom.selType?.value ? dom.selType.value : "";
-      selectionLabel.hidden = !dom.selType?.value;
-    }
-    const colorChip = dom.relicThumb.querySelector(".mini-tile__color-chip");
-    if (colorChip && dom.relicColorChip) {
-      const swatch = dom.relicColorChip.style.getPropertyValue("--chip-swatch") || "";
-      colorChip.style.setProperty("--chip-swatch", swatch || "rgba(255,255,255,0.12)");
-    }
-  }
-
-  if (dom.relicTypeMenu) {
-    const current = normalizeLower(dom.selType?.value || "");
-    dom.relicTypeMenu.querySelectorAll("[data-relic-type]").forEach(btn => {
-      const isActive = normalizeLower(btn.dataset.relicType || "") === current;
-      btn.classList.toggle("is-active", isActive);
-      btn.setAttribute("aria-checked", isActive ? "true" : "false");
-    });
-  }
-
-  renderRelicTypePopover();
-}
-
-function renderRelicTypePopover() {
-  if (!dom.relicTypePopover) return;
-  const currentType = (pendingRelicType || dom.selType?.value || "").trim();
-  const currentColor = (pendingRelicColor || selectedColor || "Random").trim() || "Random";
-
-  const types = [
-    { value: "Standard", label: "Standard", img: "../Assets/relics/default/standard.png" },
-    { value: "Depth Of Night", label: "Depth of Night", img: "../Assets/relics/default/depth_of_night.png" }
-  ];
-
-  const typeButtons = types.map(entry => {
-    const isActive = normalizeLower(entry.value) === normalizeLower(currentType);
-    return `
-      <button type="button" class="relic-type-popover__type-btn${isActive ? " is-active" : ""}" data-relic-type-choice="${escapeHtml(entry.value)}" style="background-image: url('${entry.img}')">
-        <span class="relic-type-popover__type-label">${escapeHtml(entry.label)}</span>
-      </button>
-    `;
-  }).join("");
-
-  const colorButtons = COLOR_CHOICES.map(color => {
-    const swatch = swatchForColorName(color);
-    const isActive = normalizeLower(color) === normalizeLower(currentColor);
-    return `
-      <button type="button" class="relic-type-popover__color${isActive ? " is-active" : ""}" data-relic-color-choice="${escapeHtml(color)}" style="--swatch: ${swatch};">
-        <span class="sr-only">${escapeHtml(color)}</span>
-      </button>
-    `;
-  }).join("");
-
-  dom.relicTypePopover.innerHTML = `
-    <div class="relic-type-popover__types">${typeButtons}</div>
-    <div class="relic-type-popover__colors">${colorButtons}</div>
-    <div class="relic-type-popover__actions">
-      <button type="button" class="secondary" data-relic-popover-cancel>Cancel</button>
-      <button type="button" class="primary" data-relic-popover-save>Save</button>
-    </div>
-  `;
-}
-
-function openRelicTypePopover() {
-  pendingRelicType = dom.selType?.value || "";
-  pendingRelicColor = selectedColor || "Random";
-  renderRelicTypePopover();
-  if (dom.relicTypePopover) dom.relicTypePopover.hidden = false;
-  relicTypePopoverOpen = true;
-}
-
-function closeRelicTypePopover() {
-  if (dom.relicTypePopover) dom.relicTypePopover.hidden = true;
-  relicTypePopoverOpen = false;
-}
-
-function applyRelicTypePopoverSelection() {
-  setSelectedRelicType(pendingRelicType || "");
-  selectedColor = pendingRelicColor || "Random";
-  updateColorChipLabel();
-  updateUI("color-change");
-  closeRelicTypePopover();
-}
-
-function toggleRelicTypePopover(force) {
-  const nextOpen = typeof force === "boolean" ? force : !relicTypePopoverOpen;
-  if (nextOpen) {
-    openRelicTypePopover();
-  } else {
-    closeRelicTypePopover();
-  }
-}
-
-function setClassPortraitMenu(open) {
-  if (!dom.classPortraitBtn || !dom.classPortraitMenu) return;
-  classPortraitMenuOpen = !!open;
-  dom.classPortraitBtn.setAttribute("aria-expanded", classPortraitMenuOpen ? "true" : "false");
-  dom.classPortraitMenu.hidden = !classPortraitMenuOpen;
-}
-
-function classPortraitBg(name) {
-  const portrait = characterPortrait(name) || randomPortrait();
-  return portrait || "";
-}
-
-function updateClassPortraitUI() {
-  if (dom.classPortraitBtn) {
-    const portrait = classPortraitBg(selectedClass);
-    dom.classPortraitBtn.style.backgroundImage = portrait || "";
-    const isEmpty = !portrait;
-    dom.classPortraitBtn.classList.toggle("is-empty", isEmpty);
-    dom.classPortraitBtn.setAttribute("aria-label", selectedClass ? `Class: ${selectedClass}` : "All classes");
-  }
-
-  if (dom.classPortraitMenu) {
-    const normSel = normalizeLower(selectedClass);
-    dom.classPortraitMenu.querySelectorAll("[data-class]").forEach(btn => {
-      const isActive = normalizeLower(btn.dataset.class || "") === normSel;
-      btn.classList.toggle("is-active", isActive);
-      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
-      btn.setAttribute("aria-checked", isActive ? "true" : "false");
-    });
-  }
-}
-
 function resolveCharacterOption(normChar) {
   return (CHARACTERS || []).find(c => normalizeLower(c) === normalizeLower(normChar)) || "";
 }
@@ -1111,7 +849,7 @@ function setSelectedClass(next, triggerUI = true) {
     return;
   }
 
-  selectedClass = normalized;
+  setSelectedClassState(normalized);
 
   if (dom.selClass) {
     populateClassOptions();
@@ -1151,17 +889,6 @@ function pruneChaliceSelectionsForClass() {
   };
   pruneSide("standard");
   pruneSide("depth");
-}
-
-function filteredChalices() {
-  if (!Array.isArray(chaliceData) || !chaliceData.length) return [];
-  if (!selectedClass) return chaliceData.filter(entry => (entry?.chalicename || "").toString().trim());
-  const target = normalizeLower(selectedClass);
-  return chaliceData.filter(entry => normalizeLower(entry?.character || "") === target);
-}
-
-function normalizeLower(value) {
-  return (value ?? "").toString().trim().toLowerCase();
 }
 
 function rowMatchesClass(row) {
@@ -1357,7 +1084,7 @@ if (autoSortBtn) {
 }
 
 function pickRandomColor() {
-  currentRandomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+  setCurrentRandomColor(COLORS[Math.floor(Math.random() * COLORS.length)]);
 }
 
 function getRow(effectId) {
@@ -3467,10 +3194,10 @@ function maybeAutoSortChalice(force = false) {
   const std = handleSide(sideInfo("standard"));
   const dep = handleSide(sideInfo("depth"));
 
-  lastChaliceRollIssues = {
+  setLastChaliceRollIssues({
     standard: std.issues,
     depth: dep.issues
-  };
+  });
 
   return std.changed || dep.changed;
 }
@@ -4450,168 +4177,6 @@ function updateChaliceStatusFromResults(standard, depth) {
   setChaliceStatus(statusText);
 }
 
-function buildChaliceIssueAssignments(issues) {
-  const perSlot = new Map();
-  const rail = { errors: [], warnings: [] };
-  const counters = { error: 0, warning: 0 };
-
-  const process = (arr, severity) => {
-    const list = Array.isArray(arr) ? arr : [];
-    list.forEach(item => {
-      const isObj = typeof item === "object" && item !== null;
-      const message = isObj ? (item.message || String(item)) : String(item);
-      const slots = isObj && Array.isArray(item.slots) ? item.slots : [];
-      const code = isObj ? (item.code || "") : "";
-      const badge = { num: ++counters[severity], message, severity, code };
-
-      if (severity === "error") {
-        rail.errors.push(badge);
-      } else {
-        rail.warnings.push(badge);
-      }
-
-      slots.forEach(slot => {
-        const side = slot?.side || "standard";
-        const idx = Number.parseInt(slot?.slot, 10);
-        if (!Number.isInteger(idx) || idx < 0) return;
-        const key = `${side}:${idx}`;
-        if (!perSlot.has(key)) perSlot.set(key, { errors: [], warnings: [] });
-        const bucket = severity === "error" ? perSlot.get(key).errors : perSlot.get(key).warnings;
-        bucket.push(badge);
-      });
-    });
-  };
-
-  process(issues?.errors, "error");
-  process(issues?.warnings, "warning");
-
-  return { rail, perSlot };
-}
-
-function chaliceBadgeKey(_scope, severity, badge, _side = "", _slotIdx = null) {
-  const numPart = Number.isFinite(badge?.num) ? `num:${badge.num}` : "";
-  const codePart = badge?.code ? `code:${badge.code}` : "";
-  const messagePart = badge?.message ? `msg:${badge.message}` : "";
-  // Use a shared key per severity/num so linked badges pulse/clear together across rail + slots
-  return ["badge", severity, numPart || codePart || messagePart].filter(Boolean).join(":");
-}
-
-function isChaliceBadgeSeen(key) {
-  return key ? seenChaliceBadges.has(key) : false;
-}
-
-function markChaliceBadgeSeen(key, el) {
-  if (!key) return;
-  if (!seenChaliceBadges.has(key)) {
-    seenChaliceBadges.add(key);
-  }
-  // Clear pulse on the triggering badge and any matching badges rendered elsewhere
-  const targets = el ? [el, ...document.querySelectorAll(`[data-badge-key="${CSS.escape(key)}"]`)] : [];
-  targets.forEach(node => node.classList.remove("chalice-badge--pulse"));
-}
-
-function installChaliceBadgeSeenHandlers(root) {
-  if (!root) return;
-  root.querySelectorAll("[data-badge-key]").forEach(el => {
-    const key = el.getAttribute("data-badge-key") || "";
-    if (!key) return;
-    if (isChaliceBadgeSeen(key)) {
-      el.classList.remove("chalice-badge--pulse");
-      return;
-    }
-    const stopPulse = () => markChaliceBadgeSeen(key, el);
-    el.addEventListener("pointerenter", stopPulse, { passive: true });
-    el.addEventListener("focus", stopPulse, { passive: true });
-  });
-}
-
-function renderChaliceAlertCounts(counts) {
-  const warnRoot = document.getElementById("chaliceAlertCountsWarning");
-  const errRoot = document.getElementById("chaliceAlertCountsError");
-
-  const renderList = (root, severity, badges) => {
-    if (!root) return;
-    const active = Array.isArray(badges) && badges.length > 0;
-    root.hidden = !active;
-    root.setAttribute("aria-hidden", active ? "false" : "true");
-    if (!active) {
-      root.innerHTML = "";
-      return;
-    }
-    root.innerHTML = `<ol class="chalice-alert-counts__list">${badges
-      .map(b => {
-        const badgeKey = chaliceBadgeKey("rail", severity, b);
-        const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
-        return `<li><span class="chalice-alert-counts__badge is-${severity}${pulseClass}" data-badge-key="${escapeHtml(badgeKey)}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span></li>`;
-      })
-      .join("")}</ol>`;
-    installChaliceBadgeSeenHandlers(root);
-  };
-
-  renderList(warnRoot, "warning", counts?.warnings || []);
-  renderList(errRoot, "error", counts?.errors || []);
-}
-
-function renderIllegalErrorBadge(assignments) {
-  const badgeEl = dom.illegalErrorBadge;
-  if (!badgeEl) return;
-
-  const errors = assignments?.rail?.errors || [];
-  const badge = errors.find(b => b?.code === "show-illegal-on");
-  const shouldShow = !!badge && showIllegalActive;
-
-  if (!shouldShow) {
-    badgeEl.hidden = true;
-    badgeEl.setAttribute("aria-hidden", "true");
-    badgeEl.textContent = "";
-    badgeEl.removeAttribute("data-tooltip");
-    badgeEl.removeAttribute("aria-label");
-    return;
-  }
-
-  const badgeKey = chaliceBadgeKey("rail", "error", badge);
-  const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
-  const message = badge.message || "Showing illegal combinations; Use with caution.";
-  badgeEl.textContent = String(badge.num);
-  badgeEl.setAttribute("data-badge-key", badgeKey);
-  badgeEl.hidden = false;
-  badgeEl.setAttribute("aria-hidden", "false");
-  badgeEl.setAttribute("data-tooltip", message);
-  badgeEl.setAttribute("aria-label", message);
-  badgeEl.classList.toggle("chalice-badge--pulse", !!pulseClass.trim());
-  installChaliceBadgeSeenHandlers(badgeEl.parentElement || badgeEl);
-}
-
-function renderAutoSortWarningBadge(assignments) {
-  const badgeEl = dom.autoSortWarningBadge;
-  if (!badgeEl) return;
-
-  const warnings = assignments?.rail?.warnings || [];
-  const badge = warnings.find(b => b?.code === "auto-sort-off");
-  const shouldShow = !!badge && !isAutoSortEnabled();
-
-  if (!shouldShow) {
-    badgeEl.hidden = true;
-    badgeEl.setAttribute("aria-hidden", "true");
-    badgeEl.textContent = "";
-    badgeEl.removeAttribute("data-tooltip");
-    badgeEl.removeAttribute("aria-label");
-    return;
-  }
-
-  const badgeKey = chaliceBadgeKey("rail", "warning", badge);
-  const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
-  const message = badge.message || "Auto-Sort is off. Use with caution.";
-  badgeEl.textContent = String(badge.num);
-  badgeEl.setAttribute("data-badge-key", badgeKey);
-  badgeEl.hidden = false;
-  badgeEl.setAttribute("aria-hidden", "false");
-  badgeEl.setAttribute("data-tooltip", message);
-  badgeEl.setAttribute("aria-label", message);
-  badgeEl.classList.toggle("chalice-badge--pulse", !!pulseClass.trim());
-  installChaliceBadgeSeenHandlers(badgeEl.parentElement || badgeEl);
-}
-
 function validSlotSetFromCombos(standard, depth) {
   const valid = new Set();
 
@@ -4629,382 +4194,6 @@ function validSlotSetFromCombos(standard, depth) {
   collect(depth, "depth");
   return valid;
 }
-
-function renderValidCheck() {
-  return `
-    <span class="chalice-slot__valid-check" aria-label="Valid effect" title="Valid effect">
-      <span class="check-box" aria-hidden="true"></span>
-    </span>
-  `;
-}
-
-function updateChaliceSlotIssues(assignments = lastChaliceIssueAssignments, validSlots = new Set(), rollMoves = new Map()) {
-  const perSlot = assignments?.perSlot && typeof assignments.perSlot.get === "function"
-    ? assignments.perSlot
-    : new Map();
-
-  document.querySelectorAll(".chalice-slot").forEach(slot => {
-    slot.classList.remove("chalice-slot--warning", "chalice-slot--error", "chalice-slot--valid");
-    const badgeTarget = slot.querySelector("[data-ch-issue-badges]");
-    if (badgeTarget) badgeTarget.innerHTML = "";
-
-    const side = slot.getAttribute("data-side") || "standard";
-    const idx = Number.parseInt(slot.getAttribute("data-slot"), 10);
-    const key = Number.isInteger(idx) ? `${side}:${idx}` : null;
-    const entry = key && perSlot.has(key) ? (perSlot.get(key) || { errors: [], warnings: [] }) : { errors: [], warnings: [] };
-    const rollMove = key && rollMoves instanceof Map ? rollMoves.get(key) : null;
-    const hasRollIndicator = !!rollMove && !isAutoSortEnabled();
-    const hasErrors = Array.isArray(entry.errors) && entry.errors.length > 0;
-    const hasWarnings = Array.isArray(entry.warnings) && entry.warnings.length > 0;
-    const slotHasEffect = !slot.classList.contains("chalice-slot--empty");
-    const isValid = slotHasEffect && !hasErrors && !hasWarnings && key && validSlots instanceof Set && validSlots.has(key);
-
-    if (hasErrors) slot.classList.add("chalice-slot--error");
-    else if (hasWarnings) slot.classList.add("chalice-slot--warning");
-    else if (isValid) slot.classList.add("chalice-slot--valid");
-
-    if (!badgeTarget) return;
-    const badges = [];
-    const tooltipParts = [];
-    if (hasErrors) {
-      entry.errors.forEach(b => {
-        if (hasRollIndicator && b?.code === "roll-order") return; // replace roll-order badge with arrows
-        const badgeKey = chaliceBadgeKey("slot", "error", b, side, idx);
-        const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
-        badges.push(`<span class="chalice-slot__issue-badge is-error${pulseClass}" data-badge-key="${escapeHtml(badgeKey)}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
-        tooltipParts.push(b.message || "");
-      });
-    }
-    if (hasWarnings) {
-      entry.warnings.forEach(b => {
-        if (hasRollIndicator && b?.code === "roll-order") return;
-        const badgeKey = chaliceBadgeKey("slot", "warning", b, side, idx);
-        const pulseClass = isChaliceBadgeSeen(badgeKey) ? "" : " chalice-badge--pulse";
-        badges.push(`<span class="chalice-slot__issue-badge is-warning${pulseClass}" data-badge-key="${escapeHtml(badgeKey)}" data-tooltip="${escapeHtml(b.message)}" aria-label="${escapeHtml(b.message)}">${b.num}</span>`);
-        tooltipParts.push(b.message || "");
-      });
-    }
-
-    if (hasRollIndicator) {
-      badges.push(moveIndicatorHtml(rollMove.delta, rollMove.showOk));
-    }
-
-    if (!badges.length && isValid) badges.push(renderValidCheck());
-    badgeTarget.innerHTML = badges.join("");
-  installChaliceBadgeSeenHandlers(badgeTarget);
-
-    // Mirror the first tooltip onto the issue column so hovering the icon column also reveals the message,
-    // but don't attach it when roll-order arrows are present; those should not trigger the tooltip.
-    const tooltipText = tooltipParts.join(" | ").trim();
-    if (tooltipText && !hasRollIndicator) {
-      badgeTarget.setAttribute("data-tooltip", tooltipText);
-      badgeTarget.setAttribute("aria-label", tooltipText);
-    } else {
-      badgeTarget.removeAttribute("data-tooltip");
-      badgeTarget.removeAttribute("aria-label");
-    }
-  });
-}
-
-function renderChaliceAlerts(issues, assignments = lastChaliceIssueAssignments) {
-  // Cache latest issues so view changes can re-run alignment without recomputing
-  lastChaliceIssues = issues || { errors: [], warnings: [] };
-  if (!assignments) assignments = buildChaliceIssueAssignments(issues);
-  lastChaliceIssueAssignments = assignments;
-
-  const layout = dom.chaliceLayout;
-  const iconStack = dom.chaliceAlertIconStack;
-  const iconError = dom.chaliceAlertIconError;
-  const iconWarning = dom.chaliceAlertIconWarning;
-  const panelWarn = dom.chaliceAlertPanelWarning;
-  const panelWarnTitle = dom.chaliceAlertPanelTitleWarning;
-  const listWarn = dom.chaliceAlertListWarning;
-  const panelErr = dom.chaliceAlertPanelError;
-  const panelErrTitle = dom.chaliceAlertPanelTitleError;
-  const listErr = dom.chaliceAlertListError;
-
-  if (!panelWarn || !panelErr || !listWarn || !listErr) return;
-
-  const errors = Array.isArray(issues?.errors) ? issues.errors : [];
-  const warnings = Array.isArray(issues?.warnings) ? issues.warnings : [];
-  const msgText = (entry) => (typeof entry === "object" && entry !== null ? entry.message || String(entry) : String(entry));
-
-  const hasErrors = errors.length > 0;
-  const hasWarnings = warnings.length > 0;
-  const hasAny = hasErrors || hasWarnings;
-
-  if (!hasAny) {
-    if (layout) layout.classList.remove("has-chalice-alerts");
-    panelWarn.hidden = true;
-    panelWarn.setAttribute("aria-hidden", "true");
-    listWarn.innerHTML = "";
-    panelErr.hidden = true;
-    panelErr.setAttribute("aria-hidden", "true");
-    listErr.innerHTML = "";
-    if (iconStack) {
-      iconStack.hidden = false;
-      iconStack.setAttribute("aria-hidden", "false");
-    }
-    if (iconError) {
-      iconError.hidden = true;
-      iconError.removeAttribute("src");
-    }
-    if (iconWarning) {
-      iconWarning.hidden = true;
-      iconWarning.removeAttribute("src");
-    }
-    renderChaliceAlertCounts({ errors: [], warnings: [] });
-    positionChaliceAlertCounts();
-    return;
-  }
-
-  if (layout) layout.classList.add("has-chalice-alerts");
-  const showErrorIcon = hasErrors;
-  const showWarningIcon = hasWarnings;
-
-  if (iconStack) {
-    iconStack.hidden = false;
-    iconStack.setAttribute("aria-hidden", "false");
-  }
-
-  if (iconError) {
-    if (showErrorIcon) {
-      iconError.src = alertIconUrl("error");
-      iconError.alt = "Errors present";
-      iconError.hidden = false;
-    } else {
-      iconError.hidden = true;
-      iconError.removeAttribute("src");
-    }
-  }
-
-  if (iconWarning) {
-    if (showWarningIcon) {
-      iconWarning.src = alertIconUrl("warning");
-      iconWarning.alt = "Warnings present";
-      iconWarning.hidden = false;
-    } else {
-      iconWarning.hidden = true;
-      iconWarning.removeAttribute("src");
-    }
-  }
-
-  // warnings panel
-  if (hasWarnings) {
-    const warningMsg = warnings
-      .map(entry => `<li class="chalice-alert__item chalice-alert__item--warning">${escapeHtml(msgText(entry))}</li>`)
-      .join("");
-    listWarn.innerHTML = warningMsg;
-    panelWarn.hidden = false;
-    panelWarn.setAttribute("aria-hidden", "false");
-    if (panelWarnTitle) {
-      panelWarnTitle.textContent = warnings.length > 1 ? "Warnings detected" : "Warning detected";
-    }
-  } else {
-    listWarn.innerHTML = "";
-    panelWarn.hidden = true;
-    panelWarn.setAttribute("aria-hidden", "true");
-  }
-
-  // errors panel
-  if (hasErrors) {
-    const errorMsg = errors
-      .map(entry => `<li class="chalice-alert__item chalice-alert__item--error">${escapeHtml(msgText(entry))}</li>`)
-      .join("");
-    listErr.innerHTML = errorMsg;
-    panelErr.hidden = false;
-    panelErr.setAttribute("aria-hidden", "false");
-    if (panelErrTitle) {
-      panelErrTitle.textContent = errors.length > 1 ? "Errors detected" : "Error detected";
-    }
-  } else {
-    listErr.innerHTML = "";
-    panelErr.hidden = true;
-    panelErr.setAttribute("aria-hidden", "true");
-  }
-
-  renderChaliceAlertCounts(assignments?.rail || { errors: [], warnings: [] });
-  scheduleChaliceAlertLayout();
-}
-
-function positionChaliceAlertIcons() {
-  const rail = dom.chaliceAlertIconStack;
-  if (!rail || rail.hidden) return;
-
-  const details = dom.chaliceDetails;
-  const isCollapsed = details?.dataset?.detailsState === "collapsed";
-
-  const warnIcon = dom.chaliceAlertIconWarning;
-  const errIcon = dom.chaliceAlertIconError;
-
-  if (isCollapsed) {
-    positionCollapsedAlertIcons(warnIcon, errIcon, rail);
-    return;
-  }
-
-  const warnHeader = dom.chaliceAlertPanelWarning?.querySelector(".chalice-alert-panel__header");
-  const errHeader = dom.chaliceAlertPanelError?.querySelector(".chalice-alert-panel__header");
-
-  const railRect = rail.getBoundingClientRect();
-  if (!railRect || !railRect.height) return;
-
-  const placeIcon = (iconEl, headerEl, key) => {
-    if (!iconEl || iconEl.hidden || !headerEl) {
-      if (iconEl) iconEl.style.top = "";
-      lastChaliceIconOffsets[key] = null;
-      return;
-    }
-    const headerRect = headerEl.getBoundingClientRect();
-    const iconHeight = iconEl.getBoundingClientRect().height || 0;
-    const targetCenter = headerRect.top + headerRect.height * 0.5;
-    const offset = targetCenter - railRect.top - iconHeight * 0.5 - 4;
-    const clamped = Math.max(0, offset);
-    iconEl.style.top = `${clamped}px`;
-    lastChaliceIconOffsets[key] = clamped;
-  };
-
-  placeIcon(warnIcon, warnHeader, "warning");
-  placeIcon(errIcon, errHeader, "error");
-}
-
-function positionCollapsedAlertIcons(warnIcon, errIcon, rail) {
-  // Flex layout + CSS padding-top handles positioning; clear inline tops
-  if (rail) rail.style.paddingTop = "";
-  [warnIcon, errIcon].forEach(icon => {
-    if (icon) icon.style.top = "";
-  });
-}
-
-function positionChaliceAlertCounts() {
-  const rail = dom.chaliceAlertIconStack;
-  const warnRoot = document.getElementById("chaliceAlertCountsWarning");
-  const errRoot = document.getElementById("chaliceAlertCountsError");
-  const warnList = dom.chaliceAlertListWarning;
-  const errList = dom.chaliceAlertListError;
-  const detailsState = dom.chaliceResultsShell?.dataset?.detailsState || dom.chaliceLayout?.dataset?.detailsState || "";
-  const isCollapsed = detailsState === "collapsed";
-
-  const resetRoot = (root) => {
-    if (!root) return;
-    root.style.position = "";
-    root.style.top = "";
-    root.style.left = "";
-    root.style.transform = "";
-    root.style.height = "";
-    const ol = root.querySelector("ol");
-    if (ol) {
-      ol.style.position = "";
-      Array.from(ol.children).forEach(li => {
-        li.style.position = "";
-        li.style.top = "";
-        li.style.left = "";
-        li.style.transform = "";
-      });
-    }
-  };
-
-  if (!rail || rail.hidden || isCollapsed) {
-    resetRoot(warnRoot);
-    resetRoot(errRoot);
-    return;
-  }
-
-  const railRect = rail.getBoundingClientRect();
-  if (!railRect || !railRect.height) {
-    resetRoot(warnRoot);
-    resetRoot(errRoot);
-    return;
-  }
-
-  const placeCounts = (root, listEl) => {
-    if (!root || root.hidden) {
-      resetRoot(root);
-      return;
-    }
-    const ol = root.querySelector("ol");
-    if (!ol || !listEl) {
-      resetRoot(root);
-      return;
-    }
-    const items = Array.from(listEl.querySelectorAll(".chalice-alert__item"));
-    if (!items.length) {
-      resetRoot(root);
-      return;
-    }
-
-    const badgeItems = Array.from(ol.children);
-    const firstRect = items[0].getBoundingClientRect();
-    const badgeHeight = badgeItems[0]?.getBoundingClientRect()?.height || 0;
-    const baseTop = Math.max(0, firstRect.top - railRect.top);
-
-    root.style.position = "absolute";
-    root.style.left = "50%";
-    root.style.transform = "translateX(-50%)";
-    root.style.top = `${baseTop}px`;
-
-    ol.style.position = "relative";
-
-    let maxOffset = 0;
-    badgeItems.forEach((li, idx) => {
-      const target = items[idx];
-      if (!target) return;
-      const targetRect = target.getBoundingClientRect();
-      const offset = targetRect.top - firstRect.top;
-      maxOffset = Math.max(maxOffset, offset);
-      li.style.position = "absolute";
-      li.style.left = "50%";
-      li.style.transform = "translateX(-50%)";
-      li.style.top = `${offset}px`;
-    });
-
-    const totalHeight = maxOffset + badgeHeight;
-    if (totalHeight > 0) root.style.height = `${totalHeight}px`;
-  };
-
-  placeCounts(warnRoot, warnList);
-  placeCounts(errRoot, errList);
-}
-
-function scheduleChaliceAlertLayout() {
-  // Immediate pass for already-stable layouts
-  positionChaliceAlertIcons();
-  positionChaliceAlertCounts();
-
-  // Next frame handles freshly-updated DOM
-  requestAnimationFrame(() => {
-    positionChaliceAlertIcons();
-    positionChaliceAlertCounts();
-  });
-
-  // One more frame catches CSS transitions triggered by details state changes
-  requestAnimationFrame(() => {
-    positionChaliceAlertIcons();
-    positionChaliceAlertCounts();
-  });
-}
-
-function installChaliceAlertLayoutListeners() {
-  const targets = [dom.chaliceDetails, dom.chaliceResultsShell, dom.chaliceLayout].filter(Boolean);
-  const events = ["transitionend", "animationend"]; // re-run after CSS-driven layout shifts
-
-  targets.forEach(target => {
-    events.forEach(evt => {
-      target.addEventListener(evt, e => {
-        const prop = e?.propertyName || "";
-        if (prop && !/height|width|top|bottom|left|right|margin|padding|transform|gap/i.test(prop)) return;
-        scheduleChaliceAlertLayout();
-      });
-    });
-  });
-
-  // ResizeObserver catches content-driven height changes (e.g., alert text wrapping)
-  const observed = [dom.chaliceAlertListWarning, dom.chaliceAlertListError].filter(Boolean);
-  if (observed.length && typeof ResizeObserver !== "undefined") {
-    const ro = new ResizeObserver(() => scheduleChaliceAlertLayout());
-    observed.forEach(el => ro.observe(el));
-  }
-}
-
 function renderChaliceResults() {
   const standardMeta = sideInfo("standard");
   const depthMeta = sideInfo("depth");
@@ -5017,7 +4206,7 @@ function renderChaliceResults() {
   const rollIssues = [...(rollIssuesStandard || []), ...(rollIssuesDepth || [])];
   const hasRollIssue = rollIssues.length > 0;
   const rollMoves = hasRollIssue && !isAutoSortEnabled() ? buildChaliceRollMoveMap(rollIssues) : new Map();
-  lastChaliceRollIssues = { standard: rollIssuesStandard, depth: rollIssuesDepth };
+  setLastChaliceRollIssues({ standard: rollIssuesStandard, depth: rollIssuesDepth });
 
   // Debug hook: surface current roll-order state for console inspection
   if (typeof window !== "undefined") {
@@ -5077,11 +4266,12 @@ function renderChaliceResults() {
   }
 
   const validSlots = validSlotSetFromCombos(standard, depth);
-  lastChaliceIssueAssignments = buildChaliceIssueAssignments(stackingIssues);
-  renderChaliceAlerts(stackingIssues, lastChaliceIssueAssignments);
-  renderIllegalErrorBadge(lastChaliceIssueAssignments);
-  renderAutoSortWarningBadge(lastChaliceIssueAssignments);
-  updateChaliceSlotIssues(lastChaliceIssueAssignments, validSlots, rollMoves);
+  const issueAssignments = buildChaliceIssueAssignments(stackingIssues);
+  setLastChaliceIssueAssignments(issueAssignments);
+  renderChaliceAlerts(stackingIssues, issueAssignments);
+  renderIllegalErrorBadge(issueAssignments);
+  renderAutoSortWarningBadge(issueAssignments);
+  updateChaliceSlotIssues(issueAssignments, validSlots, rollMoves);
 }
 
 function updateChaliceCounts() {
@@ -5114,7 +4304,7 @@ function resetChaliceSelections() {
   chaliceCurses.standard.fill("");
   chaliceCurses.depth.fill("");
   conditionalEffectState.clear();
-  selectedChaliceId = "";
+  setSelectedChaliceId("");
   setChaliceStatus("");
   renderChalicePickers();
   renderChaliceUI();
@@ -5124,90 +4314,6 @@ function getSelectedChalice() {
   if (selectedChaliceId === "") return null;
   const list = filteredChalices();
   return list.find(c => String(c.chaliceID) === String(selectedChaliceId)) || list[0] || null;
-}
-
-function colorChip(color) {
-  const swatch = COLOR_SWATCH[color] || "#4a4f59";
-  return `<span class="chalice-color-chip" data-color="${color}" style="--chip-color:${swatch}" title="${color}">${color}</span>`;
-}
-
-function renderChaliceColors() {
-  if (!dom.chaliceStandardColors || !dom.chaliceDepthColors) return;
-  const entry = getSelectedChalice();
-  const isAllChalices = !entry && selectedChaliceId === "";
-  const fallbackDots = isAllChalices ? ["#ffffff", "#ffffff", "#ffffff"] : [];
-  const stdColors = entry ? [entry.standard1, entry.standard2, entry.standard3].filter(Boolean) : fallbackDots;
-  const depthColors = entry ? [entry.depth1, entry.depth2, entry.depth3].filter(Boolean) : fallbackDots;
-
-  const toSwatch = (color) => {
-    if (color == null) return "#ffffff";
-    const raw = COLOR_SWATCH[color] || color;
-    return normalizeChaliceColor(raw);
-  };
-
-  const dotHtml = (list) => list.map(color => {
-    const swatch = toSwatch(color);
-    return `<span class="chalice-color-dot" data-color="${swatch}" style="background:${swatch};"></span>`;
-  }).join("");
-
-  const stdSwatches = stdColors.map(toSwatch);
-  const depthSwatches = depthColors.map(toSwatch);
-
-  chaliceColorListCache.standard = stdSwatches;
-  chaliceColorListCache.depth = depthSwatches;
-
-  chaliceColorCache.standard = stdSwatches.length ? stdSwatches[0] : "#ffffff";
-  chaliceColorCache.depth = depthSwatches.length ? depthSwatches[0] : "#ffffff";
-
-  setChaliceSideColorVar(sideInfo("standard"), chaliceColorCache.standard);
-  setChaliceSideColorVar(sideInfo("depth"), chaliceColorCache.depth);
-
-  applyChaliceGrouping();
-
-  dom.chaliceStandardColors.innerHTML = dotHtml(stdColors);
-  dom.chaliceDepthColors.innerHTML = dotHtml(depthColors);
-}
-
-function chaliceSideColor(meta, index = 0) {
-  const list = chaliceColorListCache[meta.key] || [];
-  if (list.length) return list[index % list.length] || list[0];
-  return chaliceColorCache[meta.key] || "#ffffff";
-}
-
-function comboKeyFromIndices(indices) {
-  const sorted = [...indices].sort((a, b) => a - b);
-  return sorted.join("-");
-}
-
-function orderedCombosWithSaved(meta, combos) {
-  const list = Array.isArray(combos) ? [...combos] : [];
-  if (!list.length) return list;
-
-  const saved = Array.isArray(chaliceGroupOrder[meta.key]) ? chaliceGroupOrder[meta.key] : [];
-  if (!saved.length) return list;
-
-  const byKey = new Map();
-  list.forEach(combo => {
-    const key = comboKeyFromIndices(combo.indices || []);
-    if (!byKey.has(key)) byKey.set(key, combo);
-  });
-
-  const ordered = [];
-  saved.forEach(key => {
-    if (byKey.has(key)) {
-      ordered.push(byKey.get(key));
-      byKey.delete(key);
-    }
-  });
-
-  // Append any new combos that weren't    the saved order
-  byKey.forEach(combo => ordered.push(combo));
-  return ordered;
-}
-
-function setSavedGroupOrder(meta, combos) {
-  const keys = (Array.isArray(combos) ? combos : []).map(c => comboKeyFromIndices(c.indices || []));
-  chaliceGroupOrder[meta.key] = keys;
 }
 
 function snapshotComboData(meta, indices) {
@@ -5545,114 +4651,6 @@ function installChaliceEffectDrag(listEl, meta) {
   });
 }
 
-function applyChaliceGroupingForSide(meta) {
-  const listEl = meta.key === "depth" ? dom.chaliceDepthList : dom.chaliceStandardList;
-  if (!listEl) return;
-
-  // Unwrap previous groupings so we start from a clean list
-  const priorGroups = Array.from(listEl.querySelectorAll(".chalice-slot-group"));
-  priorGroups.forEach(group => {
-    const inner = group.querySelector(".chalice-slot-group__list");
-    if (inner) {
-      Array.from(inner.children).forEach(li => {
-        listEl.insertBefore(li, group);
-      });
-    }
-    group.remove();
-  });
-
-  const result = generateCombosForSide(meta);
-  if (!result.combos.length) {
-    installChaliceEffectDrag(listEl, meta);
-    return;
-  }
-
-  const orderedCombos = orderedCombosWithSaved(meta, result.combos);
-  setSavedGroupOrder(meta, orderedCombos);
-  const hasMultipleCombos = orderedCombos.length >= 2;
-
-  const slotLiByIdx = new Map();
-  listEl.querySelectorAll(".chalice-slot").forEach(slot => {
-    const idx = Number(slot.getAttribute("data-slot"));
-    if (Number.isInteger(idx)) slotLiByIdx.set(idx, slot.closest("li"));
-  });
-
-  // Reorder list items to match desired group order so content moves between color buckets
-  const orderedLis = [];
-  const usedIdx = new Set();
-  orderedCombos.forEach(combo => {
-    const indices = [...(combo.indices || [])].sort((a, b) => a - b);
-    const members = indices.map(i => slotLiByIdx.get(i)).filter(Boolean);
-    if (members.length !== indices.length) return;
-    members.forEach(m => {
-      orderedLis.push(m);
-      usedIdx.add(Number(m.querySelector(".chalice-slot")?.getAttribute("data-slot")));
-    });
-  });
-
-  // Append any remaining slots that were not part of combos
-  slotLiByIdx.forEach((li, idx) => {
-    if (!usedIdx.has(idx)) orderedLis.push(li);
-  });
-
-  if (orderedLis.length) {
-    listEl.innerHTML = "";
-    orderedLis.forEach(li => listEl.appendChild(li));
-  }
-
-  const used = new Set();
-
-  orderedCombos.forEach((combo, comboIdx) => {
-    const indices = [...combo.indices].sort((a, b) => a - b);
-    const members = indices.map(i => slotLiByIdx.get(i)).filter(Boolean);
-    if (members.length !== indices.length) return;
-    if (members.some(node => used.has(node))) return;
-
-    const groupLi = document.createElement("li");
-    groupLi.className = "chalice-slot-group";
-    const groupKey = comboKeyFromIndices(combo.indices || []);
-    groupLi.dataset.chGroupKey = groupKey;
-    groupLi.dataset.side = meta.key;
-
-    if (hasMultipleCombos) {
-      const handle = document.createElement("div");
-      handle.className = "chalice-slot-group__handle";
-      handle.setAttribute("aria-hidden", "true");
-      groupLi.appendChild(handle);
-    }
-
-    const innerList = document.createElement("ol");
-    innerList.className = "chalice-slot-group__list";
-    groupLi.appendChild(innerList);
-
-    const insertBeforeNode = members[0];
-    listEl.insertBefore(groupLi, insertBeforeNode);
-
-    members.forEach(node => {
-      used.add(node);
-      innerList.appendChild(node);
-    });
-  });
-
-  // Apply positional colors after grouping so colors stay with slots, not with the moved trio content
-  const groups = Array.from(listEl.querySelectorAll(".chalice-slot-group"));
-  groups.forEach((group, idx) => {
-    const color = chaliceSideColor(meta, idx) || "#ffffff";
-    group.style.setProperty("--chalice-group-color", color);
-    group.style.borderColor = color;
-    const handleDot = textColorFor(color);
-    group.style.setProperty("--chalice-handle-dot-color", handleDot);
-  });
-
-  installChaliceGroupDrag(listEl, meta);
-  installChaliceEffectDrag(listEl, meta);
-}
-
-function applyChaliceGrouping() {
-  applyChaliceGroupingForSide(sideInfo("standard"));
-  applyChaliceGroupingForSide(sideInfo("depth"));
-}
-
 function renderChalicePickers() {
   if (dom.chaliceSelect) {
     const list = filteredChalices();
@@ -5661,30 +4659,15 @@ function renderChalicePickers() {
       ...list.map(c => `<option value="${c.chaliceID}">${c.chalicename}</option>`)
     ].join("");
     dom.chaliceSelect.innerHTML = optionsHtml;
-    if (!selectedChaliceId && selectedChaliceId !== "") selectedChaliceId = "";
-    const hasCurrent = selectedChaliceId === "" || list.some(c => String(c.chaliceID) === String(selectedChaliceId));
-    if (!hasCurrent) selectedChaliceId = list.length ? list[0].chaliceID : "";
-    dom.chaliceSelect.value = selectedChaliceId;
+    let currentChalice = selectedChaliceId ?? "";
+    if (!currentChalice && currentChalice !== "") currentChalice = "";
+    const hasCurrent = currentChalice === "" || list.some(c => String(c.chaliceID) === String(currentChalice));
+    if (!hasCurrent) currentChalice = list.length ? list[0].chaliceID : "";
+    setSelectedChaliceId(currentChalice);
+    dom.chaliceSelect.value = currentChalice;
   }
 
   renderChaliceColors();
-}
-
-function indexChaliceData(list) {
-  chalicesByCharacter = new Map();
-  for (const entry of list || []) {
-    const char = (entry?.character || "").toString().trim();
-    if (!char) continue;
-    if (!chalicesByCharacter.has(char)) chalicesByCharacter.set(char, []);
-    chalicesByCharacter.get(char).push(entry);
-  }
-
-  for (const [, arr] of chalicesByCharacter.entries()) {
-    arr.sort((a, b) => String(a?.chalicename || "").localeCompare(String(b?.chalicename || "")));
-  }
-
-  const initialList = filteredChalices();
-  if (selectedChaliceId == null) selectedChaliceId = "";
 }
 
 // Meta visibility toggle removed; info is now provided via hover tooltips on the info icon.
@@ -5692,9 +4675,9 @@ function indexChaliceData(list) {
 function resetAllPreserveIllegal(desiredIllegal) {
   dom.selType.value = "";
   if (dom.selClass) dom.selClass.value = "";
-  selectedColor = "Random";
+  setSelectedColor("Random");
 
-  selectedClass = "";
+  setSelectedClassState("");
   updateCharacterNameLabel();
   resetVitalsPlaceholders();
   updateClassPortraitUI();
@@ -5714,7 +4697,7 @@ function resetAllPreserveIllegal(desiredIllegal) {
 }
 
 function resetClassFilter() {
-  selectedClass = "";
+  setSelectedClassState("");
   if (dom.selClass) {
     dom.selClass.value = "";
     populateClassOptions();
@@ -5730,11 +4713,11 @@ function resetClassFilter() {
 function resetAll() {
   dom.selType.value = "";
   if (dom.selClass) dom.selClass.value = "";
-  selectedColor = "Random";
+  setSelectedColor("Random");
 
   setShowIllegalActive(false);
 
-  selectedClass = "";
+  setSelectedClassState("");
   updateCharacterNameLabel();
   resetVitalsPlaceholders();
   updateClassPortraitUI();
@@ -5760,17 +4743,21 @@ async function load() {
 
   if (!relicRes.ok) throw new Error(`Failed to load ${DATA_URL} (${relicRes.status})`);
 
-  rowsAll = await relicRes.json();
-  byIdAll = new Map(rowsAll.map(r => [String(r.EffectID), r]));
-  curses = rowsAll.filter(r => String(r?.Curse ?? "0") === "1");
-  rows = rowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
-  byId = new Map(rows.map(r => [String(r.EffectID), r]));
+  const loadedRowsAll = await relicRes.json();
+  setRowsAll(loadedRowsAll);
+  setByIdAll(new Map(loadedRowsAll.map(r => [String(r.EffectID), r])));
+  const loadedCurses = loadedRowsAll.filter(r => String(r?.Curse ?? "0") === "1");
+  setCurses(loadedCurses);
+  const loadedRows = loadedRowsAll.filter(r => String(r?.Curse ?? "0") !== "1");
+  setRows(loadedRows);
+  setById(new Map(loadedRows.map(r => [String(r.EffectID), r])));
   pickRandomColor();
 
   if (chaliceRes && chaliceRes.ok) {
     try {
-      chaliceData = await chaliceRes.json();
-      indexChaliceData(chaliceData);
+      const loadedChalices = await chaliceRes.json();
+      setChaliceData(loadedChalices);
+      indexChaliceData(loadedChalices);
       renderChalicePickers();
     } catch (err) {
       console.warn("Failed to parse chalice data", err);
@@ -5819,6 +4806,7 @@ async function load() {
   }
   renderRelicTypeMenu();
   updateRelicTypeUI();
+  installRelicTypeHandlers();
   const illegalButtons = showIllegalButtons();
   if (illegalButtons.length) {
     illegalButtons.forEach(btn => {
@@ -5839,98 +4827,12 @@ async function load() {
     });
   }
   if (dom.startOverBtn) dom.startOverBtn.addEventListener("click", handleStartOver);
-
-  if (dom.classPortraitBtn) {
-    dom.classPortraitBtn.addEventListener("click", () => {
-      setClassPortraitMenu(!classPortraitMenuOpen);
-    });
-  }
-
-  if (dom.classPortraitMenu) {
-    dom.classPortraitMenu.addEventListener("click", evt => {
-      const btn = evt.target.closest("button[data-class]");
-      if (!btn) return;
-      const next = btn.dataset.class || "";
-      setSelectedClass(next, true);
-      setClassPortraitMenu(false);
-    });
-  }
-
-  if (dom.relicThumb) {
-    dom.relicThumb.addEventListener("click", evt => {
-      evt.preventDefault();
-      if (isDesktopWide()) {
-        toggleRelicTypePopover(false);
-        setRelicTypeMenu(!relicTypeMenuOpen);
-      } else {
-        setRelicTypeMenu(false);
-        toggleRelicTypePopover();
-      }
-    });
-  }
-
-  // Relic type menu left in place for fallback; popover handles selection.
-
-  if (dom.relicTypePopover) {
-    dom.relicTypePopover.addEventListener("click", evt => {
-      const typeBtn = evt.target.closest("[data-relic-type-choice]");
-      if (typeBtn) {
-        pendingRelicType = typeBtn.dataset.relicTypeChoice || "";
-        setSelectedRelicType(pendingRelicType);
-        renderRelicTypePopover();
-        return;
-      }
-
-      const colorBtn = evt.target.closest("[data-relic-color-choice]");
-      if (colorBtn) {
-        pendingRelicColor = colorBtn.dataset.relicColorChoice || "Random";
-        selectedColor = pendingRelicColor;
-        updateColorChipLabel();
-        updateUI("color-change");
-        renderRelicTypePopover();
-        return;
-      }
-
-      if (evt.target.closest("[data-relic-popover-save]")) {
-        applyRelicTypePopoverSelection();
-        return;
-      }
-
-      if (evt.target.closest("[data-relic-popover-cancel]")) {
-        closeRelicTypePopover();
-      }
-    });
-  }
-
-  if (dom.relicTypeMenu) {
-    dom.relicTypeMenu.addEventListener("click", evt => {
-      const btn = evt.target.closest("[data-relic-type]");
-      if (!btn) return;
-      const next = btn.dataset.relicType || "";
-      setSelectedRelicType(next);
-    });
-  }
+  installClassPortraitHandlers();
 
   document.addEventListener("pointerdown", evt => {
     const target = evt.target;
-
-    if (classPortraitMenuOpen) {
-      if (dom.classPortraitBtn && dom.classPortraitBtn.contains(target)) return;
-      if (dom.classPortraitMenu && dom.classPortraitMenu.contains(target)) return;
-      setClassPortraitMenu(false);
-    }
-
-    if (relicTypeMenuOpen) {
-      if (dom.relicThumb && dom.relicThumb.contains(target)) return;
-      if (dom.relicTypeMenu && dom.relicTypeMenu.contains(target)) return;
-      setRelicTypeMenu(false);
-    }
-
-    if (relicTypePopoverOpen) {
-      if (dom.relicThumb && dom.relicThumb.contains(target)) return;
-      if (dom.relicTypePopover && dom.relicTypePopover.contains(target)) return;
-      closeRelicTypePopover();
-    }
+    handleClassPortraitPointerDown(target);
+    handleRelicTypePointerDown(target);
   });
 
   window.addEventListener("resize", () => {
@@ -5942,7 +4844,8 @@ async function load() {
 
   if (dom.chaliceCharacter) {
     dom.chaliceCharacter.addEventListener("change", evt => {
-      selectedCharacter = evt.target.value || "";
+      const next = evt.target.value || "";
+      setSelectedClass(next, true);
       renderChalicePickers();
       renderChaliceUI();
     });
@@ -5950,7 +4853,7 @@ async function load() {
 
   if (dom.chaliceSelect) {
     dom.chaliceSelect.addEventListener("change", evt => {
-      selectedChaliceId = evt.target.value || "";
+      setSelectedChaliceId(evt.target.value || "");
       renderChaliceUI();
     });
   }
