@@ -1,6 +1,14 @@
 import { openEffectMenu, closeEffectMenu, isEffectMenuOverlayOpen } from "../Reliquary/reliquary.menus.js";
 import { gradientFromTheme, buildCategoryThemeMap, textColorFor } from "../scripts/ui/theme.js";
 import { applyPaletteCssVars, CHARACTER_COLORS, CHIP_COLORS } from "../scripts/ui/palette.js";
+import {
+  inferColumns,
+  reorderColumns,
+  inferTypeMap,
+  stableSort,
+  createFloatingFilterPortal,
+  exportCsvFile
+} from "./tableUtils.js";
 
 applyPaletteCssVars();
 
@@ -123,141 +131,28 @@ const state = {
 };
 
 // Single floating filter input appended to body (portal) so it never overlaps headers when hidden
-let floatingFilter = null;
-let floatingFilterCol = null;
-let floatingAnchorTh = null;
-let floatingAnchorBtn = null;
-
-function hideFloatingFilter() {
-  if (!floatingFilter) return;
-  floatingFilter.hidden = true;
-  floatingFilter.style.display = "none";
-  floatingFilter.setAttribute("aria-hidden", "true");
-  if (floatingAnchorTh) floatingAnchorTh.classList.remove("is-filtering");
-  if (floatingAnchorBtn) floatingAnchorBtn.classList.remove("is-open");
-  floatingAnchorTh = null;
-  floatingAnchorBtn = null;
-  floatingFilterCol = null;
-}
-
-function ensureFloatingFilter() {
-  if (floatingFilter) return floatingFilter;
-
-  floatingFilter = document.createElement("input");
-  floatingFilter.type = "text";
-  floatingFilter.className = "lexicon-floating-filter";
-  floatingFilter.autocomplete = "off";
-  floatingFilter.spellcheck = false;
-  floatingFilter.inputMode = "search";
-  floatingFilter.placeholder = "Filter column...";
-  floatingFilter.hidden = true;
-  floatingFilter.style.display = "none";
-  floatingFilter.setAttribute("aria-hidden", "true");
-
-  floatingFilter.addEventListener("input", () => {
-    const value = floatingFilter.value || "";
-    const trimmed = value.trim();
-    if (!floatingFilterCol) return;
-
-    if (trimmed === "") {
-      state.filters.delete(floatingFilterCol);
-      hideFloatingFilter();
-      render();
-      return;
-    }
-
-    state.filters.set(floatingFilterCol, value);
+const floatingFilterPortal = createFloatingFilterPortal({
+  getLabelForColumn: (col) => getDisplayLabel(col),
+  getFilterValue: (col) => state.filters.get(col) || "",
+  onFilterChange: (col, value) => {
+    const trimmed = (value || "").trim();
+    if (trimmed === "") state.filters.delete(col);
+    else state.filters.set(col, value);
     render();
-  });
-
-  floatingFilter.addEventListener("blur", () => {
-    if (floatingFilterCol && (floatingFilter.value || "").trim() === "") {
-      state.filters.delete(floatingFilterCol);
-    }
-    hideFloatingFilter();
-  });
-
-  window.addEventListener("scroll", hideFloatingFilter, true);
-  window.addEventListener("resize", hideFloatingFilter);
-
-  document.body.appendChild(floatingFilter);
-  return floatingFilter;
-}
-
-function openFloatingFilter(col, th, btn) {
-  ensureFloatingFilter();
-
-  const rect = btn.getBoundingClientRect();
-  floatingFilterCol = col;
-  floatingAnchorTh = th;
-  floatingAnchorBtn = btn;
-
-  const current = state.filters.get(col) || "";
-  floatingFilter.value = current;
-  const label = getDisplayLabel(col);
-  floatingFilter.placeholder = `Filter ${label}...`;
-
-  floatingFilter.hidden = false;
-  floatingFilter.removeAttribute("aria-hidden");
-  floatingFilter.style.display = "inline-block";
-
-  const top = rect.bottom + window.scrollY + 4;
-  const left = rect.left + window.scrollX;
-  const minW = Math.max(rect.width + 60, 150);
-  floatingFilter.style.top = `${top}px`;
-  floatingFilter.style.left = `${left}px`;
-  floatingFilter.style.minWidth = `${minW}px`;
-
-  th.classList.add("is-filtering");
-  btn.classList.add("is-open");
-
-  floatingFilter.focus();
-  floatingFilter.select();
-}
-
-function csvEscape(value) {
-  const s = value == null ? "" : String(value);
-  if (/[",\n\r]/.test(s)) return `\"${s.replaceAll('"', '""')}\"`;
-  return s;
-}
-
-function toCsv(columns, rows) {
-  const lines = [];
-  lines.push(columns.map(csvEscape).join(","));
-  for (const r of rows) lines.push(columns.map(c => csvEscape(r?.[c])).join(","));
-  return lines.join("\n");
-}
-
-function downloadText(filename, text, mime = "text/plain;charset=utf-8") {
-  const blob = new Blob([text], { type: mime });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  URL.revokeObjectURL(url);
-}
+  }
+});
 
 function exportCurrentTable() {
   const columns = state.columns;
   if (!columns.length) return;
-
   const rows = getCurrentViewRows();
-  const header = columns.map(col => getDisplayLabel(col));
-
-  const lines = [];
-  lines.push(header.map(csvEscape).join(","));
-  for (const r of rows) lines.push(columns.map(c => csvEscape(r?.[c])).join(","));
-
-  const date = new Date().toISOString().split("T")[0];
-  const moduleKey = state.module || "export";
-  const filename = `lexicon-${moduleKey}-${date}.csv`;
-
-  downloadText(filename, lines.join("\n"), "text/csv;charset=utf-8");
+  const filenameBase = `lexicon-${state.module || "export"}`;
+  exportCsvFile({
+    columns,
+    rows,
+    filenameBase,
+    displayLabelFor: (col) => getDisplayLabel(col)
+  });
 }
 
 function escapeHtml(str) {
@@ -288,21 +183,6 @@ function categoryCellHtml(rawValue, isSorted = false) {
   return `<td class="${cls}"><span class="lex-cat-pill" style="--lex-cat-base:${base}; background:${bg}; border-color:${borderColor}; color:${textColor};"><span class="lex-cat-pill__label">${escapeHtml(label)}</span></span></td>`;
 }
 
-function inferColumns(rows) {
-  const cols = [];
-  const seen = new Set();
-
-  for (const r of rows) {
-    if (!r || typeof r !== "object") continue;
-    for (const k of Object.keys(r)) {
-      if (seen.has(k)) continue;
-      seen.add(k);
-      cols.push(k);
-    }
-  }
-  return cols;
-}
-
 function getDisplayLabel(col) {
   const mod = state.module || "";
   const map = COLUMN_DISPLAY_NAMES[mod] || {};
@@ -326,77 +206,9 @@ const PRIORITY_COLUMNS = [
   "ChanceWeight_3000000"
 ];
 
-function reorderColumns(columns) {
-  const priLower = new Set(PRIORITY_COLUMNS.map(c => c.toLowerCase()));
+// Column ordering provided by tableUtils; priorities supplied per dataset.
 
-  const prioritized = [];
-  for (const target of PRIORITY_COLUMNS) {
-    const found = columns.find(c => c.toLowerCase() === target.toLowerCase());
-    if (found) prioritized.push(found);
-  }
-
-  const rest = columns.filter(c => !priLower.has(c.toLowerCase()));
-  return [...prioritized, ...rest];
-}
-
-function inferTypeForColumn(rows, col) {
-  let sawValue = false;
-  for (const r of rows) {
-    const v = r?.[col];
-    if (v == null || v === "") continue;
-    sawValue = true;
-
-    const n = Number(v);
-    if (!Number.isFinite(n)) return "string";
-  }
-  return sawValue ? "number" : "string";
-}
-
-function computeTypeMap(rows, columns) {
-  state.typeByCol.clear();
-  for (const c of columns) state.typeByCol.set(c, inferTypeForColumn(rows, c));
-}
-
-function getComparable(col, value) {
-  if (value == null || value === "") return null;
-  const t = state.typeByCol.get(col) || "string";
-
-  if (t === "number") {
-    const n = Number(value);
-    return Number.isFinite(n) ? n : null;
-  }
-  return String(value).toLowerCase();
-}
-
-function stableSort(rows, col, dir) {
-  if (!col || !dir) return rows;
-
-  const t = state.typeByCol.get(col) || "string";
-  const decorated = rows.map((r, idx) => ({ r, idx }));
-
-  decorated.sort((a, b) => {
-    const av = getComparable(col, a.r?.[col]);
-    const bv = getComparable(col, b.r?.[col]);
-
-    // Nulls last
-    const aNull = av == null;
-    const bNull = bv == null;
-    if (aNull && bNull) return a.idx - b.idx;
-    if (aNull) return 1;
-    if (bNull) return -1;
-
-    let cmp = 0;
-    if (t === "number") cmp = av - bv;
-    else cmp = String(av).localeCompare(String(bv));
-
-    if (cmp !== 0) return cmp * dir;
-    return a.idx - b.idx;
-  });
-
-  return decorated.map(d => d.r);
-}
-
-function noop() {}
+// Type inference, sorting, filtering are provided by tableUtils.
 
 function getManifestUrl(moduleKey) {
   const key = String(moduleKey || "").toLowerCase();
@@ -695,7 +507,6 @@ function tdHtml(key, value) {
 
 function renderHead(columns) {
   if (!dom.tableHead) return;
-  ensureFloatingFilter();
   dom.tableHead.innerHTML = `<tr>${columns.map(thHtml).join("")}</tr>`;
 
   dom.tableHead.querySelectorAll("th[data-col]").forEach(th => {
@@ -732,11 +543,9 @@ function renderHead(columns) {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       e.preventDefault();
-      const isSame = floatingFilterCol === col && floatingAnchorBtn === btn && !floatingFilter?.hidden;
-      hideFloatingFilter();
-      if (!isSame) {
-        openFloatingFilter(col, th, btn);
-      }
+      const isSame = floatingFilterPortal.isOpenFor(col);
+      floatingFilterPortal.hide();
+      if (!isSame) floatingFilterPortal.open(col, th, btn);
     });
   });
 }
@@ -800,7 +609,7 @@ function getFilteredRows() {
 
 function getCurrentViewRows() {
   const filtered = getFilteredRows();
-  return stableSort(filtered, state.sortKey, state.sortDir);
+  return stableSort(filtered, state.sortKey, state.sortDir, state.typeByCol);
 }
 
 function updateMeta() {
@@ -1182,10 +991,11 @@ async function loadData() {
 
   const rows = await res.json();
   state.rawRows = Array.isArray(rows) ? rows : [];
-  state.columns = reorderColumns(inferColumns(state.rawRows));
+  state.columns = reorderColumns(inferColumns(state.rawRows), PRIORITY_COLUMNS);
   state.filters.clear();
   state.searchTerm = "";
-  computeTypeMap(state.rawRows, state.columns);
+  floatingFilterPortal.hide();
+  state.typeByCol = inferTypeMap(state.rawRows, state.columns);
 
   // Default to the first effect so detail view is populated immediately
   state.selectedEffectId = state.rawRows[0]?.EffectID ? String(state.rawRows[0].EffectID) : "";
