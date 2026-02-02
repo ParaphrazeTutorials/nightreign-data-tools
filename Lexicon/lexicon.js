@@ -8,12 +8,9 @@ applyPaletteCssVars();
 // The Lexicon — table + tile theater mode + module picker
 // Session-only: sort + text zoom. No persistence across refresh.
 
+// Active datasets only; placeholders removed to avoid accidental fetches
 const DATASETS = {
-  reliquary: new URL("../Data/reliquary.json", window.location.href).toString(),
-  // placeholders (not wired yet)
-  menagerie: "",
-  armory: "",
-  grimoire: ""
+  reliquary: new URL("../Data/reliquary.json", window.location.href).toString()
 };
 
 // Optional column definitions per module. Add entries as needed.
@@ -404,7 +401,7 @@ function noop() {}
 
 function getManifestUrl(moduleKey) {
   const key = String(moduleKey || "").toLowerCase();
-  if (!key) return "";
+  if (!key || !DATASETS[key]) return "";
   return new URL(`../downloads/${key}/manifest.json`, window.location.href).toString();
 }
 
