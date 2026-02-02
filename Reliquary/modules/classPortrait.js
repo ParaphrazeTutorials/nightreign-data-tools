@@ -15,7 +15,7 @@ export function createClassPortraitController(dom, {
     const buttons = chars.map(name => {
       const norm = name || "";
       const portrait = characterPortrait(norm) || "";
-      const attrPortrait = portrait ? portrait.replace(/\"/g, "'") : "";
+      const attrPortrait = portrait ? portrait.replace(/"/g, "'") : "";
       const active = normalizeLower(norm) === normalizeLower(getSelectedClass());
       const bg = attrPortrait ? ` style="background-image: ${attrPortrait};"` : "";
       const cls = active ? " class=\"is-active\"" : "";

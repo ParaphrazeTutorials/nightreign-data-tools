@@ -1,0 +1,7 @@
+node_modules/
+dist/
+Downloads/
+downloads/
+Assets/
+Data/
+package-lock.json

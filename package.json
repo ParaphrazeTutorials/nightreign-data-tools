@@ -3,9 +3,24 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:reliquary": "rollup -c"
+    "build:reliquary": "rollup -c",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
-    "rollup": "^4.17.2"
+    "@playwright/test": "^1.47.2",
+    "@vitest/coverage-v8": "^2.1.1",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "prettier": "^3.3.3",
+    "rollup": "^4.17.2",
+    "vitest": "^2.1.1"
   }
 }

@@ -1,6 +1,7 @@
 import { openEffectMenu, closeEffectMenu, isEffectMenuOverlayOpen } from "../Reliquary/reliquary.menus.js";
-import { gradientFromTheme, buildCategoryThemeMap, textColorFor } from "../scripts/ui/theme.js";
 import { applyPaletteCssVars, CHARACTER_COLORS, CHIP_COLORS } from "../scripts/ui/palette.js";
+import { gradientFromTheme, buildCategoryThemeMap, textColorFor } from "../scripts/ui/theme.js";
+
 import {
   inferColumns,
   reorderColumns,
@@ -238,22 +239,6 @@ async function loadDownloadsManifest(moduleKey) {
   }
   state.downloadsLoading = false;
   renderDownloadsModal();
-}
-
-function getDownloadFilename(item) {
-  if (!item) return "";
-  if (item.filename) return String(item.filename);
-  const href = item.href || "";
-  if (!href) return item.label || "";
-  try {
-    const url = new URL(href, window.location.href);
-    const parts = (url.pathname || "").split("/").filter(Boolean);
-    if (parts.length > 0) return parts[parts.length - 1];
-  } catch (err) {
-    const parts = String(href).split("/").filter(Boolean);
-    if (parts.length > 0) return parts[parts.length - 1];
-  }
-  return item.label || "";
 }
 
 function renderDownloadsSection(title, items) {

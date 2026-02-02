@@ -1,6 +1,5 @@
 // Effect stats and conditional effect helpers
 import {
-  effectStatsRows,
   setEffectStatsRows,
   effectStatsByEffectId,
   setEffectStatsByEffectId,

@@ -1,7 +1,8 @@
 // Shared theme utilities for Reliquary and Lexicon (no DOM access)
 
-import { clamp01, normalize } from "./logic.js";
 import { COLORS as PALETTE_COLORS, EFFECT_COLOR_BASES, effectCategoryBase } from "../../scripts/ui/palette.js";
+
+import { clamp01, normalize } from "./logic.js";
 
 export const COLORS = PALETTE_COLORS;
 export const SEQ_CATEGORY_BASES = EFFECT_COLOR_BASES.sequence;

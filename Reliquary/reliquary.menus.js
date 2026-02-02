@@ -2,9 +2,10 @@
 // Pure DOM builders; state is provided by callers.
 // ==================== Menus ====================
 
+import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
+
 import { compatId } from "./modules/logic.js";
 import { textColorFor } from "./modules/theme.js";
-import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
 
 const MENU_COPY = {
   effect: {

@@ -44,7 +44,6 @@ function detectBuildStatus() {
 }
 
 const GLOBAL_BUILD_STATUS = detectBuildStatus(); // "BETA" | "LIVE" (auto from host)
-const GLOBAL_BUILD_VERSION = "v0.0.0";  // app version (update as needed)
 const GLOBAL_GAME_VERSION = "1.03.1.0029"; // game version (sourced from Reliquary baseline)
 const ART_CREDIT_URL = "https://cl.pinterest.com/smile_409/"; // single source of truth for art credit link
 const HERO_LOGO_RECT = new URL("../Assets/logo_square_plain.png", import.meta.url).href;
@@ -116,7 +115,6 @@ function renderHero() {
 
     ${showBuild ? (() => {
       const status = String(GLOBAL_BUILD_STATUS || "BETA").trim().toUpperCase();
-      const version = String(GLOBAL_BUILD_VERSION || "").trim();
       const game = String(GLOBAL_GAME_VERSION || "").trim();
       const cls = status === "LIVE" ? "is-live" : "is-beta";
       return `

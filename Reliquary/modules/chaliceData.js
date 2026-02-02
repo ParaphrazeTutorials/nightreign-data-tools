@@ -1,7 +1,6 @@
 import { normalizeLower } from "./logic.js";
 import {
   chaliceData,
-  chalicesByCharacter,
   setChalicesByCharacter,
   selectedClass,
   selectedChaliceId,

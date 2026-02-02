@@ -10,7 +10,7 @@ export function createChaliceColorController(dom, {
     if (!value) return "#ffffff";
     const trimmed = String(value).trim();
     if (trimmed.startsWith("#")) return trimmed;
-    const rgbMatch = trimmed.match(/rgba?\([^\)]+\)/i);
+    const rgbMatch = trimmed.match(/rgba?\([^)]*\)/i);
     if (rgbMatch) return rgbMatch[0];
     if (trimmed.includes("gradient")) {
       const hexMatch = trimmed.match(/#([0-9a-fA-F]{3,8})/);
