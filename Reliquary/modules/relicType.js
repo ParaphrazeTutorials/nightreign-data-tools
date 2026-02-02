@@ -11,7 +11,7 @@ import {
   selectedColor,
   setSelectedColor
 } from "./state.js";
-import { escapeHtml, swatchForColorName } from "./uiHelpers.js";
+import { swatchForColorName } from "./uiHelpers.js";
 
 export function createRelicTypeController(dom, {
   relicTypes = [],
@@ -29,15 +29,59 @@ export function createRelicTypeController(dom, {
         { value: "Depth Of Night", label: "Depth of Night", img: "../Assets/relics/default/depth_of_night.png" }
       ];
 
+  function buildTypeButtons(choices, currentType, variant) {
+    const frag = document.createDocumentFragment();
+    choices.forEach(entry => {
+      const isActive = normalizeLower(entry.value) === normalizeLower(currentType);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      if (variant === "menu") {
+        btn.dataset.relicType = entry.value;
+        btn.setAttribute("role", "menuitemradio");
+        btn.setAttribute("aria-checked", isActive ? "true" : "false");
+        btn.setAttribute("aria-label", entry.label);
+        btn.className = isActive ? "is-active" : "";
+        btn.textContent = entry.label;
+      } else {
+        btn.dataset.relicTypeChoice = entry.value;
+        btn.className = `relic-type-popover__type-btn${isActive ? " is-active" : ""}`;
+        btn.style.backgroundImage = `url('${entry.img}')`;
+        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+        const label = document.createElement("span");
+        label.className = "relic-type-popover__type-label";
+        label.textContent = entry.label;
+        btn.appendChild(label);
+      }
+      frag.appendChild(btn);
+    });
+    return frag;
+  }
+
+  function buildColorButtons(currentColor) {
+    const frag = document.createDocumentFragment();
+    colorChoices.forEach(color => {
+      const swatch = swatchForColorName(color);
+      const isActive = normalizeLower(color) === normalizeLower(currentColor);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `relic-type-popover__color${isActive ? " is-active" : ""}`;
+      btn.dataset.relicColorChoice = color;
+      btn.style.setProperty("--swatch", swatch);
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+      const sr = document.createElement("span");
+      sr.className = "sr-only";
+      sr.textContent = color;
+      btn.appendChild(sr);
+      frag.appendChild(btn);
+    });
+    return frag;
+  }
+
   function renderRelicTypeMenu() {
     if (!dom.relicTypeMenu) return;
     const current = (dom.selType?.value ?? "").trim();
-    const buttons = relicTypes.map(entry => {
-      const isActive = normalizeLower(entry.value) === normalizeLower(current);
-      const cls = isActive ? " class=\"is-active\"" : "";
-      return `<button type="button" role="menuitemradio" aria-checked="${isActive}" data-relic-type="${escapeHtml(entry.value)}" aria-label="${escapeHtml(entry.label)}"${cls}>${escapeHtml(entry.label)}</button>`;
-    });
-    dom.relicTypeMenu.innerHTML = buttons.join("");
+    const frag = buildTypeButtons(relicTypes, current, "menu");
+    dom.relicTypeMenu.replaceChildren(frag);
   }
 
   function setRelicTypeMenu(open) {
@@ -53,33 +97,36 @@ export function createRelicTypeController(dom, {
     const currentType = (pendingRelicType || dom.selType?.value || "").trim();
     const currentColor = (pendingRelicColor || selectedColor || "Random").trim() || "Random";
 
-    const typeButtons = typeChoices.map(entry => {
-      const isActive = normalizeLower(entry.value) === normalizeLower(currentType);
-      return `
-      <button type="button" class="relic-type-popover__type-btn${isActive ? " is-active" : ""}" data-relic-type-choice="${escapeHtml(entry.value)}" style="background-image: url('${entry.img}')">
-        <span class="relic-type-popover__type-label">${escapeHtml(entry.label)}</span>
-      </button>
-    `;
-    }).join("");
+    const frag = document.createDocumentFragment();
 
-    const colorButtons = colorChoices.map(color => {
-      const swatch = swatchForColorName(color);
-      const isActive = normalizeLower(color) === normalizeLower(currentColor);
-      return `
-      <button type="button" class="relic-type-popover__color${isActive ? " is-active" : ""}" data-relic-color-choice="${escapeHtml(color)}" style="--swatch: ${swatch};">
-        <span class="sr-only">${escapeHtml(color)}</span>
-      </button>
-    `;
-    }).join("");
+    const typesWrap = document.createElement("div");
+    typesWrap.className = "relic-type-popover__types";
+    typesWrap.appendChild(buildTypeButtons(typeChoices, currentType, "popover"));
 
-    dom.relicTypePopover.innerHTML = `
-    <div class="relic-type-popover__types">${typeButtons}</div>
-    <div class="relic-type-popover__colors">${colorButtons}</div>
-    <div class="relic-type-popover__actions">
-      <button type="button" class="secondary" data-relic-popover-cancel>Cancel</button>
-      <button type="button" class="primary" data-relic-popover-save>Save</button>
-    </div>
-  `;
+    const colorsWrap = document.createElement("div");
+    colorsWrap.className = "relic-type-popover__colors";
+    colorsWrap.appendChild(buildColorButtons(currentColor));
+
+    const actions = document.createElement("div");
+    actions.className = "relic-type-popover__actions";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.className = "secondary";
+    cancel.dataset.relicPopoverCancel = "";
+    cancel.textContent = "Cancel";
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "primary";
+    save.dataset.relicPopoverSave = "";
+    save.textContent = "Save";
+    actions.appendChild(cancel);
+    actions.appendChild(save);
+
+    frag.appendChild(typesWrap);
+    frag.appendChild(colorsWrap);
+    frag.appendChild(actions);
+
+    dom.relicTypePopover.replaceChildren(frag);
   }
 
   function updateRelicTypeUI() {
