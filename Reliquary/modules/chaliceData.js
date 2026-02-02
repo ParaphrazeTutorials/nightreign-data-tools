@@ -8,6 +8,12 @@ import {
   setSelectedChaliceId
 } from "./state.js";
 
+// ==================== Data ====================
+
+/**
+ * Filter chalices by the currently selected character (or return all when unset).
+ * @returns {Array<object>} Filtered chalice entries.
+ */
 export function filteredChalices() {
   if (!Array.isArray(chaliceData) || !chaliceData.length) return [];
   if (!selectedClass) return chaliceData.filter(entry => (entry?.chalicename || "").toString().trim());
@@ -15,6 +21,10 @@ export function filteredChalices() {
   return chaliceData.filter(entry => normalizeLower(entry?.character || "") === target);
 }
 
+/**
+ * Group chalice data by character and sort each group alphabetically.
+ * @param {Array<object>} list Raw chalice data rows.
+ */
 export function indexChaliceData(list) {
   const grouped = new Map();
   for (const entry of list || []) {

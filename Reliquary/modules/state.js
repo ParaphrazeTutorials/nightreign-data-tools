@@ -1,4 +1,5 @@
 // Centralized in-memory state for Reliquary
+// ==================== State ====================
 
 export const MODES = { INDIVIDUAL: "individual", CHALICE: "chalice" };
 export const DETAILS_VIEW = { COLLAPSED: "collapsed", PARTIAL: "partial", FULL: "full" };

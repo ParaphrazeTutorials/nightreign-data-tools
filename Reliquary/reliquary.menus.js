@@ -1,5 +1,6 @@
 // Effect and Curse selection menus for Reliquary
 // Pure DOM builders; state is provided by callers.
+// ==================== Menus ====================
 
 import { compatId } from "./modules/logic.js";
 import { textColorFor } from "./modules/theme.js";
@@ -725,23 +726,41 @@ function openMenu(kind, { anchorBtn, eligible, categories, currentId, selectedCa
   state.menu = menuEl;
 }
 
+/**
+ * Close the currently open effect menu (desktop or mobile overlay).
+ */
 export function closeEffectMenu() {
   teardownMenu("effect");
 }
 
+/**
+ * Whether the effect menu overlay is active (mobile overlay state).
+ * @returns {boolean} True when the overlay menu is present.
+ */
 export function isEffectMenuOverlayOpen() {
   const menu = menuState.effect.menu;
   return !!menu && menu.classList.contains("effect-overlay");
 }
 
+/**
+ * Open the effect selection menu.
+ * @param {object} options Menu configuration including rows, anchor, and callbacks.
+ */
 export function openEffectMenu(options) {
   openMenu("effect", options);
 }
 
+/**
+ * Close the currently open curse menu.
+ */
 export function closeCurseMenu() {
   teardownMenu("curse");
 }
 
+/**
+ * Open the curse selection menu.
+ * @param {object} options Menu configuration including rows, anchor, and callbacks.
+ */
 export function openCurseMenu(options) {
   openMenu("curse", options);
 }

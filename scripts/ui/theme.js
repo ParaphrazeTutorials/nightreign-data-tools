@@ -1,5 +1,6 @@
 // Shared UI theming utilities used across Reliquary and Lexicon
 // Keeps gradients and category palettes in one place.
+// ==================== Helpers ====================
 
 import { categoriesFor as reliquaryCategoriesFor } from "../../Reliquary/modules/logic.js";
 import {
@@ -9,7 +10,11 @@ import {
   textColorFor
 } from "../../Reliquary/modules/theme.js";
 
-// Build category → theme map for Reliquary-style datasets (categories derived from rows)
+/**
+ * Build a category → theme map for Reliquary-style datasets (categories derived from rows).
+ * @param {Array<object>} rows Data rows to derive categories from.
+ * @returns {Map<string, import("../../Reliquary/modules/theme.js").Theme>} Map of category to theme colors.
+ */
 export function buildCategoryThemeMap(rows) {
   if (!Array.isArray(rows) || !rows.length) return new Map();
 
@@ -27,7 +32,11 @@ export function buildCategoryThemeMap(rows) {
   return map;
 }
 
-// Build category palette for Reliquary menus given an explicit category list
+/**
+ * Build category palette for Reliquary menus given an explicit category list.
+ * @param {Array<string>} catList Categories to include.
+ * @returns {Map<string, import("../../Reliquary/modules/theme.js").Theme>} Map of category to theme colors.
+ */
 export function buildCategoryThemes(catList) {
   const map = new Map();
 

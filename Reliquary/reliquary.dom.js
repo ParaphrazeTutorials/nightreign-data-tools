@@ -1,3 +1,9 @@
+// ==================== Render ====================
+
+/**
+ * Collect and return all Reliquary DOM references needed by renderers.
+ * @returns {object} Map of DOM elements keyed by usage name.
+ */
 export function getDom() {
   return {
     // Top controls
