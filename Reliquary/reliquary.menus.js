@@ -1,7 +1,8 @@
 // Effect and Curse selection menus for Reliquary
 // Pure DOM builders; state is provided by callers.
 
-import { compatId, textColorFor } from "./reliquary.logic.js";
+import { compatId } from "./modules/logic.js";
+import { textColorFor } from "./modules/theme.js";
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
 
 // ---------- shared helpers ----------

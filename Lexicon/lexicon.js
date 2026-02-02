@@ -1,6 +1,5 @@
-import { textColorFor } from "../Reliquary/reliquary.logic.js";
 import { openEffectMenu, closeEffectMenu, isEffectMenuOverlayOpen } from "../Reliquary/reliquary.menus.js";
-import { gradientFromTheme, buildCategoryThemeMap } from "../scripts/ui/theme.js";
+import { gradientFromTheme, buildCategoryThemeMap, textColorFor } from "../scripts/ui/theme.js";
 import { applyPaletteCssVars, CHARACTER_COLORS, CHIP_COLORS } from "../scripts/ui/palette.js";
 
 applyPaletteCssVars();

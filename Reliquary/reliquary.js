@@ -14,12 +14,11 @@ import {
   autoRelicTypeFromEffect1
 } from "./modules/logic.js";
 import {
-  COLORS,
   categoryColorFor,
   themeFromBase,
   ALL_THEME,
   textColorFor
-} from "./reliquary.logic.js";
+} from "./modules/theme.js";
 import {
   renderChosenLine,
   updateCounts,
@@ -29,7 +28,7 @@ import {
 } from "./reliquary.ui.js";
 import { getDom } from "./reliquary.dom.js";
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
-import { applyPaletteCssVars, COLOR_SWATCHES, RANDOM_SWATCH, CHARACTERS, characterColors, characterBackdrop, characterPortrait, randomPortrait } from "../scripts/ui/palette.js";
+import { applyPaletteCssVars, COLOR_SWATCHES, COLORS, RANDOM_SWATCH, CHARACTERS, characterColors, characterBackdrop, characterPortrait, randomPortrait } from "../scripts/ui/palette.js";
 import { escapeHtml, colorChipLabel } from "./modules/uiHelpers.js";
 import { showPortalTooltip, hidePortalTooltip, installHoverTooltip, setHoverTooltip } from "./modules/tooltipPortal.js";
 import { openEffectMenu, closeEffectMenu, openCurseMenu, closeCurseMenu } from "./reliquary.menus.js";
