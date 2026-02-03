@@ -1,11 +1,3 @@
-# nightreign-data-tools
-Data tools created for the Elden Ring: Nightreign community.
-
-## Project workflow
-See PROJECT_GUIDE.md for how we track features, bugs, and feedback.
-
-## Development
-- Run linting: `npm run lint`
-- Format check (Prettier): `npm run format`
-- Unit tests (Vitest): `npm test`
-- Optional Playwright smoke (requires page host): set `PLAYWRIGHT_BASE_URL` to the served Reliquary URL, then run `npm run test:e2e`
+# Docs index
+- Overview and usage: see the root README at ../README.md
+- Detailed rules, probabilities, pipeline, and workflow: see PROJECT_GUIDE.md
