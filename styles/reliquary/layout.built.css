@@ -13,7 +13,7 @@
   margin-inline: auto;
 }
 
-@media (--bp-ultra) {
+@media (min-width: 1920px) {
   .tool-shell {
     max-width: clamp(1700px, 97vw, 4000px);
   }
@@ -86,14 +86,14 @@
   margin-bottom: 0.6rem;
 }
 
-@media (--bp-xxl-up) {
+@media (min-width: 1440px) {
   .tool-shell,
   .tool-shell :where(p, li, label, select, input, small) {
     font-size: 1rem;
   }
 }
 
-@media (--bp-ultra) {
+@media (min-width: 1920px) {
   .tool-shell,
   .tool-shell :where(p, li, label, select, input, small) {
     font-size: 1.05rem;
@@ -518,7 +518,7 @@
   margin-bottom: 0.35rem;
 }
 
-@media (--bp-md-down){
+@media (max-width: 899px){
   .top-grid{
     grid-template-columns: 1fr;
   }
@@ -582,7 +582,7 @@
   min-width: 260px;
 }
 
-@media (--bp-md-down) {
+@media (max-width: 899px) {
   .right-column {
     flex-direction: column;
   }
@@ -1182,7 +1182,7 @@
   width: 100%;
 }
 
-@media (--bp-lg-up) {
+@media (min-width: 900px) {
   .individual-layout {
     --chalice-layout-cols: 1fr;
     grid-template-columns: 1fr;
@@ -1190,7 +1190,7 @@
   }
 }
 
-@media (--bp-md-down) {
+@media (max-width: 899px) {
   .individual-layout {
     gap: 0.4rem;
   }
@@ -1295,7 +1295,7 @@
 }
 
 /* Mobile-first adjustments for Individual mode */
-@media (--bp-md-down) {
+@media (max-width: 899px) {
   /* Hide desktop tabs, show mobile toggle */
   .mode-tabs-slot--home,
   .mode-tabs-slot--chalice,
@@ -1502,7 +1502,7 @@
   display: none;
 }
 
-@media (--bp-lg-up) {
+@media (min-width: 900px) {
   #relicThumbSelection {
     display: inline;
   }
@@ -1542,7 +1542,7 @@
   padding: 0.8rem;
 }
 
-@media (--bp-md-down) {
+@media (max-width: 899px) {
   /* Center the relic type popover on mobile screens */
   #relicTypePopover {
     position: fixed !important;
@@ -1711,7 +1711,7 @@
   transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
-@media (--bp-lg-up) {
+@media (min-width: 900px) {
   /* Keep Select Effects title on one line on desktop */
   .individual-panel .chalice-filter__header-left h4 {
     white-space: nowrap;
@@ -1766,7 +1766,7 @@
   box-shadow: 0 0 0 1px rgba(181, 140, 255, 0.35) inset;
 }
 
-@media (--bp-md-down) {
+@media (max-width: 899px) {
   #classFilterControl {
     display: none !important;
   }
@@ -1834,7 +1834,7 @@
 }
 
 /* Small mobile (e.g., 414x896): shrink quick tiles and keep preview within viewport */
-@media (--bp-xs) {
+@media (max-width: 520px) {
   .individual-filter__header-right {
     display: flex !important;
     flex-direction: column !important;
@@ -1968,7 +1968,7 @@
 }
 
 /* Extra-small mobile: clamp preview column width to container */
-@media (--bp-sm-down) {
+@media (max-width: 639px) {
   .individual-preview-grid {
     width: 100%;
     max-width: 100%;
@@ -2140,7 +2140,7 @@
 }
 
 /* Mobile override: keep the individual preview grid to one column and boxed width */
-@media (--bp-sm-down) {
+@media (max-width: 639px) {
   .chalice-grid.individual-preview-grid,
   .individual-preview-grid {
     grid-template-columns: 1fr !important;
@@ -4379,7 +4379,7 @@ label.stat-extra__label {
   font-weight: 700;
 }
 
-@media (--bp-md-down) {
+@media (max-width: 899px) {
   .chalice-panel__header {
     flex-direction: column;
     align-items: flex-start;
@@ -4390,7 +4390,7 @@ label.stat-extra__label {
   }
 }
 
-@media (--bp-xl-down) {
+@media (max-width: 1439px) {
   .chalice-layout {
     grid-template-columns: 1fr;
   }

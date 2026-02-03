@@ -1,0 +1,556 @@
+/* ------------------------------------------------------------
+   HOME (scoped to Home content, but aligned with Reliquary shell)
+   ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
+   REAL ESTATE + TYPOGRAPHY (match Reliquary's .tool-shell defaults)
+   ------------------------------------------------------------ */
+
+.tool-shell {
+  width: min(100%, var(--shell-max));
+  margin-inline: auto;
+}
+
+/* Typography density BELOW hero only */
+.tool-shell,
+.tool-shell :where(p, li, a, small, button, label) {
+  font-size: var(--body-size);
+}
+
+.tool-shell :where(h3) {
+  font-size: 1.05rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Reduce vertical air under the hero */
+.tool-shell section,
+.tool-shell article {
+  margin-top: 0.9rem;
+}
+
+/* ------------------------------------------------------------
+   TWO-COLUMN INTRO + APPS
+   ------------------------------------------------------------ */
+
+.home-intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: clamp(0.85rem, 2vw, 1.35rem);
+  align-items: start;
+  max-width: none;
+  margin-inline: 0;
+}
+
+@media (max-width: 1279px) {
+  .home-intro-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 639px) {
+  .home-intro-grid {
+    gap: 0.75rem;
+  }
+}
+
+/* Left panel */
+.home-intro {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.22);
+  border-radius: 0.75rem;
+  padding: clamp(0.9rem, 1vw + 0.6rem, 1.25rem);
+}
+
+.home-intro p {
+  opacity: 0.9;
+  margin-bottom: 0.75rem;
+}
+
+/* Compact typography for the left intro/updates column (about 30% smaller) */
+.home-intro {
+  font-size: clamp(0.82rem, 0.78rem + 0.12vw, 0.9rem);
+}
+
+.home-intro :where(p, li, a, small, code, span, strong) {
+  font-size: clamp(0.82rem, 0.78rem + 0.12vw, 0.9rem);
+}
+
+.home-intro :where(h3) { font-size: clamp(0.95rem, 0.9rem + 0.18vw, 1.05rem); margin-bottom: 0.35rem; }
+.home-intro :where(h4) { font-size: clamp(0.88rem, 0.84rem + 0.12vw, 0.98rem); margin: 0 0 0.08rem; }
+
+.home-intro .update-card__version { font-size: clamp(0.8rem, 0.76rem + 0.12vw, 0.9rem); padding: 0.07rem 0.42rem; }
+.home-intro .update-card__sep { font-size: clamp(0.78rem, 0.74rem + 0.12vw, 0.88rem); }
+.home-intro .update-card__name { font-size: clamp(0.9rem, 0.86rem + 0.12vw, 1.0rem); }
+.home-intro .update-card__lede { font-size: clamp(0.8rem, 0.76rem + 0.12vw, 0.9rem); }
+.home-intro .update-card__group-title { font-size: clamp(0.78rem, 0.74rem + 0.12vw, 0.9rem); }
+.home-intro .update-card__list li { font-size: clamp(0.8rem, 0.76rem + 0.12vw, 0.9rem); }
+
+.home-updates {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+}
+
+.home-intro h4 + .home-updates {
+  margin-top: 0.6rem;
+}
+
+.update-card {
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.18));
+  border-radius: 0.65rem;
+  padding: 0.4rem 1.05rem 0.95rem;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.28);
+  overflow: hidden;
+  margin: 0;
+  color: var(--color-text-main);
+}
+
+.update-card :where(p, li, strong, span, div) {
+  color: inherit;
+}
+
+.update-card summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.update-card summary::marker {
+  content: "";
+}
+
+.update-card summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Disable Pico's default caret so only our chevron shows */
+.update-card summary::after {
+  content: none !important;
+}
+
+.update-card__summary {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.update-card__summary:focus-visible header {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 4px;
+  border-radius: 0.45rem;
+}
+
+.update-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: calc(100% + 2.1rem);
+  margin: -0.55rem -1.05rem 0.35rem;
+  padding: 0.45rem 1.05rem;
+  background: rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.update-card__sep {
+  opacity: 0.65;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  align-self: center;
+}
+
+.update-card__version {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.08rem 0.44rem;
+  border-radius: 999px;
+  background: var(--color-accent-primary);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 0.84rem;
+  line-height: 1;
+  color: var(--color-text-main);
+}
+
+.update-card__name {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  opacity: 1;
+  color: var(--color-text-main);
+  line-height: 1;
+}
+
+.update-card__lede {
+  margin: 0.35rem 0 0.6rem;
+  line-height: 1.5;
+}
+
+.update-card__chevron {
+  margin-left: auto;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: rotate(0deg);
+  transition: transform 140ms ease;
+}
+
+.update-card__chevron::before,
+.update-card__chevron::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 1.5px;
+  background: rgba(255,255,255,0.78);
+  border-radius: 999px;
+  transition: transform 140ms ease;
+}
+
+.update-card__chevron::before { transform: translateY(-1px) rotate(45deg); }
+.update-card__chevron::after { transform: translateY(1px) rotate(-45deg); }
+
+.update-card[open] .update-card__chevron {
+  transform: rotate(90deg);
+}
+
+.update-card__body {
+  padding-top: 0.25rem;
+}
+
+.update-card__group + .update-card__group {
+  margin-top: 0.65rem;
+}
+
+.update-card__group-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.82;
+  margin-bottom: 0.45rem;
+  display: block;
+  position: relative;
+  padding-bottom: 0.35rem;
+  width: 100%;
+}
+
+.update-card__group-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 75%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--color-accent-primary);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+  opacity: 0.9;
+}
+
+.update-card__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.update-card__list li {
+  position: relative;
+  padding-left: 1.1rem;
+  line-height: 1.4;
+  list-style: none;
+}
+
+.update-card__list li::marker {
+  content: none;
+}
+
+.update-card__list li::before {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  top: 0.55rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+}
+
+/* ------------------------------------------------------------
+   APP TILES (2x2 GRID)
+   ------------------------------------------------------------ */
+
+.home-apps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: clamp(0.9rem, 1.4vw, 1.35rem);
+  align-content: start;
+  width: 100%;
+  max-width: 1400px;
+  margin-inline: auto;
+}
+
+@media (max-width: 520px) {
+  .home-apps {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    gap: clamp(0.8rem, 3vw, 1rem);
+  }
+}
+
+@media (max-width: 899px) {
+  .home-apps {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The tile is the link */
+.app-tile {
+  position: relative;
+  display: block;
+
+  border-radius: 0.9rem;
+  overflow: hidden;
+
+  aspect-ratio: 16 / 10;
+  min-height: clamp(190px, 18vw, 320px);
+  padding: clamp(0.78rem, 1vw, 1.15rem);
+
+  color: white;
+  text-decoration: none;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  background-size: cover;
+  background-position: center;
+
+  transform: translateY(0);
+  transition: transform 120ms ease;
+}
+
+/* Dark overlay so text reads on top of the image */
+.app-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.70) 0%,
+    rgba(0,0,0,0.42) 55%,
+    rgba(0,0,0,0.18) 100%
+  );
+  z-index: 0;
+}
+
+/* Remove dark overlays on specific cards */
+.app-tile--reliquary::before,
+.app-tile--lexicon::before {
+  background: none;
+}
+
+.app-tile:hover {
+  transform: translateY(-2px);
+}
+
+.app-tile__text {
+  position: relative;
+  z-index: 1;
+}
+
+.app-tile__title {
+  font-family: "Mantinia", "Times New Roman", serif;
+  font-weight: 800;
+  line-height: 1.1;
+  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
+  color: #caa95a;
+  text-transform: uppercase;
+}
+
+.app-tile__title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.6) 70%,
+    rgba(255, 255, 255, 0.0) 90%);
+  pointer-events: none;
+}
+
+.app-tile__meta {
+  font-family: "Agmena Pro", "Georgia", serif;
+  margin-top: 0.2rem;
+  font-size: clamp(0.76rem, 0.72rem + 0.12vw, 0.88rem);
+  opacity: 0.85;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.app-tile__credit {
+  position: absolute;
+  inset: auto auto clamp(0.55rem, 1vw, 0.9rem) clamp(0.65rem, 1vw, 1rem);
+  padding: 0.25rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.82);
+  font-size: clamp(0.7rem, 0.66rem + 0.12vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  display: none;
+  z-index: 1;
+}
+
+/* Scale cards down for 1080p and below (~40% smaller) */
+@media (max-width: 1919px) {
+  .home-apps {
+    max-width: 1160px;
+    gap: clamp(0.9rem, 1.2vw, 1.2rem);
+    grid-auto-rows: auto;
+  }
+
+  .app-tile {
+    min-height: clamp(150px, 18vw, 220px);
+    padding: clamp(0.72rem, 0.95vw, 1.05rem);
+    height: auto;
+  }
+
+  .app-tile__title {
+    font-size: clamp(0.98rem, 0.9rem + 0.32vw, 1.18rem);
+  }
+
+  .app-tile__meta,
+  .app-tile__credit {
+    font-size: clamp(0.7rem, 0.64rem + 0.12vw, 0.84rem);
+  }
+}
+
+/* Tighter layout for small laptop widths (e.g., 1366x768) */
+@media (max-width: 1439px) {
+  .home-apps {
+    max-width: 1040px;
+    gap: clamp(0.75rem, 1vw, 1rem);
+  }
+
+  .app-tile {
+    min-height: clamp(140px, 18vw, 200px);
+    padding: clamp(0.66rem, 0.9vw, 0.95rem);
+  }
+
+  .app-tile__title {
+    font-size: clamp(0.94rem, 0.88rem + 0.28vw, 1.1rem);
+  }
+
+  .app-tile__meta,
+  .app-tile__credit {
+    font-size: clamp(0.66rem, 0.62rem + 0.1vw, 0.8rem);
+  }
+}
+
+/* Upscale for large/4K screens */
+@media (min-width: 1920px) {
+  .home-apps {
+    max-width: 1800px;
+    gap: clamp(1rem, 1.1vw, 1.4rem);
+  }
+
+  .app-tile {
+    min-height: clamp(220px, 14vw, 360px);
+    padding: clamp(0.9rem, 1.1vw, 1.25rem);
+  }
+
+  .app-tile__title {
+    font-size: clamp(1.1rem, 1.0rem + 0.35vw, 1.35rem);
+  }
+
+  .app-tile__meta,
+  .app-tile__credit {
+    font-size: clamp(0.8rem, 0.74rem + 0.12vw, 0.95rem);
+  }
+}
+
+.app-tile__credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  position: absolute;
+  inset: auto auto clamp(0.55rem, 1vw, 0.9rem) clamp(0.65rem, 1vw, 1rem);
+  padding: 0.25rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.82);
+  font-size: clamp(0.7rem, 0.66rem + 0.12vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  z-index: 2;
+  text-decoration: none;
+}
+
+.app-tile__credit:hover,
+.app-tile__credit:focus-visible {
+  color: #fff;
+  outline: 1px solid rgba(255,255,255,0.35);
+  outline-offset: 2px;
+}
+
+.app-tile__body {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  text-decoration: none;
+}
+
+/* ------------------------------------------------------------
+   Tile art (paths are case-sensitive on GitHub Pages)
+   home.css lives in /styles, so assets are ../Assets/...
+   ------------------------------------------------------------ */
+
+.app-tile--reliquary {
+  background-image: url("../Assets/home/Reliquary_2.png");
+  background-position: center;
+}
+
+.app-tile--reliquary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(16,18,24,0.70) 0%,
+    rgba(16,18,24,0.0) 18%,
+    rgba(16,18,24,0.0) 82%,
+    rgba(16,18,24,0.70) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+  display: none;
+}
+.app-tile--lexicon   { background-image: url("../Assets/home/Lexicon_2.png"); }
+.app-tile--menagerie { background-image: url("../Assets/home/Menagerie.png"); }
+.app-tile--armory    { background-image: url("../Assets/home/Armory.png"); }
+.app-tile--grimoire  { background-image: url("../Assets/home/Grimoire.png"); }
+
+/* Disabled styling */
+.app-tile.is-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}

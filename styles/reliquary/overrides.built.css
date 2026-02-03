@@ -33,7 +33,7 @@
 
 /* Hero art breakpoint hooks (Reliquary) — current values duplicated */
 
-@media (--bp-ultra) {
+@media (min-width: 1920px) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -41,7 +41,7 @@
   }
 }
 
-@media (--bp-xxl) {
+@media (min-width: 1440px) and (max-width: 1919px) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -49,7 +49,7 @@
   }
 }
 
-@media (--bp-xl) {
+@media (min-width: 1280px) and (max-width: 1439px) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -57,7 +57,7 @@
   }
 }
 
-@media (--bp-lg) {
+@media (min-width: 900px) and (max-width: 1279px) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -65,7 +65,7 @@
   }
 }
 
-@media (--bp-md) {
+@media (min-width: 640px) and (max-width: 899px) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -73,7 +73,7 @@
   }
 }
 
-@media (--bp-sm-down) {
+@media (max-width: 639px) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;

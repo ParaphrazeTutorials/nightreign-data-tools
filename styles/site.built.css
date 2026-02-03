@@ -1,0 +1,909 @@
+:root {
+  /* ------------------------------------------------------------
+     Core palette
+     ------------------------------------------------------------ */
+  --color-bg-dark: #0f0f12;
+  --color-bg-panel: rgba(0,0,0,0.35);
+
+  --color-accent-primary: #4a0f14;
+  --color-accent-hover: rgba(255,255,255,0.14);
+
+  --color-text-main: #ffffff;
+  --color-text-muted: rgba(255,255,255,0.75);
+
+  /* Tooltip palette */
+  --tooltip-bg: rgba(10, 16, 28, 0.96);
+  --tooltip-border: rgba(120, 170, 255, 0.55);
+  --tooltip-shadow: 0 12px 28px rgba(0, 0, 0, 0.52);
+  --tooltip-color: #f4f7ff;
+  --tooltip-radius: 0.55rem;
+  --tooltip-padding: 0.55rem 0.8rem;
+  --tooltip-font-size: 0.82rem;
+  --tooltip-line-height: 1.2;
+  --tooltip-min-width: 200px;
+  --tooltip-max-width: min(420px, 90vw);
+  --tooltip-arrow: rgba(10, 16, 28, 0.96);
+  --tooltip-offset: 4px;
+  --tooltip-z: 999999;
+
+  --overlay-strong: rgba(0,0,0,0.30);
+  --overlay-light: rgba(0,0,0,0.18);
+
+  /* ------------------------------------------------------------
+     Global Hero Art Controls (CANONICAL)
+     ------------------------------------------------------------ */
+  /* Canonical global hero art controls */
+  --hero-art-zoom: 0.4;
+  --hero-art-x: 65%;
+  --hero-art-y: 100%;
+
+  /* ------------------------------------------------------------
+     Layout + spacing tokens (responsive defaults)
+     ------------------------------------------------------------ */
+  --shell-max: 3400px;
+  --shell-pad: clamp(0.9rem, 2.2vw, 2.6rem);
+  --shell-pad-tight: clamp(0.75rem, 2vw, 2.1rem);
+  --shell-pad-mobile: 0.45rem;
+  --content-gap: clamp(0.75rem, 2vw, 1.25rem);
+
+  /* Typographic scale (fluid between phone and desktop) */
+  --h1-size: clamp(1.9rem, 1.45rem + 1.05vw, 2.6rem);
+  --h2-size: clamp(1.08rem, 0.94rem + 0.48vw, 1.45rem);
+  --body-size: clamp(0.98rem, 0.92rem + 0.25vw, 1.18rem);
+}
+
+/* ------------------------------------------------------------
+   Font faces (drop files into Assets/fonts/ and update URLs)
+   ------------------------------------------------------------ */
+@font-face {
+  font-family: "Mantinia";
+  src: url("../Assets/fonts/Mantinia.woff2") format("woff2"),
+       url("../Assets/fonts/Mantinia.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Agmena Pro";
+  src: url("../Assets/fonts/Agmena Pro Regular.woff2") format("woff2"),
+       url("../Assets/fonts/Agmena Pro Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Force a consistent dark canvas using Pico's dark palette */
+html {
+  background-color: var(--pico-background-color);
+  color-scheme: dark;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--pico-background-color);
+  color: var(--color-text-main);
+  font-size: var(--body-size);
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Accessibility helpers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------
+   Shared tooltips
+   ------------------------------------------------------------ */
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + var(--tooltip-offset));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--tooltip-padding);
+  border-radius: var(--tooltip-radius);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-color);
+  border: 1px solid var(--tooltip-border);
+  box-shadow: var(--tooltip-shadow);
+  white-space: normal;
+  font-size: var(--tooltip-font-size);
+  line-height: var(--tooltip-line-height);
+  z-index: var(--tooltip-z);
+  pointer-events: none;
+  min-width: var(--tooltip-min-width);
+  max-width: var(--tooltip-max-width);
+  width: max-content;
+  text-align: center;
+}
+
+[data-tooltip]:hover::before {
+  content: none;
+}
+
+/* Portal-based tooltip for cases where stacking contexts clip pseudo-elements */
+body.tooltip-portal-active [data-tooltip]:hover::after {
+  display: none !important;
+}
+
+.tooltip-portal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -8px);
+  padding: var(--tooltip-padding);
+  border-radius: var(--tooltip-radius);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-color);
+  border: 1px solid var(--tooltip-border);
+  box-shadow: var(--tooltip-shadow);
+  white-space: normal;
+  font-size: var(--tooltip-font-size);
+  line-height: var(--tooltip-line-height);
+  z-index: 2147483600;
+  pointer-events: none;
+  min-width: var(--tooltip-min-width);
+  max-width: var(--tooltip-max-width);
+  width: max-content;
+  text-align: center;
+  display: none;
+}
+
+.tooltip-portal.is-visible {
+  display: block;
+}
+
+.tooltip-portal.tooltip-portal--left {
+  transform: translate(-100%, -50%);
+  text-align: left;
+}
+
+
+/* ------------------------------------------------------------
+   Layout
+   ------------------------------------------------------------ */
+
+.app-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: var(--content-gap);
+}
+
+.app-shell {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding-inline: var(--shell-pad);
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.hero,
+.tool-nav,
+.tool-shell,
+.site-footer {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 520px) {
+  :root {
+    --shell-pad: var(--shell-pad-mobile);
+  }
+
+  .hero,
+  .tool-nav,
+  .tool-shell {
+    width: calc(100vw - (var(--shell-pad-mobile) * 2));
+    max-width: calc(100vw - (var(--shell-pad-mobile) * 2));
+    margin-inline: auto;
+    padding-inline: var(--shell-pad-mobile);
+  }
+}
+
+
+/* ------------------------------------------------------------
+   Hero
+   ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
+   Hero
+   ------------------------------------------------------------ */
+
+.hero {
+  position: relative; /* anchor for pill */
+  overflow: hidden;
+
+  /* reduced vertical real estate (slightly trimmed to offset larger logo) */
+  padding: 0.82rem 1.25rem 0.72rem;
+
+  border-radius: 0.5rem;
+  color: white;
+
+  /* match shell width so margins stay consistent */
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.70) 0%,
+    rgba(0, 0, 0, 0.40) 45%,
+    rgba(0, 0, 0, 0.10) 100%
+  );
+}
+
+@media (max-width: 639px) {
+  .hero {
+    padding: 0.9rem 1rem 0.75rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero h1 {
+    font-size: clamp(1.2rem, 0.95rem + 0.68vw, 1.65rem);
+  }
+
+  .hero h2 {
+    font-size: clamp(0.7rem, 0.6rem + 0.3vw, 0.9rem);
+  }
+}
+
+@media (min-width: 1920px) {
+  body {
+    font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.24rem);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.15rem, 1.6rem + 1.25vw, 2.85rem);
+  }
+
+  .hero h2 {
+    font-size: clamp(1.2rem, 1.0rem + 0.55vw, 1.55rem);
+  }
+}
+
+
+
+
+/* ------------------------------------------------------------
+   Hero Art (IMG-based, per-page src)
+   ------------------------------------------------------------ */
+
+.hero-art {
+  position: absolute;
+  z-index: 0;
+
+  left: var(--hero-art-x);
+  top: var(--hero-art-y);
+
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  min-height: 100%;
+
+  transform: translate(-50%, -50%) scale(var(--hero-art-zoom));
+  transform-origin: center;
+
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Hero art breakpoint hooks (defaults duplicated for editing)
+   ------------------------------------------------------------ */
+
+/* 1920px and up */
+@media (min-width: 1920px) {
+  .hero {
+    --hero-art-zoom: 0.2;
+    --hero-art-x: 65%;
+    --hero-art-y: 90%;
+  }
+}
+
+/* 1440–1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 1280–1439px */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 900–1279px */
+@media (min-width: 900px) and (max-width: 1279px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 640–899px */
+@media (min-width: 640px) and (max-width: 899px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+/* 0–639px */
+@media (max-width: 639px) {
+  .hero {
+    --hero-art-zoom: 0.4;
+    --hero-art-x: 65%;
+    --hero-art-y: 100%;
+  }
+}
+
+
+/* ------------------------------------------------------------
+   Hero Text
+   ------------------------------------------------------------ */
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.8vw, 1.35rem);
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  text-align: left;
+}
+
+.hero h1,
+.hero h2 {
+  margin: 0;
+}
+
+.hero h1 {
+  font-family: "Mantinia", "Times New Roman", serif;
+  font-size: calc(var(--h1-size) * 0.75);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: #caa95a;
+  text-transform: uppercase;
+}
+
+.hero h2 {
+  font-family: "Agmena Pro", "Georgia", serif;
+  font-size: calc(var(--h2-size) * 0.9);
+  font-weight: 600;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-logo {
+  display: flex;
+  align-items: center;
+  height: clamp(72px, 10vw, 118px);
+}
+
+.hero-logo__img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: min(520px, 75vw);
+  object-fit: contain;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.8vw, 1.35rem);
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.65rem;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+
+.hero-logo__img--square {
+  display: none;
+}
+
+.hero-logo__img--square-colored {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .hero {
+    padding: 0.18rem 0.8rem 0.18rem;
+  }
+
+  .hero-content.hero-badge {
+    gap: 0.65rem;
+    padding: 0.38rem 0.65rem;
+    background: none;
+    border: none;
+    box-shadow: none;
+  }
+
+  .hero-logo {
+    height: clamp(96px, 19vw, 136px);
+  }
+
+  .hero-text {
+    display: none !important;
+  }
+
+  .hero-logo__img--rectangle {
+    display: none !important;
+  }
+
+  .hero-logo__img--square {
+    display: none !important;
+  }
+
+  .hero-logo__img--square-colored {
+    display: block !important;
+    height: 100%;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-logo {
+    justify-content: flex-start;
+  }
+
+  .hero-logo__img {
+    max-width: min(360px, 82vw);
+  }
+
+  .hero-logo__img--rectangle {
+    display: none;
+  }
+
+  .hero-logo__img--square {
+    display: block;
+    height: clamp(54px, 16vw, 92px);
+  }
+}
+
+/* Hero credit pill (clickable) */
+.hero-credit {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.85rem;
+  padding: 0.62rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.91rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  z-index: 2;
+  text-decoration: none;
+  transform: scale(0.56);
+  transform-origin: bottom right;
+}
+
+.hero-credit:hover,
+.hero-credit:focus-visible {
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #ffffff;
+  outline: none;
+}
+
+/* Small devices: scale hero headings down ~35% */
+@media (max-width: 639px) {
+  .hero h1 {
+    font-size: clamp(1.2rem, 0.95rem + 0.68vw, 1.65rem);
+  }
+
+  .hero h2 {
+    font-size: clamp(0.7rem, 0.6rem + 0.3vw, 0.9rem);
+  }
+}
+
+
+/* ------------------------------------------------------------
+   Navigation (BACKGROUND BOX TIGHTENED)
+   ------------------------------------------------------------ */
+
+.tool-nav {
+  position: relative;
+  background-color: var(--color-accent-primary);
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+}
+
+.tool-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tool-nav ul {
+  display: flex;
+  column-gap: 0.95rem;
+  row-gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tool-nav a {
+  color: rgba(255,255,255,0.92);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  line-height: 1.1;
+  padding: 0.22rem 0.52rem;
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  transition: color 120ms ease, text-decoration-color 120ms ease, opacity 120ms ease;
+}
+
+.tool-nav a:not([aria-disabled="true"]):hover {
+  color: rgba(255,255,255,0.98);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: rgba(255,255,255,0.35);
+}
+
+.tool-nav a.active {
+  color: rgba(255,255,255,1);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: rgba(255,255,255,0.55);
+}
+
+.tool-nav a[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.nav-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: 0;
+  color: rgba(255,255,255,0.92);
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px; /* touch target */
+  justify-content: flex-start;
+  margin: 0;
+
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.45);
+  outline-offset: 2px;
+}
+
+.nav-toggle__bars {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-toggle__bar {
+  width: 18px;
+  height: 2px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 4px;
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+.tool-nav.is-open .nav-toggle__bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.tool-nav.is-open .nav-toggle__bar:nth-child(2) { opacity: 0; }
+.tool-nav.is-open .nav-toggle__bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.tool-nav .nav-list {
+  display: flex;
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.tool-nav__status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  grid-column: 3;
+  grid-row: 1;
+}
+
+@media (max-width: 899px) {
+  .tool-nav__inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-auto-rows: auto;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .tool-nav .nav-list {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.35rem 0.25rem 0.35rem;
+    display: none;
+    margin-top: 0.15rem;
+  }
+  
+  .tool-nav.is-open .nav-list {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .tool-nav__status {
+    align-self: center;
+    justify-self: end;
+    margin-left: 0;
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .tool-nav.is-open .nav-list {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .tool-nav ul li {
+    width: 100%;
+  }
+
+  .tool-nav a {
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+  }
+}
+
+
+/* ------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------ */
+
+footer {
+  text-align: center;
+  opacity: 0.7;
+  margin-bottom: 1rem;
+}
+
+/* ------------------------------------------------------------
+   Hero build tag (page status + DB/Game version)
+   ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
+   Hero build pill
+   ------------------------------------------------------------ */
+
+.hero-build {
+  position: absolute;
+  top: 0.75rem;
+  right: 1.05rem;
+  z-index: 5;
+
+  /* scale entire pill */
+  transform: scale(0.5);
+  transform-origin: top right;
+}
+
+
+
+.hero-build__status{
+  text-transform: uppercase;
+}
+
+.hero-build__sep{
+  opacity: 0.55;
+  font-weight: 900;
+}
+
+.hero-build__version{
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  opacity: 0.88;
+}
+
+.hero-build.is-beta .hero-build__status{
+  color: rgba(214, 92, 92, 0.95); /* medium red */
+}
+
+.hero-build.is-live .hero-build__status{
+  color: rgba(255, 255, 255, 0.92); /* medium white */
+}
+
+/* ------------------------------------------------------------
+   Overrides / upgrades (app-wide)
+   ------------------------------------------------------------ */
+
+/* Stronger nav styling (Pico can make links blue). */
+.tool-nav ul li a,
+.tool-nav ul li a:visited {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+}
+
+.tool-nav ul li a[aria-disabled="true"],
+.tool-nav ul li a[aria-disabled="true"]:visited {
+  color: rgba(255, 255, 255, 0.42);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Beta/Live pill behind the hero build string */
+.hero-build {
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(180deg, rgba(120, 16, 24, 0.38), rgba(16, 8, 10, 0.55));
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.hero-build.hero-build--in-nav {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transform: scale(0.7);
+  transform-origin: center right;
+  margin-left: auto;
+  max-width: min(64vw, 260px);
+  padding: 0.45rem 0.65rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.hero-build.hero-build--in-nav > * {
+  min-width: 0;
+}
+
+.hero-build.hero-build--in-nav .hero-build__status,
+.hero-build.hero-build--in-nav .hero-build__sep,
+.hero-build.hero-build--in-nav .hero-build__version {
+  font-size: 0.7rem;
+  line-height: 1.1;
+  letter-spacing: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  .hero-build.hero-build--in-nav {
+    max-width: min(70vw, 220px);
+    transform: scale(0.68);
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Make BETA pop while keeping the rest readable */
+.hero-build.is-beta .hero-build__status {
+  color: rgba(214, 92, 92, 0.95);
+}
+
+/* LIVE uses the same pill styling, but with a green-tinted gradient */
+.hero-build.is-live {
+  background: linear-gradient(180deg, rgba(16, 120, 60, 0.38), rgba(8, 16, 10, 0.55));
+}
+
+/* Compact global footer */
+.site-footer {
+  margin-top: 1.1rem;
+  padding: 0.55rem 0 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.site-footer .footer-inner {
+  max-width: var(--shell-max, 1600px);
+  margin: 0 auto;
+  padding: 0 var(--shell-pad, 18px);
+}
+
+.site-footer p {
+  margin: 0.15rem 0;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  opacity: 0.72;
+}
+
+.site-footer .footer-credits {
+  opacity: 0.78;
+}
+
+
+/* ------------------------------------------------------------
+   Hero build pill — normalize font weight everywhere
+   (Lexicon override fix)
+   ------------------------------------------------------------ */
+.hero .hero-build,
+.hero .hero-build *,
+header.hero .hero-build,
+header.hero .hero-build * {
+  font-weight: 400 !important;
+}
+
+.tool-nav li {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+  display: flex; /* prevents inherited block padding weirdness */
+  align-items: center;
+}
+
+.tool-nav ul li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+
+/* Lexicon footer alignment fix */
+.site-footer .footer-inner {
+  max-width: none;
+  margin: 0 auto;
+  padding-inline: clamp(0.75rem, 2.2vw, 2.75rem);
+}
