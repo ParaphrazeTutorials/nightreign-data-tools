@@ -73,22 +73,27 @@ function applyHeroFocus(el) {
     zoom: el.getAttribute("data-hero-zoom"),
   };
 
-  Object.entries(base).forEach(([key, val]) => {
-    if (!val) return;
-    el.style.setProperty(`--hero-art-${key}`, val);
-  });
-
+  // Use explicit pixel media queries so runtime-injected CSS works without custom-media support
   const slots = [
-    { key: "xs", mq: "--bp-xs" },
-    { key: "sm", mq: "--bp-sm-down" },
-    { key: "md", mq: "--bp-md" },
-    { key: "lg", mq: "--bp-lg" },
-    { key: "xl", mq: "--bp-xl" },
-    { key: "xxl", mq: "--bp-xxl" },
-    { key: "ultra", mq: "--bp-ultra" },
+    { key: "xs", mq: "(max-width: 520px)" },
+    { key: "sm", mq: "(min-width: 521px) and (max-width: 639px)" },
+    { key: "md", mq: "(min-width: 640px) and (max-width: 899px)" },
+    { key: "lg", mq: "(min-width: 900px) and (max-width: 1279px)" },
+    { key: "xl", mq: "(min-width: 1280px) and (max-width: 1439px)" },
+    { key: "xxl", mq: "(min-width: 1440px) and (max-width: 1919px)" },
+    { key: "ultra", mq: "(min-width: 1920px)" },
   ];
 
   let css = "";
+
+  // Base rule (overrides stylesheet defaults but remains overridable by breakpoint rules)
+  const baseRules = [];
+  if (base.x) baseRules.push(`--hero-art-x: ${base.x};`);
+  if (base.y) baseRules.push(`--hero-art-y: ${base.y};`);
+  if (base.zoom) baseRules.push(`--hero-art-zoom: ${base.zoom};`);
+  if (baseRules.length) {
+    css += `${selector} { ${baseRules.join(" ")} }\n`;
+  }
   for (const slot of slots) {
     const x = el.getAttribute(`data-hero-x-${slot.key}`);
     const y = el.getAttribute(`data-hero-y-${slot.key}`);

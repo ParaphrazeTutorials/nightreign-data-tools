@@ -3,6 +3,57 @@
    Purpose: safety rails only.
    ------------------------------------------------------------ */
 
+/* Keep the character popover above any other overlay/tooltips */
+#classPortraitMenu {
+  position: fixed !important;
+  z-index: 2147485000 !important;
+  pointer-events: auto !important;
+
+  /* Enforce popover spacing on top of any other rules */
+  column-gap: 1rem !important;
+  row-gap: 1rem !important;
+  padding: 1rem !important;
+}
+
+/* Popover selection highlight (purple gradient) without affecting inline background images */
+#classPortraitMenu button.is-active,
+#classPortraitMenu button[aria-checked="true"] {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(181, 140, 255, 0.9), 0 0 0 4px rgba(181, 140, 255, 0.25) inset;
+}
+
+#classPortraitMenu button.is-active::before,
+#classPortraitMenu button[aria-checked="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(86, 48, 140, 0.78), rgba(136, 96, 212, 0.82));
+  z-index: 0;
+}
+
+#classPortraitMenu button.is-active::after,
+#classPortraitMenu button[aria-checked="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: inherit;
+  background-size: inherit;
+  background-position: inherit;
+  background-repeat: inherit;
+  z-index: 1;
+}
+
+/* Ensure header pills sit under the portrait popover */
+.hero-credit,
+.hero-build {
+  z-index: 1 !important;
+}
+
 /* Force bright text on this page (Pico cards tint text gray by default) */
 .app-shell,
 .app-shell article,
@@ -57,7 +108,8 @@
   }
 }
 
-@media (--bp-lg) {
+/* Use explicit query so it works without rebuilding */
+@media (min-width: 900px) and (max-width: 1279px) {
   .hero--reliquary {
     --hero-art-zoom: 1;
     --hero-art-x: 50%;
@@ -731,4 +783,373 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* LG viewport: stack individual builder columns and keep header buttons on one row */
+@media (min-width: 900px) and (max-width: 1279px) {
+  /* Header: single-row controls, hide the title */
+  .individual-panel .chalice-filter__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .individual-panel .chalice-filter__header-left {
+    display: none;
+  }
+
+  .individual-panel .chalice-filter__header-left h4 {
+    display: none;
+  }
+
+  .individual-filter__header-right {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .individual-filter__selectors {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .individual-filter__selectors select {
+    width: 100%;
+  }
+
+  .individual-filter__actions,
+  .individual-filter__actions--split,
+  .individual-filter__controls {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.32rem;
+  }
+
+  .individual-filter__actions {
+    flex: 0 0 auto;
+  }
+
+  .individual-filter__actions .utility-field-slot--inline {
+    width: auto;
+  }
+
+  /* Layout: stack columns */
+  .individual-layout__main {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .individual-filter {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .individual-details {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .individual-preview {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+/* MD and below: keep Select Effects mobile-friendly */
+@media (max-width: 899px) {
+  .individual-panel .chalice-filter__header {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: start;
+    justify-items: center;
+  }
+
+  .individual-filter__header-right {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: start;
+    justify-items: center;
+    grid-column: 1 / -1;
+  }
+
+  /* Hide all header chrome; keep only the four requested controls */
+  .individual-panel .chalice-filter__header-left,
+  .individual-panel .chalice-filter__header-left h4,
+  .individual-filter__controls,
+  .individual-filter__selectors,
+  .individual-filter__count {
+    display: none !important;
+  }
+
+  /* Show the mini-tile row on MD and below for character + relic selection */
+  .individual-quick-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+    justify-items: center;
+    align-items: center;
+    grid-column: 1 / -1;
+  }
+
+  /* Pair Instructions under Character; Start Over under Relic */
+  .individual-panel .individual-filter__actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: center;
+    justify-items: center;
+    grid-column: 1 / -1;
+  }
+
+  .individual-panel .individual-filter__actions #instructionsBtn,
+  .individual-panel .individual-filter__actions #startOver {
+    width: 94%;
+    max-width: 300px;
+    justify-content: center;
+    padding: 0 0.55rem;
+    min-width: 0;
+  }
+
+  /* Ensure wrapped Start Over slot does not shrink the button */
+  .individual-panel .individual-filter__actions .utility-field-slot--inline {
+    width: 100%;
+    display: contents;
+  }
+
+  /* Keep filter bodies from forcing horizontal scroll */
+  .chalice-filter__body,
+  .individual-filter__body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  /* Keep the tool shell and panels within the viewport on mid-width screens */
+  .tool-shell {
+    width: min(96vw, 1200px);
+    max-width: 96vw;
+  }
+
+  html,
+  body,
+  .app-shell,
+  .tool-shell,
+  .chalice-panel,
+  .chalice-layout {
+    overflow-x: hidden;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+
+  /* Ensure the Select Effects container cannot exceed viewport width */
+
+/* Force Individual stack to viewport width on md-and-down */
+@media (max-width: 899px) {
+  /* Restore normal shell padding and allow children to breathe */
+  html,
+  body,
+  .app-shell,
+  .tool-shell,
+  .main-grid,
+  .mode-panel {
+    width: 100%;
+    max-width: 100vw;
+    padding-inline: var(--shell-pad-mobile, 0.75rem);
+    margin: 0 auto;
+    box-sizing: border-box;
+    overflow-x: visible;
+  }
+
+  /* Keep the individual builder within the viewport on mid-width screens */
+  .tool-shell {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: var(--shell-pad-mobile, 0.75rem);
+  }
+
+  .chalice-panel,
+  .chalice-layout {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  /* Force single column without min widths and allow overflow to be visible */
+  .chalice-layout {
+    --chalice-layout-cols: 1fr !important;
+    grid-template-columns: 1fr !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .individual-layout__main,
+  .individual-view,
+  .individual-details,
+  #details,
+  .individual-preview,
+  .individual-preview__panel,
+  aside.chalice-filter.individual-filter,
+  .individual-preview #results,
+  .individual-preview .relic-preview,
+  .individual-preview-grid,
+  .individual-preview-grid > *,
+  .individual-details__panel {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  /* Keep Details and Relic Preview flush with Select Effects width on MD-and-down */
+  .individual-preview__panel,
+  .individual-details__panel,
+  .individual-preview-grid {
+    margin-inline: auto;
+  }
+
+  /* Force the preview grid to a single column and stretch the card */
+  .individual-preview-grid {
+    grid-template-columns: 1fr !important;
+    justify-items: stretch;
+  }
+
+  #results {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    align-self: stretch !important;
+  }
+
+  /* Match panel padding to Select Effects panel (which is zeroed on MD-and-down) */
+  .individual-preview #results,
+  .individual-preview .relic-preview,
+  .individual-details__panel,
+  #details {
+    padding-inline: 0;
+  }
+
+  .individual-preview .relic-preview {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Let header content escape instead of clipping on the right */
+  .individual-panel .chalice-filter,
+  .individual-panel .chalice-filter__header,
+  .individual-panel .panel-header,
+  .individual-panel .panel-header__right,
+  .individual-panel .individual-filter__actions {
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+  .chalice-filter,
+  .chalice-filter__body,
+  .individual-filter__body,
+  .individual-layout,
+  .individual-layout__main,
+  .chalice-layout,
+  .chalice-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  /* Clamp the main panels so borders/padding cannot exceed the viewport */
+  .main-grid,
+  .mode-panel,
+  .chalice-panel,
+  .chalice-layout,
+  .individual-layout,
+  .individual-layout__main,
+  .chalice-filter {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: auto;
+    box-sizing: border-box;
+  }
+
+  /* Prevent transient scrollbars inside the individual panel container */
+  .chalice-panel.individual-panel {
+    overflow: hidden !important;
+    overscroll-behavior: contain;
+  }
+
+  .chalice-panel.individual-panel::-webkit-scrollbar { display: none; }
+  .chalice-panel.individual-panel { scrollbar-width: none; }
+
+  .chalice-layout.individual-layout {
+    overflow: visible !important;
+  }
+
+  .individual-layout__main,
+  .individual-view {
+    overflow: visible !important;
+  }
+
+  .individual-layout__main::-webkit-scrollbar,
+  .individual-view::-webkit-scrollbar {
+    display: none;
+  }
+
+  .individual-layout__main,
+  .individual-view {
+    scrollbar-width: none;
+  }
+
+  .chalice-layout.individual-layout::-webkit-scrollbar { display: none; }
+  .chalice-layout.individual-layout { scrollbar-width: none; }
+
+  /* Simplify padding to avoid horizontal growth */
+  .chalice-panel {
+    padding-inline: 0.5rem;
+  }
+
+  .chalice-filter {
+    padding-inline: 0;
+  }
+
+  /* Hide filter body content on MD-and-down per minimal header requirement */
+  .chalice-filter__body,
+  .individual-filter__body {
+    display: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 899px) {
+  /* Nuke min column widths: force single column to avoid overflow */
+  .chalice-layout {
+    --chalice-layout-cols: 1fr !important;
+    grid-template-columns: 1fr !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }

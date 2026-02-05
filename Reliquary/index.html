@@ -33,7 +33,17 @@
   <body>
     <main class="app-shell app-grid">
 
-      <!-- HERO (global renderer) -->
+       <!-- HERO (global renderer)
+         Breakpoints (width):
+         Base: all widths (defaults below)
+         XS:   0–520px
+         SM:   521–639px
+         MD:   640–899px
+         LG:   900–1279px
+         XL:   1280–1439px
+         XXL:  1440–1919px
+         Ultra: 1920px and up
+       -->
       <header
         id="globalHero"
         class="hero hero--reliquary"
@@ -41,6 +51,38 @@
         data-hero-h1="The Round Table Codex"
         data-hero-h2="Reliquary"
         data-hero-build="true"
+
+        data-hero-x="50%"
+        data-hero-y="200%"
+        data-hero-zoom="1"
+      
+        data-hero-x-xs="50%"
+        data-hero-y-xs="100%"
+        data-hero-zoom-xs="1"
+
+        data-hero-x-sm="50%"
+        data-hero-y-sm="100%"
+        data-hero-zoom-sm="1"
+
+        data-hero-x-md="50%"
+        data-hero-y-md="125%"
+        data-hero-zoom-md="1"
+
+        data-hero-x-lg="50%"
+        data-hero-y-lg="145%"
+        data-hero-zoom-lg="1"
+
+        data-hero-x-xl="50%"
+        data-hero-y-xl="150%"
+        data-hero-zoom-xl="1"
+
+        data-hero-x-xxl="50%"
+        data-hero-y-xxl="175%"
+        data-hero-zoom-xxl="1"
+
+        data-hero-x-ultra="50%"
+        data-hero-y-ultra="200%"
+        data-hero-zoom-ultra="1"
       ></header>
 
       <!-- NAV (global) -->
@@ -56,8 +98,12 @@
           aria-expanded="false"
           aria-controls="individualMode"
         >
-          <span class="reliq-mode-toggle__label">Individual Relics</span>
-          <span class="reliq-mode-toggle__chevron" aria-hidden="true"></span>
+          <span class="reliq-mode-toggle__label sr-only">Individual Relics</span>
+          <span class="reliq-mode-toggle__pill" aria-hidden="true">
+            <span class="reliq-mode-toggle__option" data-mode-value="individual">Individual Relics</span>
+            <span class="reliq-mode-toggle__divider"></span>
+            <span class="reliq-mode-toggle__option" data-mode-value="chalice">Chalice Builder</span>
+          </span>
         </button>
 
         <!-- UTILITY BAR (Filters + Actions) -->

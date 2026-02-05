@@ -667,6 +667,7 @@ function updateMobileModeToggle() {
     labelEl.setAttribute("aria-label", label);
     labelEl.textContent = label;
   }
+  dom.modeToggleMobile.dataset.mode = isChalice ? "chalice" : "individual";
   dom.modeToggleMobile.setAttribute("aria-expanded", isChalice ? "true" : "false");
 }
 
