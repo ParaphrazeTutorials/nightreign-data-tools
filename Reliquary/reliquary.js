@@ -25,8 +25,16 @@ import {
   updateCounts,
   setRelicImageForStage,
   installRelicImgFallback,
-  moveIndicatorHtml
+  moveIndicatorHtml,
+  isMobileViewport,
+  installMobileEffectFlyouts,
+  installMobileEffectToggles,
+  buildMobileMetaPills,
+  mobileActionFlyout,
+  mobileFlyoutItem
 } from "./reliquary.ui.js";
+
+let lastIsMobile = false;
 import { getDom } from "./reliquary.dom.js";
 import { gradientFromTheme, buildCategoryThemes } from "../scripts/ui/theme.js";
 import { applyPaletteCssVars, COLOR_SWATCHES, COLORS, RANDOM_SWATCH, CHARACTERS, characterColors, characterBackdrop, characterPortrait, randomPortrait } from "../scripts/ui/palette.js";
@@ -2755,6 +2763,9 @@ function updateUI(reason = "") {
   closeCurseMenu();
   closeColorMenu();
 
+  const isMobile = isMobileViewport();
+  lastIsMobile = isMobile;
+
   // regroup after UI changes that can alter validity/colors
   if (isChaliceMode()) {
     renderChaliceColors();
@@ -2909,7 +2920,8 @@ function updateUI(reason = "") {
       curseRequired: String(row?.CurseRequired ?? "0") === "1",
       curseRow: getAnyRow(curseBySlot[idx]),
       curseButtonLabel: curseBySlot[idx] ? "Change Curse" : "Select a Curse",
-      curseSlot: idx
+      curseSlot: idx,
+      isMobile
     });
   }
 
@@ -2924,6 +2936,8 @@ function updateUI(reason = "") {
   installCurseButtons();
   installInfoButtons();
   installRowCopyButtons();
+  installMobileEffectFlyouts();
+  installMobileEffectToggles();
 
   const firstEmptyIdx = cSelections.findIndex(r => !r);
   const activeIndex = firstEmptyIdx === -1 ? 0 : firstEmptyIdx + 1;
@@ -3254,6 +3268,88 @@ function chaliceAttrPills(row) {
   return pills;
 }
 
+function renderChaliceSlotMobile(meta, idx, row, curseRow, options) {
+  const label = `Slot ${meta.slotPrefix}${idx + 1}`;
+  const effectId = row?.EffectID;
+  const requiresCurse = options.requiresCurse;
+  const hasCurse = options.hasCurse;
+  const curseMissing = options.curseMissing;
+  const effectMenuId = `ch-${meta.key}-${idx}-effect`;
+  const curseMenuId = hasCurse ? `ch-${meta.key}-${idx}-curse` : "";
+  const pills = buildMobileMetaPills(row);
+  const metaRow = pills.map(p => `<span class="meta-pill" style="${p.style}">${p.label}</span>`).join("");
+  const validationTone = requiresCurse && curseMissing ? "warn" : "good";
+  const validationLabel = requiresCurse && curseMissing ? "Curse Required" : "Selected";
+
+  if (!row) {
+    return `
+      <li class="mobile-effect-card mobile-effect-card--empty" data-side="${meta.key}" data-slot="${idx}">
+        <div class="mobile-row-body">
+          <button
+            type="button"
+            class="mobile-button"
+            data-ch-slot="${meta.key}:${idx}"
+            aria-label="${label}: Select Effect"
+          >Select Effect</button>
+        </div>
+      </li>
+    `;
+  }
+
+  const effectFlyout = mobileActionFlyout(effectMenuId, [
+    mobileFlyoutItem({ tone: "swap", label: "Change Effect", cls: "swap-btn", attrs: `data-ch-slot="${meta.key}:${idx}"`, icon: "⇄" }),
+    mobileFlyoutItem({ tone: "danger", label: "Clear Effect", cls: "clear-btn", attrs: `data-ch-clear="${meta.key}:${idx}"`, icon: "×" }),
+    mobileFlyoutItem({ tone: "copy", label: "Copy Effect ID", cls: "copy-id-btn", attrs: `data-copy-effect-id="${effectId}"`, icon: "copy-icon" }),
+    mobileFlyoutItem({ tone: "muted", label: "Copy to Slot", cls: `dup-btn${options.dupDisabled ? " is-disabled" : ""}`, attrs: `data-ch-duplicate="${meta.key}:${idx}" ${options.dupDisabled ? "disabled" : ""}`, icon: "+" })
+  ]);
+
+  const curseFlyout = hasCurse
+    ? mobileActionFlyout(curseMenuId, [
+        mobileFlyoutItem({ tone: "swap", label: "Change Curse", cls: "swap-btn", attrs: `data-ch-curse="${meta.key}:${idx}"`, icon: "⇄" }),
+        mobileFlyoutItem({ tone: "danger", label: "Clear Curse", cls: "clear-btn", attrs: `data-ch-curse-clear="${meta.key}:${idx}"`, icon: "×" }),
+        mobileFlyoutItem({ tone: "copy", label: "Copy Curse ID", cls: "copy-id-btn", attrs: curseRow ? `data-copy-curse-id="${curseRow.EffectID}"` : "", icon: "copy-icon" })
+      ])
+    : "";
+
+  const curseBlock = requiresCurse
+    ? hasCurse
+      ? `
+          <div class="mobile-divider" aria-hidden="true"></div>
+          <div class="mobile-row-line">
+            <div class="line-header">
+              <p class="line-title">${curseRow?.EffectDescription ?? "Curse"}</p>
+              ${curseFlyout}
+            </div>
+            <p class="subtext">CurseID ${curseRow?.EffectID ?? ""}</p>
+          </div>
+        `
+      : `
+          <div class="mobile-divider" aria-hidden="true"></div>
+          <button type="button" class="mobile-button curse-btn" data-ch-curse="${meta.key}:${idx}">Select Curse</button>
+        `
+    : "";
+
+  return `
+    <li class="mobile-effect-card" data-side="${meta.key}" data-slot="${idx}" data-expanded="true">
+      <div class="mobile-row-header">
+        <div class="mobile-title">
+          <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
+          ${effectFlyout}
+        </div>
+        <div class="validation"><span class="pill ${validationTone}">${validationLabel}</span></div>
+      </div>
+      ${row.EffectExtendedDescription || row.RawEffect ? `<p class="subtext">${row.EffectExtendedDescription || row.RawEffect}</p>` : ""}
+      <div class="mobile-row-body">
+        ${metaRow ? `<div class="meta-row">${metaRow}</div>` : ""}
+        ${curseBlock}
+      </div>
+      <div class="mobile-toggle-row">
+        <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▲</button>
+      </div>
+    </li>
+  `;
+}
+
 function renderChaliceSlot(sideKey, idx) {
   const meta = sideInfo(sideKey);
   const effectId = chaliceSelections[meta.key][idx];
@@ -3262,8 +3358,17 @@ function renderChaliceSlot(sideKey, idx) {
   const curseRow = curseId ? chaliceRow(curseId) : null;
   const label = `Slot ${meta.slotPrefix}${idx + 1}`;
   const isEmpty = !row;
+  const isMobile = isMobileViewport();
 
   if (isEmpty) {
+    if (isMobile) {
+      return renderChaliceSlotMobile(meta, idx, null, null, {
+        requiresCurse: false,
+        hasCurse: false,
+        curseMissing: false,
+        dupDisabled: false
+      });
+    }
     return `
       <li>
         <div class="chalice-slot chalice-slot--empty" data-side="${meta.key}" data-slot="${idx}">
@@ -3305,6 +3410,15 @@ function renderChaliceSlot(sideKey, idx) {
     : dupDisabledBySelfStack
       ? "This effect does not self-stack"
       : "Copy effect to another slot";
+
+  if (isMobile) {
+    return renderChaliceSlotMobile(meta, idx, row, curseRow, {
+      requiresCurse,
+      hasCurse,
+      curseMissing,
+      dupDisabled
+    });
+  }
 
   return `
     <li>
@@ -3399,6 +3513,8 @@ function renderChaliceLists() {
   }
   installChaliceSlotButtons();
   installRowCopyButtons();
+  installMobileEffectFlyouts();
+  installMobileEffectToggles();
 }
 
 function installChaliceSlotButtons() {
@@ -4783,6 +4899,13 @@ async function load() {
     if (isDesktopWide()) {
       closeRelicTypePopover();
       setRelicTypeMenu(false);
+    }
+
+    const nowMobile = isMobileViewport();
+    if (nowMobile !== lastIsMobile) {
+      lastIsMobile = nowMobile;
+      updateUI("resize");
+      renderChaliceUI();
     }
   });
 

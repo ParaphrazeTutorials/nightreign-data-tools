@@ -1,4 +1,36 @@
 import { relicDefaultPath, relicPath, visualRelicType, iconPath } from "./reliquary.assets.js";
+import { categoryColorFor, gradientFromTheme, textColorFor } from "./modules/theme.js";
+
+const MOBILE_MAX_WIDTH = 899;
+
+const SELF_STACK_TOKENS = {
+  yes: { bg: "linear-gradient(135deg, #103828, #27a06a)", border: "rgba(120, 230, 170, 0.8)", text: "#e9fff5" },
+  no: { bg: "linear-gradient(135deg, #3d1318, #9b2f35)", border: "rgba(255, 130, 150, 0.8)", text: "#ffeef2" },
+  unknown: { bg: "linear-gradient(135deg, #2e2f36, #4b4e57)", border: "rgba(255, 255, 255, 0.18)", text: "#f5f7ff" }
+};
+
+const RELIC_TOKENS = {
+  standard: { bg: "linear-gradient(135deg, rgba(71, 115, 180, 0.12), rgba(145, 189, 255, 0.28))", border: "rgba(145, 189, 255, 0.5)", text: "#d5e4ff" },
+  depth: { bg: "linear-gradient(135deg, rgba(116, 83, 173, 0.16), rgba(177, 140, 255, 0.32))", border: "rgba(177, 140, 255, 0.55)", text: "#e1d3ff" },
+  both: { bg: "linear-gradient(135deg, rgba(56, 140, 120, 0.14), rgba(125, 208, 195, 0.32))", border: "rgba(125, 208, 195, 0.55)", text: "#d3f5ee" }
+};
+
+const CHARACTER_TOKEN = { bg: "rgba(255, 255, 255, 0.06)", border: "rgba(255, 255, 255, 0.18)", text: "#f5f7ff" };
+
+// Inline style to guarantee the preview card background shows even if a parent rule competes
+const MOBILE_CARD_STYLE = "background: linear-gradient(150deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));" +
+  " border: 1px solid rgba(255, 255, 255, 0.10);" +
+  " border-radius: 16px;" +
+  " padding: 14px;" +
+  " box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38);" +
+  " color: #f5f7ff;" +
+  " min-height: auto;" +
+  " height: auto;";
+
+export function isMobileViewport() {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`).matches;
+}
 
 export function fillSelect(selectEl, options, placeholderText) {
   const first = `<option value="">${placeholderText}</option>`;
@@ -84,6 +116,12 @@ export function moveIndicatorHtml(moveDelta, showOk = false) {
 }
 
 export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk = false, rowBadge = null, opts = null) {
+  const useMobile = opts?.isMobile && isMobileViewport();
+
+  if (useMobile) {
+    return renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts);
+  }
+
   // Only prepend the slot label when the slot is empty; selected rows should just show the effect name
   const prefix = (!row && slotLabel) ? `${slotLabel}: ` : "";
 
@@ -226,4 +264,243 @@ export function renderChosenLine(slotLabel, row, showRaw, moveDelta = 0, showOk 
       </div>
     </li>
   `;
+}
+
+function tokenStyle(token) {
+  if (!token) return "";
+  const bg = token.bg ? `background:${token.bg};` : "";
+  const border = token.border ? `border-color:${token.border};` : "";
+  const text = token.text ? `color:${token.text};` : "";
+  return `${bg}${border}${text}`;
+}
+
+function metaPills(row) {
+  if (!row) return [];
+
+  const pills = [];
+
+  const categoryLabel = (row.EffectCategory || "Uncategorized").trim() || "Uncategorized";
+  const catTheme = categoryColorFor(categoryLabel);
+  const catBg = gradientFromTheme(catTheme);
+  const catBorder = catTheme?.border || "rgba(255,255,255,0.14)";
+  const catText = catTheme?.text || textColorFor(catTheme?.base || "#f7f9ff");
+  pills.push({ label: categoryLabel, style: `background:${catBg};border-color:${catBorder};color:${catText};` });
+
+  const selfStackKey = (row?.SelfStacking || "").toString().toLowerCase();
+  const selfStackToken = SELF_STACK_TOKENS[selfStackKey] || SELF_STACK_TOKENS.unknown;
+  const selfStackLabel = selfStackKey === "yes" ? "Self-Stacking: Yes" : selfStackKey === "no" ? "Self-Stacking: No" : "Self-Stacking: Unknown";
+  pills.push({ label: selfStackLabel, style: tokenStyle(selfStackToken) });
+
+  const characters = (row.Characters || "").trim();
+  const isAll = !characters || characters.toLowerCase() === "all";
+  if (isAll) {
+    pills.push({ label: "All", style: tokenStyle(CHARACTER_TOKEN) });
+  } else {
+    const names = characters.split(",").map(s => s.trim()).filter(Boolean);
+    names.slice(0, 3).forEach(name => {
+      pills.push({ label: name, style: tokenStyle(CHARACTER_TOKEN) });
+    });
+  }
+
+  const relicTypeRaw = (row.RelicType || "Standard").toString().toLowerCase();
+  const relicKey = relicTypeRaw.includes("depth") ? "depth" : relicTypeRaw.includes("both") ? "both" : "standard";
+  const relicToken = RELIC_TOKENS[relicKey] || RELIC_TOKENS.standard;
+  const relicLabel = row.RelicType || "Standard";
+  pills.push({ label: relicLabel, style: tokenStyle(relicToken) });
+
+  return pills;
+}
+
+function validationPill({ rowBadge, needsCursePick, showOk }) {
+  if (rowBadge) return { label: rowBadge, tone: "warn" };
+  if (needsCursePick) return { label: "Curse Required", tone: "warn" };
+  return { label: showOk ? "Valid" : "Ready", tone: showOk ? "good" : "muted" };
+}
+
+function mobileActionFlyout(menuId, entries = []) {
+  if (!menuId) return "";
+  const items = entries.filter(Boolean).join("");
+  if (!items) return "";
+  return `
+    <span class="mobile-action-menu">
+      <button class="mobile-settings-btn" aria-haspopup="true" aria-expanded="false" aria-label="Row actions" data-menu-id="${menuId}">
+        <svg class="gear-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M2 7.86677785C3.10540596 8.47421806 3.8545971 9.64961755 3.8545971 11C3.8545971 12.3503825 3.10540596 13.5257819 2 14.1332221C2.12113545 14.481215 2.26188408 14.8200223 2.42092213 15.1483205C3.63198544 14.7963908 4.9926792 15.0978049 5.94743715 16.0525628C6.9021951 17.0073208 7.20360923 18.3680146 6.85167954 19.5790779C7.17997769 19.7381159 7.51878505 19.8788646 7.86677785 20C8.47421806 18.894594 9.64961755 18.1454029 11 18.1454029C12.3503825 18.1454029 13.5257819 18.894594 14.1332221 20C14.481215 19.8788646 14.8200223 19.7381159 15.1483205 19.5790779C14.7963908 18.3680146 15.0978049 17.0073208 16.0525628 16.0525628C17.0073208 15.0978049 18.3680146 14.7963908 19.5790779 15.1483205C19.7381159 14.8200223 19.8788646 14.481215 20 14.1332221C18.894594 13.5257819 18.1454029 12.3503825 18.1454029 11C18.1454029 9.64961755 18.894594 8.47421806 20 7.86677785C19.8788646 7.51878505 19.7381159 7.17997769 19.5790779 6.85167954C18.3680146 7.20360923 17.0073208 6.9021951 16.0525628 5.94743715C15.0978049 4.9926792 14.7963908 3.63198544 15.1483205 2.42092213C14.8200223 2.26188408 14.481215 2.12113545 14.1332221 2C13.5257819 3.10540596 12.3503825 3.8545971 11 3.8545971C9.64961755 3.8545971 8.47421806 3.10540596 7.86677785 2C7.51878505 2.12113545 7.17997769 2.26188408 6.85167954 2.42092213C7.20360923 3.63198544 6.9021951 4.9926792 5.94743715 5.94743715C4.9926792 6.9021951 3.63198544 7.20360923 2.42092213 6.85167954C2.26188408 7.17997769 2.12113545 7.51878505 2 7.86677785Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+          <circle cx="11" cy="11" r="2.2" fill="none" stroke="currentColor" stroke-width="2.4" />
+        </svg>
+      </button>
+      <div class="mobile-action-flyout" data-menu="${menuId}" role="menu">${items}</div>
+    </span>
+  `;
+}
+
+function mobileFlyoutItem({ tone = "muted", label, cls = "", attrs = "", icon = "" }) {
+  if (!label) return "";
+  const iconPart = `<span class="flyout-icon${icon ? " " + icon : ""}" data-tone="${tone}">${icon === "copy-icon" ? "" : icon || ""}</span>`;
+  return `<button class="flyout-item ${cls}" role="menuitem" ${attrs}>${iconPart}${label}</button>`;
+}
+
+function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts) {
+  const effectSlot = Number.isFinite(opts?.effectSlot) ? opts.effectSlot : null;
+  const effectBtnLabel = (opts && opts.effectButtonLabel) ? String(opts.effectButtonLabel) : (row ? "Change Effect" : "Select Effect");
+  const effectBtnDisabled = !!(opts && opts.effectButtonDisabled);
+
+  const curseRequired = !!(opts && opts.curseRequired);
+  const curseRow = opts && opts.curseRow ? opts.curseRow : null;
+  const curseName = curseRow ? (curseRow.EffectDescription ?? `(Effect ${curseRow.EffectID})`) : "";
+  const curseSlot = opts && Number.isFinite(opts.curseSlot) ? opts.curseSlot : null;
+  const curseBtnLabel = (opts && opts.curseButtonLabel) ? String(opts.curseButtonLabel) : "Select Curse";
+
+  const needsCursePick = curseRequired && !curseName && !!curseBtnLabel;
+  const hasCurse = curseRequired && !!curseName;
+
+  const effectInfoParts = row
+    ? [
+        `EffectID ${row.EffectID}`,
+        `Compatibility ${row?.CompatibilityID ?? "∅"}`,
+        `RollOrder ${(row?.RollOrder ?? "∅")}`
+      ]
+    : [];
+  const effectInfoTitle = effectInfoParts.join(" • ");
+  const curseInfoTitle = cr => cr ? `CurseID ${cr.EffectID} • CurseCompatibility ${cr.CompatibilityID ?? "∅"}` : "";
+
+  const effectMenuId = `effect-menu-${effectSlot ?? "na"}-${row?.EffectID ?? "empty"}`;
+  const curseMenuId = hasCurse ? `curse-menu-${curseSlot ?? "na"}-${curseRow?.EffectID ?? "empty"}` : "";
+
+  const validation = validationPill({ rowBadge, needsCursePick, showOk });
+
+  if (!row) {
+    return `
+      <li class="mobile-effect-card mobile-effect-card--empty" style="${MOBILE_CARD_STYLE}">
+        <div class="mobile-row-body">
+          <button
+            type="button"
+            class="mobile-button"
+            data-effect-slot="${effectSlot != null ? effectSlot : ""}"
+            ${effectBtnDisabled ? "disabled" : ""}
+          >${effectBtnLabel}</button>
+        </div>
+      </li>
+    `;
+  }
+
+  const pills = metaPills(row);
+
+  const effectFlyout = mobileActionFlyout(effectMenuId, [
+    mobileFlyoutItem({ tone: "swap", label: "Change Effect", cls: "swap-btn", attrs: effectSlot != null ? `data-effect-slot="${effectSlot}"` : "", icon: "⇄" }),
+    row ? mobileFlyoutItem({ tone: "info", label: "Information", cls: "info-btn", attrs: `data-effect-id="${row.EffectID}" data-info-kind="effect" data-info-raw="${effectInfoTitle}"`, icon: "i" }) : "",
+    row ? mobileFlyoutItem({ tone: "danger", label: "Clear Effect", cls: "clear-btn", attrs: effectSlot != null ? `data-effect-clear-slot="${effectSlot}"` : "", icon: "×" }) : "",
+    row ? mobileFlyoutItem({ tone: "copy", label: "Copy Effect ID", cls: "copy-id-btn", attrs: `data-copy-effect-id="${row.EffectID}"`, icon: "copy-icon" }) : ""
+  ]);
+
+  const curseFlyout = hasCurse
+    ? mobileActionFlyout(curseMenuId, [
+        mobileFlyoutItem({ tone: "swap", label: "Change Curse", cls: "swap-btn", attrs: curseSlot != null ? `data-curse-slot="${curseSlot}"` : "", icon: "⇄" }),
+        mobileFlyoutItem({ tone: "info", label: "Information", cls: "info-btn", attrs: curseRow ? `data-effect-id="${curseRow.EffectID}" data-info-kind="curse" data-info-raw="${curseInfoTitle(curseRow)}"` : "", icon: "i" }),
+        mobileFlyoutItem({ tone: "danger", label: "Clear Curse", cls: "clear-btn", attrs: curseSlot != null ? `data-curse-clear-slot="${curseSlot}"` : "", icon: "×" }),
+        mobileFlyoutItem({ tone: "copy", label: "Copy Curse ID", cls: "copy-id-btn", attrs: curseRow ? `data-copy-curse-id="${curseRow.EffectID}"` : "", icon: "copy-icon" })
+      ])
+    : "";
+
+  const metaRow = pills.map(p => `<span class="meta-pill" style="${p.style}">${p.label}</span>`).join("");
+
+  const curseBlock = curseRequired
+    ? hasCurse
+      ? `
+          <div class="mobile-divider" aria-hidden="true"></div>
+          <div class="mobile-row-line">
+            <div class="line-header">
+              <p class="line-title">${curseName}</p>
+              ${curseFlyout}
+            </div>
+            <p class="subtext">${curseInfoTitle(curseRow)}</p>
+          </div>
+        `
+      : `
+          <div class="mobile-divider" aria-hidden="true"></div>
+          <button type="button" class="mobile-button curse-btn" data-curse-slot="${curseSlot != null ? curseSlot : ""}">${curseBtnLabel}</button>
+        `
+    : "";
+
+  const moveLabel = Number(moveDelta || 0) !== 0
+    ? `<span class="meta-pill" data-kind="move">${moveDelta < 0 ? "Move Up" : "Move Down"} ${Math.min(3, Math.abs(moveDelta))}</span>`
+    : "";
+
+  const titlePrefix = row ? "" : (slotLabel ? `${slotLabel}: ` : "");
+
+  return `
+    <li class="mobile-effect-card" style="${MOBILE_CARD_STYLE}" data-expanded="true">
+      <div class="mobile-row-header">
+        <div class="mobile-title">
+          <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
+          ${effectFlyout}
+        </div>
+        <div class="validation"><span class="pill ${validation.tone}">${validation.label}</span></div>
+      </div>
+      ${row.EffectExtendedDescription || row.RawEffect ? `<p class="subtext">${row.EffectExtendedDescription || row.RawEffect}</p>` : ""}
+      <div class="mobile-row-body">
+        ${metaRow ? `<div class="meta-row">${metaRow}${moveLabel}</div>` : ""}
+        ${curseBlock}
+      </div>
+      <div class="mobile-toggle-row">
+        <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▲</button>
+      </div>
+    </li>
+  `;
+}
+
+export { metaPills as buildMobileMetaPills, mobileActionFlyout, mobileFlyoutItem };
+export function installMobileEffectToggles() {
+  const cards = document.querySelectorAll(".mobile-effect-card[data-expanded]");
+  cards.forEach(card => {
+    const btn = card.querySelector(".mobile-details-toggle");
+    if (!btn || btn.dataset.toggleInstalled) return;
+    btn.dataset.toggleInstalled = "true";
+      btn.addEventListener("click", () => {
+        const isExpanded = card.getAttribute("data-expanded") !== "false";
+        const next = !isExpanded;
+        card.setAttribute("data-expanded", next ? "true" : "false");
+        btn.setAttribute("aria-expanded", next ? "true" : "false");
+        btn.textContent = next ? "▲" : "▼";
+        btn.setAttribute("aria-label", next ? "Collapse details" : "Expand details");
+      });
+  });
+}
+
+let mobileFlyoutListenersInstalled = false;
+
+export function installMobileEffectFlyouts() {
+  const flyouts = new Map();
+  document.querySelectorAll(".mobile-action-flyout").forEach(f => {
+    const key = f.getAttribute("data-menu");
+    if (key) flyouts.set(key, f);
+  });
+
+  const closeAll = () => {
+    flyouts.forEach(f => f.classList.remove("open"));
+    document.querySelectorAll(".mobile-settings-btn[aria-expanded='true']").forEach(btn => btn.setAttribute("aria-expanded", "false"));
+  };
+
+  document.querySelectorAll(".mobile-settings-btn").forEach(btn => {
+    const id = btn.getAttribute("data-menu-id") || "";
+    const flyout = flyouts.get(id);
+    if (!flyout) return;
+    btn.addEventListener("click", evt => {
+      evt.stopPropagation();
+      const isOpen = flyout.classList.contains("open");
+      closeAll();
+      if (!isOpen) {
+        flyout.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+      }
+    });
+  });
+
+  if (!mobileFlyoutListenersInstalled) {
+    document.addEventListener("click", () => closeAll());
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeAll();
+    });
+    mobileFlyoutListenersInstalled = true;
+  }
 }

@@ -94,6 +94,11 @@
   </div>
 
   <div class="section">
+    <h2>Relic Types</h2>
+    <div class="pill-grid" id="pillRelic"></div>
+  </div>
+
+  <div class="section">
     <h2>Buttons</h2>
     <div class="button-row">
       <button type="button" class="demo-btn demo-btn--instructions">Instructions</button>
@@ -102,7 +107,7 @@
   </div>
 
   <script type="module">
-    import { applyPaletteCssVars, CHARACTERS, characterColors, CHIP_COLORS, EFFECT_CATEGORY_COLORS, EFFECT_COLOR_BASES } from "./palette.js";
+    import { applyPaletteCssVars, CHARACTERS, characterColors, CHIP_COLORS, RELIC_TYPE_COLORS, EFFECT_CATEGORY_COLORS, EFFECT_COLOR_BASES } from "./palette.js";
     import { gradientFromTheme } from "./theme.js";
     import { themeFromBase } from "../../Reliquary/reliquary.logic.js";
 
@@ -113,12 +118,22 @@
       const pillCurse = document.getElementById("pillCurse");
       const pillChars = document.getElementById("pillChars");
       const pillEffects = document.getElementById("pillEffects");
+      const pillRelic = document.getElementById("pillRelic");
 
       const makeSpan = (className, label) => {
         const el = document.createElement("span");
         el.className = `effect-chip ${className}`;
         el.textContent = label;
         return el;
+      };
+
+      const hexToRgba = (hex, alpha = 0.65) => {
+        const sanitized = hex.replace("#", "");
+        const bigint = parseInt(sanitized, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
       };
 
       // Self-Stacking states
@@ -147,7 +162,7 @@
         const bg = gradientFromTheme(theme);
         const chip = makeSpan("effect-chip", label);
         chip.style.background = bg;
-        chip.style.borderColor = theme.border || "rgba(255,255,255,0.12)";
+        chip.style.borderColor = hexToRgba(theme.base || base, 0.65);
         chip.style.color = theme.text || "#f7f9ff";
         pillEffects.append(chip);
       };
@@ -155,6 +170,19 @@
       Object.entries(EFFECT_CATEGORY_COLORS).forEach(([label, base]) => addEffectChip(label, base));
       addEffectChip("Curse (fallback)", EFFECT_COLOR_BASES.curseBase);
       addEffectChip("Default (fallback)", EFFECT_COLOR_BASES.defaultBase);
+
+      // Relic types
+      const addRelicChip = (label, token) => {
+        const chip = makeSpan("effect-chip", label);
+        chip.style.background = token.bg;
+        chip.style.borderColor = token.border;
+        chip.style.color = token.text;
+        pillRelic.append(chip);
+      };
+
+      addRelicChip("Depth of Night", RELIC_TYPE_COLORS.depth);
+      addRelicChip("Standard", RELIC_TYPE_COLORS.standard);
+      addRelicChip("Both", RELIC_TYPE_COLORS.both);
     } catch (err) {
       console.error("Palette preview failed", err);
       const warn = document.createElement("div");

@@ -74,16 +74,16 @@ export const CHARACTERS = [
 
 // Dark, high-contrast bases per character (can be tuned later)
 export const CHARACTER_COLORS = {
-  duchess: { bg: "linear-gradient(135deg, #2e1a2b, #5c345a)", border: "rgba(209, 144, 210, 0.7)", text: "#f7f0fa" },
-  executor: { bg: "linear-gradient(135deg, #1f2c38, #3a566a)", border: "rgba(140, 184, 220, 0.65)", text: "#eef6ff" },
-  guardian: { bg: "linear-gradient(135deg, #1f3b2f, #35644e)", border: "rgba(140, 210, 175, 0.65)", text: "#e8fff4" },
-  ironeye: { bg: "linear-gradient(135deg, #20303c, #355269)", border: "rgba(140, 180, 210, 0.65)", text: "#e9f4ff" },
-  raider: { bg: "linear-gradient(135deg, #3a231c, #6a3a2a)", border: "rgba(230, 170, 135, 0.7)", text: "#fff3e9" },
-  recluse: { bg: "linear-gradient(135deg, #1f1f32, #3d3c61)", border: "rgba(170, 160, 220, 0.7)", text: "#f2f3ff" },
-  revenant: { bg: "linear-gradient(135deg, #2d2a3a, #4b4760)", border: "rgba(190, 170, 230, 0.65)", text: "#f3f0ff" },
-  scholar: { bg: "linear-gradient(135deg, #1f323d, #345468)", border: "rgba(150, 195, 225, 0.68)", text: "#e9f6ff" },
-  undertaker: { bg: "linear-gradient(135deg, #2d1f1f, #4e3534)", border: "rgba(215, 150, 150, 0.65)", text: "#fff0f0" },
-  wylder: { bg: "linear-gradient(135deg, #21311f, #395339)", border: "rgba(170, 215, 150, 0.65)", text: "#f0fff0" }
+  duchess: { bg: "linear-gradient(135deg, #2e1a2b 0%, #5c345a 50%, #5c345a 100%)", border: "rgba(209, 144, 210, 0.7)", text: "#f7f0fa" },
+  executor: { bg: "linear-gradient(135deg, #1f2c38 0%, #3a566a 50%, #3a566a 100%)", border: "rgba(140, 184, 220, 0.65)", text: "#eef6ff" },
+  guardian: { bg: "linear-gradient(135deg, #1f3b2f 0%, #35644e 50%, #35644e 100%)", border: "rgba(140, 210, 175, 0.65)", text: "#e8fff4" },
+  ironeye: { bg: "linear-gradient(135deg, #20303c 0%, #355269 50%, #355269 100%)", border: "rgba(140, 180, 210, 0.65)", text: "#e9f4ff" },
+  raider: { bg: "linear-gradient(135deg, #3a231c 0%, #6a3a2a 50%, #6a3a2a 100%)", border: "rgba(230, 170, 135, 0.7)", text: "#fff3e9" },
+  recluse: { bg: "linear-gradient(135deg, #1f1f32 0%, #3d3c61 50%, #3d3c61 100%)", border: "rgba(170, 160, 220, 0.7)", text: "#f2f3ff" },
+  revenant: { bg: "linear-gradient(135deg, #2d2a3a 0%, #4b4760 50%, #4b4760 100%)", border: "rgba(190, 170, 230, 0.65)", text: "#f3f0ff" },
+  scholar: { bg: "linear-gradient(135deg, #1f323d 0%, #345468 50%, #345468 100%)", border: "rgba(150, 195, 225, 0.68)", text: "#e9f6ff" },
+  undertaker: { bg: "linear-gradient(135deg, #2d1f1f 0%, #4e3534 50%, #4e3534 100%)", border: "rgba(215, 150, 150, 0.65)", text: "#fff0f0" },
+  wylder: { bg: "linear-gradient(135deg, #21311f 0%, #395339 50%, #395339 100%)", border: "rgba(170, 215, 150, 0.65)", text: "#f0fff0" }
 };
 
 // Build character art URLs relative to the current page so both local file:// and
@@ -101,44 +101,63 @@ function characterAssetUrl(file) {
 // Chip color tokens; keep gradients centralized
 export const CHIP_COLORS = {
   curseYes: {
-    bg: "linear-gradient(135deg, #4c2a80, #8b5fd4)",
+    bg: "linear-gradient(135deg, #4c2a80 0%, #8b5fd4 50%, #8b5fd4 100%)",
     border: "rgba(168, 120, 230, 0.7)",
     text: "#f7f1ff"
   },
   curseNo: {
-    bg: "rgba(255, 255, 255, 0.08)",
+    bg: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.08) 100%)",
     border: "rgba(255, 255, 255, 0.14)",
     text: "rgba(245, 245, 245, 0.92)"
   },
   selfStackYes: {
-    bg: "linear-gradient(135deg, #103828, #27a06a)",
+    bg: "linear-gradient(135deg, #103828 0%, #27a06a 50%, #27a06a 100%)",
     border: "rgba(120, 230, 170, 0.8)",
     text: "#e9fff5"
   },
   selfStackNo: {
-    bg: "linear-gradient(135deg, #3d1318, #9b2f35)",
+    bg: "linear-gradient(135deg, #3d1318 0%, #9b2f35 50%, #9b2f35 100%)",
     border: "rgba(255, 130, 150, 0.8)",
     text: "#ffeef2"
   },
   selfStackUnknown: {
-    bg: "linear-gradient(135deg, #2e2f36, #4b4e57)",
+    bg: "linear-gradient(135deg, #2e2f36 0%, #4b4e57 50%, #4b4e57 100%)",
     border: "rgba(255, 255, 255, 0.18)",
     text: "rgba(245, 245, 245, 0.92)"
   },
   placeholder: {
-    bg: "rgba(255, 255, 255, 0.08)",
+    bg: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.08) 100%)",
     border: "rgba(255, 255, 255, 0.12)",
     text: "rgba(255, 255, 255, 0.9)"
   },
   character: {
-    bg: "rgba(255, 255, 255, 0.08)",
+    bg: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.08) 100%)",
     border: "rgba(255, 255, 255, 0.16)",
     text: "rgba(245, 245, 245, 0.92)"
   },
   characterAll: {
-    bg: "linear-gradient(135deg, #4c2a80, #8b5fd4)", // reserved purple gradient for ALL
+    bg: "linear-gradient(135deg, #4c2a80 0%, #8b5fd4 50%, #8b5fd4 100%)", // reserved purple gradient for ALL
     border: "rgba(168, 120, 230, 0.7)",
     text: "#f7f1ff"
+  }
+};
+
+// Relic type chips (Depth/Standard/Both)
+export const RELIC_TYPE_COLORS = {
+  depth: {
+    bg: "linear-gradient(135deg, #1b1233 0%, #4b2d7a 50%, #7a4cc2 100%)",
+    border: "rgba(180, 150, 255, 0.6)",
+    text: "#f6f2ff"
+  },
+  standard: {
+    bg: "linear-gradient(135deg, #0f213d 0%, #1f4f8a 50%, #2f7ad0 100%)",
+    border: "rgba(135, 185, 245, 0.65)",
+    text: "#e8f3ff"
+  },
+  both: {
+    bg: "linear-gradient(135deg, #0f2b35 0%, #1f5a66 50%, #2f8896 100%)",
+    border: "rgba(135, 210, 225, 0.6)",
+    text: "#e7f9ff"
   }
 };
 
@@ -244,6 +263,19 @@ export function applyPaletteCssVars(root = typeof document !== "undefined" ? doc
   setVar(root, "--chip-character-all-bg", CHIP_COLORS.characterAll.bg);
   setVar(root, "--chip-character-all-border", CHIP_COLORS.characterAll.border);
   setVar(root, "--chip-character-all-text", CHIP_COLORS.characterAll.text);
+
+  // Relic types
+  setVar(root, "--chip-relic-depth-bg", RELIC_TYPE_COLORS.depth.bg);
+  setVar(root, "--chip-relic-depth-border", RELIC_TYPE_COLORS.depth.border);
+  setVar(root, "--chip-relic-depth-text", RELIC_TYPE_COLORS.depth.text);
+
+  setVar(root, "--chip-relic-standard-bg", RELIC_TYPE_COLORS.standard.bg);
+  setVar(root, "--chip-relic-standard-border", RELIC_TYPE_COLORS.standard.border);
+  setVar(root, "--chip-relic-standard-text", RELIC_TYPE_COLORS.standard.text);
+
+  setVar(root, "--chip-relic-both-bg", RELIC_TYPE_COLORS.both.bg);
+  setVar(root, "--chip-relic-both-border", RELIC_TYPE_COLORS.both.border);
+  setVar(root, "--chip-relic-both-text", RELIC_TYPE_COLORS.both.text);
 
   // Buttons (canonical styles)
   setVar(root, "--btn-instructions-bg", BUTTONS.instructions.bg);
