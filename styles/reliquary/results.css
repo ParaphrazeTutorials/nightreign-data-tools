@@ -604,6 +604,14 @@
     display: inline-flex !important;
   }
 
+  /* State 4: match curse text size to effect text and italicize */
+  .mobile-effect-card .curse-line .curse-required,
+  .mobile-effect-card .curse-line .curse-sub {
+    font-size: 0.98rem;
+    font-style: italic;
+    letter-spacing: -0.01em;
+  }
+
   /* Two-column mobile stack: content left, validation right */
   #individualMode .chosen-effects {
     display: grid;
@@ -1044,15 +1052,17 @@
     list-style: none;
     background: linear-gradient(150deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
     border: 1px solid rgba(255, 255, 255, 0.10);
+    border-bottom: 0;
     border-radius: 16px;
     padding: 14px 14px 0;
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0;
     color: #f5f7ff;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
   }
 
   .mobile-effect-card--empty {
@@ -1107,7 +1117,7 @@
     align-items: center;
   }
 
-  .mobile-row-body { display: grid; gap: 10px; }
+  .mobile-row-body { display: grid; gap: 0; padding: 0; }
 
   /* Center the empty-state button vertically inside the card */
   .mobile-effect-card--empty .mobile-row-body {
@@ -1130,6 +1140,9 @@
     gap: 6px;
     margin-top: 3px;
   }
+
+  /* Add space between chips and the divider when expanded */
+  .mobile-effect-card[data-expanded="true"] .meta-row + .mobile-divider { margin-top: 12px; }
 
   .mobile-effect-card .meta-pill {
     display: inline-flex;
@@ -1192,40 +1205,65 @@
   }
 
   .mobile-toggle-row {
-    margin-top: 6px;
-    height: 10px;
-    width: 100%;
+    margin: -8px -14px 0;
+    height: 12px;
+    width: auto;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    justify-content: stretch;
+    align-items: stretch;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
     padding: 0;
     gap: 0;
-    font-size: 0 !important;
-    line-height: 0 !important;
+    font-size: 0;
+    line-height: 0;
+    background: linear-gradient(180deg, rgba(20, 32, 64, 0.85) 0%, rgba(12, 18, 38, 0.95) 55%, rgba(6, 10, 24, 0.98) 100%);
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+    position: relative;
   }
 
+  .mobile-effect-card[data-expanded="false"] .mobile-toggle-row {
+    background: linear-gradient(180deg, rgba(18, 28, 60, 0.9) 0%, rgba(10, 16, 34, 0.96) 60%, rgba(4, 8, 22, 0.98) 100%);
+  }
+
+  /* Add breathing room under the header row */
+  .mobile-row-header { margin-bottom: 10px; }
+
   .mobile-details-toggle {
-    width: 24px;
-    height: 6px;
-    padding: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0 6px;
     margin: 0;
     min-height: 0;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(240, 240, 245, 0.9);
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
+    border-radius: 0 0 16px 16px;
+    border: 0;
+    background: linear-gradient(135deg, rgba(58, 86, 150, 0.68) 0%, rgba(26, 42, 86, 0.82) 45%, rgba(10, 18, 40, 0.95) 100%);
+    color: rgba(232, 236, 255, 0.96);
+    font-size: 9px;
+    font-weight: 820;
+    letter-spacing: 0.05em;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0;
-    box-shadow: none;
+    gap: 3px;
+    text-transform: uppercase;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 -1px 0 rgba(0, 0, 0, 0.3);
+    cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
+    transition: filter 120ms ease, transform 120ms ease, background 160ms ease;
+  }
+
+  .mobile-effect-card[data-expanded="false"] .mobile-details-toggle {
+    background: linear-gradient(135deg, rgba(64, 96, 162, 0.62) 0%, rgba(28, 46, 96, 0.82) 40%, rgba(8, 14, 34, 0.96) 100%);
+  }
+
+  .mobile-details-toggle:hover { filter: brightness(1.05); }
+
+  .mobile-details-toggle:active {
+    transform: translateY(1px);
+    filter: brightness(0.96);
   }
 
   .mobile-button {
@@ -1248,6 +1286,28 @@
     margin: 0 !important;
   }
 
+  /* Match Select Effect styling but with the purple Select Curse gradient */
+  .mobile-effect-card .mobile-button.curse-btn {
+    padding: 6px 14px;
+    gap: 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(181, 140, 255, 0.75);
+    background: linear-gradient(135deg, #7f5dff 0%, #4a2ba3 45%, #2a1c54 100%);
+    color: #f5f7ff;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+    font-size: 0.9rem;
+    font-weight: 760;
+    letter-spacing: normal;
+    text-transform: none;
+    line-height: 1.5;
+    justify-content: center !important;
+    align-items: center;
+    text-align: center;
+    min-height: 22px;
+    width: 100%;
+    margin-top: 12px;
+  }
+
   .mobile-button:disabled { opacity: 0.6; cursor: not-allowed; }
 
   .mobile-effect-card .mobile-divider {
@@ -1256,7 +1316,11 @@
     background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(18, 18, 24, 0.2) 100%);
     border: 0;
     border-radius: 999px;
+    margin: 0 0 12px;
   }
+
+  /* Extra gap when the divider is immediately above the Select Curse button */
+  .mobile-divider + .mobile-button.curse-btn { margin-top: 12px; }
 
   .mobile-effect-card .mobile-row-line { display: grid; gap: 6px; }
 
@@ -1268,7 +1332,8 @@
 
   .mobile-effect-card .line-title {
     font-weight: 760;
-    font-size: 0.98rem;
+    font-size: 0.82rem;
+    font-style: italic;
     letter-spacing: -0.01em;
     margin: 0;
     color: #b18cff;
@@ -1309,19 +1374,22 @@
 
   .mobile-action-flyout {
     position: absolute;
-    top: 0;
-    left: 110%;
-    min-width: 200px;
+    top: 50%;
+    left: calc(100% + 8px);
+    transform: translateY(-50%);
+    min-width: auto;
     background: rgba(16, 20, 37, 0.96);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
-    padding: 8px;
+    padding: 6px 8px;
     display: none;
     z-index: 10;
+    gap: 8px;
+    align-items: center;
   }
 
-  .mobile-action-flyout.open { display: grid; gap: 6px; }
+  .mobile-action-flyout.open { display: inline-flex; }
 
   .gear-icon {
     width: 14px;
@@ -1338,34 +1406,35 @@
   .flyout-item {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
+    border: 0;
     color: #f5f7ff;
-    font-weight: 720;
-    font-size: 0.9rem;
     cursor: pointer;
   }
 
   .flyout-icon {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     display: grid;
     place-items: center;
     border-radius: 50%;
-    font-weight: 760;
+    font-weight: 780;
     font-size: 0.9rem;
     line-height: 1;
     border: 1px solid rgba(255, 255, 255, 0.18);
+    background: transparent;
   }
 
-  .flyout-icon[data-tone="info"] { color: #b18cff; border-color: rgba(177, 140, 255, 0.65); }
-  .flyout-icon[data-tone="swap"] { color: #6ba7ff; border-color: rgba(107, 167, 255, 0.7); }
-  .flyout-icon[data-tone="danger"] { color: #e6767a; border-color: rgba(230, 118, 122, 0.75); }
-  .flyout-icon[data-tone="copy"] { color: #7dd0c3; border-color: rgba(125, 208, 195, 0.7); }
-  .flyout-icon[data-tone="muted"] { color: #9aa3c2; border-color: rgba(154, 163, 194, 0.45); }
+  .flyout-item[data-tone="info"] .flyout-icon { color: #b18cff; border-color: rgba(177, 140, 255, 0.65); }
+  .flyout-item[data-tone="swap"] .flyout-icon { color: #6ba7ff; border-color: rgba(107, 167, 255, 0.7); }
+  .flyout-item[data-tone="danger"] .flyout-icon { color: #e6767a; border-color: rgba(230, 118, 122, 0.75); }
+  .flyout-item[data-tone="copy"] .flyout-icon { color: #7dd0c3; border-color: rgba(125, 208, 195, 0.7); }
+  .flyout-item[data-tone="muted"] .flyout-icon { color: #9aa3c2; border-color: rgba(154, 163, 194, 0.45); }
 
   .flyout-icon.copy-icon {
     background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, rgba(24,38,32,0.9) 55%, rgba(16,26,22,0.9) 100%);

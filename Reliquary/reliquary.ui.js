@@ -335,9 +335,10 @@ function mobileActionFlyout(menuId, entries = []) {
 }
 
 function mobileFlyoutItem({ tone = "muted", label, cls = "", attrs = "", icon = "" }) {
-  if (!label) return "";
+  if (!label && !icon) return "";
   const iconPart = `<span class="flyout-icon${icon ? " " + icon : ""}" data-tone="${tone}">${icon === "copy-icon" ? "" : icon || ""}</span>`;
-  return `<button class="flyout-item ${cls}" role="menuitem" ${attrs}>${iconPart}${label}</button>`;
+  const safeLabel = label || "Action";
+  return `<button class="flyout-item ${cls}" role="menuitem" data-tone="${tone}" aria-label="${safeLabel}" title="${safeLabel}" ${attrs}>${iconPart}</button>`;
 }
 
 function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts) {
@@ -385,6 +386,7 @@ function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts
   }
 
   const pills = metaPills(row);
+  const cursePills = curseRow ? metaPills(curseRow) : [];
 
   const effectFlyout = mobileActionFlyout(effectMenuId, [
     mobileFlyoutItem({ tone: "swap", label: "Change Effect", cls: "swap-btn", attrs: effectSlot != null ? `data-effect-slot="${effectSlot}"` : "", icon: "⇄" }),
@@ -403,6 +405,7 @@ function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts
     : "";
 
   const metaRow = pills.map(p => `<span class="meta-pill" style="${p.style}">${p.label}</span>`).join("");
+  const curseMetaRow = cursePills.map(p => `<span class="meta-pill" style="${p.style}">${p.label}</span>`).join("");
 
   const curseBlock = curseRequired
     ? hasCurse
@@ -410,10 +413,11 @@ function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts
           <div class="mobile-divider" aria-hidden="true"></div>
           <div class="mobile-row-line">
             <div class="line-header">
-              <p class="line-title">${curseName}</p>
               ${curseFlyout}
+              <p class="line-title">${curseName}</p>
             </div>
-            <p class="subtext">${curseInfoTitle(curseRow)}</p>
+            ${curseRow?.EffectExtendedDescription || curseRow?.RawEffect ? `<p class="subtext">${curseRow?.EffectExtendedDescription || curseRow?.RawEffect}</p>` : ""}
+            ${curseMetaRow ? `<div class="meta-row">${curseMetaRow}</div>` : ""}
           </div>
         `
       : `
@@ -429,11 +433,11 @@ function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts
   const titlePrefix = row ? "" : (slotLabel ? `${slotLabel}: ` : "");
 
   return `
-    <li class="mobile-effect-card" style="${MOBILE_CARD_STYLE}" data-expanded="true">
+    <li class="mobile-effect-card" style="${MOBILE_CARD_STYLE}" data-expanded="false">
       <div class="mobile-row-header">
         <div class="mobile-title">
-          <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
           ${effectFlyout}
+          <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
         </div>
         <div class="validation"><span class="pill ${validation.tone}">${validation.label}</span></div>
       </div>
@@ -443,7 +447,7 @@ function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts
         ${curseBlock}
       </div>
       <div class="mobile-toggle-row">
-        <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▲</button>
+        <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▴ Less ▴</button>
       </div>
     </li>
   `;
@@ -452,18 +456,41 @@ function renderMobileEffectRow(slotLabel, row, moveDelta, showOk, rowBadge, opts
 export { metaPills as buildMobileMetaPills, mobileActionFlyout, mobileFlyoutItem };
 export function installMobileEffectToggles() {
   const cards = document.querySelectorAll(".mobile-effect-card[data-expanded]");
+  const expandedText = "▴ Less ▴";
+  const collapsedText = "▾ More ▾";
+
+  const enforceHandleFlush = card => {
+    // Remove any bottom padding/border that can show under the handle
+    card.style.paddingBottom = "0";
+    card.style.borderBottom = "0";
+    const toggleRow = card.querySelector(".mobile-toggle-row");
+    if (toggleRow) {
+      toggleRow.style.margin = "12px -14px -1px";
+      toggleRow.style.borderRadius = "0 0 16px 16px";
+      toggleRow.style.borderBottom = "0";
+      toggleRow.style.overflow = "hidden";
+    }
+  };
+
+  const setToggleState = (card, btn, expanded) => {
+    card.setAttribute("data-expanded", expanded ? "true" : "false");
+    btn.setAttribute("aria-expanded", expanded ? "true" : "false");
+    btn.textContent = expanded ? expandedText : collapsedText;
+    btn.setAttribute("aria-label", expanded ? "Collapse details" : "Expand details");
+    enforceHandleFlush(card);
+  };
+
   cards.forEach(card => {
     const btn = card.querySelector(".mobile-details-toggle");
     if (!btn || btn.dataset.toggleInstalled) return;
     btn.dataset.toggleInstalled = "true";
-      btn.addEventListener("click", () => {
-        const isExpanded = card.getAttribute("data-expanded") !== "false";
-        const next = !isExpanded;
-        card.setAttribute("data-expanded", next ? "true" : "false");
-        btn.setAttribute("aria-expanded", next ? "true" : "false");
-        btn.textContent = next ? "▲" : "▼";
-        btn.setAttribute("aria-label", next ? "Collapse details" : "Expand details");
-      });
+    const startExpanded = card.getAttribute("data-expanded") !== "false";
+    setToggleState(card, btn, startExpanded);
+
+    btn.addEventListener("click", () => {
+      const isExpanded = card.getAttribute("data-expanded") !== "false";
+      setToggleState(card, btn, !isExpanded);
+    });
   });
 }
 

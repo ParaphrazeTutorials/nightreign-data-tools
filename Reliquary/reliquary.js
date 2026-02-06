@@ -3277,7 +3277,9 @@ function renderChaliceSlotMobile(meta, idx, row, curseRow, options) {
   const effectMenuId = `ch-${meta.key}-${idx}-effect`;
   const curseMenuId = hasCurse ? `ch-${meta.key}-${idx}-curse` : "";
   const pills = buildMobileMetaPills(row);
+  const cursePills = curseRow ? buildMobileMetaPills(curseRow) : [];
   const metaRow = pills.map(p => `<span class="meta-pill" style="${p.style}">${p.label}</span>`).join("");
+  const curseMetaRow = cursePills.map(p => `<span class="meta-pill" style="${p.style}">${p.label}</span>`).join("");
   const validationTone = requiresCurse && curseMissing ? "warn" : "good";
   const validationLabel = requiresCurse && curseMissing ? "Curse Required" : "Selected";
 
@@ -3317,10 +3319,11 @@ function renderChaliceSlotMobile(meta, idx, row, curseRow, options) {
           <div class="mobile-divider" aria-hidden="true"></div>
           <div class="mobile-row-line">
             <div class="line-header">
-              <p class="line-title">${curseRow?.EffectDescription ?? "Curse"}</p>
               ${curseFlyout}
+              <p class="line-title">${curseRow?.EffectDescription ?? "Curse"}</p>
             </div>
-            <p class="subtext">CurseID ${curseRow?.EffectID ?? ""}</p>
+            ${curseRow?.EffectExtendedDescription || curseRow?.RawEffect ? `<p class="subtext">${curseRow?.EffectExtendedDescription || curseRow?.RawEffect}</p>` : ""}
+            ${curseMetaRow ? `<div class="meta-row">${curseMetaRow}</div>` : ""}
           </div>
         `
       : `
@@ -3330,11 +3333,11 @@ function renderChaliceSlotMobile(meta, idx, row, curseRow, options) {
     : "";
 
   return `
-    <li class="mobile-effect-card" data-side="${meta.key}" data-slot="${idx}" data-expanded="true">
+    <li class="mobile-effect-card" data-side="${meta.key}" data-slot="${idx}" data-expanded="false">
       <div class="mobile-row-header">
         <div class="mobile-title">
-          <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
           ${effectFlyout}
+          <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
         </div>
         <div class="validation"><span class="pill ${validationTone}">${validationLabel}</span></div>
       </div>
@@ -3344,7 +3347,7 @@ function renderChaliceSlotMobile(meta, idx, row, curseRow, options) {
         ${curseBlock}
       </div>
       <div class="mobile-toggle-row">
-        <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▲</button>
+        <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▴ Less ▴</button>
       </div>
     </li>
   `;
