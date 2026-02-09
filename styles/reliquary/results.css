@@ -1075,7 +1075,7 @@
   #results .chosen-effects,
   #individualMode .relic-effects,
   .chalice-slot-list {
-    width: min(100%, 640px);
+    width: min(100%, 700px);
     margin-left: auto;
     margin-right: auto;
     gap: 16px;

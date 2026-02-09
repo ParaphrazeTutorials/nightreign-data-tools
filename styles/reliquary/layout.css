@@ -589,6 +589,54 @@
 }
 
 @media (--bp-md-down){
+  /* If there are no alerts, remove the empty rail row under the Details header on mobile widths */
+  .chalice-layout:not(.has-chalice-alerts) .details-rail,
+  .chalice-layout:not(.has-chalice-alerts) #chaliceAlertIconStack,
+  .chalice-layout:not(.has-chalice-alerts) .chalice-alert-icon-stack,
+  .chalice-results:not(.has-chalice-alerts) .details-rail,
+  .chalice-results:not(.has-chalice-alerts) #chaliceAlertIconStack,
+  .chalice-results:not(.has-chalice-alerts) .chalice-alert-icon-stack {
+    display: none !important;
+    height: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .chalice-layout:not(.has-chalice-alerts) .chalice-results__frame,
+  .chalice-results:not(.has-chalice-alerts) .chalice-results__frame {
+    grid-template-rows: auto 1fr;
+  }
+
+  /* Also hide the rail when the alert stack itself is hidden/aria-hidden */
+  .details-rail .chalice-alert-icon-stack[hidden],
+  .details-rail .chalice-alert-icon-stack[aria-hidden="true"],
+  .details-rail:has(.chalice-alert-icon-stack[hidden]),
+  .details-rail:has(.chalice-alert-icon-stack[aria-hidden="true"]),
+  .details-rail[aria-hidden="true"] {
+    display: none !important;
+    height: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .details-rail:has(.chalice-alert-icon-stack[hidden]),
+  .details-rail:has(.chalice-alert-icon-stack[aria-hidden="true"]) ~ .chalice-results__frame,
+  .details-rail[aria-hidden="true"] ~ .chalice-results__frame {
+    grid-template-rows: auto 1fr;
+  }
+
+  /* Hide the empty Details body on mobile when no alerts/content are present */
+  #detailsBody:empty {
+    display: none;
+    padding: 0;
+    min-height: 0;
+  }
+
+  .individual-details__panel:has(#detailsBody:empty) {
+    padding-bottom: 0;
+    row-gap: 0;
+  }
+
   .top-grid{
     grid-template-columns: 1fr;
   }
