@@ -1096,8 +1096,8 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
 
   /* Prevent transient scrollbars inside the individual panel container */
   .chalice-panel.individual-panel {
-    overflow: hidden !important;
-    overscroll-behavior: contain;
+    overflow: visible !important;
+    overscroll-behavior: auto;
   }
 
   .chalice-panel.individual-panel::-webkit-scrollbar { display: none; }

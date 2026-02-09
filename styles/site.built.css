@@ -2,7 +2,8 @@
   /* ------------------------------------------------------------
      Core palette
      ------------------------------------------------------------ */
-  --color-bg-dark: #0f0f12;
+  padding: 0;
+  touch-action: pan-y
   --color-bg-panel: rgba(0,0,0,0.35);
 
   --color-accent-primary: #4a0f14;
@@ -11,7 +12,9 @@
   --color-text-main: #ffffff;
   --color-text-muted: rgba(255,255,255,0.75);
 
-  /* Tooltip palette */
+  padding: 0;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch
   --tooltip-bg: rgba(10, 16, 28, 0.96);
   --tooltip-border: rgba(120, 170, 255, 0.55);
   --tooltip-shadow: 0 12px 28px rgba(0, 0, 0, 0.52);
@@ -189,6 +192,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto;
   gap: var(--content-gap);
+  touch-action: pan-y
 }
 
 .app-shell {
@@ -197,6 +201,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   margin: 0 auto;
   padding-inline: var(--shell-pad);
   overflow-x: hidden;
+  touch-action: pan-y;
   box-sizing: border-box;
 }
 
@@ -208,6 +213,10 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   max-width: 100%;
   margin-inline: 0;
   box-sizing: border-box;
+}
+
+.tool-shell {
+  touch-action: pan-y
 }
 
 @media (max-width: 520px) {

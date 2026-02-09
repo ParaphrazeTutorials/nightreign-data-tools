@@ -62,6 +62,7 @@ function lockBodyScroll() {
   const scrollTop = window.scrollY || 0;
   bodyScrollLockState = { scrollTop, previousOverflow: document.body.style.overflow || "" };
   document.body.style.overflow = "hidden";
+  document.body.style.touchAction = "pan-y";
   document.body.style.position = "fixed";
   document.body.style.top = `-${scrollTop}px`;
   document.body.style.width = "100%";

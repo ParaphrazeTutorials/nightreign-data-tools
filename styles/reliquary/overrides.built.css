@@ -1082,10 +1082,10 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     box-sizing: border-box;
   }
 
-.chalice-panel.individual-panel {
-  overflow: hidden !important;
-  overscroll-behavior: contain;
-}
+  .chalice-panel.individual-panel {
+    overflow: visible !important;
+    overscroll-behavior: auto;
+  }
 
 .chalice-panel.individual-panel::-webkit-scrollbar { display: none; }
 .chalice-panel.individual-panel { scrollbar-width: none; }

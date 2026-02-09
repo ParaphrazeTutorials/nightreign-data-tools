@@ -83,6 +83,7 @@ html {
   color-scheme: dark;
   margin: 0;
   padding: 0;
+  touch-action: pan-y;
 }
 
 body {
@@ -92,6 +93,8 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Accessibility helpers */
@@ -189,6 +192,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto;
   gap: var(--content-gap);
+  touch-action: pan-y;
 }
 
 .app-shell {
@@ -197,6 +201,7 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   margin: 0 auto;
   padding-inline: var(--shell-pad);
   overflow-x: hidden;
+  touch-action: pan-y;
   box-sizing: border-box;
 }
 
@@ -208,6 +213,11 @@ body.tooltip-portal-active [data-tooltip]:hover::after {
   max-width: 100%;
   margin-inline: 0;
   box-sizing: border-box;
+}
+
+/* Ensure main content sections still accept vertical swipe gestures on touch devices */
+.tool-shell {
+  touch-action: pan-y;
 }
 
 @media (--bp-xs) {

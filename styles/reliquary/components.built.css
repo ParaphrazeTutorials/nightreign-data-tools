@@ -727,7 +727,9 @@
   justify-content: center;
   padding: min(24px, 4vw);
   box-sizing: border-box;
+  touch-action: pan-y
 }
+.effect-overlay[hidden]{display:none!important;pointer-events:none!important}
 
 .effect-overlay__backdrop {
   position: absolute;
@@ -753,6 +755,9 @@
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   overflow: hidden;
   box-sizing: border-box;
+  touch-action: pan-y;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch
 }
 
 .effect-overlay__header {

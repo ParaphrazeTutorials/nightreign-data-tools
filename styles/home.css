@@ -322,6 +322,7 @@
 
   border-radius: 0.9rem;
   overflow: hidden;
+  touch-action: pan-y;
 
   aspect-ratio: 16 / 10;
   min-height: clamp(190px, 18vw, 320px);
