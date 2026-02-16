@@ -1153,3 +1153,28 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     max-width: 100% !important;
   }
 }
+
+@media (max-width: 899px) {
+  /* Chalice mobile: hide picker and surface add buttons */
+  #chaliceMode #chalicePickerSlot {
+    display: none !important;
+  }
+
+  #chaliceMode .chalice-filter__body {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.35rem 0.05rem 0.45rem;
+    margin: 0;
+  }
+
+  #chaliceMode .chalice-filter__actions {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  #chaliceMode .chalice-filter__actions .chalice-filter__btn {
+    width: 90%;
+    justify-self: center;
+  }
+}
