@@ -3,6 +3,45 @@
    Purpose: safety rails only.
    ------------------------------------------------------------ */
 
+#classPortraitSlotChalice,
+#chalicePlaceholderSlot {
+  display: none;
+}
+
+#chalicePopover {
+  width: 90vw;
+  max-width: 960px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+#chalicePopover .relic-type-popover__types {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#chalicePopover .relic-type-popover__type-label {
+  top: 0.35rem;
+  bottom: auto;
+  left: 0.5rem;
+  right: 0.5rem;
+  width: auto;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: clamp(0.78rem, 2vw, 0.95rem);
+  padding: 0.18rem 0.45rem;
+}
+
+#chalicePopover .chalice-popover__colors {
+  display: none;
+}
+
 /* Keep the character popover above any other overlay/tooltips */
 #classPortraitMenu {
   position: fixed !important;
@@ -1120,6 +1159,11 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     padding-inline: 0;
   }
 
+  #classPortraitSlotChalice,
+  #chalicePlaceholderSlot {
+    display: none;
+  }
+
   .chalice-filter__body,
   .individual-filter__body {
     display: none !important;
@@ -1139,6 +1183,174 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
 }
 
 @media (max-width: 899px) {
+  #chaliceMode .chalice-filter__title-row,
+  #chaliceMode .chalice-filter__title-row h4 {
+    display: none !important;
+  }
+
+  #chaliceMode .chalice-filter .panel-header {
+    padding-bottom: 0;
+    margin-bottom: 0.2rem;
+  }
+
+  #chaliceMode .chalice-filter .panel-header::after {
+    display: none !important;
+  }
+
+  #chaliceMode .chalice-filter__header {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0.6rem;
+  }
+
+  #chaliceMode .chalice-filter__header-right {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "char placeholder"
+      "instr start";
+    gap: 0.6rem;
+    justify-items: center;
+    align-items: center;
+  }
+
+  #chaliceMode .chalice-filter__header-right .chalice-filter__selectors,
+  #chaliceMode #chaliceFilterTotals,
+  #chaliceMode #classFilterSlotChalice {
+    display: none !important;
+  }
+
+  #chaliceMode #classPortraitSlotChalice {
+    grid-area: char;
+    width: auto;
+    justify-self: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #chaliceMode #classPortraitSlotChalice .mini-tile {
+    width: 150px;
+    max-width: 150px;
+    min-width: 150px;
+    aspect-ratio: 1 / 1;
+    height: 150px;
+    min-height: 150px;
+    margin: 0;
+  }
+
+  #chaliceMode #chalicePlaceholderSlot {
+    grid-area: placeholder;
+    width: auto;
+    justify-self: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+  }
+
+  #chaliceMode #chalicePlaceholderSlot:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+  }
+
+  #chaliceMode #chalicePlaceholderSlot .mini-tile--placeholder {
+    width: 150px;
+    max-width: 150px;
+    min-width: 150px;
+    aspect-ratio: 1 / 1;
+    height: 150px;
+    min-height: 150px;
+    border-radius: 0.55rem;
+    display: block;
+    object-fit: contain;
+    background: #0b0d11;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    margin: 0;
+  }
+
+  #chaliceMode #chalicePlaceholderSlot .mini-tile--placeholder.is-empty {
+    border: 1px dashed rgba(255, 255, 255, 0.22);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  }
+
+  #chaliceMode #chalicePlaceholderSlot .mini-tile--placeholder.has-image {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: #0b0d11;
+  }
+
+  #chaliceMode #chalicePlaceholderSlot .chalice-placeholder-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0.45rem 0.55rem;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 28%, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0));
+  }
+
+  #chaliceMode #chalicePlaceholderSlot .chalice-placeholder-name {
+    margin-top: 0.2rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.45rem;
+    background: rgba(0, 0, 0, 0.45);
+    color: #f5f7ff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    text-align: center;
+    max-width: 92%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  }
+
+  #chaliceMode #chalicePlaceholderSlot .chalice-placeholder-colors {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0.1rem;
+  }
+
+  #chalicePopover {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin-top: 0 !important;
+    width: 90vw !important;
+    max-width: 540px;
+    max-height: 90vh;
+    z-index: 1200;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  #chaliceMode #instructionsBtnChalice,
+  #chaliceMode #startOverSlotChalice,
+  #chaliceMode #startOverSlotChalice button {
+    width: 94%;
+    max-width: none;
+    justify-content: center;
+  }
+
+  #chaliceMode #startOverSlotChalice {
+    grid-area: start;
+    display: contents;
+  }
+
+  #chaliceMode #instructionsBtnChalice {
+    grid-area: instr;
+  }
+
   #chaliceMode #chalicePickerSlot {
     display: none !important;
   }
@@ -1152,12 +1364,74 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
   }
 
   #chaliceMode .chalice-filter__actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.6rem;
   }
 
   #chaliceMode .chalice-filter__actions .chalice-filter__btn {
-    width: 90%;
+    width: 94%;
     justify-self: center;
+  }
+}
+
+@media (max-width: 899px) {
+  #chalicePopover .relic-type-popover__type-btn {
+    overflow: hidden;
+  }
+
+  #chalicePopover .relic-type-popover__type-label {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    max-width: calc(100% - 1rem);
+    text-align: center;
+    text-overflow: clip;
+    overflow: visible;
+  }
+
+  #chalicePopover .chalice-popover__colors,
+  #chaliceMode #chalicePlaceholderSlot .chalice-popover__colors {
+    position: absolute;
+    inset: auto 0.45rem 0.45rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.4rem;
+    border-radius: 0.55rem;
+    background: linear-gradient(165deg, rgba(7, 10, 16, 0.65), rgba(16, 20, 28, 0.45));
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+  }
+
+  #chaliceMode #chalicePlaceholderSlot .chalice-popover__colors {
+    position: static;
+    width: auto;
+    margin-inline: auto;
+  }
+
+  #chalicePopover .chalice-popover__dot-row,
+  #chaliceMode #chalicePlaceholderSlot .chalice-popover__dot-row {
+    display: inline-flex;
+    gap: 0.35rem;
+    justify-content: center;
+  }
+
+  #chalicePopover .chalice-popover__divider,
+  #chaliceMode #chalicePlaceholderSlot .chalice-popover__divider {
+    width: 76%;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(197, 226, 255, 0.9), rgba(145, 115, 215, 0.95), rgba(197, 226, 255, 0.9));
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    opacity: 0.9;
+  }
+
+  #chalicePopover .chalice-color-dot--micro,
+  #chaliceMode #chalicePlaceholderSlot .chalice-color-dot--micro {
+    width: 14px;
+    height: 14px;
+    border-width: 1px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 3px 8px rgba(0, 0, 0, 0.2);
   }
 }

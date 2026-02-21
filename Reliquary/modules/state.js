@@ -13,6 +13,7 @@ export let relicTypePopoverOpen = false;
 export let classPortraitMenuOpen = false;
 export let showIllegalActive = false;
 export let autoSortEnabled = true;
+export let chalicePopoverOpen = false;
 
 // Color selection
 export let currentRandomColor = "Red";
@@ -82,6 +83,7 @@ export function setRelicTypePopoverOpen(next) { relicTypePopoverOpen = !!next; }
 export function setClassPortraitMenuOpen(next) { classPortraitMenuOpen = !!next; }
 export function setShowIllegalActive(next) { showIllegalActive = !!next; }
 export function setAutoSortEnabled(next) { autoSortEnabled = !!next; }
+export function setChalicePopoverOpen(next) { chalicePopoverOpen = !!next; }
 export function setPendingRelicType(next) { pendingRelicType = next; }
 export function setPendingRelicColor(next) { pendingRelicColor = next; }
 export function setSelectedColor(next) { selectedColor = next; }

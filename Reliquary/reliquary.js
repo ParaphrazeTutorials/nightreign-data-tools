@@ -1,4 +1,4 @@
-import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, alertIconUrl, relicDefaultPath, visualRelicType, iconPath } from "./reliquary.assets.js";
+import { CHALICE_DATA_URL, DATA_URL, EFFECT_STATS_URL, alertIconUrl, chalicePlaceholderPath, relicDefaultPath, visualRelicType, iconPath } from "./reliquary.assets.js";
 import {
   clamp01,
   normalize,
@@ -70,6 +70,8 @@ import {
   setSelectedColor,
   currentRandomColor,
   setCurrentRandomColor,
+  chalicePopoverOpen,
+  setChalicePopoverOpen,
   rows,
   setRows,
   byId,
@@ -237,6 +239,146 @@ const {
   installChaliceAlertLayoutListeners
 } = chaliceAlertController;
 
+function chaliceColorSwatch(value) {
+  const key = value ?? "";
+  const swatch = COLOR_SWATCH?.[key] ?? key;
+  return swatch || "#ffffff";
+}
+
+function chalicePopoverColors(entry) {
+  const dotRow = colors => colors.map(color => {
+    const swatch = chaliceColorSwatch(color);
+    const safeSwatch = escapeHtml(swatch);
+    return `<span class="chalice-color-dot chalice-color-dot--micro" aria-hidden="true" style="background:${safeSwatch};"></span>`;
+  }).join("");
+
+  const standardDots = dotRow([entry.standard1, entry.standard2, entry.standard3]);
+  const depthDots = dotRow([entry.depth1, entry.depth2, entry.depth3]);
+
+  return `
+    <div class="chalice-popover__colors" aria-hidden="true">
+      <div class="chalice-popover__dot-row is-standard">${standardDots}</div>
+      <div class="chalice-popover__divider"></div>
+      <div class="chalice-popover__dot-row is-depth">${depthDots}</div>
+    </div>
+  `;
+}
+
+function fitChalicePopoverNames() {
+  if (!dom.chalicePopover || !isMobileViewport()) return;
+
+  const labels = dom.chalicePopover.querySelectorAll(".relic-type-popover__type-label");
+  if (!labels.length) return;
+
+  labels.forEach(label => {
+    const btn = label.closest(".relic-type-popover__type-btn");
+    if (!btn) return;
+
+    label.style.fontSize = "";
+    label.style.maxWidth = "";
+
+    const available = Math.max(0, btn.clientWidth - 16);
+    if (!available) return;
+
+    label.style.maxWidth = `${available}px`;
+
+    const baseSize = parseFloat(window.getComputedStyle(label).fontSize) || 14;
+    const textWidth = label.scrollWidth;
+
+    if (!textWidth) return;
+
+    const scale = Math.min(1, available / textWidth);
+    const minSize = 11;
+    const nextSize = Math.max(minSize, baseSize * scale);
+
+    label.style.fontSize = `${nextSize}px`;
+  });
+}
+
+function scheduleChalicePopoverNameFit() {
+  if (!isMobileViewport() || !dom.chalicePopover || dom.chalicePopover.hidden) return;
+  window.requestAnimationFrame(() => fitChalicePopoverNames());
+}
+
+// Chalice popover rendering
+function renderChalicePopover() {
+  if (!dom.chalicePopover) return;
+  const list = filteredChalices();
+  const current = (selectedChaliceId ?? "").toString();
+
+  const frag = document.createDocumentFragment();
+  const typesWrap = document.createElement("div");
+  typesWrap.className = "relic-type-popover__types chalice-popover__types";
+
+  list.forEach(entry => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "relic-type-popover__type-btn chalice-popover__type-btn";
+    btn.dataset.chaliceId = entry.chaliceID;
+    const art = chalicePlaceholderPath(entry.chaliceIconID);
+    btn.style.backgroundImage = `url("${art}")`;
+    const name = entry.chalicename || `Chalice ${entry.chaliceID}`;
+    btn.innerHTML = `
+      <span class="relic-type-popover__type-label">${escapeHtml(name)}</span>
+      ${chalicePopoverColors(entry)}
+    `;
+    btn.setAttribute("aria-label", name);
+    const isActive = current && String(entry.chaliceID) === current;
+    if (isActive) btn.classList.add("is-active");
+    typesWrap.appendChild(btn);
+  });
+
+  frag.appendChild(typesWrap);
+  dom.chalicePopover.replaceChildren(frag);
+
+  if (!dom.chalicePopover.hidden) scheduleChalicePopoverNameFit();
+}
+
+function openChalicePopover() {
+  if (!dom.chalicePopover) return;
+  renderChalicePopover();
+  dom.chalicePopover.hidden = false;
+  setChalicePopoverOpen(true);
+  if (dom.chalicePlaceholderSlot) dom.chalicePlaceholderSlot.setAttribute("aria-expanded", "true");
+  scheduleChalicePopoverNameFit();
+}
+
+function closeChalicePopover() {
+  if (!dom.chalicePopover) return;
+  dom.chalicePopover.hidden = true;
+  setChalicePopoverOpen(false);
+  if (dom.chalicePlaceholderSlot) dom.chalicePlaceholderSlot.setAttribute("aria-expanded", "false");
+}
+
+function toggleChalicePopover(force) {
+  const next = typeof force === "boolean" ? force : !chalicePopoverOpen;
+  if (next) {
+    openChalicePopover();
+  } else {
+    closeChalicePopover();
+  }
+}
+
+function handleChalicePopoverClick(evt) {
+  const btn = evt.target.closest?.("[data-chalice-id]");
+  if (!btn) return;
+  const nextId = btn.dataset.chaliceId || "";
+  setSelectedChaliceId(nextId);
+  if (dom.chaliceSelect) dom.chaliceSelect.value = nextId;
+  renderChalicePlaceholder();
+  renderChaliceColors();
+  renderChaliceUI();
+  closeChalicePopover();
+}
+
+function handleChalicePlaceholderPointer(target) {
+  if (chalicePopoverOpen) {
+    if (dom.chalicePopover && dom.chalicePopover.contains(target)) return;
+    if (dom.chalicePlaceholderSlot && dom.chalicePlaceholderSlot.contains(target)) return;
+    closeChalicePopover();
+  }
+}
+
 // showIllegalActive and autoSortEnabled now live in modules/state.js
 
 function showIllegalButtons() {
@@ -267,7 +409,13 @@ document.addEventListener("pointerleave", e => {
 }, true);
 
 document.addEventListener("scroll", () => hidePortalTooltip(), true);
-window.addEventListener("resize", () => hidePortalTooltip());
+window.addEventListener("resize", () => {
+  hidePortalTooltip();
+  if (chalicePopoverOpen) scheduleChalicePopoverNameFit();
+  const entry = getSelectedChalice();
+  setChalicePlaceholderOverlay(entry);
+  scheduleChalicePlaceholderNameFit(dom.chalicePlaceholderSlot?.querySelector?.(".chalice-placeholder-overlay"));
+});
 
 function isShowIllegalActive() {
   return showIllegalActive;
@@ -779,6 +927,11 @@ function syncModeUI() {
   const classSlot = isChalice ? dom.classFilterSlotChalice : dom.classFilterSlotIndividual;
   moveNode(dom.classFilterControl, classSlot);
   setClassPortraitMenu(false);
+
+  // Move portrait selector between individual quick row and chalice header
+  const portraitSlot = isChalice ? dom.classPortraitSlotChalice : dom.classPortraitSlotIndividual;
+  moveNode(dom.classPortraitBtn, portraitSlot);
+  moveNode(dom.classPortraitMenu, portraitSlot);
 
   if (!isChalice && dom.toggleSlotIndividual) {
     moveNode(dom.showIllegalBtn, dom.toggleSlotIndividual);
@@ -4345,6 +4498,104 @@ function updateChaliceCounts() {
   if (dom.chaliceFilterTotals) dom.chaliceFilterTotals.textContent = `${std} / 9 Standard • ${dep} / 9 Depth`;
 }
 
+function ensureChalicePlaceholderOverlay() {
+  if (!dom.chalicePlaceholderSlot) return null;
+  let overlay = dom.chalicePlaceholderSlot.querySelector(".chalice-placeholder-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.className = "chalice-placeholder-overlay";
+    const nameEl = document.createElement("div");
+    nameEl.className = "chalice-placeholder-name";
+    const colorsEl = document.createElement("div");
+    colorsEl.className = "chalice-placeholder-colors";
+    overlay.appendChild(nameEl);
+    overlay.appendChild(colorsEl);
+    dom.chalicePlaceholderSlot.appendChild(overlay);
+  }
+  return overlay;
+}
+
+function setChalicePlaceholderOverlay(entry) {
+  const overlay = ensureChalicePlaceholderOverlay();
+  if (!overlay) return;
+  const nameEl = overlay.querySelector(".chalice-placeholder-name");
+  const colorsEl = overlay.querySelector(".chalice-placeholder-colors");
+
+  const canShow = entry && isMobileViewport();
+
+  if (canShow) {
+    const label = entry.chalicename || `Chalice ${entry.chaliceID}`;
+    if (nameEl) nameEl.textContent = label;
+    if (colorsEl) colorsEl.innerHTML = chalicePopoverColors(entry);
+    overlay.hidden = false;
+    scheduleChalicePlaceholderNameFit(overlay);
+  } else {
+    if (nameEl) nameEl.textContent = "";
+    if (colorsEl) colorsEl.innerHTML = "";
+    overlay.hidden = true;
+  }
+}
+
+function fitChalicePlaceholderName(overlay) {
+  if (!overlay) return;
+  const label = overlay.querySelector?.(".chalice-placeholder-name");
+  if (!label) return;
+
+  label.style.fontSize = "";
+  label.style.maxWidth = "";
+
+  const overlayWidth = overlay.clientWidth || label.parentElement?.clientWidth || 0;
+  const available = Math.max(0, overlayWidth - 14);
+  if (!available) return;
+
+  label.style.maxWidth = `${available}px`;
+
+  const baseSize = parseFloat(window.getComputedStyle(label).fontSize) || 15;
+  const textWidth = label.scrollWidth;
+  if (!textWidth) return;
+
+  const scale = Math.min(1, available / textWidth);
+  const minSize = 10;
+  const nextSize = Math.max(minSize, baseSize * scale);
+
+  label.style.fontSize = `${nextSize}px`;
+}
+
+function scheduleChalicePlaceholderNameFit(overlay) {
+  if (!overlay || overlay.hidden || !isMobileViewport()) return;
+  window.requestAnimationFrame(() => fitChalicePlaceholderName(overlay));
+}
+
+function renderChalicePlaceholder() {
+  if (!dom.chalicePlaceholderImg) return;
+
+  const entry = getSelectedChalice();
+  const iconId = entry?.chaliceIconID;
+  const hasImage = Boolean(iconId);
+  const fallbackSrc = chalicePlaceholderPath("");
+  const nextSrc = chalicePlaceholderPath(iconId);
+  const overlay = ensureChalicePlaceholderOverlay();
+
+  if (!dom.chalicePlaceholderImg.dataset.fallbackInstalled) {
+    dom.chalicePlaceholderImg.addEventListener("error", () => {
+      dom.chalicePlaceholderImg.src = fallbackSrc;
+      dom.chalicePlaceholderImg.classList.remove("has-image");
+      dom.chalicePlaceholderImg.classList.add("is-empty");
+      if (dom.chalicePlaceholderSlot) dom.chalicePlaceholderSlot.classList.remove("has-image");
+    });
+    dom.chalicePlaceholderImg.dataset.fallbackInstalled = "true";
+  }
+
+  if (dom.chalicePlaceholderImg.src !== nextSrc) dom.chalicePlaceholderImg.src = nextSrc;
+  const altLabel = entry?.chalicename ? `Chalice: ${entry.chalicename}` : "Select a chalice";
+  dom.chalicePlaceholderImg.alt = altLabel;
+  dom.chalicePlaceholderImg.classList.toggle("has-image", hasImage);
+  dom.chalicePlaceholderImg.classList.toggle("is-empty", !hasImage);
+  if (dom.chalicePlaceholderSlot) dom.chalicePlaceholderSlot.classList.toggle("has-image", hasImage);
+  if (dom.chalicePlaceholderSlot) dom.chalicePlaceholderSlot.setAttribute("aria-label", altLabel);
+  setChalicePlaceholderOverlay(entry);
+}
+
 function openQuickChalicePicker(sideKey, anchorBtn) {
   const idx = firstAvailableChaliceSlot(sideKey);
   openChaliceEffectMenu(sideKey, idx, anchorBtn);
@@ -4355,6 +4606,8 @@ function renderChaliceUI() {
   renderChaliceLists();
   updateChaliceCounts();
   renderChaliceColors();
+  renderChalicePlaceholder();
+  renderChalicePopover();
   renderChaliceResults();
   applyChaliceGrouping();
 }
@@ -4730,6 +4983,8 @@ function renderChalicePickers() {
     dom.chaliceSelect.value = currentChalice;
   }
 
+  renderChalicePlaceholder();
+  renderChalicePopover();
   renderChaliceColors();
 }
 
@@ -4896,6 +5151,7 @@ async function load() {
     const target = evt.target;
     handleClassPortraitPointerDown(target);
     handleRelicTypePointerDown(target);
+    handleChalicePlaceholderPointer(target);
   });
 
   window.addEventListener("resize", () => {
@@ -4925,7 +5181,16 @@ async function load() {
     dom.chaliceSelect.addEventListener("change", evt => {
       setSelectedChaliceId(evt.target.value || "");
       renderChaliceUI();
+      closeChalicePopover();
     });
+  }
+
+  if (dom.chalicePopover) {
+    dom.chalicePopover.addEventListener("click", handleChalicePopoverClick);
+  }
+
+  if (dom.chalicePlaceholderSlot) {
+    dom.chalicePlaceholderSlot.addEventListener("click", () => toggleChalicePopover());
   }
 
   if (dom.chaliceAddStandard) {

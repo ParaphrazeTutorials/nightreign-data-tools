@@ -489,7 +489,7 @@
                           </div>
                         </div>
                         <div class="individual-quick-row" aria-label="Quick controls">
-                          <div class="quick-tile">
+                          <div class="quick-tile" id="classPortraitSlotIndividual">
                             <button id="classPortraitBtn" class="mini-tile mini-tile--portrait" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="classPortraitMenu">
                               <span class="mini-tile__hint">Select Character</span>
                               <span class="sr-only">Select Class</span>
@@ -649,6 +649,22 @@
                         </div>
                       </div>
                       <div class="panel-header__right chalice-filter__header-right">
+                        <div id="classPortraitSlotChalice" class="mini-tile-slot"></div>
+                        <button
+                          id="chalicePlaceholderSlot"
+                          class="mini-tile-slot mini-tile-slot--placeholder"
+                          type="button"
+                          aria-haspopup="dialog"
+                          aria-expanded="false"
+                          aria-label="Select Chalice"
+                        >
+                          <img
+                            id="chalicePlaceholderImg"
+                            class="mini-tile mini-tile--placeholder is-empty"
+                            alt="Select a chalice"
+                            loading="lazy"
+                          />
+                        </button>
                         <div class="chalice-filter__selectors chalice-filter__selectors--inline chalice-filter__selectors--compact">
                           <div id="classFilterSlotChalice" class="utility-field-slot"></div>
                           <div id="chalicePickerSlot" class="utility-field-slot">
@@ -657,6 +673,7 @@
                             </label>
                           </div>
                         </div>
+                        <div id="chalicePopover" class="relic-type-popover" hidden></div>
                         <span class="pill pill--ghost chalice-filter__count" id="chaliceFilterTotals" aria-live="polite"></span>
                         <button id="instructionsBtnChalice" class="utility-ghost utility-ghost--small" type="button">Instructions</button>
                         <div id="startOverSlotChalice" class="utility-field-slot utility-field-slot--inline"></div>

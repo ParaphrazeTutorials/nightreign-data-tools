@@ -69,6 +69,13 @@ export function iconPath(statusIconId) {
   return assetUrl(`${ASSET_PREFIX}${relative}`);
 }
 
+// Chalice art placeholders: Assets/chalices/{chaliceIconID}.png
+export function chalicePlaceholderPath(chaliceIconId) {
+  const key = (chaliceIconId ?? "").toString().trim();
+  const relative = key ? `chalices/${key}.png` : "chalices/placeholder.png";
+  return assetUrl(`${ASSET_PREFIX}${relative}`);
+}
+
 export function alertIconUrl(kind) {
   const key = kind === "error" ? "error" : "warning";
   const file = ALERT_ICON_FILES[key];
