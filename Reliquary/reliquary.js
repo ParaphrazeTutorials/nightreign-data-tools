@@ -91,6 +91,7 @@ import {
   chaliceSelections,
   chaliceGroupOrder,
   chaliceEffectDrag,
+  chaliceEffectClick,
   chaliceCurses,
   chaliceCats,
   chaliceColorCache,
@@ -3435,17 +3436,20 @@ function renderChaliceSlotMobile(meta, idx, row, curseRow, options) {
   const curseMetaRow = cursePills.map(p => `<span class="meta-pill" style="${p.style}">${p.label}</span>`).join("");
   const validationTone = requiresCurse && curseMissing ? "warn" : "good";
   const validationLabel = requiresCurse && curseMissing ? "Curse Required" : "Selected";
+  const handleColor = options.handleColor || "#ffffff";
 
   if (!row) {
     return `
       <li class="mobile-effect-card mobile-effect-card--empty" data-side="${meta.key}" data-slot="${idx}">
-        <div class="mobile-row-body">
-          <button
-            type="button"
-            class="mobile-button"
-            data-ch-slot="${meta.key}:${idx}"
-            aria-label="${label}: Select Effect"
-          >Select Effect</button>
+        <div class="chalice-slot chalice-slot--mobile chalice-slot--empty" data-side="${meta.key}" data-slot="${idx}">
+          <div class="mobile-row-body">
+            <button
+              type="button"
+              class="mobile-button"
+              data-ch-slot="${meta.key}:${idx}"
+              aria-label="${label}: Select Effect"
+            >Select Effect</button>
+          </div>
         </div>
       </li>
     `;
@@ -3487,20 +3491,31 @@ function renderChaliceSlotMobile(meta, idx, row, curseRow, options) {
 
   return `
     <li class="mobile-effect-card" data-side="${meta.key}" data-slot="${idx}" data-expanded="false">
-      <div class="mobile-row-header">
-        <div class="mobile-title">
-          ${effectFlyout}
-          <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
+      <div class="chalice-slot chalice-slot--mobile" data-side="${meta.key}" data-slot="${idx}">
+        <div
+          class="chalice-slot__handle chalice-slot__handle--mobile"
+          draggable="true"
+          style="--chalice-side-color: ${handleColor}"
+          data-ch-slot-handle="${meta.key}:${idx}"
+          aria-hidden="true"
+        ></div>
+        <div class="mobile-card-shell">
+          <div class="mobile-row-header">
+            <div class="mobile-title">
+              ${effectFlyout}
+              <span class="mobile-title-text">${row.EffectDescription ?? `(Effect ${row.EffectID})`}</span>
+            </div>
+            <div class="validation"><span class="pill ${validationTone}">${validationLabel}</span></div>
+          </div>
+          ${row.EffectExtendedDescription || row.RawEffect ? `<p class="subtext">${row.EffectExtendedDescription || row.RawEffect}</p>` : ""}
+          <div class="mobile-row-body">
+            ${metaRow ? `<div class="meta-row">${metaRow}</div>` : ""}
+            ${curseBlock}
+          </div>
+          <div class="mobile-toggle-row">
+            <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▴ Less ▴</button>
+          </div>
         </div>
-        <div class="validation"><span class="pill ${validationTone}">${validationLabel}</span></div>
-      </div>
-      ${row.EffectExtendedDescription || row.RawEffect ? `<p class="subtext">${row.EffectExtendedDescription || row.RawEffect}</p>` : ""}
-      <div class="mobile-row-body">
-        ${metaRow ? `<div class="meta-row">${metaRow}</div>` : ""}
-        ${curseBlock}
-      </div>
-      <div class="mobile-toggle-row">
-        <button class="mobile-details-toggle" type="button" aria-expanded="true" aria-label="Collapse details">▴ Less ▴</button>
       </div>
     </li>
   `;
@@ -3572,7 +3587,8 @@ function renderChaliceSlot(sideKey, idx) {
       requiresCurse,
       hasCurse,
       curseMissing,
-      dupDisabled
+      dupDisabled,
+      handleColor
     });
   }
 
@@ -3660,12 +3676,30 @@ function renderChaliceSlot(sideKey, idx) {
   `;
 }
 
+function visibleChaliceSlotIndices(sideKey) {
+  const slots = chaliceSelections[sideKey] || [];
+  const indices = slots.map((_, idx) => idx);
+  if (!isMobileViewport()) return indices;
+
+  const filled = [];
+  const empty = [];
+  slots.forEach((val, idx) => {
+    if (val) filled.push(idx);
+    else empty.push(idx);
+  });
+
+  const nextEmpty = empty.length ? [empty[0]] : [];
+  return [...filled, ...nextEmpty].sort((a, b) => a - b);
+}
+
 function renderChaliceLists() {
   if (dom.chaliceStandardList) {
-    dom.chaliceStandardList.innerHTML = chaliceSelections.standard.map((_, idx) => renderChaliceSlot("standard", idx)).join("");
+    const indices = visibleChaliceSlotIndices("standard");
+    dom.chaliceStandardList.innerHTML = indices.map(idx => renderChaliceSlot("standard", idx)).join("");
   }
   if (dom.chaliceDepthList) {
-    dom.chaliceDepthList.innerHTML = chaliceSelections.depth.map((_, idx) => renderChaliceSlot("depth", idx)).join("");
+    const indices = visibleChaliceSlotIndices("depth");
+    dom.chaliceDepthList.innerHTML = indices.map(idx => renderChaliceSlot("depth", idx)).join("");
   }
   installChaliceSlotButtons();
   installRowCopyButtons();
@@ -4779,6 +4813,27 @@ function installChaliceGroupDrag(listEl, meta) {
   const groups = Array.from(listEl.querySelectorAll(".chalice-slot-group"));
   const enableDrag = groups.length >= 2;
 
+   // Touch drag fallback state (HTML5 drag is not available on most mobile browsers)
+   const touchGroupDrag = {
+     active: false,
+     side: "",
+     key: "",
+     over: null,
+     startX: 0,
+     startY: 0
+   };
+
+   const clearTouchGroupDrag = () => {
+     if (touchGroupDrag.over) touchGroupDrag.over.classList.remove("is-dragover");
+     listEl.querySelectorAll(".chalice-slot-group.is-dragging").forEach(g => g.classList.remove("is-dragging"));
+     touchGroupDrag.active = false;
+     touchGroupDrag.side = "";
+     touchGroupDrag.key = "";
+     touchGroupDrag.over = null;
+     touchGroupDrag.startX = 0;
+     touchGroupDrag.startY = 0;
+   };
+
   groups.forEach(group => {
     if (!enableDrag) {
       group.removeAttribute("draggable");
@@ -4845,6 +4900,81 @@ function installChaliceGroupDrag(listEl, meta) {
       clearChaliceGroupDragState();
       applyChaliceGrouping();
     });
+
+    const onTouchMove = evt => {
+      if (!touchGroupDrag.active) return;
+      const t = evt.touches?.[0];
+      if (!t) return;
+      const dx = t.clientX - touchGroupDrag.startX;
+      const dy = t.clientY - touchGroupDrag.startY;
+      const moved = Math.hypot(dx, dy) > 6;
+      if (!moved) return;
+      evt.preventDefault();
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const target = el?.closest?.(".chalice-slot-group");
+      if (touchGroupDrag.over && touchGroupDrag.over !== target) {
+        touchGroupDrag.over.classList.remove("is-dragover");
+      }
+      if (target && target.dataset.side === meta.key) {
+        target.classList.add("is-dragover");
+        touchGroupDrag.over = target;
+      } else {
+        touchGroupDrag.over = null;
+      }
+    };
+
+    const onTouchEnd = evt => {
+      if (!touchGroupDrag.active) return;
+      evt.preventDefault();
+      const t = evt.changedTouches?.[0];
+      const el = t ? document.elementFromPoint(t.clientX, t.clientY) : null;
+      const target = el?.closest?.(".chalice-slot-group");
+      const targetKey = target?.dataset.chGroupKey || "";
+      const sourceKey = touchGroupDrag.key;
+
+      document.removeEventListener("touchmove", onTouchMove, { capture: true });
+      document.removeEventListener("touchend", onTouchEnd, { capture: true });
+      document.removeEventListener("touchcancel", onTouchEnd, { capture: true });
+
+      if (target && targetKey && targetKey !== sourceKey && target.dataset.side === meta.key) {
+        const current = Array.isArray(chaliceGroupOrder[meta.key]) ? [...chaliceGroupOrder[meta.key]] : [];
+        const cleaned = current.filter(k => k);
+        if (!cleaned.length) {
+          const liveKeys = groups.map(g => g.dataset.chGroupKey || "").filter(Boolean);
+          cleaned.push(...liveKeys);
+        }
+
+        const sourceIdx = cleaned.indexOf(sourceKey);
+        const targetIdx = cleaned.indexOf(targetKey);
+        if (sourceIdx !== -1 && targetIdx !== -1) {
+          const next = [...cleaned];
+          [next[sourceIdx], next[targetIdx]] = [next[targetIdx], next[sourceIdx]];
+          chaliceGroupOrder[meta.key] = next;
+          reorderChaliceGroupsData(meta, next);
+          applyChaliceGrouping();
+        }
+      }
+
+      clearTouchGroupDrag();
+    };
+
+    group.addEventListener("touchstart", evt => {
+      if (!enableDrag) return;
+      const key = group.dataset.chGroupKey || "";
+      if (!key) return;
+      const t = evt.touches?.[0];
+      if (!t) return;
+      touchGroupDrag.active = true;
+      touchGroupDrag.side = meta.key;
+      touchGroupDrag.key = key;
+      touchGroupDrag.startX = t.clientX;
+      touchGroupDrag.startY = t.clientY;
+      group.classList.add("is-dragging");
+      group.style.touchAction = "none";
+      document.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
+      document.addEventListener("touchend", onTouchEnd, { passive: false, capture: true });
+      document.addEventListener("touchcancel", onTouchEnd, { passive: false, capture: true });
+    }, { passive: false });
   });
 }
 
@@ -4853,8 +4983,94 @@ function installChaliceEffectDrag(listEl, meta) {
   const slots = Array.from(listEl.querySelectorAll(".chalice-slot"));
   const handles = Array.from(listEl.querySelectorAll("[data-ch-slot-handle]"));
 
+  const touchDrag = {
+    active: false,
+    side: "",
+    sourceIdx: -1,
+    overSlot: null,
+    startX: 0,
+    startY: 0
+  };
+
+   // Click-to-swap support (mobile-friendly fallback)
+  const clearClickSelection = () => {
+    const prev = listEl.querySelector(".chalice-slot.is-click-selected");
+    if (prev) prev.classList.remove("is-click-selected");
+    chaliceEffectClick.side = "";
+    chaliceEffectClick.slot = -1;
+  };
+
+  const clearTouchDrag = () => {
+    if (touchDrag.overSlot) {
+      touchDrag.overSlot.classList.remove("is-dragover");
+    }
+    listEl.querySelectorAll(".chalice-slot.is-dragging").forEach(s => s.classList.remove("is-dragging"));
+    listEl.querySelectorAll(".mobile-effect-card.is-dragging").forEach(c => c.classList.remove("is-dragging"));
+    touchDrag.active = false;
+    touchDrag.side = "";
+    touchDrag.sourceIdx = -1;
+    touchDrag.overSlot = null;
+    touchDrag.startX = 0;
+    touchDrag.startY = 0;
+  };
+
+  const attemptSwap = (sourceIdx, targetIdx, targetSlot) => {
+    const autoSortWasEnabled = isAutoSortEnabled();
+    const beforeEffects = Array.isArray(chaliceSelections[meta.key]) ? [...chaliceSelections[meta.key]] : [];
+    const beforeCats = Array.isArray(chaliceCats[meta.key]) ? [...chaliceCats[meta.key]] : [];
+    const beforeCurses = Array.isArray(chaliceCurses[meta.key]) ? [...chaliceCurses[meta.key]] : [];
+
+    try {
+      console.log("[chalice-swap] attemptSwap", { side: meta.key, sourceIdx, targetIdx, autoSortWasEnabled, beforeEffects });
+    } catch (e) {
+      /* noop */
+    }
+
+    if (performChaliceSwap(meta, sourceIdx, targetIdx)) {
+      try {
+        console.log("[chalice-swap] performChaliceSwap accepted", { side: meta.key, sourceIdx, targetIdx });
+      } catch (e) {
+        /* noop */
+      }
+      setAutoSortEnabled(false);
+      renderChaliceUI();
+
+      const afterEffects = Array.isArray(chaliceSelections[meta.key]) ? chaliceSelections[meta.key] : [];
+      const swapped = beforeEffects.some((val, i) => val !== afterEffects[i]);
+
+      if (!swapped) {
+        chaliceSelections[meta.key] = beforeEffects;
+        chaliceCats[meta.key] = beforeCats;
+        chaliceCurses[meta.key] = beforeCurses;
+        setAutoSortEnabled(autoSortWasEnabled);
+        const sourceSlot = listEl.querySelector(`.chalice-slot[data-slot="${sourceIdx}"]`);
+        flashChaliceSwapError(sourceSlot);
+        flashChaliceSwapError(targetSlot);
+        renderChaliceUI();
+        try {
+          console.log("[chalice-swap] swap reverted", { side: meta.key, sourceIdx, targetIdx });
+        } catch (e) {
+          /* noop */
+        }
+      }
+      clearClickSelection();
+    } else {
+      setAutoSortEnabled(autoSortWasEnabled);
+      const sourceSlot = listEl.querySelector(`.chalice-slot[data-slot="${sourceIdx}"]`);
+      flashChaliceSwapError(sourceSlot);
+      flashChaliceSwapError(targetSlot);
+      clearClickSelection();
+      try {
+        console.log("[chalice-swap] performChaliceSwap refused", { side: meta.key, sourceIdx, targetIdx });
+      } catch (e) {
+        /* noop */
+      }
+    }
+  };
+
   const clearOverStates = () => {
     slots.forEach(s => s.classList.remove("is-dragover"));
+    touchDrag.overSlot = null;
   };
 
   handles.forEach(handle => {
@@ -4862,8 +5078,82 @@ function installChaliceEffectDrag(listEl, meta) {
     const slotIdx = Number(slotEl?.getAttribute("data-slot"));
     if (!slotEl || !Number.isInteger(slotIdx)) return;
 
+    const logHandleEvent = (evt, phase) => {
+      try {
+        console.debug(`[chalice-handle] ${phase}`, { side: meta.key, slotIdx, type: evt.type });
+      } catch (e) {
+        /* noop */
+      }
+    };
+
+    // Ensure draggable is set even if the template omitted it (mobile)
+    handle.setAttribute("draggable", "true");
+    handle.style.touchAction = "none";
+
+    const handleTapSwap = (evt) => {
+      logHandleEvent(evt, "tap");
+      // Ignore the synthetic pointerdown that precedes touchstart; handle touch in touchstart only
+      if (evt.type === "pointerdown" && evt.pointerType === "touch") {
+        return;
+      }
+      const isTouchLike = evt.type === "touchstart" || evt.pointerType === "touch";
+      if (isTouchLike) {
+        evt.preventDefault();
+      }
+      evt.stopPropagation();
+      const prevSide = chaliceEffectClick.side;
+      const prevSlot = chaliceEffectClick.slot;
+
+      // First click: select source
+      if (prevSide === "" || prevSlot === -1 || prevSide !== meta.key) {
+        clearClickSelection();
+        chaliceEffectClick.side = meta.key;
+        chaliceEffectClick.slot = slotIdx;
+        slotEl.classList.add("is-click-selected");
+        try {
+          console.log("[chalice-swap] select", { side: meta.key, slotIdx, event: evt.type });
+        } catch (e) {
+          /* noop */
+        }
+        return;
+      }
+
+      // Second click on same slot: deselect
+      if (prevSide === meta.key && prevSlot === slotIdx) {
+        clearClickSelection();
+        try {
+          console.log("[chalice-swap] deselect", { side: meta.key, slotIdx, event: evt.type });
+        } catch (e) {
+          /* noop */
+        }
+        return;
+      }
+
+      // Second click on same side, different slot: swap
+      const targetSlot = slotEl;
+      clearClickSelection();
+      try {
+        console.log("[chalice-swap] attempt", { side: meta.key, sourceIdx: prevSlot, targetIdx: slotIdx, event: evt.type });
+      } catch (e) {
+        /* noop */
+      }
+      attemptSwap(prevSlot, slotIdx, targetSlot);
+    };
+
+    handle.addEventListener("click", handleTapSwap, { passive: false });
+    handle.addEventListener("pointerdown", handleTapSwap, { passive: false });
+    handle.addEventListener("touchstart", handleTapSwap, { passive: false });
+
+    const delegateTapSwap = evt => {
+      if (!evt.target.closest?.(".chalice-slot__handle")) return;
+      handleTapSwap(evt);
+    };
+
+    slotEl.addEventListener("touchstart", delegateTapSwap, { passive: false });
+
     handle.addEventListener("dragstart", evt => {
       evt.stopPropagation();
+      logHandleEvent(evt, "dragstart");
       if (!evt.dataTransfer) return;
       chaliceEffectDrag.side = meta.key;
       chaliceEffectDrag.slot = slotIdx;
@@ -4871,6 +5161,67 @@ function installChaliceEffectDrag(listEl, meta) {
       evt.dataTransfer.effectAllowed = "move";
       evt.dataTransfer.setData("text/plain", `${meta.key}:${slotIdx}`);
     });
+
+    // Touch drag fallback (HTML5 drag is not supported on most mobile browsers)
+    const onTouchMove = evt => {
+      if (!touchDrag.active) return;
+      const t = evt.touches?.[0];
+      if (!t) return;
+      const dx = t.clientX - touchDrag.startX;
+      const dy = t.clientY - touchDrag.startY;
+      const moved = Math.hypot(dx, dy) > 6;
+      if (!moved) return;
+      evt.preventDefault();
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const targetSlot = el?.closest?.(".chalice-slot");
+      if (touchDrag.overSlot && touchDrag.overSlot !== targetSlot) {
+        touchDrag.overSlot.classList.remove("is-dragover");
+      }
+      if (targetSlot && targetSlot.getAttribute("data-side") === meta.key) {
+        targetSlot.classList.add("is-dragover");
+        touchDrag.overSlot = targetSlot;
+      } else {
+        touchDrag.overSlot = null;
+      }
+    };
+
+    const onTouchEnd = evt => {
+      if (!touchDrag.active) return;
+      evt.preventDefault();
+      const t = evt.changedTouches?.[0];
+      const el = t ? document.elementFromPoint(t.clientX, t.clientY) : null;
+      const targetSlot = el?.closest?.(".chalice-slot");
+      const destIdx = Number(targetSlot?.getAttribute("data-slot"));
+      const sourceIdx = touchDrag.sourceIdx;
+
+      document.removeEventListener("touchmove", onTouchMove, { capture: true });
+      document.removeEventListener("touchend", onTouchEnd, { capture: true });
+      document.removeEventListener("touchcancel", onTouchEnd, { capture: true });
+
+      if (Number.isInteger(destIdx) && destIdx !== sourceIdx && targetSlot && targetSlot.getAttribute("data-side") === meta.key) {
+        attemptSwap(sourceIdx, destIdx, targetSlot);
+      }
+
+      clearOverStates();
+      clearTouchDrag();
+    };
+
+    handle.addEventListener("touchstart", evt => {
+      // Allow tap-swap handler to run; also arm touch drag tracking
+      const t = evt.touches?.[0];
+      if (!t) return;
+      touchDrag.active = true;
+      touchDrag.side = meta.key;
+      touchDrag.sourceIdx = slotIdx;
+      touchDrag.startX = t.clientX;
+      touchDrag.startY = t.clientY;
+      slotEl.classList.add("is-dragging");
+      const card = slotEl.closest(".mobile-effect-card");
+      if (card) card.classList.add("is-dragging");
+      document.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
+      document.addEventListener("touchend", onTouchEnd, { passive: false, capture: true });
+      document.addEventListener("touchcancel", onTouchEnd, { passive: false, capture: true });
+    }, { passive: false });
 
     handle.addEventListener("dragend", evt => {
       evt.stopPropagation();

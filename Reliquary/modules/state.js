@@ -36,6 +36,7 @@ export const chaliceGroupOrder = {
   depth: []
 };
 export const chaliceEffectDrag = { side: "", slot: -1 };
+export const chaliceEffectClick = { side: "", slot: -1 };
 export const chaliceCurses = {
   standard: Array(9).fill(""),
   depth: Array(9).fill("")
