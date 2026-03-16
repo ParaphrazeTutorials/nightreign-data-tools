@@ -1105,6 +1105,134 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     max-width: 100% !important;
   }
 }
+
+/* Mobile Select Effects modal (effect-cat dialog) ensure present/new styling */
+.effect-cat-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483602;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.effect-cat-dialog.is-visible {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.effect-cat-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 10, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.effect-cat-dialog__panel {
+  position: relative;
+  width: min(720px, 94vw);
+  max-width: 94vw;
+  max-height: 75vh;
+  margin: 0.5rem;
+  border-radius: 16px 16px 14px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(150deg, rgba(14, 18, 28, 0.98), rgba(10, 12, 18, 0.96));
+  box-shadow:
+    0 -4px 20px rgba(0, 0, 0, 0.32),
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transform: translateY(24px);
+  transition: transform 200ms ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.effect-cat-dialog.is-visible .effect-cat-dialog__panel {
+  transform: translateY(0);
+}
+
+.effect-cat-dialog__header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.effect-cat-dialog__title {
+  text-align: center;
+  font-weight: 760;
+  letter-spacing: 0.01em;
+  color: rgba(243, 246, 252, 0.96);
+}
+
+.effect-cat-dialog__back,
+.effect-cat-dialog__close {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(245, 247, 251, 0.95);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  transition: transform 120ms ease, border-color 120ms ease, filter 120ms ease;
+}
+
+.effect-cat-dialog__back:hover,
+.effect-cat-dialog__back:focus-visible,
+.effect-cat-dialog__close:hover,
+.effect-cat-dialog__close:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.32);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.effect-cat-dialog__body {
+  padding: 0.85rem;
+  overflow: auto;
+  max-height: calc(75vh - 3.5rem);
+}
+
+.effect-cat-dialog__pill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+@media (--bp-xs) {
+  .effect-cat-dialog__pill-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .effect-cat-dialog {
+    align-items: stretch;
+  }
+
+  .effect-cat-dialog__panel {
+    width: min(720px, 96vw);
+    max-width: 96vw;
+    max-height: 90vh;
+    height: auto;
+    margin: 0.35rem;
+    border-radius: 14px;
+  }
+
+  .effect-cat-dialog__body {
+    max-height: calc(90vh - 3.5rem);
+  }
+}
   .chalice-filter,
   .chalice-filter__body,
   .individual-filter__body,
@@ -1426,6 +1554,10 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     row-gap: 0;
     position: relative;
     overflow: visible;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   /* Empty slots: collapse to single column so the button spans full width */
@@ -1538,6 +1670,8 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     overflow: visible;
     position: relative;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     margin-left: 0;
     box-sizing: border-box;
   }
@@ -1581,6 +1715,10 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     align-items: stretch;
     gap: 0.5rem;
     margin: 0.35rem 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   #chaliceMode .chalice-slot-group__handle {
@@ -1602,6 +1740,8 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
   #chaliceMode .chalice-slot-group__list {
     display: grid;
     gap: 0.5rem;
+    width: 100%;
+    min-width: 0;
   }
 
   /* Tighten collapsed spacing by shrinking header gap */
@@ -1663,11 +1803,16 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     grid-template-columns: auto 1fr;
     gap: 0.5rem;
     padding: 10px 10px 10px 14px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   #chaliceMode .chalice-slot-group__list {
     display: grid;
     width: 100%;
+    min-width: 0;
   }
 
   /* Hide details rail/popup entirely on mobile */

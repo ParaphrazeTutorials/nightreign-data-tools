@@ -1725,3 +1725,16 @@ button#autoSortToggleChalice[aria-pressed="true"] .utility-toggle__svg {
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 3px 8px rgba(0, 0, 0, 0.2);
   }
 }
+
+.effect-cat-dialog{position:fixed;inset:0;z-index:2147483602;display:flex;align-items:flex-end;justify-content:center;pointer-events:none;opacity:0;transition:opacity 140ms ease}
+.effect-cat-dialog.is-visible{pointer-events:auto;opacity:1}
+.effect-cat-dialog__backdrop{position:absolute;inset:0;background:rgba(4,6,10,0.65);backdrop-filter:blur(4px)}
+.effect-cat-dialog__panel{position:relative;width:min(720px, 100%);max-height:75vh;margin:.5rem;border-radius:16px 16px 14px 14px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(150deg,rgba(14,18,28,.98),rgba(10,12,18,.96));box-shadow:0 -4px 20px rgba(0,0,0,.32),0 18px 48px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05) inset;transform:translateY(24px);transition:transform 200ms ease;overflow:hidden}
+.effect-cat-dialog.is-visible .effect-cat-dialog__panel{transform:translateY(0)}
+.effect-cat-dialog__header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.5rem;padding:.65rem .85rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.effect-cat-dialog__title{text-align:center;font-weight:760;letter-spacing:.01em;color:rgba(243,246,252,.96)}
+.effect-cat-dialog__back,.effect-cat-dialog__close{appearance:none;-webkit-appearance:none;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:rgba(245,247,251,.95);border-radius:999px;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;box-shadow:0 10px 22px rgba(0,0,0,.28);transition:transform 120ms ease,border-color 120ms ease,filter 120ms ease}
+.effect-cat-dialog__back:hover,.effect-cat-dialog__back:focus-visible,.effect-cat-dialog__close:hover,.effect-cat-dialog__close:focus-visible{outline:none;border-color:rgba(255,255,255,.32);filter:brightness(1.08);transform:translateY(-1px)}
+.effect-cat-dialog__body{padding:.85rem;overflow:auto;max-height:calc(75vh - 3.5rem)}
+.effect-cat-dialog__pill-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+@media (--bp-xs){.effect-cat-dialog__pill-grid{grid-template-columns:1fr}.effect-cat-dialog{align-items:stretch}.effect-cat-dialog__panel{width:100%;max-height:90vh;height:auto;margin:.25rem;border-radius:14px}.effect-cat-dialog__body{max-height:calc(90vh - 3.5rem)}}
